@@ -1,3 +1,26 @@
+**Getting Started**
+These instructions will help you set up the project on your local machine for development purposes.
+
+**Prerequisites**
+Make sure you have the following installed:
+
+Node.js
+Node.js is required to run React projects. Follow these steps to install Node.js on your system:
+
+Download Node.js from the official website: Node.js
+Choose the appropriate version for your operating system and install it.
+
+After installation, verify it using the following commands in your terminal:
+node -v
+npm -v
+
+**Install Dependencies**
+
+Before running the project, you need to install its dependencies, including React, Material UI, and others.
+
+Run the following command in your terminal:
+npm install
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
