@@ -4,7 +4,6 @@ import {
   Button,
   Divider,
   Grid2,
-  Link,
   MenuItem,
   TextField,
   Typography,
@@ -17,7 +16,7 @@ import {
   Visibility,
   VisibilityOff,
 } from "@mui/icons-material";
-
+import { Link } from "react-router-dom";
 const Signup = () => {
   // State for form fields
   const [formData, setFormData] = useState({
@@ -263,7 +262,7 @@ const Signup = () => {
               </Button>
               <Typography sx={{ marginTop: "20px" }}>
                 Already a member?{" "}
-                <Link href='Login' color='#3393EA'>
+                <Link to='/login' color='#3393EA'>
                   Login
                 </Link>
               </Typography>
