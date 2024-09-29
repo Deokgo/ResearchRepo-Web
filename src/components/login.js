@@ -2,12 +2,7 @@
 //this file is for the login page (provided 2nd option for its UI)
 
 import React, { useState } from "react";
-import {
-  Box,
-  Button,
-  TextField,
-  Typography
-} from "@mui/material";
+import { Box, Button, TextField, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
 import logoImage from "./MMCL_Logo_Horizontal.png"; //path of the image
 
@@ -27,9 +22,27 @@ const Login = () => {
   };
 
   //handle form submission
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData); //log form data
+    console.log(formData);
+    try {
+      const response = await fetch("http://127.0.0.1:5000/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log("Response from server:", data);
+      alert(`Login successful for ${data.email}`);
+    } catch (error) {
+      console.error("Error during login request:", error);
+    }
   };
 
   return (
@@ -56,7 +69,7 @@ const Login = () => {
         >
           <img
             src={logoImage}
-            alt="MMCL Logo"
+            alt='MMCL Logo'
             style={{ width: "80%", maxWidth: "700px", height: "auto" }}
           />
         </Box>
@@ -81,8 +94,8 @@ const Login = () => {
             }}
           >
             <Typography
-              variant="h4"
-              color="#F40824"
+              variant='h4'
+              color='#F40824'
               sx={{
                 textAlign: { xs: "center", md: "left" },
                 marginBottom: "1em",
@@ -92,7 +105,7 @@ const Login = () => {
             </Typography>
 
             <Box
-              component="form"
+              component='form'
               onSubmit={handleSubmit}
               sx={{
                 width: "100%",
@@ -102,25 +115,25 @@ const Login = () => {
               {/* Email Field */}
               <TextField
                 fullWidth
-                label="Mapúa MCL Live Account"
-                name="email"
-                type="email"
+                label='Mapúa MCL Live Account'
+                name='email'
+                type='email'
                 value={formData.email}
                 onChange={handleChange}
-                margin="normal"
-                variant="outlined"
+                margin='normal'
+                variant='outlined'
               />
 
               {/* Password Field */}
               <TextField
                 fullWidth
-                label="Password"
-                name="password"
-                type="password" 
+                label='Password'
+                name='password'
+                type='password'
                 value={formData.password}
                 onChange={handleChange}
-                margin="normal"
-                variant="outlined"
+                margin='normal'
+                variant='outlined'
               />
 
               {/* Submit Button */}
@@ -133,9 +146,9 @@ const Login = () => {
                 }}
               >
                 <Button
-                  type="submit"
+                  type='submit'
                   fullWidth
-                  variant="contained"
+                  variant='contained'
                   sx={{
                     maxWidth: "250px",
                     marginTop: "20px",
@@ -148,7 +161,7 @@ const Login = () => {
 
                 <Typography sx={{ marginTop: "20px" }}>
                   Don’t have an account?{" "}
-                  <Link to="/signup" style={{ color: "#3393EA" }}>
+                  <Link to='/signup' style={{ color: "#3393EA" }}>
                     Sign up
                   </Link>
                 </Typography>
