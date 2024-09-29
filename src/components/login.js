@@ -63,9 +63,9 @@ const Login = () => {
           {/* Add the image at the top */}
           <Box sx={{ textAlign: "center", marginBottom: "1.5em" }}>
             <img
-              src={logoImage} // Add your image source here
+              src={logoImage} //add the image source here
               alt="Mapua MCL Logo"
-              style={{ width: "250px" }} // Adjust width based on your needs
+              style={{ width: "250px" }} 
             />
           </Box>
 
