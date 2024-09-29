@@ -1,25 +1,21 @@
 //created by Nicole Cabansag (September 29, 2024)
-//this file is for the login page of the system
+//this file is for the login page (provided 2nd option for its UI)
 
 import React, { useState } from "react";
 import {
   Box,
   Button,
   TextField,
-  Typography,
-  IconButton,
-  InputAdornment,
+  Typography
 } from "@mui/material";
 import { Link } from "react-router-dom";
-import logoImage from "./MMCL_Logo_Horizontal.png"; // Import your image here
+import logoImage from "./MMCL_Logo_Horizontal.png"; //path of the image
 
 const Login = () => {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
-
-  const [showPassword, setShowPassword] = useState(false);
 
   //handle input changes
   const handleChange = (e) => {
@@ -33,7 +29,7 @@ const Login = () => {
   //handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(formData); //log form data 
+    console.log(formData); //log form data
   };
 
   return (
@@ -45,96 +41,119 @@ const Login = () => {
           width: "100vw",
           margin: 0,
           padding: 0,
-          backgroundColor: "#08397C", //background color based on the image
-          justifyContent: "center",
-          alignItems: "center",
         }}
       >
+        {/* Left side for large screens */}
         <Box
           sx={{
-            backgroundColor: "#fff",
-            padding: "2em",
-            borderRadius: "8px",
-            boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
-            maxWidth: "500px", //increase the maxWidth
-            width: "100%",
+            backgroundColor: "#08397C",
+            flex: 0.55,
+            display: { xs: "none", md: "flex" },
+            alignItems: "center",
+            justifyContent: "center",
+            flexDirection: "column",
           }}
         >
-          {/* Add the image at the top */}
-          <Box sx={{ textAlign: "center", marginBottom: "1.5em" }}>
-            <img
-              src={logoImage} //add the image source here
-              alt="Mapua MCL Logo"
-              style={{ width: "250px" }} 
-            />
-          </Box>
+          <img
+            src={logoImage}
+            alt="MMCL Logo"
+            style={{ width: "80%", maxWidth: "700px", height: "auto" }}
+          />
+        </Box>
 
-          <Typography
-            variant="h4"
-            color="#F40824"
-            sx={{
-              textAlign: "center",
-              marginBottom: "1em",
-            }}
-          >
-            Login to Mapúa MCL's Research Repository
-          </Typography>
-
+        {/* Right side (login form) */}
+        <Box
+          sx={{
+            flex: { xs: 1, md: 0.45 },
+            backgroundColor: "#fff",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
           <Box
-            component="form"
-            onSubmit={handleSubmit}
             sx={{
               width: "100%",
+              maxWidth: "500px",
               justifyContent: "center",
+              padding: "2em",
             }}
           >
-            <TextField
-              fullWidth
-              label="Mapúa MCL Live Account"
-              name="email"
-              type="email"
-              value={formData.email}
-              onChange={handleChange}
-              margin="normal"
-              variant="outlined"
-            ></TextField>
-
-            <TextField
-              fullWidth
-              label="Password"
-              name="password"
-              type="password"  // Always keep it as password
-              value={formData.password}
-              onChange={handleChange}
-              margin="normal"
-              variant="outlined"
-            ></TextField>
-
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              sx={{
-                marginTop: "20px",
-                padding: "15px",
-                backgroundColor: "#EC1F28",
-                color: "#fff",
-              }}
-            >
-              Log in
-            </Button>
-
             <Typography
+              variant="h4"
+              color="#F40824"
               sx={{
-                marginTop: "10px",
-                textAlign: "center",
+                textAlign: { xs: "center", md: "left" },
+                marginBottom: "1em",
               }}
             >
-              Don’t have an account?{" "}
-              <Link to="/signup" style={{ color: "#3393EA" }}>
-                Sign up
-              </Link>
+              Login
             </Typography>
+
+            <Box
+              component="form"
+              onSubmit={handleSubmit}
+              sx={{
+                width: "100%",
+                justifyContent: "center",
+              }}
+            >
+              {/* Email Field */}
+              <TextField
+                fullWidth
+                label="Mapúa MCL Live Account"
+                name="email"
+                type="email"
+                value={formData.email}
+                onChange={handleChange}
+                margin="normal"
+                variant="outlined"
+              />
+
+              {/* Password Field */}
+              <TextField
+                fullWidth
+                label="Password"
+                name="password"
+                type="password" 
+                value={formData.password}
+                onChange={handleChange}
+                margin="normal"
+                variant="outlined"
+              />
+
+              {/* Submit Button */}
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  marginTop: "20px",
+                }}
+              >
+                <Button
+                  type="submit"
+                  fullWidth
+                  variant="contained"
+                  sx={{
+                    maxWidth: "250px",
+                    marginTop: "20px",
+                    padding: "15px",
+                    backgroundColor: "#EC1F28",
+                  }}
+                >
+                  Log in
+                </Button>
+
+                <Typography sx={{ marginTop: "20px" }}>
+                  Don’t have an account?{" "}
+                  <Link to="/signup" style={{ color: "#3393EA" }}>
+                    Sign up
+                  </Link>
+                </Typography>
+              </Box>
+            </Box>
           </Box>
         </Box>
       </Box>

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import logoImage from "./MMCL_Logo_Horizontal.png"; //path of the image
 import {
   Box,
   Button,
@@ -71,8 +72,9 @@ const Signup = () => {
           padding: 0,
         }}
       >
+        {/* Left side for large screens */} 
         <Box
-          sx={{
+          sx={{ 
             backgroundColor: "#08397C",
             flex: 0.55,
             display: { xs: "none", md: "flex" },
@@ -80,7 +82,13 @@ const Signup = () => {
             justifyContent: "center",
             flexDirection: "column",
           }}
-        ></Box>
+        >
+          <img
+            src={logoImage} //modified by Nicole Cabansag
+            alt="MMCL Logo"
+            style={{ width: "80%", maxWidth: "700px", height: "auto" }}
+          />
+        </Box>
         <Box
           sx={{
             flex: { xs: 1, md: 0.45 },
