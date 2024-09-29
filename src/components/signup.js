@@ -148,7 +148,7 @@ const Signup = () => {
             ></TextField>
             <TextField
               fullWidth
-              label='Email Address'
+              label='Mapúa MCL Live Account'
               name='email'
               type='email'
               value={formData.email}
