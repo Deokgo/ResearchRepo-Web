@@ -34,16 +34,19 @@ const Login = () => {
         body: JSON.stringify(formData),
       });
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorData = await response.json(); //get error details from server
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
       }
-
+  
       const data = await response.json();
       console.log("Response from server:", data);
       alert(`Login successful for ${data.email}`);
     } catch (error) {
       console.error("Error during login request:", error);
+      alert(`Login failed: ${error.message}`); //show error message to user
     }
   };
+  
 
   return (
     <>
