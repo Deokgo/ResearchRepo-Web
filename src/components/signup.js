@@ -22,7 +22,9 @@ const Signup = () => {
   // State for form fields
   const [formData, setFormData] = useState({
     firstName: "",
+    middleName: "",
     lastName: "",
+    suffix: "",
     email: "",
     department: "",
     program: "",
@@ -72,9 +74,9 @@ const Signup = () => {
           padding: 0,
         }}
       >
-        {/* Left side for large screens */} 
+        {/* Left side for large screens */}
         <Box
-          sx={{ 
+          sx={{
             backgroundColor: "#08397C",
             flex: 0.55,
             display: { xs: "none", md: "flex" },
@@ -85,7 +87,7 @@ const Signup = () => {
         >
           <img
             src={logoImage} //modified by Nicole Cabansag
-            alt="MMCL Logo"
+            alt='MMCL Logo'
             style={{ width: "80%", maxWidth: "700px", height: "auto" }}
           />
         </Box>
@@ -138,6 +140,24 @@ const Signup = () => {
             ></TextField>
             <TextField
               fullWidth
+              label='Middle Name'
+              name='middleName'
+              value={formData.middleName}
+              onChange={handleChange}
+              margin='normal'
+              variant='outlined'
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position='end'>
+                    <IconButton onClick={() => clearField("middleName")}>
+                      <ClearIcon />
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+            <TextField
+              fullWidth
               label='Last Name'
               name='lastName'
               value={formData.lastName}
@@ -154,6 +174,24 @@ const Signup = () => {
                 ),
               }}
             ></TextField>
+            <TextField
+              fullWidth
+              label='Suffix'
+              name='suffix'
+              value={formData.suffix}
+              onChange={handleChange}
+              margin='normal'
+              variant='outlined'
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position='end'>
+                    <IconButton onClick={() => clearField("suffix")}>
+                      <ClearIcon />
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
             <TextField
               fullWidth
               label='Mapúa MCL Live Account'
