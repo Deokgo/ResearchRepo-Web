@@ -25,6 +25,7 @@ const Signup = () => {
     middleName: "",
     lastName: "",
     suffix: "",
+    role: "",
     email: "",
     department: "",
     program: "",
@@ -51,9 +52,35 @@ const Signup = () => {
   };
 
   // Handle form submission
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData); // This is for us to get the form data using console log
+    console.log(formData);
+    try {
+      const response = await fetch("http://127.0.0.1:5000/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json(); //get error details from server
+        throw new Error(
+          errorData.message || `HTTP error! status: ${response.status}`
+        );
+      }
+
+      const data = await response.json();
+      console.log("Response from server:", data);
+
+      //since the /login route returns 'user_id' and 'role', update the alert message accordingly
+      alert(`Signup successful! User ID: ${data.user_id}, Role: ${data.role}`);
+      window.location.href = "/home"; 
+    } catch (error) {
+      console.error("Error during signup request:", error);
+      alert(`Signup failed: ${error.message}`); //show error message to the user
+    }
   };
 
   const togglePasswordVisibility = () => {
@@ -156,42 +183,49 @@ const Signup = () => {
                 ),
               }}
             />
-            <TextField
-              fullWidth
-              label='Last Name'
-              name='lastName'
-              value={formData.lastName}
-              onChange={handleChange}
-              margin='normal'
-              variant='outlined'
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position='end'>
-                    <IconButton onClick={() => clearField("lastName")}>
-                      <ClearIcon />
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-            ></TextField>
-            <TextField
-              fullWidth
-              label='Suffix'
-              name='suffix'
-              value={formData.suffix}
-              onChange={handleChange}
-              margin='normal'
-              variant='outlined'
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position='end'>
-                    <IconButton onClick={() => clearField("suffix")}>
-                      <ClearIcon />
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-            />
+            
+            <Grid2 container spacing={{ xs: 0, md: 2 }}>
+              <Grid2 item size={{ xs: 12, md: 6 }}>
+                <TextField
+                  fullWidth
+                  label='Last Name'
+                  name='lastName'
+                  value={formData.lastName}
+                  onChange={handleChange}
+                  margin='normal'
+                  variant='outlined'
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position='end'>
+                        <IconButton onClick={() => clearField("lastName")}>
+                          <ClearIcon />
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
+                ></TextField>
+              </Grid2>
+              <Grid2 item size={{ xs: 12, md: 6 }}>
+                <TextField
+                  fullWidth
+                  label='Suffix'
+                  name='suffix'
+                  value={formData.suffix}
+                  onChange={handleChange}
+                  margin='normal'
+                  variant='outlined'
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position='end'>
+                        <IconButton onClick={() => clearField("suffix")}>
+                          <ClearIcon />
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
+                ></TextField>
+              </Grid2>
+            </Grid2>
             <TextField
               fullWidth
               label='Mapúa MCL Live Account'
@@ -210,6 +244,16 @@ const Signup = () => {
                   </InputAdornment>
                 ),
               }}
+            ></TextField>
+            <TextField
+              fullWidth
+              label='Role'
+              name='role'
+              select
+              value={formData.role}
+              onChange={handleChange}
+              margin='normal'
+              variant='outlined'
             ></TextField>
             <Grid2 container spacing={{ xs: 0, md: 2 }}>
               <Grid2 item size={{ xs: 12, md: 6 }}>
