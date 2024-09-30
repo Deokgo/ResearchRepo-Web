@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import logoImage from "./MMCL_Logo_Horizontal.png"; //path of the image
+import logoImage from "../assets/MMCL_Logo_Horizontal.png"; //path of the image
 import {
   Box,
   Button,

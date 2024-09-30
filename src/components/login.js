@@ -4,7 +4,7 @@
 import React, { useState } from "react";
 import { Box, Button, TextField, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
-import logoImage from "./MMCL_Logo_Horizontal.png"; //path of the image
+import logoImage from "../assets/MMCL_Logo_Horizontal.png"; //path of the image
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -22,33 +22,35 @@ const Login = () => {
   };
 
   //handle form submission --> modified by Nicole Cabansag (September 24, 2024)
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  console.log(formData);
-  try {
-    const response = await fetch("http://127.0.0.1:5000/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
-    });
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    console.log(formData);
+    try {
+      const response = await fetch("http://127.0.0.1:5000/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
 
-    if (!response.ok) {
-      const errorData = await response.json(); //get error details from server
-      throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      if (!response.ok) {
+        const errorData = await response.json(); //get error details from server
+        throw new Error(
+          errorData.message || `HTTP error! status: ${response.status}`
+        );
+      }
+
+      const data = await response.json();
+      console.log("Response from server:", data);
+
+      //since the /login route returns 'user_id' and 'role', update the alert message accordingly
+      alert(`Login successful! User ID: ${data.user_id}, Role: ${data.role}`);
+    } catch (error) {
+      console.error("Error during login request:", error);
+      alert(`Login failed: ${error.message}`); //show error message to the user
     }
-
-    const data = await response.json();
-    console.log("Response from server:", data);
-
-    //since the /login route returns 'user_id' and 'role', update the alert message accordingly
-    alert(`Login successful! User ID: ${data.user_id}, Role: ${data.role}`);
-  } catch (error) {
-    console.error("Error during login request:", error);
-    alert(`Login failed: ${error.message}`); //show error message to the user
-  }
-};
+  };
 
   return (
     <>
