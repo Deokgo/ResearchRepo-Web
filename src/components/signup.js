@@ -18,20 +18,27 @@ import {
   VisibilityOff,
 } from "@mui/icons-material";
 import { Link } from "react-router-dom";
+
+
 const Signup = () => {
   // State for form fields
+  /////////////////////////////////////////////////////////////////////////////////////////////
+  //Dummy values for role, department, program since there are no values yet in the combobox
+  //subject for changes once combobox is setup
   const [formData, setFormData] = useState({
     firstName: "",
     middleName: "",
     lastName: "",
     suffix: "",
-    role: "",
+    role_id: "01",
     email: "",
-    department: "",
-    program: "",
+    department: "CCIS",
+    program: "CS",
     password: "",
     confirmPassword: "",
   });
+  ////////////////////////////////////////////////////////////////////////////////////////////
+
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -51,7 +58,7 @@ const Signup = () => {
     }));
   };
 
-  // Handle form submission
+  // Handle form submission --> modified by Kane Cometa (September 30, 2024)
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log(formData);
@@ -74,9 +81,9 @@ const Signup = () => {
       const data = await response.json();
       console.log("Response from server:", data);
 
-      //since the /login route returns 'user_id' and 'role', update the alert message accordingly
-      alert(`Signup successful! User ID: ${data.user_id}, Role: ${data.role}`);
-      window.location.href = "/home"; 
+      //since the /signup route returns 'user_id' and 'role', update the alert message accordingly
+      alert(`Signup successful! User ID: ${data.user_id}`);
+      window.location.href = "/login";
     } catch (error) {
       console.error("Error during signup request:", error);
       alert(`Signup failed: ${error.message}`); //show error message to the user
@@ -248,7 +255,7 @@ const Signup = () => {
             <TextField
               fullWidth
               label='Role'
-              name='role'
+              name='role_id'
               select
               value={formData.role}
               onChange={handleChange}
@@ -341,6 +348,7 @@ const Signup = () => {
               <Button
                 fullWidth
                 variant='contained'
+                type="submit"
                 sx={{
                   maxWidth: "250px",
                   marginTop: "20px",
