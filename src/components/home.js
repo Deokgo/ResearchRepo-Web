@@ -31,7 +31,7 @@ const Home = () => {
   const [currentIndex, setCurrentIndex] = React.useState(0);
   const navigate = useNavigate();
 
-  const pages = ["Home", "Communities & Collections", "Log in"];
+  const pages = ["Home", "Communities & Collections", "Log out"];
   const departments = [
     {
       id: 1,
@@ -205,7 +205,7 @@ const Home = () => {
                 </Button>
               ))}
               <Button
-                key={"Log in"}
+                key={"Log out"}
                 onClick={handleLogin}
                 sx={{
                   my: 2,
@@ -215,7 +215,7 @@ const Home = () => {
                   fontWeight: 600,
                 }}
               >
-                Log in
+                Log out
               </Button>
             </Box>
             <Box sx={{ display: { xs: "flex", md: "none" } }}>
@@ -251,13 +251,13 @@ const Home = () => {
                   </MenuItem>
                 ))}
                 <MenuItem
-                  key='Log in'
+                  key='Log out'
                   onClick={() => {
                     handleLogin();
                     handleCloseNavMenu();
                   }}
                 >
-                  <Typography textAlign='center'>Log in</Typography>
+                  <Typography textAlign='center'>Log out</Typography>
                 </MenuItem>
               </Menu>
             </Box>
