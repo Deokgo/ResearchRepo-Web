@@ -17,7 +17,7 @@ import {
   Typography,
   useMediaQuery,
 } from "@mui/material";
-import React from "react";
+import React, { useState } from "react";
 import navLogo from "../assets/MMCL_Logo_Nav.png";
 import homeBg from "../assets/home_bg.png";
 import heroImage from "../assets/hero_image.png";
@@ -25,11 +25,14 @@ import { useNavigate } from "react-router-dom";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import placeholderImage from "../assets/placeholder_image.png";
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 const Home = () => {
-  const [anchorElNav, setAnchorElNav] = React.useState(null);
-  const [anchorElUser, setAnchorElUser] = React.useState(null);
-  const [currentIndex, setCurrentIndex] = React.useState(0);
+  const [anchorElNav, setAnchorElNav] = useState(null);
+  const [anchorElUser, setAnchorElUser] = useState(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const navigate = useNavigate();
   const isMobile = useMediaQuery("(max-width:600px)");
 
@@ -73,26 +76,47 @@ const Home = () => {
   const handleLogin = () => {
     navigate("/login");
   };
-  const handlePrev = () => {
-    setCurrentIndex((prevIndex) =>
-      prevIndex === 0 ? departments.length - 1 : prevIndex - 1
+  const NextArrow = ({ onClick }) => {
+    return (
+      <IconButton
+        onClick={onClick}
+        sx={{
+          color: "#CA031B", // Set the arrow color to black
+          position: "absolute",
+          top: "50%",
+          right: "-25px",
+          transform: "translateY(-50%)",
+        }}
+      >
+        <ArrowForwardIosIcon />
+      </IconButton>
     );
   };
 
-  const handleNext = () => {
-    setCurrentIndex((prevIndex) =>
-      prevIndex === departments.length - 1 ? 0 : prevIndex + 1
+  const PrevArrow = ({ onClick }) => {
+    return (
+      <IconButton
+        onClick={onClick}
+        sx={{
+          color: "#CA031B", // Set the arrow color to black
+          position: "absolute",
+          top: "50%",
+          left: "-25px",
+          transform: "translateY(-50%)",
+        }}
+      >
+        <ArrowBackIosIcon />
+      </IconButton>
     );
   };
-  const getVisibleDepartments = () => {
-    const visibleDepartments = [];
-    const itemsToShow = isMobile ? 1 : 3; // Show 1 item in mobile, 3 in desktop
-    for (let i = 0; i < itemsToShow; i++) {
-      visibleDepartments.push(
-        departments[(currentIndex + i) % departments.length]
-      );
-    }
-    return visibleDepartments;
+  const settings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: isMobile ? 1 : 3,
+    slidesToScroll: 1,
+    nextArrow: <NextArrow />, // Use custom NextArrow
+    prevArrow: <PrevArrow />,
   };
 
   return (
@@ -121,7 +145,7 @@ const Home = () => {
               alignItems: "center",
             }}
           >
-            <Box sx={{ display: "flex", alignItems: "center" }}>
+            <Box sx={{ display: "flex", alignItems: "center", mb: "0rem" }}>
               <IconButton
                 sx={{
                   p: 0,
@@ -258,7 +282,6 @@ const Home = () => {
                   </MenuItem>
                 ))}
 
-                {/* Divider between "Communities & Collections" and "Log in" */}
                 <Divider sx={{ borderColor: "#FFF" }} />
                 <MenuItem
                   key='Log in'
@@ -322,11 +345,11 @@ const Home = () => {
                 sx={{
                   fontFamily: "Montserrat, sans-serif",
                   fontWeight: 800,
-                  fontSize: { xs: "2.5rem", md: "4.375rem" },
+                  fontSize: { xs: "2rem", sm: "2.5rem", md: "4.375rem" },
                   color: "#FFF",
                   mb: 2,
                   lineHeight: 1.25,
-                  maxWidth: "80%",
+                  maxWidth: { xs: "100%", md: "80%" },
                   alignSelf: "center",
                 }}
               >
@@ -340,7 +363,7 @@ const Home = () => {
                   fontSize: { xs: "1rem", md: "1.25rem" },
                   color: "#F0F0F0",
                   mb: 4,
-                  maxWidth: "80%",
+                  maxWidth: { xs: "100%", md: "80%" },
                   alignSelf: "center",
                 }}
               >
@@ -419,6 +442,7 @@ const Home = () => {
               fontWeight: 800,
               color: "#0A438F",
               fontFamily: "Montserrat, sans-serif",
+              fontSize: { xs: "1.5rem", sm: "2rem", md: "4.375rem" },
             }}
           >
             Communities & Collections
@@ -427,38 +451,33 @@ const Home = () => {
             sx={{
               display: "flex",
               justifyContent: "center",
-              alignItems: "center",
-              gap: 2,
+              width: "100%",
+              mb: "5rem",
             }}
           >
-            <IconButton onClick={handlePrev}>
-              <ArrowBackIosIcon />
-            </IconButton>
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                width: "75%",
-                marginBottom: "5rem",
-              }}
-            >
-              {getVisibleDepartments().map(
-                (
-                  department // this would create a paper for each dept
-                ) => (
+            <Slider {...settings} style={{ width: isMobile ? "60%" : "70%" }}>
+              {departments.map((department) => (
+                <Box key={department.id} sx={{ px: 2 }}>
                   <Paper
                     elevation={3}
                     sx={{
                       padding: 2,
                       textAlign: "center",
-                      width: { xs: "100%", md: "30%" },
+                      width: { xs: "70%", md: "100%" },
+                      width: "100%",
                       height: "auto",
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      justifyContent: "center",
                     }}
-                    key={department.id}
                   >
                     <img
                       src={department.image}
-                      style={{ width: "100%", height: "auto" }}
+                      style={{
+                        width: "100%",
+                        height: "auto",
+                      }}
                       alt={department.name}
                     />
                     <Typography
@@ -467,17 +486,17 @@ const Home = () => {
                         fontWeight: 600,
                         fontFamily: "Montserrat, sans-serif",
                         color: "#08397C",
+                        minHeight: "3rem",
+                        lineHeight: 1.2,
+                        WebkitBoxOrient: "vertical",
                       }}
                     >
                       {department.name}
                     </Typography>
                   </Paper>
-                )
-              )}
-            </Box>
-            <IconButton onClick={handleNext}>
-              <ArrowForwardIosIcon />
-            </IconButton>
+                </Box>
+              ))}
+            </Slider>
           </Box>
         </Box>
         <Box sx={{ backgroundColor: "#CA031B", color: "#FFF", py: 3, mt: 8 }}>
