@@ -15,6 +15,7 @@ import {
   Toolbar,
   Tooltip,
   Typography,
+  useMediaQuery,
 } from "@mui/material";
 import React from "react";
 import navLogo from "../assets/MMCL_Logo_Nav.png";
@@ -30,6 +31,7 @@ const Home = () => {
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const [currentIndex, setCurrentIndex] = React.useState(0);
   const navigate = useNavigate();
+  const isMobile = useMediaQuery("(max-width:600px)");
 
   const pages = ["Home", "Communities & Collections", "Log out"];
   const departments = [
@@ -84,7 +86,8 @@ const Home = () => {
   };
   const getVisibleDepartments = () => {
     const visibleDepartments = [];
-    for (let i = 0; i < 3; i++) {
+    const itemsToShow = isMobile ? 1 : 3; // Show 1 item in mobile, 3 in desktop
+    for (let i = 0; i < itemsToShow; i++) {
       visibleDepartments.push(
         departments[(currentIndex + i) % departments.length]
       );
@@ -150,7 +153,8 @@ const Home = () => {
               <Box
                 sx={{
                   display: "flex",
-                  flexDirection: { xs: "column", md: "row" },
+                  // flexDirection: { xs: "column", md: "row" },
+                  flexDirection: "row",
                   alignItems: "center",
                 }}
               >
@@ -163,7 +167,7 @@ const Home = () => {
                     color: "#CA031B",
                     fontSize: { xs: "1.2rem", md: "1.5rem" },
                     textAlign: { xs: "center", md: "inherit" },
-                    mr: 1.5,
+                    mr: 1,
                   }}
                 >
                   Institutional
@@ -215,7 +219,7 @@ const Home = () => {
                   fontWeight: 600,
                 }}
               >
-                Log out
+                Log in
               </Button>
             </Box>
             <Box sx={{ display: { xs: "flex", md: "none" } }}>
@@ -244,14 +248,20 @@ const Home = () => {
                 }}
                 open={Boolean(anchorElNav)}
                 onClose={handleCloseNavMenu}
+                sx={{ "& .MuiPaper-root": { backgroundColor: "#CA031B" } }}
               >
                 {pages.slice(0, 2).map((page) => (
                   <MenuItem key={page} onClick={handleCloseNavMenu}>
-                    <Typography textAlign='center'>{page}</Typography>
+                    <Typography textAlign='center' sx={{ color: "#FFF" }}>
+                      {page}
+                    </Typography>
                   </MenuItem>
                 ))}
+
+                {/* Divider between "Communities & Collections" and "Log in" */}
+                <Divider sx={{ borderColor: "#FFF" }} />
                 <MenuItem
-                  key='Log out'
+                  key='Log in'
                   onClick={() => {
                     handleLogin();
                     handleCloseNavMenu();
@@ -441,7 +451,7 @@ const Home = () => {
                     sx={{
                       padding: 2,
                       textAlign: "center",
-                      width: "30%",
+                      width: { xs: "100%", md: "30%" },
                       height: "auto",
                     }}
                     key={department.id}
