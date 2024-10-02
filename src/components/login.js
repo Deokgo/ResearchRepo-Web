@@ -46,13 +46,13 @@ const Login = () => {
 
       //since the /login route returns 'user_id' and 'role', update the alert message accordingly
       alert(`Login successful! User ID: ${data.user_id}, Role: ${data.role}`);
-      window.location.href = "/home"; 
+      window.location.href = "/home";
     } catch (error) {
       console.error("Error during login request:", error);
       alert(`Login failed: ${error.message}`); //show error message to the user
     }
   };
-
+  const axios = require("axios").default;
   return (
     <>
       <Box

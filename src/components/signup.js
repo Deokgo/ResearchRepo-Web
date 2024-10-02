@@ -19,7 +19,6 @@ import {
 } from "@mui/icons-material";
 import { Link } from "react-router-dom";
 
-
 const Signup = () => {
   // State for form fields
   /////////////////////////////////////////////////////////////////////////////////////////////
@@ -38,7 +37,6 @@ const Signup = () => {
     confirmPassword: "",
   });
   ////////////////////////////////////////////////////////////////////////////////////////////
-
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -190,7 +188,7 @@ const Signup = () => {
                 ),
               }}
             />
-            
+
             <Grid2 container spacing={{ xs: 0, md: 2 }}>
               <Grid2 item size={{ xs: 12, md: 6 }}>
                 <TextField
@@ -348,7 +346,7 @@ const Signup = () => {
               <Button
                 fullWidth
                 variant='contained'
-                type="submit"
+                type='submit'
                 sx={{
                   maxWidth: "250px",
                   marginTop: "20px",
