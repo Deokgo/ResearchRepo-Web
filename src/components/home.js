@@ -397,6 +397,8 @@ const Home = () => {
                 </Button>
                 <Button
                   variant='contained'
+                  key={"Get Started"}
+                  onClick={handleLogin}
                   sx={{
                     backgroundColor: "#CA031B",
                     color: "#FFF",
