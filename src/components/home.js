@@ -1,4 +1,3 @@
-import MenuIcon from "@mui/icons-material/Menu";
 import {
   AppBar,
   Avatar,
@@ -18,7 +17,6 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import React, { useState } from "react";
-import navLogo from "../assets/MMCL_Logo_Nav.png";
 import homeBg from "../assets/home_bg.png";
 import heroImage from "../assets/hero_image.png";
 import { useNavigate } from "react-router-dom";
@@ -33,8 +31,6 @@ import Footer from "./footer";
 
 const Home = () => {
   const [anchorElNav, setAnchorElNav] = useState(null);
-  const [anchorElUser, setAnchorElUser] = useState(null);
-  const [currentIndex, setCurrentIndex] = useState(0);
   const navigate = useNavigate();
   const isMobile = useMediaQuery("(max-width:600px)");
 
@@ -87,7 +83,6 @@ const Home = () => {
           position: "absolute",
           top: "50%",
           right: "-25px",
-          transform: "translateY(-50%)",
         }}
       >
         <ArrowForwardIosIcon />
@@ -104,7 +99,6 @@ const Home = () => {
           position: "absolute",
           top: "50%",
           left: "-25px",
-          transform: "translateY(-50%)",
         }}
       >
         <ArrowBackIosIcon />

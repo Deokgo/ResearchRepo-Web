@@ -5,7 +5,7 @@ import React, { useState } from "react";
 import { Box, Button, TextField, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
 import logoImage from "../assets/MMCL_Logo_Horizontal.png"; //path of the image
-
+const axios = require("axios").default;
 const Login = () => {
   const [formData, setFormData] = useState({
     email: "",
@@ -52,7 +52,7 @@ const Login = () => {
       alert(`Login failed: ${error.message}`); //show error message to the user
     }
   };
-  const axios = require("axios").default;
+
   return (
     <>
       <Box
