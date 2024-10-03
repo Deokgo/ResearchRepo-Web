@@ -1,6 +1,7 @@
 // src/components/Navbar.js
 
 import MenuIcon from "@mui/icons-material/Menu";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import {
   AppBar,
   Box,
@@ -19,8 +20,10 @@ import navLogo from "../assets/MMCL_Logo_Nav.png";
 
 const Navbar = () => {
   const [anchorElNav, setAnchorElNav] = useState(null);
+  const [anchorElUser, setAnchorElUser] = useState(null);
   const navigate = useNavigate();
-  const pages = ["Home", "Communities & Collections", "Log out"];
+  const isLoggedIn = !!localStorage.getItem("token");
+
   const isMobile = useMediaQuery("(max-width:600px)");
 
   const handleOpenNavMenu = (event) => {
@@ -30,10 +33,43 @@ const Navbar = () => {
   const handleCloseNavMenu = () => {
     setAnchorElNav(null);
   };
+  const handleOpenUserMenu = (event) => {
+    setAnchorElUser(event.currentTarget);
+  };
+  const handleProfile = () => {
+    navigate("/profile");
+  };
+
+  const handleManageUsers = () => {
+    navigate("/manage-users");
+  };
+
+  const handleCloseUserMenu = () => {
+    setAnchorElUser(null);
+  };
 
   const handleLogin = () => {
     navigate("/login");
   };
+
+  const handleNavigateHome = () => {
+    navigate("/home");
+  };
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/login");
+  };
+  const mobileMenuItems = isLoggedIn
+    ? [
+        { label: "Home", onClick: handleNavigateHome },
+        { label: "Communities & Collections", onClick: handleCloseNavMenu },
+        { label: "Profile", onClick: handleProfile },
+        { label: "Manage Users", onClick: handleManageUsers },
+      ]
+    : [
+        { label: "Home", onClick: handleNavigateHome },
+        { label: "Log in", onClick: handleLogin },
+      ];
 
   return (
     <AppBar
@@ -53,6 +89,7 @@ const Navbar = () => {
       >
         <Box sx={{ display: "flex", alignItems: "center", mb: "0rem" }}>
           <IconButton
+            onClick={handleNavigateHome}
             sx={{
               p: 0,
               width: { xs: "2.5rem", md: "5rem" },
@@ -85,7 +122,9 @@ const Navbar = () => {
               display: "flex",
               flexDirection: "row",
               alignItems: "center",
+              cursor: "pointer",
             }}
+            onClick={handleNavigateHome}
           >
             <Typography
               variant='h6'
@@ -115,39 +154,55 @@ const Navbar = () => {
             </Typography>
           </Box>
         </Box>
-        <Box
-          sx={{
-            display: { xs: "none", md: "flex" },
-            gap: 3,
-          }}
-        >
-          {pages.slice(0, 2).map((page) => (
-            <Button
-              key={page}
-              onClick={handleCloseNavMenu}
-              sx={{
-                my: 2,
-                color: "#001C43",
-                fontFamily: "Montserrat, sans-serif",
-                fontWeight: 600,
-              }}
-            >
-              {page}
-            </Button>
-          ))}
+        <Box sx={{ display: { xs: "none", md: "flex" }, gap: 3 }}>
           <Button
-            key={"Log out"}
-            onClick={handleLogin}
+            key='Home'
+            onClick={handleNavigateHome}
             sx={{
               my: 2,
-              color: "#CA031B",
-              fontSize: "1rem",
+              color: "#001C43",
               fontFamily: "Montserrat, sans-serif",
               fontWeight: 600,
             }}
           >
-            Log in
+            Home
           </Button>
+          <Button
+            key='Communities & Collections'
+            onClick={handleCloseNavMenu}
+            sx={{
+              my: 2,
+              color: "#001C43",
+              fontFamily: "Montserrat, sans-serif",
+              fontWeight: 600,
+            }}
+          >
+            Communities & Collections
+          </Button>
+
+          {!isLoggedIn ? (
+            <Button
+              key={"Log in"}
+              onClick={handleLogin}
+              sx={{
+                my: 2,
+                color: "#CA031B",
+                fontSize: "1rem",
+                fontFamily: "Montserrat, sans-serif",
+                fontWeight: 600,
+              }}
+            >
+              Log in
+            </Button>
+          ) : (
+            <IconButton
+              size='large'
+              onClick={handleOpenUserMenu}
+              sx={{ color: "#CA031B" }}
+            >
+              <AccountCircleIcon sx={{ fontSize: "2rem" }} />
+            </IconButton>
+          )}
         </Box>
         <Box sx={{ display: { xs: "flex", md: "none" } }}>
           <IconButton
@@ -177,10 +232,16 @@ const Navbar = () => {
             onClose={handleCloseNavMenu}
             sx={{ "& .MuiPaper-root": { backgroundColor: "#CA031B" } }}
           >
-            {pages.slice(0, 2).map((page) => (
-              <MenuItem key={page} onClick={handleCloseNavMenu}>
+            {mobileMenuItems.map((menuItem, index) => (
+              <MenuItem
+                key={index}
+                onClick={() => {
+                  menuItem.onClick();
+                  handleCloseNavMenu();
+                }}
+              >
                 <Typography textAlign='center' sx={{ color: "#FFF" }}>
-                  {page}
+                  {menuItem.label}
                 </Typography>
               </MenuItem>
             ))}
@@ -197,6 +258,32 @@ const Navbar = () => {
             </MenuItem>
           </Menu>
         </Box>
+        <Menu
+          anchorEl={anchorElUser}
+          anchorOrigin={{
+            vertical: "top",
+            horizontal: "right",
+          }}
+          keepMounted
+          transformOrigin={{
+            vertical: "top",
+            horizontal: "right",
+          }}
+          open={Boolean(anchorElUser)}
+          onClose={handleCloseUserMenu}
+          sx={{ "& .MuiPaper-root": { backgroundColor: "#CA031B" } }}
+        >
+          <MenuItem onClick={handleProfile}>
+            <Typography>Profile</Typography>
+          </MenuItem>
+          <MenuItem onClick={handleManageUsers}>
+            <Typography>Manage Users</Typography>
+          </MenuItem>
+          <Divider />
+          <MenuItem onClick={handleLogout}>
+            <Typography>Log out</Typography>
+          </MenuItem>
+        </Menu>
       </Toolbar>
     </AppBar>
   );

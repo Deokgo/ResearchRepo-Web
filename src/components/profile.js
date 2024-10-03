@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Navbar from "./navbar";
 import Footer from "./footer";
 import {
@@ -14,6 +14,8 @@ import {
 import EditIcon from "@mui/icons-material/Edit";
 import homeBg from "../assets/home_bg.png";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const modalStyle = {
   position: "absolute",
@@ -26,20 +28,61 @@ const modalStyle = {
   p: 4,
   borderRadius: "10px",
 };
+
 const Profile = () => {
+  const [userData, setUserData] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const navigate = useNavigate();
+  // Retrieve user_id from cookie/localStorage
+  const getUserId = () => {
+    const userId = localStorage.getItem("user_id");
+    return userId;
+  };
+  const [formValues, setFormValues] = useState({
+    firstName: "",
+    middleName: "",
+    lastName: "",
+    suffix: "",
+    department: "",
+    program: "",
+  });
+
+  const fetchUserData = async () => {
+    const userId = getUserId();
+    if (userId) {
+      try {
+        const response = await axios.get(
+          `http://localhost:5000/users/${userId}`
+        );
+        const data = response.data;
+        setUserData(data);
+
+        // Pre-fill the form with user data
+        setFormValues({
+          firstName: data.researcher.first_name || "",
+          middleName: data.researcher.middle_name || "",
+          lastName: data.researcher.last_name || "",
+          suffix: data.researcher.suffix || "",
+          department: data.researcher.college_id || "",
+          program: data.researcher.program_id || "",
+        });
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    }
+  };
+
+  // Fetch user data on component mount
+  useEffect(() => {
+    fetchUserData();
+  }, []);
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormValues({ ...formValues, [name]: value });
   };
-  const [formValues, setFormValues] = useState({
-    firstName: "John",
-    middleName: "Garret",
-    lastName: "Doe",
-    suffix: "Garret",
-    department: "CCIS",
-    program: "Computer Science",
-  });
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const handleNavigateHome = () => {
+    navigate("/home");
+  };
 
   const handleOpenModal = () => {
     setIsModalOpen(true);
@@ -86,10 +129,10 @@ const Profile = () => {
                 zIndex: 1,
               }}
             />
-            <Box sx={{ display: "flex", ml: "5rem" }}>
+            <Box sx={{ display: "flex", ml: "5rem", zIndex: 3 }}>
               <IconButton
+                onClick={handleNavigateHome}
                 sx={{
-                  // onClick={},
                   color: "#fff",
                 }}
               >
@@ -125,7 +168,7 @@ const Profile = () => {
               width: "100%",
             }}
           >
-            <Box sx={{ width: "70%", mb: "1.5rem" }}>
+            <Box sx={{ width: "60%", mb: "1.5rem" }}>
               <Button
                 variant='outlined'
                 startIcon={<EditIcon />}
@@ -135,48 +178,72 @@ const Profile = () => {
                 Edit Profile
               </Button>
             </Box>
-            <Grid2 container spacing={2} sx={{ width: "70%" }}>
-              <Grid2 size={{ xs: 12, sm: 12 }}></Grid2>
-              {[
-                { label: "First Name", value: "John" },
-                { label: "Middle Name", value: "Garret" },
-                { label: "Last Name", value: "Doe" },
-                { label: "Suffix", value: "Garret" },
-                {
-                  label: "Mapúa MCL Live Account",
-                  value: "johndoe@live.mcl.edu.ph",
-                },
-                { label: "Role", value: "Admin" },
-                { label: "Department", value: "CCIS" },
-                { label: "Program", value: "Computer Science" },
-              ].map((field, index) => (
-                <Grid2 size={{ xs: 12, sm: 6 }} key={index}>
-                  <Typography
-                    variant='body1'
-                    sx={{
-                      color: "#777",
-                      fontWeight: 600,
-                      fontSize: "1rem",
-                    }}
-                  >
-                    {field.label}
-                  </Typography>
-                  <Typography
-                    variant='h6'
-                    sx={{
-                      color: "#001C43",
-                      fontWeight: 600,
-                      fontSize: "1.25rem",
-                      mt: "0.25rem",
-                    }}
-                  >
-                    {field.value}
-                  </Typography>
-                  <Divider
-                    sx={{ mt: "0.75rem", mb: "1.5rem", borderColor: "#ccc" }}
-                  />
-                </Grid2>
-              ))}
+            <Grid2 container spacing={2} sx={{ width: "60%" }}>
+              {userData ? (
+                [
+                  {
+                    label: "First Name",
+                    value: userData.researcher.first_name,
+                  },
+                  {
+                    label: "Middle Name",
+                    value: userData.researcher.middle_name,
+                  },
+                  {
+                    label: "Last Name",
+                    value: userData.researcher.last_name,
+                  },
+                  {
+                    label: "Suffix",
+                    value: userData.researcher.suffix,
+                  },
+                  {
+                    label: "Mapúa MCL Live Account",
+                    value: userData.account.live_account,
+                  },
+                  {
+                    label: "Role",
+                    value: userData.account.role,
+                  },
+                  {
+                    label: "Department",
+                    value: userData.researcher.college_id,
+                  },
+                  {
+                    label: "Program",
+                    value: userData.researcher.program_id,
+                  },
+                ].map((field, index) => (
+                  <Grid2 size={{ xs: 12, sm: 6 }} key={index}>
+                    <Typography
+                      variant='body1'
+                      sx={{
+                        color: "#777",
+                        fontWeight: 600,
+                        fontSize: "1rem",
+                      }}
+                    >
+                      {field.label}
+                    </Typography>
+                    <Typography
+                      variant='h6'
+                      sx={{
+                        color: "#001C43",
+                        fontWeight: 600,
+                        fontSize: "1.25rem",
+                        mt: "0.25rem",
+                      }}
+                    >
+                      {field.value}
+                    </Typography>
+                    <Divider
+                      sx={{ mt: "0.75rem", mb: "1.5rem", borderColor: "#ccc" }}
+                    />
+                  </Grid2>
+                ))
+              ) : (
+                <Typography variant='body1'>Loading user data...</Typography>
+              )}
             </Grid2>
           </Box>
           <Modal open={isModalOpen} onClose={handleCloseModal}>
