@@ -3,7 +3,7 @@
 
 import React, { useState } from "react";
 import { Box, Button, TextField, Typography } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import logoImage from "../assets/MMCL_Logo_Horizontal.png"; //path of the image
 const axios = require("axios").default;
 const Login = () => {
@@ -11,7 +11,7 @@ const Login = () => {
     email: "",
     password: "",
   });
-
+  const navigate = useNavigate();
   //handle input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -26,7 +26,7 @@ const Login = () => {
     e.preventDefault();
     console.log(formData);
     try {
-      const response = await fetch("http://127.0.0.1:5000/login", {
+      const response = await fetch("/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -43,10 +43,12 @@ const Login = () => {
 
       const data = await response.json();
       console.log("Response from server:", data);
-
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("role", data.role);
+      localStorage.setItem("user_id", data.user_id);
       //since the /login route returns 'user_id' and 'role', update the alert message accordingly
       alert(`Login successful! User ID: ${data.user_id}, Role: ${data.role}`);
-      window.location.href = "/home";
+      navigate("/home");
     } catch (error) {
       console.error("Error during login request:", error);
       alert(`Login failed: ${error.message}`); //show error message to the user
