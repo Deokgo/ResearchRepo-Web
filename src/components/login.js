@@ -3,6 +3,7 @@ import { Box, Button, TextField, Typography } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 import logoImage from "../assets/mmcl_logo_white.png"; // path of the image
 import homeBg from "../assets/home_bg.png";
+import LeftPanel from "../components/leftpanel";
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -60,61 +61,7 @@ const Login = () => {
           padding: 0,
         }}
       >
-        {/* Left side for large screens */}
-        <Box
-          sx={{
-            position: "relative",
-            backgroundColor: "#08397C",
-            flex: 0.55,
-            display: { xs: "none", md: "flex" },
-            alignItems: "center",
-            justifyContent: "center",
-            flexDirection: "column",
-          }}
-        >
-          <Box
-            sx={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              backgroundImage: `url(${homeBg})`,
-              backgroundSize: "cover",
-              opacity: 0.25,
-              zIndex: 1,
-            }}
-          />
-          <img
-            src={logoImage}
-            alt='MMCL Logo'
-            style={{ width: "30%", height: "auto" }}
-            sx={{ zIndex: 2 }}
-          />
-          <Box
-            sx={{
-              zIndex: 2,
-              backgroundColor: "#EC1F28",
-              padding: "10px 20px",
-              marginTop: "20px",
-              borderRadius: "8rem",
-            }}
-          >
-            <Typography
-              variant='h2'
-              sx={{
-                fontFamily: "Montserrat, sans-serif",
-                fontWeight: 400,
-                color: "#FFF",
-                px: "3rem",
-                fontSize: "1.5rem",
-                letterSpacing: "0.1rem", // Add letter spacing
-              }}
-            >
-              Institutional Repository
-            </Typography>
-          </Box>
-        </Box>
+        <LeftPanel />
 
         {/* Right side (login form) */}
         <Box

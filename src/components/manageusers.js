@@ -189,7 +189,7 @@ const ManageUsers = () => {
                 <Typography>Loading users...</Typography>
               ) : (
                 <Virtuoso
-                  style={{ height: "400px" }}
+                  style={{ height: "500px" }}
                   totalCount={filteredUsers.length}
                   components={{
                     Header: () => (
@@ -203,7 +203,7 @@ const ManageUsers = () => {
                           fontWeight: 700,
                           position: "sticky",
                           top: 0,
-                          zIndex: 2,
+                          zIndex: 1000,
                         }}
                       >
                         <Box sx={{ flex: 1 }}>User ID</Box>
