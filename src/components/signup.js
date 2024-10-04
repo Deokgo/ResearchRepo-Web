@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import logoImage from "../assets/MMCL_Logo_Horizontal.png"; //path of the image
+import logoImage from "../assets/mmcl_logo_white.png"; //path of the image
+import homeBg from "../assets/home_bg.png";
 import {
   Box,
   Button,
@@ -109,6 +110,7 @@ const Signup = () => {
         {/* Left side for large screens */}
         <Box
           sx={{
+            position: "relative",
             backgroundColor: "#08397C",
             flex: 0.55,
             display: { xs: "none", md: "flex" },
@@ -117,11 +119,47 @@ const Signup = () => {
             flexDirection: "column",
           }}
         >
-          <img
-            src={logoImage} //modified by Nicole Cabansag
-            alt='MMCL Logo'
-            style={{ width: "80%", maxWidth: "700px", height: "auto" }}
+          <Box
+            sx={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundImage: `url(${homeBg})`,
+              opacity: 0.25,
+              zIndex: 1,
+            }}
           />
+          <img
+            src={logoImage}
+            alt='MMCL Logo'
+            style={{ width: "30%", height: "auto" }}
+            sx={{ zIndex: 2 }}
+          />
+          <Box
+            sx={{
+              zIndex: 2,
+              backgroundColor: "#EC1F28",
+              padding: "10px 20px",
+              marginTop: "20px",
+              borderRadius: "8rem",
+            }}
+          >
+            <Typography
+              variant='h2'
+              sx={{
+                fontFamily: "Montserrat, sans-serif",
+                fontWeight: 400,
+                color: "#FFF",
+                px: "3rem",
+                fontSize: "1.5rem",
+                letterSpacing: "0.1rem", // Add letter spacing
+              }}
+            >
+              Institutional Repository
+            </Typography>
+          </Box>
         </Box>
         <Box
           sx={{
@@ -144,52 +182,57 @@ const Signup = () => {
             }}
           >
             <Typography
-              variant='h4'
+              variant='h3'
               color='#F40824'
+              fontWeight='700'
               sx={{
                 textAlign: { xs: "center", md: "left" },
               }}
             >
               Sign up
             </Typography>
-            <TextField
-              fullWidth
-              label='First Name'
-              name='firstName'
-              value={formData.firstName}
-              onChange={handleChange}
-              margin='normal'
-              variant='outlined'
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position='end'>
-                    <IconButton onClick={() => clearField("firstName")}>
-                      <ClearIcon />
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-            ></TextField>
-            <TextField
-              fullWidth
-              label='Middle Name'
-              name='middleName'
-              value={formData.middleName}
-              onChange={handleChange}
-              margin='normal'
-              variant='outlined'
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position='end'>
-                    <IconButton onClick={() => clearField("middleName")}>
-                      <ClearIcon />
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-            />
 
             <Grid2 container spacing={{ xs: 0, md: 2 }}>
+              <Grid2 item size={{ xs: 12, md: 6 }}>
+                <TextField
+                  fullWidth
+                  label='First Name'
+                  name='firstName'
+                  value={formData.firstName}
+                  onChange={handleChange}
+                  margin='normal'
+                  variant='outlined'
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position='end'>
+                        <IconButton onClick={() => clearField("firstName")}>
+                          <ClearIcon />
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
+                ></TextField>
+              </Grid2>
+              <Grid2 item size={{ xs: 12, md: 6 }}>
+                <TextField
+                  fullWidth
+                  label='Middle Name'
+                  name='middleName'
+                  value={formData.middleName}
+                  onChange={handleChange}
+                  margin='normal'
+                  variant='outlined'
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position='end'>
+                        <IconButton onClick={() => clearField("middleName")}>
+                          <ClearIcon />
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </Grid2>
               <Grid2 item size={{ xs: 12, md: 6 }}>
                 <TextField
                   fullWidth
@@ -249,16 +292,6 @@ const Signup = () => {
                   </InputAdornment>
                 ),
               }}
-            ></TextField>
-            <TextField
-              fullWidth
-              label='Role'
-              name='role_id'
-              select
-              value={formData.role}
-              onChange={handleChange}
-              margin='normal'
-              variant='outlined'
             ></TextField>
             <Grid2 container spacing={{ xs: 0, md: 2 }}>
               <Grid2 item size={{ xs: 12, md: 6 }}>

@@ -1,17 +1,13 @@
-import React, { useState } from "react";
 import { Box, Button, TextField, Typography } from "@mui/material";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState } from "react";
 import logoImage from "../assets/mmcl_logo_white.png"; // path of the image
 import homeBg from "../assets/home_bg.png";
+import { Link } from "react-router-dom";
 
-const Login = () => {
+const PasswordReset = () => {
   const [formData, setFormData] = useState({
     email: "",
-    password: "",
   });
-  const navigate = useNavigate();
-
-  // Handle input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
@@ -19,36 +15,6 @@ const Login = () => {
       [name]: value,
     }));
   };
-
-  // Handle form submission
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await fetch("/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(
-          errorData.message || `HTTP error! status: ${response.status}`
-        );
-      }
-
-      const data = await response.json();
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("role", data.role);
-      localStorage.setItem("user_id", data.user_id);
-      navigate("/home");
-    } catch (error) {
-      alert(`Login failed: ${error.message}`);
-    }
-  };
-
   return (
     <>
       <Box
@@ -115,7 +81,7 @@ const Login = () => {
           </Box>
         </Box>
 
-        {/* Right side (login form) */}
+        {/* Right side (Password Recovery) */}
         <Box
           sx={{
             flex: { xs: 1, md: 0.45 },
@@ -136,78 +102,50 @@ const Login = () => {
           >
             <Typography
               variant='h3'
-              color='#F40824'
               fontWeight='700'
+              color='#F40824'
               sx={{
                 textAlign: { xs: "center", md: "left" },
                 marginBottom: "1em",
               }}
             >
-              Login
+              Reset Password
             </Typography>
-
+            <TextField
+              fullWidth
+              label='Mapúa MCL Live Account'
+              name='email'
+              type='email'
+              value={formData.email}
+              onChange={handleChange}
+              margin='normal'
+              variant='outlined'
+            />
             <Box
-              component='form'
-              onSubmit={handleSubmit}
               sx={{
-                width: "100%",
-                justifyContent: "center",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                marginTop: "20px",
               }}
             >
-              {/* Email Field */}
-              <TextField
+              <Typography sx={{ marginTop: "20px" }}>
+                Did not receive the OTP?{" "}
+                <Link style={{ color: "#3393EA" }}>Resend OTP</Link>
+              </Typography>
+              <Button
+                type='submit'
                 fullWidth
-                label='Mapúa MCL Live Account'
-                name='email'
-                type='email'
-                value={formData.email}
-                onChange={handleChange}
-                margin='normal'
-                variant='outlined'
-              />
-
-              {/* Password Field */}
-              <TextField
-                fullWidth
-                label='Password'
-                name='password'
-                type='password'
-                value={formData.password}
-                onChange={handleChange}
-                margin='normal'
-                variant='outlined'
-              />
-
-              {/* Submit Button */}
-              <Box
+                variant='contained'
                 sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
+                  maxWidth: "250px",
                   marginTop: "20px",
+                  padding: "15px",
+                  backgroundColor: "#EC1F28",
                 }}
               >
-                <Button
-                  type='submit'
-                  fullWidth
-                  variant='contained'
-                  sx={{
-                    maxWidth: "250px",
-                    marginTop: "20px",
-                    padding: "15px",
-                    backgroundColor: "#EC1F28",
-                  }}
-                >
-                  Log in
-                </Button>
-
-                <Typography sx={{ marginTop: "20px" }}>
-                  Don’t have an account?{" "}
-                  <Link to='/signup' style={{ color: "#3393EA" }}>
-                    Sign up
-                  </Link>
-                </Typography>
-              </Box>
+                Send OTP
+              </Button>
             </Box>
           </Box>
         </Box>
@@ -216,4 +154,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default PasswordReset;
