@@ -45,6 +45,8 @@ const Profile = () => {
     suffix: "",
     department: "",
     program: "",
+    liveAccount: "",
+    role: "",
   });
 
   const fetchUserData = async () => {
@@ -56,8 +58,6 @@ const Profile = () => {
         );
         const data = response.data;
         setUserData(data);
-
-        // Pre-fill the form with user data
         setFormValues({
           firstName: data.researcher.first_name || "",
           middleName: data.researcher.middle_name || "",
@@ -65,6 +65,8 @@ const Profile = () => {
           suffix: data.researcher.suffix || "",
           department: data.researcher.college_id || "",
           program: data.researcher.program_id || "",
+          liveAccount: data.account.live_account || "",
+          role: data.account.role || "",
         });
       } catch (error) {
         console.error("Error fetching user data:", error);
@@ -248,47 +250,85 @@ const Profile = () => {
           </Box>
           <Modal open={isModalOpen} onClose={handleCloseModal}>
             <Box sx={modalStyle}>
-              <Typography variant='h4' sx={{ mb: 4, fontWeight: 600 }}>
+              <Typography
+                variant='h4'
+                sx={{ mb: 4, fontWeight: 800, color: "#08397C" }}
+              >
                 Edit Profile
               </Typography>
               <Grid2 container spacing={2}>
-                {[
-                  {
-                    label: "First Name",
-                    name: "firstName",
-                    value: formValues.firstName,
-                  },
-                  {
-                    label: "Middle Name",
-                    name: "middleName",
-                    value: formValues.middleName,
-                  },
-                  {
-                    label: "Last Name",
-                    name: "lastName",
-                    value: formValues.lastName,
-                  },
-                  {
-                    label: "Department",
-                    name: "department",
-                    value: formValues.department,
-                  },
-                  {
-                    label: "Program",
-                    name: "program",
-                    value: formValues.program,
-                  },
-                ].map((field, index) => (
-                  <Grid2 item xs={12} sm={6} key={index}>
-                    <TextField
-                      label={field.label}
-                      fullWidth
-                      name={field.name}
-                      value={field.value}
-                      onChange={handleInputChange}
-                    />
-                  </Grid2>
-                ))}
+                <Grid2 size={{ xs: 12, sm: 6 }}>
+                  <TextField
+                    label='First Name'
+                    fullWidth
+                    name='firstName'
+                    value={formValues.firstName}
+                    onChange={handleInputChange}
+                  />
+                </Grid2>
+                <Grid2 size={{ xs: 12, sm: 6 }}>
+                  <TextField
+                    label='Middle Name'
+                    fullWidth
+                    name='middleName'
+                    value={formValues.middleName}
+                    onChange={handleInputChange}
+                  />
+                </Grid2>
+                <Grid2 size={{ xs: 12, sm: 6 }}>
+                  <TextField
+                    label='Last Name'
+                    fullWidth
+                    name='lastName'
+                    value={formValues.lastName}
+                    onChange={handleInputChange}
+                  />
+                </Grid2>
+                <Grid2 size={{ xs: 12, sm: 6 }}>
+                  <TextField
+                    label='Suffix'
+                    fullWidth
+                    name='suffix'
+                    value={formValues.suffix}
+                    onChange={handleInputChange}
+                  />
+                </Grid2>
+                <Grid2 size={{ xs: 12, sm: 6 }}>
+                  <TextField
+                    label='Mapúa MCL Live Account'
+                    fullWidth
+                    name='liveAccount'
+                    value={formValues.liveAccount}
+                    disabled
+                  />
+                </Grid2>
+                <Grid2 size={{ xs: 12, sm: 6 }}>
+                  <TextField
+                    label='Role'
+                    fullWidth
+                    name='role'
+                    value={formValues.role}
+                    disabled
+                  />
+                </Grid2>
+                <Grid2 size={{ xs: 12, sm: 6 }}>
+                  <TextField
+                    label='Department'
+                    fullWidth
+                    name='department'
+                    value={formValues.department}
+                    onChange={handleInputChange}
+                  />
+                </Grid2>
+                <Grid2 size={{ xs: 12, sm: 6 }}>
+                  <TextField
+                    label='Program'
+                    fullWidth
+                    name='program'
+                    value={formValues.program}
+                    onChange={handleInputChange}
+                  />
+                </Grid2>
               </Grid2>
               <Box
                 sx={{
