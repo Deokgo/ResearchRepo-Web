@@ -23,14 +23,14 @@ import { Link } from "react-router-dom";
 const Signup = () => {
   // State for form fields
   /////////////////////////////////////////////////////////////////////////////////////////////
-  //Dummy values for role, department, program since there are no values yet in the combobox
+  //Dummy values for department, program since there are no values yet in the combobox
   //subject for changes once combobox is setup
   const [formData, setFormData] = useState({
     firstName: "",
     middleName: "",
     lastName: "",
     suffix: "",
-    role_id: "01",
+    role_id: "04",
     email: "",
     department: "CCIS",
     program: "CS",

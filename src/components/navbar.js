@@ -274,14 +274,14 @@ const Navbar = () => {
           sx={{ "& .MuiPaper-root": { backgroundColor: "#CA031B" } }}
         >
           <MenuItem onClick={handleProfile}>
-            <Typography>Profile</Typography>
+            <Typography color="common.white" >Profile</Typography>
           </MenuItem>
           <MenuItem onClick={handleManageUsers}>
-            <Typography>Manage Users</Typography>
+            <Typography color="common.white" >Manage Users</Typography>
           </MenuItem>
           <Divider />
           <MenuItem onClick={handleLogout}>
-            <Typography>Log out</Typography>
+            <Typography color="common.white" >Log out</Typography>
           </MenuItem>
         </Menu>
       </Toolbar>
