@@ -182,11 +182,11 @@ const Signup = () => {
             }}
           >
             <Typography
-              variant='h3'
+              variant='h2'
               color='#F40824'
               fontWeight='700'
               sx={{
-                textAlign: { xs: "center", md: "left" },
+                textAlign: { xs: "center", md: "left", paddingBottom: 20},
               }}
             >
               Sign up
@@ -240,7 +240,6 @@ const Signup = () => {
                   name='lastName'
                   value={formData.lastName}
                   onChange={handleChange}
-                  margin='normal'
                   variant='outlined'
                   InputProps={{
                     endAdornment: (
@@ -260,7 +259,6 @@ const Signup = () => {
                   name='suffix'
                   value={formData.suffix}
                   onChange={handleChange}
-                  margin='normal'
                   variant='outlined'
                   InputProps={{
                     endAdornment: (

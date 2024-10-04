@@ -103,6 +103,7 @@ const Navbar = () => {
                 width: "100%",
                 height: "100%",
                 objectFit: "contain",
+                padding: 10
               }}
             />
           </IconButton>
@@ -200,7 +201,7 @@ const Navbar = () => {
               onClick={handleOpenUserMenu}
               sx={{ color: "#CA031B" }}
             >
-              <AccountCircleIcon sx={{ fontSize: "2rem" }} />
+              <AccountCircleIcon sx={{ fontSize: "3.5rem" }} />
             </IconButton>
           )}
         </Box>
@@ -220,13 +221,13 @@ const Navbar = () => {
             id='menu-appbar'
             anchorEl={anchorElNav}
             anchorOrigin={{
-              vertical: "top",
-              horizontal: "right",
+              vertical: "bottom",
+              horizontal: "center",
             }}
             keepMounted
             transformOrigin={{
               vertical: "top",
-              horizontal: "right",
+              horizontal: "center",
             }}
             open={Boolean(anchorElNav)}
             onClose={handleCloseNavMenu}

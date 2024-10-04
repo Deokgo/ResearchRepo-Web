@@ -131,7 +131,7 @@ const Profile = () => {
                 zIndex: 1,
               }}
             />
-            <Box sx={{ display: "flex", ml: "5rem", zIndex: 3 }}>
+            <Box sx={{ display: "flex", ml: "12rem", zIndex: 3}}>
               <IconButton
                 onClick={handleNavigateHome}
                 sx={{
@@ -145,12 +145,13 @@ const Profile = () => {
                 sx={{
                   fontFamily: "Montserrat, sans-serif",
                   fontWeight: 800,
-                  fontSize: { xs: "2rem", sm: "2.5rem", md: "4.375rem" },
+                  fontSize: { xs: "2rem", sm: "2.5rem", md: "3.5rem" },
                   color: "#FFF",
                   mb: 2,
                   lineHeight: 1.25,
                   maxWidth: { xs: "100%", md: "80%" },
                   alignSelf: "center",
+                  paddingLeft: 5,
                   zIndex: 2,
                 }}
               >

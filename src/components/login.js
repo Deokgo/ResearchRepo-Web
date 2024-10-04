@@ -80,6 +80,7 @@ const Login = () => {
               right: 0,
               bottom: 0,
               backgroundImage: `url(${homeBg})`,
+              backgroundSize: 'cover',
               opacity: 0.25,
               zIndex: 1,
             }}
@@ -135,7 +136,7 @@ const Login = () => {
             }}
           >
             <Typography
-              variant='h3'
+              variant='h2'
               color='#F40824'
               fontWeight='700'
               sx={{

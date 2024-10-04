@@ -29,7 +29,7 @@ const Footer = () => {
               sx={{
                 fontFamily: "Montserrat, sans-serif",
                 fontWeight: 600,
-                fontSize: { xs: "0.8rem", md: "1rem" },
+                fontSize: { xs: "0.8rem", md: "0.7rem" },
               }}
             >
               © All Digital Rights Reserved 2024
@@ -37,7 +37,7 @@ const Footer = () => {
             <Divider
               orientation='vertical'
               sx={{
-                height: "1.2rem",
+                height: "1rem",
                 borderColor: "#FFF",
                 borderWidth: "2px",
                 display: { xs: "none", md: "inline-flex" },
@@ -48,7 +48,7 @@ const Footer = () => {
               sx={{
                 fontFamily: "Montserrat, sans-serif",
                 fontWeight: 600,
-                fontSize: { xs: "0.8rem", md: "1rem" },
+                fontSize: { xs: "0.8rem", md: "0.7rem" },
                 cursor: "pointer",
               }}
             >
@@ -57,7 +57,7 @@ const Footer = () => {
             <Divider
               orientation='vertical'
               sx={{
-                height: "1.2rem",
+                height: "1rem",
                 borderColor: "#FFF",
                 borderWidth: "2px",
                 display: { xs: "none", md: "inline-flex" },
@@ -68,7 +68,7 @@ const Footer = () => {
               sx={{
                 fontFamily: "Montserrat, sans-serif",
                 fontWeight: 600,
-                fontSize: { xs: "0.8rem", md: "1rem" },
+                fontSize: { xs: "0.8rem", md: "0.7rem" },
                 cursor: "pointer",
               }}
             >
@@ -80,7 +80,7 @@ const Footer = () => {
             sx={{
               fontFamily: "Montserrat, sans-serif",
               fontWeight: 600,
-              fontSize: { xs: "0.8rem", md: "1rem" },
+              fontSize: { xs: "0.8rem", md: "0.7rem" },
               justifyContent: "flex-end",
               textAlign: "right",
             }}

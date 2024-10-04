@@ -150,6 +150,7 @@ const Home = () => {
               right: 0,
               bottom: 0,
               backgroundImage: `url(${homeBg})`,
+              backgroundSize: "cover",
               opacity: 0.25, // 25% opacity for the background image
               zIndex: 1,
             }}
@@ -176,22 +177,22 @@ const Home = () => {
                 sx={{
                   fontFamily: "Montserrat, sans-serif",
                   fontWeight: 800,
-                  fontSize: { xs: "2rem", sm: "2.5rem", md: "4.375rem" },
+                  fontSize: { xs: "2rem", sm: "2.5rem", md: "4.10rem" },
                   color: "#FFF",
-                  mb: 2,
+                  mb: 3,
                   lineHeight: 1.25,
                   maxWidth: { xs: "100%", md: "80%" },
                   alignSelf: "center",
                 }}
               >
-                A centralized hub for all your research needs.
+                A Centralized hub for all your research needs.
               </Typography>
               <Typography
                 variant='body1'
                 sx={{
                   fontFamily: "Montserrat, sans-serif",
-                  fontWeight: 500,
-                  fontSize: { xs: "1rem", md: "1.25rem" },
+                  fontWeight: 300,
+                  fontSize: { xs: "1rem", md: "1.15rem" },
                   color: "#F0F0F0",
                   mb: 4,
                   maxWidth: { xs: "100%", md: "80%" },
@@ -207,6 +208,7 @@ const Home = () => {
                   gap: 7,
                   justifyContent: { xs: "center", md: "flex-start" },
                   marginLeft: { xs: 0, md: "5rem" },
+                  marginTop: { xs: 0, md: "2.5rem" },
                 }}
               >
                 <Button
@@ -219,7 +221,7 @@ const Home = () => {
                     textTransform: "none",
                     fontSize: { xs: "0.875rem", md: "1.375rem" },
                     padding: { xs: "0.5rem 1rem", md: "0.75rem 2rem" },
-                    borderRadius: "8px",
+                    borderRadius: "100px",
                     maxHeight: "5rem",
                   }}
                   flexItem
@@ -238,7 +240,7 @@ const Home = () => {
                     textTransform: "none",
                     fontSize: { xs: "0.875rem", md: "1.375rem" },
                     padding: { xs: "0.5rem 1rem", md: "0.75rem 2rem" },
-                    borderRadius: "8px",
+                    borderRadius: "100px",
                     maxHeight: "5rem",
                   }}
                   flexItem
@@ -275,7 +277,7 @@ const Home = () => {
               fontWeight: 800,
               color: "#0A438F",
               fontFamily: "Montserrat, sans-serif",
-              fontSize: { xs: "1.5rem", sm: "2rem", md: "4.375rem" },
+              fontSize: { xs: "1.5rem", sm: "2rem", md: "3.5rem" },
             }}
           >
             Communities & Collections
@@ -286,11 +288,12 @@ const Home = () => {
               justifyContent: "center",
               width: "100%",
               mb: "5rem",
+              padding: "2em"
             }}
           >
             <Slider {...settings} style={{ width: isMobile ? "60%" : "70%" }}>
               {departments.map((department) => (
-                <Box key={department.id} sx={{ px: 2 }}>
+                <Box key={department.id} sx={{ px: 3 }}>
                   <Paper
                     elevation={3}
                     sx={{
@@ -308,13 +311,14 @@ const Home = () => {
                     <img
                       src={department.image}
                       style={{
-                        width: "100%",
+                        width: "75%",
                         height: "auto",
+                        padding: "1em"
                       }}
                       alt={department.name}
                     />
                     <Typography
-                      variant='h6'
+                      variant='h7'
                       sx={{
                         fontWeight: 600,
                         fontFamily: "Montserrat, sans-serif",
