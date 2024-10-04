@@ -30,7 +30,7 @@ function App() {
           }
         />
         <Route
-          path='/manageusers'
+          path='/manage-users'
           element={
             <PrivateRoute>
               <ManageUsers />

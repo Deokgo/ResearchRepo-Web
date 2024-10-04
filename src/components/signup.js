@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import logoImage from "../assets/mmcl_logo_white.png"; //path of the image
 import homeBg from "../assets/home_bg.png";
 import {
@@ -19,6 +19,7 @@ import {
   VisibilityOff,
 } from "@mui/icons-material";
 import { Link } from "react-router-dom";
+import axios from "axios";
 
 const Signup = () => {
   // State for form fields
@@ -41,7 +42,38 @@ const Signup = () => {
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [colleges, setColleges] = useState([]);
+  const [programs, setPrograms] = useState([]);
+  const [selectedCollege, setSelectedCollege] = useState("");
 
+  useEffect(() => {
+    const fetchColleges = async () => {
+      try {
+        const response = await axios.get("/college_depts");
+        const data = response.data;
+        setColleges(data.colleges);
+      } catch (error) {
+        console.error("Error fetching college data:", error);
+      }
+    };
+    fetchColleges();
+  }, []);
+  const fetchPrograms = async (collegeId) => {
+    if (collegeId) {
+      try {
+        const response = await axios.get(`/programs?department=${collegeId}`);
+        setPrograms(response.data.programs);
+      } catch (error) {
+        console.error("Error fetching programs:", error);
+      }
+    }
+  };
+  const handleCollegeChange = (e) => {
+    const collegeId = e.target.value;
+    setSelectedCollege(collegeId);
+    setFormData((prevData) => ({ ...prevData, department: collegeId }));
+    fetchPrograms(collegeId);
+  };
   // Handle input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -299,10 +331,20 @@ const Signup = () => {
                   name='department'
                   select
                   value={formData.department}
-                  onChange={handleChange}
+                  onChange={handleCollegeChange}
                   margin='normal'
                   variant='outlined'
-                ></TextField>
+                >
+                  <MenuItem value=''>-- Select Department --</MenuItem>
+                  {colleges.map((college) => (
+                    <MenuItem
+                      key={college.college_id}
+                      value={college.college_id}
+                    >
+                      {college.college_name}
+                    </MenuItem>
+                  ))}
+                </TextField>
               </Grid2>
               <Grid2 item size={{ xs: 12, md: 6 }}>
                 <TextField
@@ -314,7 +356,14 @@ const Signup = () => {
                   onChange={handleChange}
                   margin='normal'
                   variant='outlined'
-                ></TextField>
+                >
+                  <MenuItem value=''>-- Select Program --</MenuItem>
+                  {programs.map((prog) => (
+                    <MenuItem key={prog.program_id} value={prog.program_id}>
+                      {prog.program_name}
+                    </MenuItem>
+                  ))}
+                </TextField>
               </Grid2>
             </Grid2>
             <Divider orientation='horizontal' flexItem />
