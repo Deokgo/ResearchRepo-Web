@@ -53,9 +53,7 @@ const Profile = () => {
     const userId = getUserId();
     if (userId) {
       try {
-        const response = await axios.get(
-          `http://localhost:5000/users/${userId}`
-        );
+        const response = await axios.get(`/accounts/users/${userId}`);
         const data = response.data;
         setUserData(data);
         setFormValues({
@@ -131,7 +129,7 @@ const Profile = () => {
                 zIndex: 1,
               }}
             />
-            <Box sx={{ display: "flex", ml: "12rem", zIndex: 3}}>
+            <Box sx={{ display: "flex", ml: "12rem", zIndex: 3 }}>
               <IconButton
                 onClick={handleNavigateHome}
                 sx={{
@@ -198,7 +196,7 @@ const Profile = () => {
                   },
                   {
                     label: "Suffix",
-                    value: userData.researcher.suffix,
+                    value: userData.researcher.suffix || "N/A",
                   },
                   {
                     label: "Mapúa MCL Live Account",

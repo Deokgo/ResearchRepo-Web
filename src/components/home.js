@@ -61,6 +61,13 @@ const Home = () => {
         "Amplifying student voices; nurturing student leaders — for success in today's business world.",
       image: placeholderImage,
     }, // Placeholder for image path
+    {
+      id: 5,
+      name: "College of Health Sciences",
+      description:
+        "Amplifying student voices; nurturing student leaders — for success in today's business world.",
+      image: placeholderImage,
+    }, // Placeholder for image path
   ];
 
   const handleOpenNavMenu = (event) => {
@@ -288,7 +295,7 @@ const Home = () => {
               justifyContent: "center",
               width: "100%",
               mb: "5rem",
-              padding: "2em"
+              padding: "2em",
             }}
           >
             <Slider {...settings} style={{ width: isMobile ? "60%" : "70%" }}>
@@ -313,7 +320,7 @@ const Home = () => {
                       style={{
                         width: "75%",
                         height: "auto",
-                        padding: "1em"
+                        padding: "1em",
                       }}
                       alt={department.name}
                     />

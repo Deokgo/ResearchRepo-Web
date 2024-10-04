@@ -24,7 +24,7 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("/login", {
+      const response = await fetch("/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -80,7 +80,7 @@ const Login = () => {
               right: 0,
               bottom: 0,
               backgroundImage: `url(${homeBg})`,
-              backgroundSize: 'cover',
+              backgroundSize: "cover",
               opacity: 0.25,
               zIndex: 1,
             }}

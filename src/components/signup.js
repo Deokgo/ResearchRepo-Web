@@ -49,7 +49,7 @@ const Signup = () => {
   useEffect(() => {
     const fetchColleges = async () => {
       try {
-        const response = await axios.get("/college_depts");
+        const response = await axios.get("/deptprogs/college_depts");
         const data = response.data;
         setColleges(data.colleges);
       } catch (error) {
@@ -61,7 +61,9 @@ const Signup = () => {
   const fetchPrograms = async (collegeId) => {
     if (collegeId) {
       try {
-        const response = await axios.get(`/programs?department=${collegeId}`);
+        const response = await axios.get(
+          `/deptprogs/programs?department=${collegeId}`
+        );
         setPrograms(response.data.programs);
       } catch (error) {
         console.error("Error fetching programs:", error);
@@ -94,7 +96,7 @@ const Signup = () => {
     e.preventDefault();
     console.log(formData);
     try {
-      const response = await fetch("http://127.0.0.1:5000/signup", {
+      const response = await fetch("/auth/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -218,7 +220,7 @@ const Signup = () => {
               color='#F40824'
               fontWeight='700'
               sx={{
-                textAlign: { xs: "center", md: "left", paddingBottom: 20},
+                textAlign: { xs: "center", md: "left", paddingBottom: 20 },
               }}
             >
               Sign up
