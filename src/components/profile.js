@@ -45,7 +45,7 @@ const Profile = () => {
     suffix: "",
     department: "",
     program: "",
-    liveAccount: "",
+    email: "",
     role: "",
   });
 
@@ -63,7 +63,7 @@ const Profile = () => {
           suffix: data.researcher.suffix || "",
           department: data.researcher.college_id || "",
           program: data.researcher.program_id || "",
-          liveAccount: data.account.live_account || "",
+          email: data.account.email || "",
           role: data.account.role || "",
         });
       } catch (error) {
@@ -199,8 +199,8 @@ const Profile = () => {
                     value: userData.researcher.suffix || "N/A",
                   },
                   {
-                    label: "Mapúa MCL Live Account",
-                    value: userData.account.live_account,
+                    label: "Email Account",
+                    value: userData.account.email,
                   },
                   {
                     label: "Role",
@@ -294,10 +294,10 @@ const Profile = () => {
                 </Grid2>
                 <Grid2 size={{ xs: 12, sm: 6 }}>
                   <TextField
-                    label='Mapúa MCL Live Account'
+                    label='Email Account'
                     fullWidth
-                    name='liveAccount'
-                    value={formValues.liveAccount}
+                    name='email'
+                    value={formValues.email}
                     disabled
                   />
                 </Grid2>
