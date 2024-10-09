@@ -8,6 +8,7 @@ import ManageUsers from "./components/manageusers";
 import PasswordReset from "./components/passwordreset";
 import { CssBaseline } from "@mui/material"; // To remove default margin
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import KnowledgeGraph from "./components/knowledgegraph";
 
 function App() {
   const [data, setData] = useState([{}]);
@@ -21,6 +22,7 @@ function App() {
         <Route path='/signup' element={<Signup />} />
         <Route path='/home' element={<Home />} />
         <Route path='/resetpassword' element={<PasswordReset />} />
+        <Route path='/knowledgegraph' element={<KnowledgeGraph />} />
         <Route
           path='/profile'
           element={
