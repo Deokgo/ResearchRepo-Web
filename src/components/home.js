@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import homeBg from "../assets/home_bg.png";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import placeholderImage from "../assets/placeholder_image.png";
@@ -8,7 +8,7 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Navbar from "./navbar";
-import Footer from "./footer";
+import LoginModal from "./loginmodal"
 import {
   Box,
   Button,
@@ -401,7 +401,7 @@ const Home = () => {
                 <Button
                   variant='contained'
                   key={"Get Started"}
-                  onClick={handleOpenSignupModal}
+                  onClick={setIsLoginModalOpen(true)}
                   sx={{
                     backgroundColor: "#CA031B",
                     color: "#FFF",
@@ -446,6 +446,8 @@ const Home = () => {
           </Box>
         </Box>
 
+        <LoginModal show={isModalLoginOpen} close={setIsLoginModalOpen(false)}/>
+        
         {/*Log In Modal*/}
         <Modal open={isModalLoginOpen} onClose={handleCloseLoginModal}>
           <Box sx={modalStyle}>
