@@ -8,7 +8,7 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Navbar from "./navbar";
-import LoginModal from "./loginmodal"
+import LoginModal from "./loginmodal";
 import {
   Box,
   Button,
@@ -401,7 +401,7 @@ const Home = () => {
                 <Button
                   variant='contained'
                   key={"Get Started"}
-                  onClick={setIsLoginModalOpen(true)}
+                  onClick={() => setIsLoginModalOpen(true)}
                   sx={{
                     backgroundColor: "#CA031B",
                     color: "#FFF",
@@ -446,8 +446,11 @@ const Home = () => {
           </Box>
         </Box>
 
-        <LoginModal show={isModalLoginOpen} close={setIsLoginModalOpen(false)}/>
-        
+        <LoginModal
+          show={isModalLoginOpen}
+          close={() => setIsLoginModalOpen(false)}
+        />
+
         {/*Log In Modal*/}
         <Modal open={isModalLoginOpen} onClose={handleCloseLoginModal}>
           <Box sx={modalStyle}>
