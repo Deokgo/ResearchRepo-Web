@@ -12,6 +12,7 @@ import { CssBaseline } from "@mui/material"; // To remove default margin
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import KnowledgeGraph from "./components/knowledgegraph";
 import { ModalProvider } from "./components/modalcontext";
+import MainDash from "./components/maindash";
 
 function App() {
   const [data, setData] = useState([{}]);
@@ -30,7 +31,9 @@ function App() {
 
           <Route path='/resetpassword' element={<PasswordReset />} />
           <Route path='/knowledgegraph' element={<KnowledgeGraph />} />
+          <Route path='/maindash' element={<MainDash />} />
           <Route path='/researchthrust' element={<ResearchThrust />} />
+
           <Route
             path='/profile'
             element={
