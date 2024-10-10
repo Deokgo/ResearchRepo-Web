@@ -106,7 +106,6 @@ const Home = () => {
       ...prevData,
       [name]: value,
     }));
-
   };
 
   const NextArrow = ({ onClick }) => {
@@ -208,8 +207,8 @@ const Home = () => {
       localStorage.setItem("token", data.token);
       localStorage.setItem("role", data.role);
       localStorage.setItem("user_id", data.user_id);
-      alert(`Login Successfully`)
-      handleCloseLoginModal()
+      alert(`Login Successfully`);
+      handleCloseLoginModal();
       navigate("/home");
     } catch (error) {
       alert(`Login failed: ${error.message}`);
@@ -240,8 +239,8 @@ const Home = () => {
       console.log("Response from server:", data);
 
       //since the /signup route returns 'user_id' and 'role', update the alert message accordingly
-      handleCloseSignupModal()
-      handleOpenLoginModal()
+      handleCloseSignupModal();
+      handleOpenLoginModal();
       alert(`Signup successful! User ID: ${data.user_id}`);
     } catch (error) {
       console.error("Error during signup request:", error);
@@ -302,7 +301,7 @@ const Home = () => {
                 flexDirection: "column",
                 justifyContent: "center",
                 zIndex: 2,
-                width: "auto"
+                width: "auto",
               }}
             >
               <Box
@@ -314,7 +313,10 @@ const Home = () => {
                   padding: "2em",
                 }}
               >
-                <Slider {...settings} style={{ width: isMobile ? "60%" : "70%" }}>
+                <Slider
+                  {...settings}
+                  style={{ width: isMobile ? "60%" : "70%" }}
+                >
                   {departments.map((department) => (
                     <Box key={department.id} sx={{ px: 3 }}>
                       <Paper
@@ -375,7 +377,7 @@ const Home = () => {
                 sx={{
                   display: "flex",
                   gap: 7,
-                  justifyContent: { xs: "center"},
+                  justifyContent: { xs: "center" },
                   marginTop: { xs: 0, md: "2rem" },
                 }}
               >
@@ -446,290 +448,309 @@ const Home = () => {
 
         {/*Log In Modal*/}
         <Modal open={isModalLoginOpen} onClose={handleCloseLoginModal}>
-            <Box 
-              sx={modalStyle}
+          <Box sx={modalStyle}>
+            <Typography
+              variant='h2'
+              color='#F40824'
+              fontWeight='700'
+              padding={3}
+              sx={{
+                textAlign: { xs: "center", md: "bottom" },
+              }}
             >
-              <Typography
-                  variant='h2'
-                  color='#F40824'
-                  fontWeight='700'
-                  padding={3}
-                  sx={{
-                    textAlign: { xs: "center", md: "bottom" }}}
-              > 
-                Login
-              </Typography>
-              <form onSubmit={handleLogin}>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                      marginLeft: "4rem",
-                      marginRight: "4rem"
-                    }}
-                  >
-                  <TextField
-                    label='Email'
-                    fullWidth
-                    name='email'
-                    type='email'
-                    value={formValues.email}
-                    onChange={handleChange}
-                    margin='normal'
-                    variant='outlined'
-                  />
-                  <TextField
-                    label='Password'
-                    fullWidth
-                    name='password'
-                    type='password'
-                    onChange={handleChange}
-                    value={formValues.password}
-                    margin='normal'
-                    variant='outlined'
-                  />
-                  <Box
-                    sx={{
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                      marginTop: "20px",
-                    }}
-                  >
-                    <Button
-                      type='submit'
-                      fullWidth
-                      variant='contained'
-                      sx={{
-                        maxWidth: "250px",
-                        marginTop: "20px",
-                        padding: "15px",
-                        backgroundColor: "#EC1F28",
-                      }}
-                    >
-                      Log in
-                    </Button>
-
-                    <Typography sx={{ marginTop: "20px" }}>
-                      Don’t have an account?{" "}
-                      <Link to={handleOpenSignupModal}  style={{ color: "#3393EA" }}>
-                          Sign up
-                      </Link>
-                    </Typography>
-                  </Box>
-                </Box>
-              </form>   
-            </Box>
-          </Modal>
-
-          {/*Sign Up Modal*/}
-          <Modal 
-            open={isModalSignupOpen} 
-            onClose={handleCloseSignupModal}
-          >
-            <Box 
-              sx={modalStyle}
-            >
-              <Typography
-                  variant='h2'
-                  color='#F40824'
-                  fontWeight='700'
-                  paddingTop='1rem'
-                  sx={{
-                    textAlign: { xs: "center", md: "bottom" },                }}
-              > 
-                Sign Up
-              </Typography>
-              <form onSubmit={handleSignup}>
+              Login
+            </Typography>
+            <form onSubmit={handleLogin}>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  marginLeft: "4rem",
+                  marginRight: "4rem",
+                }}
+              >
+                <TextField
+                  label='Email'
+                  fullWidth
+                  name='email'
+                  type='email'
+                  value={formValues.email}
+                  onChange={handleChange}
+                  margin='normal'
+                  variant='outlined'
+                />
+                <TextField
+                  label='Password'
+                  fullWidth
+                  name='password'
+                  type='password'
+                  onChange={handleChange}
+                  value={formValues.password}
+                  margin='normal'
+                  variant='outlined'
+                />
                 <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    marginTop: "20px",
+                  }}
+                >
+                  <Button
+                    type='submit'
+                    fullWidth
+                    variant='contained'
+                    sx={{
+                      maxWidth: "250px",
+                      marginTop: "20px",
+                      padding: "15px",
+                      backgroundColor: "#EC1F28",
+                    }}
+                  >
+                    Log in
+                  </Button>
+
+                  <Typography sx={{ marginTop: "20px" }}>
+                    Don’t have an account?{" "}
+                    <a
+                      href='#'
+                      onClick={(e) => {
+                        e.preventDefault(); // For the anchor element not to do its usual behavior which is to navigate to another page
+                        handleCloseLoginModal();
+                        handleOpenSignupModal();
+                      }}
+                      style={{ color: "#3393EA" }}
+                    >
+                      Sign up
+                    </a>
+                  </Typography>
+                </Box>
+              </Box>
+            </form>
+          </Box>
+        </Modal>
+
+        {/*Sign Up Modal*/}
+        <Modal open={isModalSignupOpen} onClose={handleCloseSignupModal}>
+          <Box sx={modalStyle}>
+            <Typography
+              variant='h2'
+              color='#F40824'
+              fontWeight='700'
+              paddingTop='1rem'
+              sx={{
+                textAlign: { xs: "center", md: "bottom" },
+              }}
+            >
+              Sign Up
+            </Typography>
+            <form onSubmit={handleSignup}>
+              <Box
                 sx={{
                   width: "100%",
                   maxWidth: "500px",
                   justifyContent: "center",
                   padding: "2em",
                 }}
+              >
+                <Grid2 container spacing={{ xs: 0, md: 2 }}>
+                  <Grid2 item size={{ xs: 12, md: 6 }}>
+                    <TextField
+                      fullWidth
+                      label='First Name'
+                      name='firstName'
+                      value={formData.firstName}
+                      onChange={handleChange}
+                      margin='normal'
+                      variant='outlined'
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position='end'>
+                            <IconButton onClick={() => clearField("firstName")}>
+                              <ClearIcon />
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      }}
+                    ></TextField>
+                  </Grid2>
+                  <Grid2 item size={{ xs: 12, md: 6 }}>
+                    <TextField
+                      fullWidth
+                      label='Middle Name'
+                      name='middleName'
+                      value={formData.middleName}
+                      onChange={handleChange}
+                      margin='normal'
+                      variant='outlined'
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position='end'>
+                            <IconButton
+                              onClick={() => clearField("middleName")}
+                            >
+                              <ClearIcon />
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  </Grid2>
+                  <Grid2 item size={{ xs: 12, md: 6 }}>
+                    <TextField
+                      fullWidth
+                      label='Last Name'
+                      name='lastName'
+                      value={formData.lastName}
+                      onChange={handleChange}
+                      variant='outlined'
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position='end'>
+                            <IconButton onClick={() => clearField("lastName")}>
+                              <ClearIcon />
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      }}
+                    ></TextField>
+                  </Grid2>
+                  <Grid2 item size={{ xs: 12, md: 6 }}>
+                    <TextField
+                      fullWidth
+                      label='Suffix'
+                      name='suffix'
+                      value={formData.suffix}
+                      onChange={handleChange}
+                      variant='outlined'
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position='end'>
+                            <IconButton onClick={() => clearField("suffix")}>
+                              <ClearIcon />
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      }}
+                    ></TextField>
+                  </Grid2>
+                </Grid2>
+                <TextField
+                  fullWidth
+                  label='Email'
+                  name='email'
+                  type='email'
+                  value={formData.email}
+                  onChange={handleChange}
+                  margin='normal'
+                  variant='outlined'
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position='end'>
+                        <IconButton onClick={() => clearField("email")}>
+                          <ClearIcon />
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
+                ></TextField>
+                <Divider orientation='horizontal' flexItem />
+                <Grid2 container spacing={{ xs: 0, md: 2 }}>
+                  <Grid2 size={{ xs: 12, md: 6 }}>
+                    <TextField
+                      fullWidth
+                      label='Password'
+                      name='password'
+                      type={showPassword ? "text" : "password"}
+                      value={formData.password}
+                      onChange={handleChange}
+                      margin='normal'
+                      variant='outlined'
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position='end'>
+                            <IconButton onClick={togglePasswordVisibility}>
+                              {showPassword ? (
+                                <VisibilityOff />
+                              ) : (
+                                <Visibility />
+                              )}
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      }}
+                    ></TextField>
+                  </Grid2>
+                  <Grid2 size={{ xs: 12, md: 6 }}>
+                    <TextField
+                      fullWidth
+                      label='Confirm Password'
+                      name='confirmPassword'
+                      type={showConfirmPassword ? "text" : "password"}
+                      value={formData.confirmPassword}
+                      onChange={handleChange}
+                      margin='normal'
+                      variant='outlined'
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position='end'>
+                            <IconButton
+                              onClick={toggleConfirmPasswordVisibility}
+                            >
+                              {showConfirmPassword ? (
+                                <VisibilityOff />
+                              ) : (
+                                <Visibility />
+                              )}
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      }}
+                    ></TextField>
+                  </Grid2>
+                </Grid2>
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    marginTop: "20px",
+                  }}
                 >
-                  <Grid2 container spacing={{ xs: 0, md: 2 }}>
-                    <Grid2 item size={{ xs: 12, md: 6 }}>
-                      <TextField
-                        fullWidth
-                        label='First Name'
-                        name='firstName'
-                        value={formData.firstName}
-                        onChange={handleChange}
-                        margin='normal'
-                        variant='outlined'
-                        InputProps={{
-                          endAdornment: (
-                            <InputAdornment position='end'>
-                              <IconButton onClick={() => clearField("firstName")}>
-                                <ClearIcon />
-                              </IconButton>
-                            </InputAdornment>
-                          ),
-                        }}
-                      ></TextField>
-                    </Grid2>
-                    <Grid2 item size={{ xs: 12, md: 6 }}>
-                      <TextField
-                        fullWidth
-                        label='Middle Name'
-                        name='middleName'
-                        value={formData.middleName}
-                        onChange={handleChange}
-                        margin='normal'
-                        variant='outlined'
-                        InputProps={{
-                          endAdornment: (
-                            <InputAdornment position='end'>
-                              <IconButton onClick={() => clearField("middleName")}>
-                                <ClearIcon />
-                              </IconButton>
-                            </InputAdornment>
-                          ),
-                        }}
-                      />
-                    </Grid2>
-                    <Grid2 item size={{ xs: 12, md: 6 }}>
-                      <TextField
-                        fullWidth
-                        label='Last Name'
-                        name='lastName'
-                        value={formData.lastName}
-                        onChange={handleChange}
-                        variant='outlined'
-                        InputProps={{
-                          endAdornment: (
-                            <InputAdornment position='end'>
-                              <IconButton onClick={() => clearField("lastName")}>
-                                <ClearIcon />
-                              </IconButton>
-                            </InputAdornment>
-                          ),
-                        }}
-                      ></TextField>
-                    </Grid2>
-                    <Grid2 item size={{ xs: 12, md: 6 }}>
-                      <TextField
-                        fullWidth
-                        label='Suffix'
-                        name='suffix'
-                        value={formData.suffix}
-                        onChange={handleChange}
-                        variant='outlined'
-                        InputProps={{
-                          endAdornment: (
-                            <InputAdornment position='end'>
-                              <IconButton onClick={() => clearField("suffix")}>
-                                <ClearIcon />
-                              </IconButton>
-                            </InputAdornment>
-                          ),
-                        }}
-                      ></TextField>
-                    </Grid2>
-                  </Grid2>
-                  <TextField
+                  <Button
                     fullWidth
-                    label='Email'
-                    name='email'
-                    type='email'
-                    value={formData.email}
-                    onChange={handleChange}
-                    margin='normal'
-                    variant='outlined'
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position='end'>
-                          <IconButton onClick={() => clearField("email")}>
-                            <ClearIcon />
-                          </IconButton>
-                        </InputAdornment>
-                      ),
-                    }}
-                  ></TextField>
-                  <Divider orientation='horizontal' flexItem />
-                  <Grid2 container spacing={{ xs: 0, md: 2 }}>
-                    <Grid2 size={{ xs: 12, md: 6 }}>
-                      <TextField
-                        fullWidth
-                        label='Password'
-                        name='password'
-                        type={showPassword ? "text" : "password"}
-                        value={formData.password}
-                        onChange={handleChange}
-                        margin='normal'
-                        variant='outlined'
-                        InputProps={{
-                          endAdornment: (
-                            <InputAdornment position='end'>
-                              <IconButton onClick={togglePasswordVisibility}>
-                                {showPassword ? <VisibilityOff /> : <Visibility />}
-                              </IconButton>
-                            </InputAdornment>
-                          ),
-                        }}
-                      ></TextField>
-                    </Grid2>
-                    <Grid2 size={{ xs: 12, md: 6 }}>
-                      <TextField
-                        fullWidth
-                        label='Confirm Password'
-                        name='confirmPassword'
-                        type={showConfirmPassword ? "text" : "password"}
-                        value={formData.confirmPassword}
-                        onChange={handleChange}
-                        margin='normal'
-                        variant='outlined'
-                        InputProps={{
-                          endAdornment: (
-                            <InputAdornment position='end'>
-                              <IconButton onClick={toggleConfirmPasswordVisibility}>
-                                {showConfirmPassword ? (
-                                  <VisibilityOff />
-                                ) : (
-                                  <Visibility />
-                                )}
-                              </IconButton>
-                            </InputAdornment>
-                          ),
-                        }}
-                      ></TextField>
-                    </Grid2>
-                  </Grid2>
-                  <Box
+                    variant='contained'
+                    type='submit'
                     sx={{
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
+                      maxWidth: "250px",
                       marginTop: "20px",
+                      padding: "15px",
+                      backgroundColor: "#EC1F28",
                     }}
                   >
-                    <Button
-                      fullWidth
-                      variant='contained'
-                      type='submit'
-                      sx={{
-                        maxWidth: "250px",
-                        marginTop: "20px",
-                        padding: "15px",
-                        backgroundColor: "#EC1F28",
+                    Create Account
+                  </Button>
+                  <Typography sx={{ marginTop: "20px" }}>
+                    Already a member?{" "}
+                    <a
+                      href='#'
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleCloseSignupModal();
+                        handleOpenLoginModal();
                       }}
+                      style={{ color: "#3393EA" }}
                     >
-                      Create Account
-                    </Button>
-                    <Typography sx={{ marginTop: "20px" }}>
-                      Already a member?{" "}
-                      <Link to={handleOpenLoginModal} color='#3393EA'>
-                        Login
-                      </Link>
-                    </Typography>
-                  </Box>
+                      Login
+                    </a>
+                  </Typography>
                 </Box>
-              </form>   
-            </Box>
-          </Modal>
+              </Box>
+            </form>
+          </Box>
+        </Modal>
       </Box>
     </>
   );
