@@ -81,7 +81,7 @@ const Profile = () => {
     setFormValues({ ...formValues, [name]: value });
   };
   const handleNavigateHome = () => {
-    navigate("/home");
+    navigate("/main");
   };
 
   const handleOpenModal = () => {

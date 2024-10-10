@@ -48,7 +48,7 @@ const ManageUsers = () => {
   }, []);
 
   const handleNavigateHome = () => {
-    navigate("/home");
+    navigate("/main");
   };
 
   const handleSearchChange = (e) => {

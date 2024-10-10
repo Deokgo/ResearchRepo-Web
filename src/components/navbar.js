@@ -2,6 +2,7 @@
 
 import MenuIcon from "@mui/icons-material/Menu";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import {
   AppBar,
   Box,
@@ -21,11 +22,31 @@ import navLogo from "../assets/MMCL_Logo_Nav.png";
 const Navbar = () => {
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
+
+  const [anchorElRepo, setAnchorElRepo] = useState(null);
+  const [anchorElRetr, setAnchorElRetr] = useState(null);
+  const [anchorElSyma, setAnchorElSyma] = useState(null);
+
+  const [open, setOpen] = React.useState(false);
+  const anchorRef = React.useRef<HTMLButtonElement>(null);
   const navigate = useNavigate();
   const isLoggedIn = !!localStorage.getItem("token");
 
   const isMobile = useMediaQuery("(max-width:600px)");
 
+  {/*****************Event Handlers******************/}
+
+  {/*Logged Out*/}
+  const handleResearchThrust = () => {
+      navigate("/researchthrust")
+    }
+
+  const handleLogin = () => {
+      navigate("/login");
+    };
+
+
+  {/*Logged In*/}
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
   };
@@ -33,9 +54,40 @@ const Navbar = () => {
   const handleCloseNavMenu = () => {
     setAnchorElNav(null);
   };
+
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
   };
+
+ const handleCloseUserMenu = () => {
+    setAnchorElUser(null);
+  };
+
+  const handleOpenRepoMenu = (event) => {
+      setAnchorElRepo (event.currentTarget);
+    };
+  
+  const handleCloseRepoMenu = () => {
+    setAnchorElRepo(null);
+  };
+    
+  const handleOpenRetrMenu = (event) => {
+    setAnchorElRetr(event.currentTarget);
+  };
+
+  const handleCloseRetrMenu = () => {
+    setAnchorElRetr(null);
+  };
+
+  const handleOpenSymaMenu = (event) => {
+    setAnchorElSyma(event.currentTarget);
+  };
+
+  const handleCloseSymaMenu = () => {
+    setAnchorElSyma(null);
+  };
+
+
   const handleProfile = () => {
     navigate("/profile");
   };
@@ -44,25 +96,18 @@ const Navbar = () => {
     navigate("/manage-users");
   };
 
-  const handleCloseUserMenu = () => {
-    setAnchorElUser(null);
-  };
-
-  const handleLogin = () => {
-    navigate("/login");
-  };
-
   const handleNavigateHome = () => {
-    navigate("/home");
+    navigate("/main");
   };
   const handleLogout = () => {
     localStorage.removeItem("token");
     navigate("/home");
   };
+
   const mobileMenuItems = isLoggedIn
     ? [
         { label: "Home", onClick: handleNavigateHome },
-        { label: "Research Thrusts", onClick: handleCloseNavMenu },
+        { label: "Research Thrusts", onClick: handleResearchThrust },
         { label: "Profile", onClick: handleProfile },
         { label: "Manage Users", onClick: handleManageUsers },
       ]
@@ -70,6 +115,14 @@ const Navbar = () => {
         { label: "Home", onClick: handleNavigateHome },
         { label: "Log in", onClick: handleLogin },
       ];
+
+  const buttonSettings = {
+    my: 2,
+    color: "#001C43",
+    fontFamily: "Montserrat, sans-serif",
+    fontWeight: 600,
+    marginRight: "1rem"
+  }
 
   return (
     <AppBar
@@ -155,57 +208,82 @@ const Navbar = () => {
             </Typography>
           </Box>
         </Box>
-        <Box sx={{ display: { xs: "none", md: "flex" }, gap: 3 }}>
-          <Button
-            key='Home'
-            onClick={handleNavigateHome}
-            sx={{
-              my: 2,
-              color: "#001C43",
-              fontFamily: "Montserrat, sans-serif",
-              fontWeight: 600,
-              marginRight: "3rem"
-            }}
-          >
-            Home
-          </Button>
-          <Button
-            key='Research Thrusts'
-            onClick={handleCloseNavMenu}
-            sx={{
-              my: 2,
-              color: "#001C43",
-              fontFamily: "Montserrat, sans-serif",
-              fontWeight: 600,
-              marginRight: "3rem"
-            }}
-          >
-            Research Thrusts
-          </Button>
 
+
+        {/*Navigation Buttons*/}
+        <Box sx={{ display: { xs: "none", md: "flex" }, gap: 3 }}>
           {!isLoggedIn ? (
-            <Button
-              key={"Log in"}
-              onClick={handleLogin}
-              sx={{
-                my: 2,
-                color: "#CA031B",
-                fontSize: "1.25rem",
-                fontFamily: "Montserrat, sans-serif",
-                fontWeight: 800,
-                marginRight: "3rem"
-              }}
-            >
-              Log in
-            </Button>
+            <Box sx={{ display: { xs: "none", md: "flex" }, gap: 3 }}>
+              <Button
+                key='Home'
+                onClick={handleNavigateHome}
+                sx={buttonSettings}
+              >
+                Home
+              </Button>
+              <Button
+                key='Research Thrusts'
+                onClick={handleResearchThrust}
+                sx={buttonSettings}
+              >
+                Research Thrusts
+              </Button>
+              <Button
+                key={"Log in"}
+                onClick={handleLogin}
+                sx={buttonSettings}
+              >
+                Log in
+              </Button>
+            </Box>
           ) : (
-            <IconButton
-              size='large'
-              onClick={handleOpenUserMenu}
-              sx={{ color: "#CA031B" }}
-            >
-              <AccountCircleIcon sx={{ fontSize: "3.5rem" }} />
-            </IconButton>
+            <Box>
+              <Button
+                key='Home'
+                onClick={handleNavigateHome}
+                sx={buttonSettings}
+              >
+                Home
+              </Button>
+              <Button
+                key='Repository'
+                onClick={handleOpenRepoMenu}
+                endIcon={<KeyboardArrowDownIcon style={{ color: 'red', fontSize: 30 }}/>}
+                sx={buttonSettings}
+              >
+                Repository
+              </Button>
+              <Button
+                key='ResearchTracking'
+                onClick={handleOpenRetrMenu}
+                endIcon={<KeyboardArrowDownIcon style={{ color: 'red', fontSize: 30 }}/>}
+                sx={buttonSettings}
+              >
+                Research Tracking
+              </Button>
+              <Button
+                key='ResearchThrust'
+                onClick={handleResearchThrust}
+                sx={buttonSettings}
+              >
+                Research Thrusts
+              </Button>
+              <Button
+                key='SystemManagement'
+                onClick={handleOpenSymaMenu}
+                endIcon={<KeyboardArrowDownIcon style={{ color: 'red', fontSize: 30 }}/>}
+                sx={buttonSettings}
+              >
+                System Management
+              </Button>
+              <IconButton
+                size='large'
+                onClick={handleOpenUserMenu}
+                sx={{ color: "#CA031B" }}
+              >
+                <AccountCircleIcon sx={{ fontSize: "3.5rem" }} />
+              </IconButton>
+            </Box>   
           )}
         </Box>
         <Box sx={{ display: { xs: "flex", md: "none" } }}>
@@ -262,6 +340,8 @@ const Navbar = () => {
             </MenuItem>
           </Menu>
         </Box>
+
+        {/*User Menu*/}
         <Menu
           anchorEl={anchorElUser}
           anchorOrigin={{
@@ -280,12 +360,93 @@ const Navbar = () => {
           <MenuItem onClick={handleProfile}>
             <Typography color="common.white" >Profile</Typography>
           </MenuItem>
-          <MenuItem onClick={handleManageUsers}>
-            <Typography color="common.white" >Manage Users</Typography>
+          <MenuItem onClick={null}>
+            <Typography color="common.white" >Contact Us</Typography>
+          </MenuItem>
+          <MenuItem onClick={null}>
+            <Typography color="common.white" >Help</Typography>
           </MenuItem>
           <Divider />
           <MenuItem onClick={handleLogout}>
             <Typography color="common.white" >Log out</Typography>
+          </MenuItem>
+        </Menu>
+
+        {/*Repository Menu*/}
+        <Menu
+          anchorEl={anchorElRepo}
+          anchorOrigin={{
+            vertical: "top",
+            horizontal: "right",
+          }}
+          keepMounted
+          transformOrigin={{
+            vertical: "top",
+            horizontal: "right",
+          }}
+          open={Boolean(anchorElRepo)}
+          onClose={handleCloseRepoMenu}
+          sx={{ "& .MuiPaper-root": { backgroundColor: "#CA031B" } }}
+        >
+          <MenuItem onClick={null}>
+            <Typography color="common.white" >Collections</Typography>
+          </MenuItem>
+          <MenuItem onClick={null}>
+            <Typography color="common.white" >Knowledge Graph</Typography>
+          </MenuItem>
+          <MenuItem onClick={null}>
+            <Typography color="common.white" >Manage Papers</Typography>
+          </MenuItem>
+        </Menu>
+
+        {/*Research Tracking Menu*/}
+        <Menu
+          anchorEl={anchorElRetr}
+          anchorOrigin={{
+            vertical: "top",
+            horizontal: "right",
+          }}
+          keepMounted
+          transformOrigin={{
+            vertical: "top",
+            horizontal: "right",
+          }}
+          open={Boolean(anchorElRetr)}
+          onClose={handleCloseRetrMenu}
+          sx={{ "& .MuiPaper-root": { backgroundColor: "#CA031B" } }}
+        >
+          <MenuItem onClick={null}>
+            <Typography color="common.white" >Proceeding</Typography>
+          </MenuItem>
+          <MenuItem onClick={null}>
+            <Typography color="common.white" >Journal</Typography>
+          </MenuItem>
+        </Menu>
+
+        {/*System Management Menu*/}
+        <Menu
+          anchorEl={anchorElSyma}
+          anchorOrigin={{
+            vertical: "top",
+            horizontal: "right",
+          }}
+          keepMounted
+          transformOrigin={{
+            vertical: "top",
+            horizontal: "right",
+          }}
+          open={Boolean(anchorElSyma)}
+          onClose={handleCloseSymaMenu}
+          sx={{ "& .MuiPaper-root": { backgroundColor: "#CA031B" } }}
+        >
+          <MenuItem onClick={handleManageUsers}>
+            <Typography color="common.white" >Manage Users</Typography>
+          </MenuItem>
+          <MenuItem onClick={null}>
+            <Typography color="common.white" >Manage College</Typography>
+          </MenuItem>
+          <MenuItem onClick={null}>
+            <Typography color="common.white" >Manage Program</Typography>
           </MenuItem>
         </Menu>
       </Toolbar>

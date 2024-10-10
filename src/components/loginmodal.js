@@ -58,7 +58,7 @@ const LoginModal = ({ isOpen, handleClose }) => {
       localStorage.setItem("user_id", data.user_id);
       alert(`Login Successfully`);
       handleClose();
-      navigate("/home");
+      navigate("/main");
     } catch (error) {
       alert(`Login failed: ${error.message}`);
     }

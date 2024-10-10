@@ -16,19 +16,10 @@ import {
   Button,
   IconButton,
   Paper,
-  TextField,
   Typography,
   useMediaQuery,
-  Modal,
-  Grid2,
-  InputAdornment,
-  Divider,
+
 } from "@mui/material";
-import {
-  Clear as ClearIcon,
-  Visibility,
-  VisibilityOff,
-} from "@mui/icons-material";
 
 const Home = () => {
   const [showPassword, setShowPassword] = useState(false);
