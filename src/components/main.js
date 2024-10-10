@@ -1,18 +1,11 @@
 import React, { useState } from "react";
 import homeBg from "../assets/home_bg.png";
 import { useNavigate } from "react-router-dom";
-import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
-import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
-import placeholderImage from "../assets/placeholder_image.png";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Navbar from "./navbar";
-import { useModal } from "./modalcontext";
 import {
   Box,
-  Button,
-  IconButton,
-  Paper,
   Typography,
   useMediaQuery,
 
@@ -23,8 +16,6 @@ const Main = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
   const isMobile = useMediaQuery("(max-width:600px)");
-  const [isModalLoginOpen, setIsLoginModalOpen] = useState(false);
-  const [isModalSignupOpen, setIsSignupModalOpen] = useState(false);
 
   return (
     <>

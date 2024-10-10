@@ -5,10 +5,8 @@ import {
   Box,
   Button,
   IconButton,
-  Paper,
   TextField,
   Typography,
-  useMediaQuery,
   Modal,
   Grid2,
   InputAdornment,
@@ -275,7 +273,7 @@ const SignUpModal = () => {
                   variant='contained'
                   type='submit'
                   sx={{
-                    maxWidth: "250px",
+                    maxWidth: "200px",
                     marginTop: "20px",
                     padding: "15px",
                     backgroundColor: "#EC1F28",

@@ -5,7 +5,7 @@ import { useModalContext } from "./modalcontext";
 
 const LoginModal = ({ isOpen, handleClose }) => {
   const navigate = useNavigate();
-  const { isLoginModalOpen, closeLoginModal, openSignupModal } =
+  const { isLoginModalOpen, closeLoginModal, openSignupModal, openPassresetModal } =
     useModalContext();
 
   const [formValues, setFormValues] = useState({
@@ -123,7 +123,7 @@ const LoginModal = ({ isOpen, handleClose }) => {
                   fullWidth
                   variant='contained'
                   sx={{
-                    maxWidth: "250px",
+                    maxWidth: "200px",
                     marginTop: "20px",
                     padding: "15px",
                     backgroundColor: "#EC1F28",
@@ -132,6 +132,20 @@ const LoginModal = ({ isOpen, handleClose }) => {
                   Log in
                 </Button>
 
+                <Typography sx={{ marginTop: "20px" }}> 
+                    {" "}
+                    <a
+                        href='#'
+                        onClick={(e) => {
+                        e.preventDefault();
+                        closeLoginModal();
+                        openPassresetModal();
+                        }}
+                        style={{ color: "#3393EA" }}
+                    >
+                    Forgot Password
+                    </a>
+                </Typography>   
                 <Typography sx={{ marginTop: "20px" }}>
                   Don’t have an account?{" "}
                   <a

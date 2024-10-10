@@ -7,11 +7,14 @@ export const useModalContext = () => {
 export const ModalProvider = ({ children }) => {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isSignupModalOpen, setIsSignupModalOpen] = useState(false);
+  const [isPassresetModalOpen, setIsPassresetModalOpen] = useState(false);
 
   const openLoginModal = () => setIsLoginModalOpen(true);
   const closeLoginModal = () => setIsLoginModalOpen(false);
   const openSignupModal = () => setIsSignupModalOpen(true);
   const closeSignupModal = () => setIsSignupModalOpen(false);
+  const openPassresetModal = () => setIsPassresetModalOpen(true);
+  const closePassresetModal = () => setIsPassresetModalOpen(false);
 
   return (
     <ModalContext.Provider
@@ -22,6 +25,9 @@ export const ModalProvider = ({ children }) => {
         isSignupModalOpen,
         openSignupModal,
         closeSignupModal,
+        isPassresetModalOpen,
+        openPassresetModal,
+        closePassresetModal
       }}
     >
       {children}

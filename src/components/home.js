@@ -10,7 +10,7 @@ import "slick-carousel/slick/slick-theme.css";
 import Navbar from "./navbar";
 import LoginModal from "./loginmodal";
 import SignupModal from "./signupmodal";
-import { useModal } from "./modalcontext";
+import PasswordResetModal from "./passresetmodal";
 import {
   Box,
   Button,
@@ -28,6 +28,7 @@ const Home = () => {
   const isMobile = useMediaQuery("(max-width:600px)");
   const [isModalLoginOpen, setIsLoginModalOpen] = useState(false);
   const [isModalSignupOpen, setIsSignupModalOpen] = useState(false);
+  const [isModalPassresetOpen, setIsPassresetModalOpen] = useState(false);
 
   const departments = [
     {
@@ -104,18 +105,6 @@ const Home = () => {
     prevArrow: <PrevArrow />,
   };
 
-  const modalStyle = {
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    width: 600,
-    bgcolor: "background.paper",
-    boxShadow: 24,
-    p: 4,
-    borderRadius: "10px",
-  };
-
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
   };
@@ -136,6 +125,14 @@ const Home = () => {
 
   const handleCloseSignupModal = () => {
     setIsSignupModalOpen(false);
+  };
+
+  const handleOpenPassresetModal = () => {
+    setIsPassresetModalOpen(true);
+  };
+
+  const handleClosePassresetModal = () => {
+    setIsPassresetModalOpen(false);
   };
 
   return (
@@ -340,11 +337,17 @@ const Home = () => {
           isOpen={isModalLoginOpen}
           handleClose={handleCloseLoginModal}
           handleOpenSignup={handleOpenSignupModal}
+          handleOpenPassreset={handleOpenPassresetModal}
         />
         <SignupModal
           isOpen={isModalSignupOpen}
           handleClose={handleCloseSignupModal}
           handleOpenLogin={handleOpenLoginModal} // Pass function to open LoginModal after signup
+        />
+        <PasswordResetModal
+          isOpen={isModalPassresetOpen}
+          handleClose={handleClosePassresetModal}
+          handleOpenLogin={handleOpenLoginModal}
         />
       </Box>
     </>

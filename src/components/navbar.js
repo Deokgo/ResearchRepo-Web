@@ -96,6 +96,14 @@ const Navbar = () => {
     navigate("/manage-users");
   };
 
+  const handleKnowledgeGraph = () => {
+    navigate("/knowledgegraph");
+  };
+
+  const handleMainDash = () => {
+    navigate("/maindash");
+  };
+
   const handleNavigateHome = () => {
     navigate("/main");
   };
@@ -391,7 +399,10 @@ const Navbar = () => {
           <MenuItem onClick={null}>
             <Typography color="common.white" >Collections</Typography>
           </MenuItem>
-          <MenuItem onClick={null}>
+          <MenuItem onClick={handleMainDash}>
+            <Typography color="common.white" >Data Analytics</Typography>
+          </MenuItem>
+          <MenuItem onClick={handleKnowledgeGraph}>
             <Typography color="common.white" >Knowledge Graph</Typography>
           </MenuItem>
           <MenuItem onClick={null}>
