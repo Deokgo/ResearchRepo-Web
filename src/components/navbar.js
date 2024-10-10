@@ -57,12 +57,12 @@ const Navbar = () => {
   };
   const handleLogout = () => {
     localStorage.removeItem("token");
-    navigate("/login");
+    navigate("/home");
   };
   const mobileMenuItems = isLoggedIn
     ? [
         { label: "Home", onClick: handleNavigateHome },
-        { label: "Communities & Collections", onClick: handleCloseNavMenu },
+        { label: "Research Thrusts", onClick: handleCloseNavMenu },
         { label: "Profile", onClick: handleProfile },
         { label: "Manage Users", onClick: handleManageUsers },
       ]
@@ -121,8 +121,8 @@ const Navbar = () => {
           <Box
             sx={{
               display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
+              flexDirection: "column",
+              alignItems: "left",
               cursor: "pointer",
             }}
             onClick={handleNavigateHome}
@@ -133,9 +133,8 @@ const Navbar = () => {
                 fontFamily: "Montserrat, sans-serif",
                 fontWeight: 600,
                 color: "#CA031B",
-                fontSize: { xs: "1.2rem", md: "1.5rem" },
+                fontSize: { xs: "1.2rem", md: "1.25rem" },
                 textAlign: { xs: "center", md: "inherit" },
-                mr: 1,
               }}
             >
               Institutional
@@ -146,9 +145,10 @@ const Navbar = () => {
                 fontFamily: "Montserrat, sans-serif",
                 fontWeight: 600,
                 color: "#001C43",
-                fontSize: { xs: "1.2rem", md: "1.5rem" },
+                fontSize: { xs: "1.2rem", md: "1.25rem" },
                 textAlign: { xs: "center", md: "inherit" },
-                lineHeight: { xs: "1.2", md: "inherit" },
+                lineHeight: { xs: "0.5"},
+                paddingBottom: "0.75rem"
               }}
             >
               Repository
@@ -164,21 +164,23 @@ const Navbar = () => {
               color: "#001C43",
               fontFamily: "Montserrat, sans-serif",
               fontWeight: 600,
+              marginRight: "3rem"
             }}
           >
             Home
           </Button>
           <Button
-            key='Communities & Collections'
+            key='Research Thrusts'
             onClick={handleCloseNavMenu}
             sx={{
               my: 2,
               color: "#001C43",
               fontFamily: "Montserrat, sans-serif",
               fontWeight: 600,
+              marginRight: "3rem"
             }}
           >
-            Communities & Collections
+            Research Thrusts
           </Button>
 
           {!isLoggedIn ? (
@@ -188,9 +190,10 @@ const Navbar = () => {
               sx={{
                 my: 2,
                 color: "#CA031B",
-                fontSize: "1rem",
+                fontSize: "1.25rem",
                 fontFamily: "Montserrat, sans-serif",
-                fontWeight: 600,
+                fontWeight: 800,
+                marginRight: "3rem"
               }}
             >
               Log in
