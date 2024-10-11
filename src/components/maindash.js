@@ -5,7 +5,7 @@ import { Box, CircularProgress } from "@mui/material";
 
 const MainDash = () => {
   const [loading, setLoading] = useState(true);
-  
+
   // Handle iframe load event to set loading state
   const handleIframeLoad = () => {
     setLoading(false);
@@ -30,13 +30,13 @@ const MainDash = () => {
 
   return (
     <>
-      <Box sx={{ margin: 0, padding: 0, height: "100vh" }}>
+      <Box sx={{ margin: 0, padding: 0, height: "85vh" }}>
         <Navbar />
         <Box
           sx={{
             display: "flex",
             flexDirection: "column",
-            height: "calc(100vh - 6rem)",
+            height: "calc(100vh - 6rem)", // Adjusts based on Navbar and Footer height
             marginTop: { xs: "3.5rem", sm: "4rem", md: "6rem" },
           }}
         >
@@ -46,7 +46,7 @@ const MainDash = () => {
               backgroundColor: "#f5f5f5",
               padding: 0,
               boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-              overflowY: "auto",
+              overflowY: "hidden", // Prevent scrollbar in parent
             }}
           >
             {loading && (
@@ -66,7 +66,7 @@ const MainDash = () => {
               src="http://localhost:5000/dashboard/overview"
               style={{
                 width: "100%",
-                height: "100%", // Initial height
+                height: "100%", // Ensure it takes full height of parent
                 border: "none",
                 display: loading ? "none" : "block",
               }}
@@ -74,7 +74,6 @@ const MainDash = () => {
             />
           </Box>
         </Box>
-        <Footer />
       </Box>
     </>
   );
