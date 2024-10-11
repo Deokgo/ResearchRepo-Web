@@ -8,6 +8,7 @@ import PrivateRoute from "./components/privateroute";
 import ManageUsers from "./components/manageusers";
 import PasswordReset from "./components/passwordreset";
 import ResearchThrust from "./components/researchthrust"
+import ResearchTracking from "./components/researchtracking"
 import { CssBaseline } from "@mui/material"; // To remove default margin
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import KnowledgeGraph from "./components/knowledgegraph";
@@ -35,6 +36,7 @@ function App() {
           <Route path='/maindash' element={<MainDash />} />
           <Route path='/publication' element={<PubDash />} />
           <Route path='/researchthrust' element={<ResearchThrust />} />
+          <Route path='/researchtracking' element={<ResearchTracking />} />
 
           <Route
             path='/profile'

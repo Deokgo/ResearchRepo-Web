@@ -151,8 +151,6 @@ const Profile = () => {
               marginTop: { xs: "3.5rem", sm: "4rem", md: "6rem" },
               display: "flex",
               flexDirection: { xs: "column", md: "row" },
-              padding: 4,
-              gap: 4,
               backgroundSize: "cover",
               backgroundPosition: "center",
               height: { xs: "5rem", md: "8rem" },
@@ -191,7 +189,7 @@ const Profile = () => {
                   lineHeight: 1.25,
                   maxWidth: { xs: "100%", md: "100%" },
                   alignSelf: "center",
-                  paddingLeft: 5,
+                  paddingLeft: 3,
                   zIndex: 2,
                 }}
               >
@@ -205,81 +203,75 @@ const Profile = () => {
             sx={{
               display: "flex",
               flexDirection: "column",
-              alignItems: "left",
               padding: 4,
-              marginLeft: "10rem",
               width: "100%",
             }}
           >
-            {/* Search Bar */}
             <Box
               sx={{
-                paddingLeft: "5em",
                 display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
+                flexDirection: "column",
+                paddingLeft: "12rem"
               }}
             >
+              {/* Search Bar */}
               <TextField
                 variant='outlined'
                 placeholder='Search...'
                 value={searchQuery}
                 onChange={handleSearchChange}
-                sx={{ width: "30rem" }}
+                sx={{ width: "30rem", paddingLeft: 5}}
               />
-            </Box>
-            <Box
-              sx={{
-                display: "flex",
-                flexWrap: "wrap",
-                width: "90%",
-                mb: "1rem",
-                padding: "2em",
-              }}
-            >
-              {departments.map((department) => (
-                <Box key={department.id} sx={{ px: 3 }}>
-                  <Paper
-                    elevation={3}
-                    sx={{
-                      padding: 2,
-                      textAlign: "center",
-                      display: "flex",
-                      width: "20rem",
-                      margin: 2,
-                      flexDirection: "column",
-                      alignItems: "center",
-                    }}
-                  >
-                    <img
-                      src={department.image}
-                      style={{
-                        width: "10rem",
-                        height: "8rem",
-                        padding: "1em",
-                      }}
-                      alt={department.name}
-                    />
-                    <Typography
-                      variant='h7'
+              <Box
+                sx={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  width: "90%",
+                }}
+              >
+                {departments.map((department) => (
+                  <Box key={department.id} sx={{ px: 3 }}>
+                    <Paper
+                      elevation={3}
                       sx={{
-                        fontWeight: 600,
-                        fontFamily: "Montserrat, sans-serif",
-                        color: "#08397C",
-                        minHeight: "3rem",
-                        lineHeight: 1.2,
-                        WebkitBoxOrient: "vertical",
+                        padding: 2,
+                        textAlign: "center",
+                        display: "flex",
+                        width: "20rem",
+                        margin: 2,
+                        flexDirection: "column",
+                        alignItems: "center",
                       }}
                     >
-                      {department.name}
-                    </Typography>
-                  </Paper>
-                </Box>
-              ))}
+                      <img
+                        src={department.image}
+                        style={{
+                          width: "10rem",
+                          height: "8rem",
+                          padding: "1em",
+                        }}
+                        alt={department.name}
+                      />
+                      <Typography
+                        variant='h7'
+                        sx={{
+                          fontWeight: 600,
+                          fontFamily: "Montserrat, sans-serif",
+                          color: "#08397C",
+                          minHeight: "3rem",
+                          lineHeight: 1.2,
+                          WebkitBoxOrient: "vertical",
+                        }}
+                      >
+                        {department.name}
+                      </Typography>
+                    </Paper>
+                  </Box>
+                ))}
+              </Box>
             </Box>
           </Box>
         </Box>
-        <Footer />
       </Box>
     </>
   );

@@ -358,7 +358,6 @@ const Profile = () => {
             </Box>
           </Modal>
         </Box>
-        <Footer />
       </Box>
     </>
   );
