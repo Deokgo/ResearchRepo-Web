@@ -108,6 +108,10 @@ const Navbar = () => {
     navigate("/publication");
   };
 
+  const handleResTrackProceeding = () => {
+    navigate("/researchtracking");
+  };
+
   const handleNavigateMain = () => {
     navigate("/main");
   };
@@ -438,7 +442,7 @@ const Navbar = () => {
           onClose={handleCloseRetrMenu}
           sx={{ "& .MuiPaper-root": { backgroundColor: "#CA031B" } }}
         >
-          <MenuItem onClick={null}>
+          <MenuItem onClick={handleResTrackProceeding}>
             <Typography color="common.white" >Proceeding</Typography>
           </MenuItem>
           <MenuItem onClick={null}>
