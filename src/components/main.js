@@ -12,8 +12,6 @@ import {
 } from "@mui/material";
 
 const Main = () => {
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
   const isMobile = useMediaQuery("(max-width:600px)");
 

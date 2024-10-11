@@ -222,7 +222,7 @@ const Profile = () => {
             >
               <TextField
                 variant='outlined'
-                placeholder='Search User...'
+                placeholder='Search...'
                 value={searchQuery}
                 onChange={handleSearchChange}
                 sx={{ width: "30rem" }}

@@ -104,9 +104,18 @@ const Navbar = () => {
     navigate("/maindash");
   };
 
-  const handleNavigateHome = () => {
+  const handlePublication = () => {
+    navigate("/publication");
+  };
+
+  const handleNavigateMain = () => {
     navigate("/main");
   };
+
+  const handleNavigateHome = () => {
+    navigate("/home");
+  };
+
   const handleLogout = () => {
     localStorage.removeItem("token");
     navigate("/home");
@@ -248,7 +257,7 @@ const Navbar = () => {
             <Box>
               <Button
                 key='Home'
-                onClick={handleNavigateHome}
+                onClick={handleNavigateMain}
                 sx={buttonSettings}
               >
                 Home
@@ -401,6 +410,9 @@ const Navbar = () => {
           </MenuItem>
           <MenuItem onClick={handleMainDash}>
             <Typography color="common.white" >Data Analytics</Typography>
+          </MenuItem>
+          <MenuItem onClick={handlePublication}>
+            <Typography color="common.white" >Publications</Typography>
           </MenuItem>
           <MenuItem onClick={handleKnowledgeGraph}>
             <Typography color="common.white" >Knowledge Graph</Typography>
