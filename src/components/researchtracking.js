@@ -5,8 +5,6 @@ import {
   Box,
   Button,
   FormControl,
-  IconButton,
-  InputAdornment,
   InputLabel,
   MenuItem,
   Modal,
@@ -14,6 +12,9 @@ import {
   TextField,
   Typography,
   Paper,
+  Pagination,
+  IconButton,
+  InputAdornment,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import homeBg from "../assets/home_bg.png";
@@ -27,15 +28,23 @@ const ResearchTracking = () => {
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const rowsPerPage = 10; // Changed to a constant
   const navigate = useNavigate();
   const [openModal, setOpenModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [newRole, setNewRole] = useState("");
+
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get("/accounts/users");
-        const fetchedUsers = response.data.researchers;
+        const response = await axios.get("/dataset/fetch_dataset");
+        const fetchedUsers = response.data.dataset.map((user) => ({
+          research_id: user.research_id,
+          title: user.title,
+          timestamp: user.timestamp,
+          status: user.status,
+        }));
         setUsers(fetchedUsers);
         setFilteredUsers(fetchedUsers);
       } catch (error) {
@@ -58,11 +67,12 @@ const ResearchTracking = () => {
     setFilteredUsers(
       users.filter(
         (user) =>
-          user.email.toLowerCase().includes(query) ||
-          user.researcher_id.toLowerCase().includes(query)
+          user.research_id.toLowerCase().includes(query) ||
+          user.title.toLowerCase().includes(query)
       )
     );
   };
+
   const handleOpenModal = (user) => {
     setSelectedUser(user);
     setNewRole(user.role);
@@ -77,12 +87,20 @@ const ResearchTracking = () => {
   const handleSaveChanges = () => {
     console.log(
       "Saving changes for:",
-      selectedUser.researcher_id,
+      selectedUser.research_id,
       "New Role:",
       newRole
     );
+    // Here, you might want to implement an API call to save the changes
     setOpenModal(false);
   };
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  // Sliced data for pagination
+  const paginatedUsers = filteredUsers.slice((page - 1) * rowsPerPage, page * rowsPerPage);
 
   const numberFontSettings = {
     fontFamily: "Montserrat, sans-serif",
@@ -93,7 +111,7 @@ const ResearchTracking = () => {
     lineHeight: 1.25,
     alignSelf: "center",
     zIndex: 2,
-  }
+  };
 
   const labelFontSettings = {
     fontFamily: "Montserrat, sans-serif",
@@ -104,7 +122,7 @@ const ResearchTracking = () => {
     lineHeight: 1.25,
     alignSelf: "center",
     zIndex: 2,
-  }
+  };
 
   const boxSettings = {
     display: "flex",
@@ -112,7 +130,7 @@ const ResearchTracking = () => {
     flexDirection: "column",
     justifyContent: "space-between",
     alignItems: "center",
-  }
+  };
 
   return (
     <>
@@ -158,10 +176,10 @@ const ResearchTracking = () => {
                   color: "#fff",
                 }}
               >
-                <ArrowBackIosIcon></ArrowBackIosIcon>
+                <ArrowBackIosIcon />
               </IconButton>
               <Typography
-                variant='h3'
+                variant="h3"
                 sx={{
                   fontFamily: "Montserrat, sans-serif",
                   fontWeight: 800,
@@ -178,272 +196,187 @@ const ResearchTracking = () => {
             </Box>
           </Box>
 
-
-          {/*Main Content */}
+          {/* Main Content */}
           <Box
             sx={{
               display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
+              flexDirection: { xs: "column", md: "row" },
+              padding: 4,
             }}
           >
+            {/* Filter Section (Left) */}
             <Box
               sx={{
-                p: 4,
-                width: "80%", // Center search bar and button
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
-              <Paper
-                variant="outlined"
-                square={false}
-                sx={{
-                  textAlign: "center",
-                  width: { xs: "50%", md: "100%" },
-                  height: "auto",
-                  display: "flex",
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: "10rem"
-                }}
-                style={{ border: '3px solid', borderRadius: 20, borderColor:"#001C43"}}
-              >
-                {/*contents here */}   
-                <Box
-                  sx={boxSettings}
-                >
-                  <Typography
-                    variant='h3'
-                    sx={numberFontSettings}
-                  >
-                    37
-                  </Typography>
-                  <Typography
-                    variant='h3'
-                    sx={labelFontSettings}
-                  >
-                    SUBMITTED
-                  </Typography>
-                </Box>
-                <Box
-                  sx={boxSettings}
-                >
-                  <Typography
-                    variant='h3'
-                    sx={numberFontSettings}
-                  >
-                    2
-                  </Typography>
-                  <Typography
-                    variant='h3'
-                    sx={labelFontSettings}
-                  >
-                    ACCEPTED
-                  </Typography>
-                </Box>
-                <Box
-                  sx={boxSettings}
-                >
-                  <Typography
-                    variant='h3'
-                    sx={numberFontSettings}
-                  >
-                    187
-                  </Typography>
-                  <Typography
-                    variant='h3'
-                    sx={labelFontSettings}
-                  >
-                    PUBLISHED
-                  </Typography>
-                </Box>
-                <Box
-                  sx={boxSettings}
-                >
-                  <Typography
-                    variant='h3'
-                    sx={numberFontSettings}
-                  >
-                    26
-                  </Typography>
-                  <Typography
-                    variant='h3'
-                    sx={labelFontSettings}
-                  >
-                    INDEXED
-                  </Typography>
-                </Box>
-              </Paper>
-            </Box>
-            
-            {/* Search Bar */}
-            <Box
-              sx={{
-                pl: 4,
-                width: "80%", // Center search bar and button
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
+                flexBasis: "20%",
+                mr: 4,
               }}
             >
               <TextField
-                variant='outlined'
-                placeholder='Search ...'
+                variant="outlined"
+                placeholder="Filter by"
                 value={searchQuery}
                 onChange={handleSearchChange}
-                sx={{ width: "30rem" }}
+                sx={{ width: "100%" }}
+              />
+            </Box>
+
+            {/* Container for Stats, Search Bar, and Virtuoso Table (Right) */}
+            <Box sx={{ flexBasis: "80%" }}>
+              {/* Stats Section */}
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  mb: 4,
+                }}
+              >
+                <Paper
+                  variant="outlined"
+                  square={false}
+                  sx={{
+                    textAlign: "center",
+                    width: "100%",
+                    height: "auto",
+                    display: "flex",
+                    justifyContent: "space-around",
+                    padding: 2,
+                    borderRadius: 3,
+                    borderColor: "#001C43",
+                  }}
+                >
+                  <Box sx={boxSettings}>
+                    <Typography variant="h3" sx={numberFontSettings}>
+                      37
+                    </Typography>
+                    <Typography variant="h3" sx={labelFontSettings}>
+                      READY
+                    </Typography>
+                  </Box>
+                  <Box sx={boxSettings}>
+                    <Typography variant="h3" sx={numberFontSettings}>
+                      2
+                    </Typography>
+                    <Typography variant="h3" sx={labelFontSettings}>
+                      SUBMITTED
+                    </Typography>
+                  </Box>
+                  <Box sx={boxSettings}>
+                    <Typography variant="h3" sx={numberFontSettings}>
+                      187
+                    </Typography>
+                    <Typography variant="h3" sx={labelFontSettings}>
+                      ACCEPTED
+                    </Typography>
+                  </Box>
+                  <Box sx={boxSettings}>
+                    <Typography variant="h3" sx={numberFontSettings}>
+                      26
+                    </Typography>
+                    <Typography variant="h3" sx={labelFontSettings}>
+                      PUBLISHED
+                    </Typography>
+                  </Box>
+                </Paper>
+              </Box>
+
+              {/* Search Bar */}
+              <TextField
+                variant="outlined"
+                placeholder="Search ..."
+                value={searchQuery}
+                onChange={handleSearchChange}
+                sx={{
+                  marginBottom: 2,
+                  width: "100%",
+                  display: "flex",
+                  alignItems: "center",
+                }}
                 InputProps={{
                   startAdornment: (
-                    <InputAdornment position='start'>
+                    <InputAdornment position="start">
                       <Search />
                     </InputAdornment>
                   ),
                 }}
               />
-            </Box>
 
-            {/* Virtuoso Table */}
-            <Box sx={{ padding: 4, width: "80%" }}>
-              {loading ? (
-                <Typography>Loading users...</Typography>
-              ) : (
-                <Virtuoso
-                  style={{ height: "250px" }}
-                  totalCount={filteredUsers.length}
-                  header
-                  
-                  components={{
-                    Header: () => (
+              {/* Virtuoso Table */}
+              <Box sx={{ padding: 2, backgroundColor: "#F7F9FC" }}>
+                {loading ? (
+                  <Typography>Loading...</Typography>
+                ) : (
+                  <Virtuoso
+                    style={{ height: "400px" }}
+                    data={paginatedUsers}
+                    itemContent={(index, user) => (
                       <Box
+                        key={user.research_id}
                         sx={{
-                          display: "flex",
-                          fontFamily: "Montserrat, sans-serif",
-                          fontSize: { xs: "1.5rem", sm: "2rem", md: "1.25rem" },
-                          justifyContent: "space-between",
-                          color: "#001C43",
-                          padding: "10px",
-                          fontWeight: 700,
-                          position: "sticky",
-                          top: 0,
-                          zIndex: 1000,
+                          padding: 2,
+                          borderBottom: "1px solid #ddd",
+                          cursor: "pointer",
                         }}
+                        onClick={() => handleOpenModal(user)}
                       >
-                        <Box sx={{ flex: 1 }}>Research ID</Box>
-                        <Box sx={{ flex: 2 }}>Title</Box>
-                        <Box sx={{ flex: 1 }}>Status</Box>
-                        <Box sx={{ flex: 1 }}>Action</Box>
+                        <Typography variant="h6">{user.title}</Typography>
+                        <Typography variant="body2" color="textSecondary">
+                          Status: {user.status} | Timestamp: {user.timestamp}
+                        </Typography>
                       </Box>
-                    ),
-                  }}
-                  itemContent={(index) => {
-                    const user = filteredUsers[index];
-                    return (
-                      <Box
-                        sx={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          padding: "10px",
-                          borderBottom: "1px solid #ccc",
-                        }}
-                      >
-                        <Box sx={{ flex: 1 }}>PBC-20240101-040</Box>
-                        <Box sx={{ flex: 2 }}>Architectural Design in Modern Cities</Box>
-                        <Box sx={{ flex: 1 }}>SUBMITTED</Box>
-                        <Box sx={{ flex: 1 }}>
-                          <Button
-                            variant='text'
-                            color='primary'
-                            onClick={() => handleOpenModal(user)}
-                          >
-                            Edit
-                          </Button>
-                        </Box>
-                      </Box>
-                    );
-                  }}
-                />
-              )}
+                    )}
+                  />
+                )}
+              </Box>
+
+              {/* Pagination */}
+              <Pagination
+                count={Math.ceil(filteredUsers.length / rowsPerPage)}
+                page={page}
+                onChange={handleChangePage}
+                sx={{ mt: 2 }}
+              />
             </Box>
-            {selectedUser && (
-              <Modal
-                open={openModal}
-                onClose={handleCloseModal}
-                aria-labelledby='edit-user-role-modal'
-              >
-                <Box
-                  sx={{
-                    position: "absolute",
-                    top: "50%",
-                    left: "50%",
-                    transform: "translate(-50%, -50%)",
-                    width: 400,
-                    bgcolor: "background.paper",
-                    boxShadow: 24,
-                    p: 4,
-                    borderRadius: "8px",
-                  }}
-                >
-                  <Typography variant='h5' mb={3}>
-                    Edit User Role
-                  </Typography>
-                  <TextField
-                    label='Research ID'
-                    value="PBC-20240101-040"
-                    disabled
-                    fullWidth
-                    margin='normal'
-                  />
-                  <TextField
-                    label='Title'
-                    value="Architectural Design in Modern Cities"
-                    disabled
-                    fullWidth
-                    margin='normal'
-                  />
-                  <FormControl fullWidth margin='normal'>
-                    <InputLabel>Status</InputLabel>
-                    <Select
-                      value="SUBMITTED"
-                      onChange={(e) => ["ACCEPTED", "INDEXED", "SUBMITTED"]}
-                      label='Status'
-                    >
-                      <MenuItem value='Admin'>ACCEPTED</MenuItem>
-                      <MenuItem value='Researcher'>INDEXED</MenuItem>
-                      <MenuItem value='Viewer'>SUBMITTED</MenuItem>
-                    </Select>
-                  </FormControl>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      mt: 3,
-                    }}
-                  >
-                    <Button
-                      variant='outlined'
-                      onClick={handleCloseModal}
-                      sx={{ fontWeight: 600 }}
-                    >
-                      Back
-                    </Button>
-                    <Button
-                      variant='contained'
-                      color='primary'
-                      onClick={handleSaveChanges}
-                      sx={{ fontWeight: 600 }}
-                    >
-                      Save Changes
-                    </Button>
-                  </Box>
-                </Box>
-              </Modal>
-            )}
           </Box>
         </Box>
+
+        {/* Modal for Editing User */}
+        <Modal open={openModal} onClose={handleCloseModal}>
+          <Box
+            sx={{
+              width: "400px",
+              bgcolor: "background.paper",
+              p: 4,
+              borderRadius: 2,
+              boxShadow: 24,
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+            }}
+          >
+            <Typography variant="h6" component="h2">
+              Edit User Role
+            </Typography>
+            <TextField
+              variant="outlined"
+              label="Role"
+              value={newRole}
+              onChange={(e) => setNewRole(e.target.value)}
+              sx={{ mt: 2, width: "100%" }}
+            />
+            <Box sx={{ display: "flex", justifyContent: "space-between", mt: 4 }}>
+              <Button variant="contained" onClick={handleSaveChanges}>
+                Save
+              </Button>
+              <Button variant="outlined" onClick={handleCloseModal}>
+                Cancel
+              </Button>
+            </Box>
+          </Box>
+        </Modal>
       </Box>
+      <Footer />
     </>
   );
 };
