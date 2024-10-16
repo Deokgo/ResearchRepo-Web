@@ -25,6 +25,7 @@ const SignUpModal = () => {
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
+    institution: "",
     email: "",
     reason: "",
     password: "",
@@ -205,6 +206,25 @@ const SignUpModal = () => {
                   endAdornment: (
                     <InputAdornment position='end'>
                       <IconButton onClick={() => clearField("email")}>
+                        <ClearIcon />
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              ></TextField>
+              <TextField
+                fullWidth
+                label='Institution'
+                name='institution'
+                type='institution'
+                value={formData.institution}
+                onChange={handleChange}
+                margin='normal'
+                variant='outlined'
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position='end'>
+                      <IconButton onClick={() => clearField("institution")}>
                         <ClearIcon />
                       </IconButton>
                     </InputAdornment>
