@@ -321,7 +321,7 @@ const ResearchTracking = () => {
                       >
                         <Typography variant="h6">{user.title}</Typography>
                         <Typography variant="body2" color="textSecondary">
-                          Status: {user.status} | Timestamp: {user.timestamp}
+                          Status: {user.status} | Last Updated: {user.timestamp}
                         </Typography>
                       </Box>
                     )}
