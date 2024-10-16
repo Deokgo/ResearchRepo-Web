@@ -18,7 +18,6 @@ import {
   Paper,
   Typography,
   useMediaQuery,
-
 } from "@mui/material";
 
 const Home = () => {

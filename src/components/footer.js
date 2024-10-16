@@ -4,7 +4,7 @@ import { Box, Container, Divider, Typography } from "@mui/material";
 
 const Footer = () => {
   return (
-    <Box sx={{ backgroundColor: "#CA031B", color: "#FFF", py: 3, mt: 8 }}>
+    <Box sx={{ backgroundColor: "#CA031B", color: "#FFF", py: "1rem" }}>
       <Container maxWidth='false'>
         <Box
           sx={{
