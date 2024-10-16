@@ -23,8 +23,8 @@ const Navbar = () => {
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
 
+  const [anchorElDash, setAnchorElDash] = useState(null);
   const [anchorElRepo, setAnchorElRepo] = useState(null);
-  const [anchorElRetr, setAnchorElRetr] = useState(null);
   const [anchorElSyma, setAnchorElSyma] = useState(null);
 
   const [open, setOpen] = React.useState(false);
@@ -63,20 +63,20 @@ const Navbar = () => {
     setAnchorElUser(null);
   };
 
+  const handleOpenDashMenu = (event) => {
+    setAnchorElDash (event.currentTarget);
+  };
+
+  const handleCloseDashMenu = () => {
+    setAnchorElDash(null);
+  };
+
   const handleOpenRepoMenu = (event) => {
       setAnchorElRepo (event.currentTarget);
     };
   
   const handleCloseRepoMenu = () => {
     setAnchorElRepo(null);
-  };
-    
-  const handleOpenRetrMenu = (event) => {
-    setAnchorElRetr(event.currentTarget);
-  };
-
-  const handleCloseRetrMenu = () => {
-    setAnchorElRetr(null);
   };
 
   const handleOpenSymaMenu = (event) => {
@@ -104,12 +104,16 @@ const Navbar = () => {
     navigate("/maindash");
   };
 
-  const handlePublication = () => {
+  const handleReports = () => {
     navigate("/publication");
   };
 
-  const handleResTrackProceeding = () => {
+  const handleResesearchTrack = () => {
     navigate("/researchtracking");
+  };
+
+  const handleManagePapers = () => {
+    navigate("/managepapers");
   };
 
   const handleNavigateMain = () => {
@@ -163,7 +167,7 @@ const Navbar = () => {
       >
         <Box sx={{ display: "flex", alignItems: "center", mb: "0rem" }}>
           <IconButton
-            onClick={handleNavigateHome}
+            onClick={handleNavigateMain}
             sx={{
               p: 0,
               width: { xs: "2.5rem", md: "5rem" },
@@ -199,7 +203,7 @@ const Navbar = () => {
               alignItems: "left",
               cursor: "pointer",
             }}
-            onClick={handleNavigateHome}
+            onClick={handleNavigateMain}
           >
             <Typography
               variant='h6'
@@ -260,11 +264,12 @@ const Navbar = () => {
           ) : (
             <Box>
               <Button
-                key='Home'
-                onClick={handleNavigateMain}
+                key='Dashboard'
+                onClick={handleOpenDashMenu}
+                endIcon={<KeyboardArrowDownIcon style={{ color: 'red', fontSize: 30 }}/>}
                 sx={buttonSettings}
               >
-                Home
+                Dashboard
               </Button>
               <Button
                 key='Repository'
@@ -276,8 +281,7 @@ const Navbar = () => {
               </Button>
               <Button
                 key='ResearchTracking'
-                onClick={handleOpenRetrMenu}
-                endIcon={<KeyboardArrowDownIcon style={{ color: 'red', fontSize: 30 }}/>}
+                onClick={handleResesearchTrack}
                 sx={buttonSettings}
               >
                 Research Tracking
@@ -393,6 +397,33 @@ const Navbar = () => {
           </MenuItem>
         </Menu>
 
+        {/*Dashboard Menu*/}
+        <Menu
+          anchorEl={anchorElDash}
+          anchorOrigin={{
+            vertical: "top",
+            horizontal: "right",
+          }}
+          keepMounted
+          transformOrigin={{
+            vertical: "top",
+            horizontal: "right",
+          }}
+          open={Boolean(anchorElDash)}
+          onClose={handleCloseDashMenu}
+          sx={{ "& .MuiPaper-root": { backgroundColor: "#CA031B" } }}
+        >
+          <MenuItem onClick={handleReports}>
+            <Typography color="common.white" >Reports</Typography>
+          </MenuItem>
+          <MenuItem onClick={handleMainDash}>
+            <Typography color="common.white" >Analytics</Typography>
+          </MenuItem>
+          <MenuItem onClick={handleKnowledgeGraph}>
+            <Typography color="common.white" >Knowledge Graph</Typography>
+          </MenuItem>
+        </Menu>
+
         {/*Repository Menu*/}
         <Menu
           anchorEl={anchorElRepo}
@@ -412,41 +443,8 @@ const Navbar = () => {
           <MenuItem onClick={null}>
             <Typography color="common.white" >Collections</Typography>
           </MenuItem>
-          <MenuItem onClick={handleMainDash}>
-            <Typography color="common.white" >Data Analytics</Typography>
-          </MenuItem>
-          <MenuItem onClick={handlePublication}>
-            <Typography color="common.white" >Publications</Typography>
-          </MenuItem>
-          <MenuItem onClick={handleKnowledgeGraph}>
-            <Typography color="common.white" >Knowledge Graph</Typography>
-          </MenuItem>
-          <MenuItem onClick={null}>
+          <MenuItem onClick={handleManagePapers}>
             <Typography color="common.white" >Manage Papers</Typography>
-          </MenuItem>
-        </Menu>
-
-        {/*Research Tracking Menu*/}
-        <Menu
-          anchorEl={anchorElRetr}
-          anchorOrigin={{
-            vertical: "top",
-            horizontal: "right",
-          }}
-          keepMounted
-          transformOrigin={{
-            vertical: "top",
-            horizontal: "right",
-          }}
-          open={Boolean(anchorElRetr)}
-          onClose={handleCloseRetrMenu}
-          sx={{ "& .MuiPaper-root": { backgroundColor: "#CA031B" } }}
-        >
-          <MenuItem onClick={handleResTrackProceeding}>
-            <Typography color="common.white" >Proceeding</Typography>
-          </MenuItem>
-          <MenuItem onClick={null}>
-            <Typography color="common.white" >Journal</Typography>
           </MenuItem>
         </Menu>
 

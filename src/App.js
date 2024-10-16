@@ -9,6 +9,7 @@ import ManageUsers from "./components/manageusers";
 import PasswordReset from "./components/passwordreset";
 import ResearchThrust from "./components/researchthrust"
 import ResearchTracking from "./components/researchtracking"
+import ManagePapers from "./components/managepapers"
 import { CssBaseline } from "@mui/material"; // To remove default margin
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import KnowledgeGraph from "./components/knowledgegraph";
@@ -37,6 +38,7 @@ function App() {
           <Route path='/publication' element={<PubDash />} />
           <Route path='/researchthrust' element={<ResearchThrust />} />
           <Route path='/researchtracking' element={<ResearchTracking />} />
+          <Route path='/managepapers' element={<ManagePapers />} />
 
           <Route
             path='/profile'
