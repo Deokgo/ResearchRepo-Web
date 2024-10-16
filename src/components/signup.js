@@ -256,7 +256,7 @@ const Signup = () => {
             </Grid2>
             <TextField
               fullWidth
-              label='Mapúa MCL Live Account'
+              label='Email'
               name='email'
               type='email'
               value={formData.email}

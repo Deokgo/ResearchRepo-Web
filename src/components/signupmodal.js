@@ -26,6 +26,7 @@ const SignUpModal = () => {
     firstName: "",
     lastName: "",
     email: "",
+    reason: "",
     password: "",
   });
 
@@ -107,7 +108,6 @@ const SignUpModal = () => {
             <Box
               sx={{
                 width: "100%",
-                maxWidth: "500px",
                 justifyContent: "center",
                 padding: "2em",
               }}
@@ -205,6 +205,31 @@ const SignUpModal = () => {
                   endAdornment: (
                     <InputAdornment position='end'>
                       <IconButton onClick={() => clearField("email")}>
+                        <ClearIcon />
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              ></TextField>
+              <TextField
+                fullWidth
+                label='Reason'
+                name='reason'
+                type='reason'
+                value={formData.reason}
+                onChange={handleChange}
+                margin='normal'
+                multiline
+                maxRows={1}
+                variant='outlined'
+                helperText={`${formData.reason.length}/${100}`}
+                inputProps={{
+                  maxLength: 100,
+                }}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position='end'>
+                      <IconButton onClick={() => clearField("reason")}>
                         <ClearIcon />
                       </IconButton>
                     </InputAdornment>
