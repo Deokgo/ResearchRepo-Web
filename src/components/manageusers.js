@@ -162,9 +162,10 @@ const ManageUsers = () => {
             {/* Search Bar */}
             <Box
               sx={{
-                p: 4,
                 width: "80%", // Center search bar and button
                 display: "flex",
+                paddingTop: 2,
+                paddingBottom: 2,
                 justifyContent: "space-between",
                 alignItems: "center",
               }}
@@ -183,13 +184,13 @@ const ManageUsers = () => {
                   ),
                 }}
               />
-              <Button variant='contained' color='primary' sx={{ ml: 2 }}>
+              <Button variant='contained' color='primary'>
                 Add New User
               </Button>
             </Box>
 
             {/* Virtuoso Table */}
-            <Box sx={{ padding: 4, width: "80%" }}>
+            <Box sx={{ width: "80%" }}>
               {loading ? (
                 <Typography>Loading users...</Typography>
               ) : (
@@ -323,7 +324,6 @@ const ManageUsers = () => {
             )}
           </Box>
         </Box>
-        <Footer />
       </Box>
     </>
   );
