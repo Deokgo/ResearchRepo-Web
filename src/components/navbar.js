@@ -105,11 +105,11 @@ const Navbar = () => {
   };
 
   const handleMainDash = () => {
-    navigate("/maindash");
+    navigate("/publication");
   };
 
   const handleReports = () => {
-    navigate("/publication");
+    navigate("/maindash");
   };
 
   const handleResesearchTrack = () => {
