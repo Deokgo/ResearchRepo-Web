@@ -9,6 +9,7 @@ import ManageUsers from "./components/manageusers";
 import PasswordReset from "./components/passwordreset";
 import ResearchThrust from "./components/researchthrust";
 import ResearchTracking from "./components/researchtracking";
+import UpdateResearchInfo from "./components/updateresearchinfo";
 import Collection from "./components/departmentcollection";
 import ManagePapers from "./components/managepapers";
 import { CssBaseline } from "@mui/material"; // To remove default margin
@@ -39,6 +40,7 @@ function App() {
           <Route path='/publication' element={<PubDash />} />
           <Route path='/researchthrust' element={<ResearchThrust />} />
           <Route path='/researchtracking' element={<ResearchTracking />} />
+          <Route path='/updateresearchinfo' element={<UpdateResearchInfo />} />
           <Route path='/managepapers' element={<ManagePapers />} />
 
           <Route
