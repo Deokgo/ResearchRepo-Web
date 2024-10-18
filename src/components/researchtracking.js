@@ -191,7 +191,7 @@ const ResearchTracking = () => {
                   zIndex: 2,
                 }}
               >
-                Research Tracking
+                Research Publication Tracking
               </Typography>
             </Box>
           </Box>
