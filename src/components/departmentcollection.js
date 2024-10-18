@@ -252,22 +252,21 @@ const DepartmentCollection = () => {
           <Box
             sx={{
               flexGrow: 1,
-              padding: 4,
-              overflow: "hidden",
-              mb: 4,
+              padding: 2,
+              mb: 2,
             }}
           >
-            <Grid2 container spacing={2} sx={{ height: "100%" }}>
-              <Grid2 size={3}>
+            <Grid2 container spacing={5} sx={{ height: "100%" }}>
+              <Grid2 display="flex" justifyContent="flex-end" size={3}>
                 <Box
                   sx={{
-                    border: "1px solid #ccc",
-                    height: "100%",
+                    border: "2px solid #0A438F",
                     padding: 2,
-                    boxSizing: "border-box",
                     display: "flex",
                     flexDirection: "column",
-                    overflow: "hidden",
+                    width: "80%",
+                    height: "auto",
+                    borderRadius: 3,
                   }}
                 >
                   <Typography
@@ -281,10 +280,10 @@ const DepartmentCollection = () => {
                   >
                     {userDepartment}
                   </Typography>
-                  <Typography variant='h6' sx={{ mb: 2 }}>
+                  <Typography variant='h6' sx={{ mb: 2, fontWeight: "bold", color: "#F40824"}}>
                     Filters
                   </Typography>
-                  <Typography variant='body1' sx={{ mb: 1 }}>
+                  <Typography variant='body1' sx={{ mb: 1, color: "#08397C"}}>
                     Date Range:
                   </Typography>
                   <Slider
@@ -295,7 +294,10 @@ const DepartmentCollection = () => {
                     max={2024}
                     sx={{ my: 3, width: "80%", alignSelf: "center" }}
                   />
-                  <Typography variant='body1' sx={{ mb: 1 }}>
+                  <Typography variant='body1' sx={{ mb: 1, color: "#08397C"}}>
+                    College:
+                  </Typography>
+                  <Typography variant='body1' sx={{ mb: 1, color: "#08397C"}}>
                     Program:
                   </Typography>
                   <Box
@@ -320,7 +322,7 @@ const DepartmentCollection = () => {
                       />
                     ))}
                   </Box>
-                  <Typography variant='body1' sx={{ mt: 2, mb: 1 }}>
+                  <Typography variant='body1' sx={{ color: "#08397C"}}>
                     Publication Format:
                   </Typography>
                   {["Journal", "Proceeding", "Unpublished"].map((format) => (
@@ -430,8 +432,6 @@ const DepartmentCollection = () => {
             </Grid2>
           </Box>
         </Box>
-
-        <Footer />
       </Box>
     </>
   );

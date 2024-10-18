@@ -14,7 +14,12 @@ import {
   Paper,
   Pagination,
   IconButton,
+  Grid2,
   InputAdornment,
+  Slider,
+  FormControlLabel,
+  Checkbox,
+  Divider
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import homeBg from "../assets/home_bg.png";
@@ -34,6 +39,132 @@ const ResearchTracking = () => {
   const [openModal, setOpenModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [newRole, setNewRole] = useState("");
+
+  const [department, setDepartment] = useState(null);
+  const [research, setResearch] = useState([]);
+  const [programs, setPrograms] = useState([]);
+  const [filteredResearch, setFilteredResearch] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [dateRange, setDateRange] = useState([2010, 2024]);
+  const [selectedPrograms, setSelectedPrograms] = useState([]);
+  const [selectedCollege, setSelectedCollege] = useState([]);
+  const [selectedFormats, setSelectedFormats] = useState([]);
+  const itemsPerPage = 5;
+
+  useEffect(() => {
+    const fetchCollege = async () => {
+      if (department) {
+        try {
+          const response = await axios.get(`/deptprogs/college_depts`);
+          setDepartment(response.data.college_depts);
+        } catch (error) {
+          console.error("Error fetching department:", error);
+        }
+      }
+    };
+    fetchCollege();
+  }, [department]);
+
+  useEffect(() => {
+    const fetchPrograms = async () => {
+      if (department) {
+        try {
+          const response = await axios.get(`/deptprogs/programs`, {
+            params: { department: department },
+          });
+          setPrograms(response.data.programs);
+        } catch (error) {
+          console.error("Error fetching programs for department:", error);
+        }
+      }
+    };
+    fetchPrograms();
+  }, [department]);
+
+  useEffect(() => {
+    const fetchDepartmentResearch = async () => {
+      if (department) {
+        try {
+          const response = await axios.put(
+            `/dataset/fetch_researches/${department}`
+          );
+          const fetchedResearch = response.data.dataset;
+          setResearch(fetchedResearch);
+          setFilteredResearch(fetchedResearch);
+        } catch (error) {
+          console.error("Error fetching data of research:", error);
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+    fetchDepartmentResearch();
+  }, [department]);
+
+  useEffect(() => {
+    let filtered = research;
+
+    // Filter by Date Range
+    filtered = filtered.filter(
+      (item) => item.year >= dateRange[0] && item.year <= dateRange[1]
+    );
+
+    // Filter by College
+    if (selectedCollege.length > 0) {
+      filtered = filtered.filter((item) =>
+        selectedCollege.includes(item.college_name)
+      );
+    }
+
+    // Filter by Selected Programs
+    if (selectedPrograms.length > 0) {
+      filtered = filtered.filter((item) =>
+        selectedPrograms.includes(item.program_name)
+      );
+    }
+
+    // Filter by Selected Formats
+    if (selectedFormats.length > 0) {
+      filtered = filtered.filter((item) =>
+        selectedFormats.some(
+          (format) => format.toLowerCase() === item.journal.toLowerCase()
+        )
+      );
+    }
+
+    // Filter by Search Query
+    if (searchQuery) {
+      filtered = filtered.filter(
+        (item) =>
+          item.title.toLowerCase().includes(searchQuery) ||
+          item.concatenated_authors.toLowerCase().includes(searchQuery)
+      );
+    }
+
+    setFilteredResearch(filtered);
+    setCurrentPage(1); // Reset to the first page on filter change
+  }, [dateRange, selectedPrograms, selectedFormats, searchQuery, research]);
+
+  // Handle change in date range filter
+  const handleDateRangeChange = (event, newValue) => {
+    setDateRange(newValue);
+  };
+
+  // Handle change in selected programs filter
+  const handleProgramChange = (event) => {
+    const { value, checked } = event.target;
+    setSelectedPrograms((prev) =>
+      checked ? [...prev, value] : prev.filter((item) => item !== value)
+    );
+  };
+
+  // Handle change in selected formats filter
+  const handleFormatChange = (event) => {
+    const { value, checked } = event.target;
+    setSelectedFormats((prev) =>
+      checked ? [...prev, value] : prev.filter((item) => item !== value)
+    );
+  };
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -138,7 +269,6 @@ const ResearchTracking = () => {
         sx={{
           display: "flex",
           flexDirection: "column",
-          minHeight: "100vh",
         }}
       >
         <Navbar />
@@ -199,148 +329,222 @@ const ResearchTracking = () => {
           {/* Main Content */}
           <Box
             sx={{
-              display: "flex",
-              flexDirection: { xs: "column", md: "row" },
-              padding: 4,
+              flexGrow: 1,
+              padding: 2,
+              mb: 2,
             }}
           >
-            {/* Filter Section (Left) */}
-            <Box
-              sx={{
-                flexBasis: "20%",
-                mr: 4,
-              }}
-            >
-              <TextField
-                variant="outlined"
-                placeholder="Filter by"
-                value={searchQuery}
-                onChange={handleSearchChange}
-                sx={{ width: "100%" }}
-              />
-            </Box>
-
-            {/* Container for Stats, Search Bar, and Virtuoso Table (Right) */}
-            <Box sx={{ flexBasis: "80%" }}>
-              {/* Stats Section */}
+            <Grid2 container spacing={5} sx={{ height: "100%"}}>
+              
+              {/* Filter Section (Left) */}
+              <Grid2 display="flex" justifyContent="flex-end" size={3}>
               <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  mb: 4,
-                }}
-              >
-                <Paper
-                  variant="outlined"
-                  square={false}
                   sx={{
-                    textAlign: "center",
-                    width: "100%",
-                    height: "auto",
-                    display: "flex",
-                    justifyContent: "space-around",
+                    border: "2px solid #0A438F",
                     padding: 2,
+                    display: "flex",
+                    flexDirection: "column",
+                    width: "80%",
+                    height: "auto",
                     borderRadius: 3,
-                    borderColor: "#001C43",
                   }}
                 >
-                  <Box sx={boxSettings}>
-                    <Typography variant="h3" sx={numberFontSettings}>
-                      37
-                    </Typography>
-                    <Typography variant="h3" sx={labelFontSettings}>
-                      READY
-                    </Typography>
+                  <Typography
+                    variant='h6'
+                    sx={{
+                      mb: 2,
+                      fontWeight: "bold",
+                      color: "#0A438F",
+                      fontSize: "1.5rem",
+                    }}
+                  >
+                    {department}
+                  </Typography>
+                  <Typography variant='h6' sx={{ mb: 2, fontWeight: "bold", color: "#F40824"}}>
+                    Filters
+                  </Typography>
+                  <Typography variant='body1' sx={{ mb: 1, color: "#08397C"}}>
+                    Date Range:
+                  </Typography>
+                  <Slider
+                    value={dateRange}
+                    onChange={handleDateRangeChange}
+                    valueLabelDisplay='on'
+                    min={2010}
+                    max={2024}
+                    sx={{ my: 3, width: "80%", alignSelf: "center" }}
+                  />
+                  <Typography variant='body1' sx={{ mb: 1, color: "#08397C"}}>
+                    Colleges:
+                  </Typography>
+                  
+                  <Typography variant='body1' sx={{ mb: 1, color: "#08397C"}}>
+                    Program:
+                  </Typography>
+                  <Box
+                    sx={{
+                      height: "8rem",
+                      overflowY: "auto",
+                    }}
+                  >
+                    {programs.map((program) => (
+                      <FormControlLabel
+                        key={program.program_id}
+                        control={
+                          <Checkbox
+                            checked={selectedPrograms.includes(
+                              program.program_name
+                            )}
+                            onChange={handleProgramChange}
+                            value={program.program_name}
+                          />
+                        }
+                        label={program.program_name}
+                      />
+                    ))}
                   </Box>
-                  <Box sx={boxSettings}>
-                    <Typography variant="h3" sx={numberFontSettings}>
-                      2
-                    </Typography>
-                    <Typography variant="h3" sx={labelFontSettings}>
-                      SUBMITTED
-                    </Typography>
-                  </Box>
-                  <Box sx={boxSettings}>
-                    <Typography variant="h3" sx={numberFontSettings}>
-                      187
-                    </Typography>
-                    <Typography variant="h3" sx={labelFontSettings}>
-                      ACCEPTED
-                    </Typography>
-                  </Box>
-                  <Box sx={boxSettings}>
-                    <Typography variant="h3" sx={numberFontSettings}>
-                      26
-                    </Typography>
-                    <Typography variant="h3" sx={labelFontSettings}>
-                      PUBLISHED
-                    </Typography>
-                  </Box>
-                </Paper>
-              </Box>
+                  <Divider orientation='horizontal'/>
+                  {["Sort by Date", "Sort by Title", "Sort by Research Code"].map((format) => (
+                    <FormControlLabel
+                      key={format}
+                      control={
+                        <Checkbox
+                          checked={selectedFormats.includes(format)}
+                          onChange={handleFormatChange}
+                          value={format}
+                        />
+                      }
+                      label={format}
+                    />
+                  ))}
+                </Box>
+              </Grid2>
+              <Grid2 display="flex" justifyContent="flex-start" size={9}>
 
-              {/* Search Bar */}
-              <TextField
-                variant="outlined"
-                placeholder="Search ..."
-                value={searchQuery}
-                onChange={handleSearchChange}
-                sx={{
-                  marginBottom: 2,
-                  width: "100%",
-                  display: "flex",
-                  alignItems: "center",
-                }}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <Search />
-                    </InputAdornment>
-                  ),
-                }}
-              />
-
-              {/* Virtuoso Table */}
-              <Box sx={{ padding: 2, backgroundColor: "#F7F9FC" }}>
-                {loading ? (
-                  <Typography>Loading...</Typography>
-                ) : (
-                  <Virtuoso
-                    style={{ height: "400px" }}
-                    data={paginatedUsers}
-                    itemContent={(index, user) => (
-                      <Box
-                        key={user.research_id}
-                        sx={{
-                          padding: 2,
-                          borderBottom: "1px solid #ddd",
-                          cursor: "pointer",
-                        }}
-                        onClick={() => handleOpenModal(user)}
-                      >
-                        <Typography variant="h6">{user.title}</Typography>
-                        <Typography variant="body2" color="textSecondary">
-                          Status: {user.status} | Last Updated: {user.timestamp}
+                {/* Container for Stats, Search Bar, and Virtuoso Table (Right) */}
+                <Box sx={{ flexBasis: "90%" }}>
+                  {/* Stats Section */}
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      mb: 4,
+                    }}
+                  >
+                    <Paper
+                      variant="outlined"
+                      square={false}
+                      sx={{
+                        textAlign: "center",
+                        width: "100%",
+                        height: "auto",
+                        display: "flex",
+                        justifyContent: "space-around",
+                        padding: 2,
+                        borderRadius: 3,
+                        borderColor: "#001C43",
+                      }}
+                    >
+                      <Box sx={boxSettings}>
+                        <Typography variant="h3" sx={numberFontSettings}>
+                          37
+                        </Typography>
+                        <Typography variant="h3" sx={labelFontSettings}>
+                          READY
                         </Typography>
                       </Box>
-                    )}
-                  />
-                )}
-              </Box>
+                      <Box sx={boxSettings}>
+                        <Typography variant="h3" sx={numberFontSettings}>
+                          2
+                        </Typography>
+                        <Typography variant="h3" sx={labelFontSettings}>
+                          SUBMITTED
+                        </Typography>
+                      </Box>
+                      <Box sx={boxSettings}>
+                        <Typography variant="h3" sx={numberFontSettings}>
+                          187
+                        </Typography>
+                        <Typography variant="h3" sx={labelFontSettings}>
+                          ACCEPTED
+                        </Typography>
+                      </Box>
+                      <Box sx={boxSettings}>
+                        <Typography variant="h3" sx={numberFontSettings}>
+                          26
+                        </Typography>
+                        <Typography variant="h3" sx={labelFontSettings}>
+                          PUBLISHED
+                        </Typography>
+                      </Box>
+                    </Paper>
+                  </Box>
 
-              {/* Pagination */}
-              <Pagination
-                count={Math.ceil(filteredUsers.length / rowsPerPage)}
-                page={page}
-                onChange={handleChangePage}
-                sx={{ mt: 2 }}
-              />
-            </Box>
+                  {/* Search Bar */}
+                  <TextField
+                    variant="outlined"
+                    placeholder="Search ..."
+                    value={searchQuery}
+                    onChange={handleSearchChange}
+                    sx={{
+                      width: "40%",
+                      display: "flex",
+                      justifyContent: "flex-start"
+                    }}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <Search />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+
+                  {/* Virtuoso Table */}
+                  <Box sx={{ padding: 2, backgroundColor: "#F7F9FC" }}>
+                    {loading ? (
+                      <Typography>Loading...</Typography>
+                    ) : (
+                      <Virtuoso
+                        style={{ height: "400px" }}
+                        data={paginatedUsers}
+                        itemContent={(index, user) => (
+                          <Box
+                            key={user.research_id}
+                            sx={{
+                              padding: 2,
+                              borderBottom: "1px solid #ddd",
+                              cursor: "pointer",
+                            }}
+                            onClick={() => handleOpenModal(user)}
+                          >
+                            <Typography variant="h6">{user.title}</Typography>
+                            <Typography variant="body2" color="textSecondary">
+                              Status: {user.status} | Last Updated: {user.timestamp}
+                            </Typography>
+                          </Box>
+                        )}
+                      />
+                    )}
+                  </Box>
+
+                  {/* Pagination */}
+                  <Pagination
+                    count={Math.ceil(filteredUsers.length / rowsPerPage)}
+                    page={page}
+                    onChange={handleChangePage}
+                    sx={{ mt: 2 }}
+                  />
+                </Box>
+              </Grid2>
+            </Grid2>
+
+            
           </Box>
         </Box>
 
-        {/* Modal for Editing User */}
+        {/* Modal for Updating Status */}
         <Modal open={openModal} onClose={handleCloseModal}>
           <Box
             sx={{
@@ -356,12 +560,11 @@ const ResearchTracking = () => {
             }}
           >
             <Typography variant="h6" component="h2">
-              Edit User Role
+              Update Status
             </Typography>
             <TextField
               variant="outlined"
-              label="Role"
-              value={newRole}
+              value={"(STATUS)"}
               onChange={(e) => setNewRole(e.target.value)}
               sx={{ mt: 2, width: "100%" }}
             />

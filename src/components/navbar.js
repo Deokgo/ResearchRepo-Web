@@ -92,6 +92,10 @@ const Navbar = () => {
     navigate("/profile");
   };
 
+  const handleCollection = () => {
+    navigate("/collection");
+  };
+
   const handleManageUsers = () => {
     navigate("/manage-users");
   };
@@ -440,7 +444,7 @@ const Navbar = () => {
           onClose={handleCloseRepoMenu}
           sx={{ "& .MuiPaper-root": { backgroundColor: "#CA031B" } }}
         >
-          <MenuItem onClick={null}>
+          <MenuItem onClick={handleCollection}>
             <Typography color="common.white" >Collections</Typography>
           </MenuItem>
           <MenuItem onClick={handleManagePapers}>
