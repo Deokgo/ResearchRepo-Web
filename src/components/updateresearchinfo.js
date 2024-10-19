@@ -78,11 +78,6 @@ const ManageUsers = () => {
     setOpenModal(true);
   };
 
-  const handleCloseModal = () => {
-    setOpenModal(false);
-    setSelectedUser(null);
-  };
-
   const handleSaveChanges = () => {
     console.log(
       "Saving changes for:",
@@ -137,7 +132,7 @@ const ManageUsers = () => {
             
             <Box sx={{ display: "flex", flexDirection: "row", ml: "5rem", zIndex: 3 }}>
               <IconButton
-                onClick={handleNavigateHome}
+                onClick={() => navigate(-1)}
                 sx={{
                   color: "#fff",
                 }}

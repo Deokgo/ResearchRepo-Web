@@ -68,7 +68,7 @@ const Home = () => {
       <IconButton
         onClick={onClick}
         sx={{
-          color: "#CA031B", // Set the arrow color to black
+          color: "#FFF", // Set the arrow color to black
           position: "absolute",
           top: "50%",
           right: "-25px",
@@ -84,7 +84,7 @@ const Home = () => {
       <IconButton
         onClick={onClick}
         sx={{
-          color: "#CA031B", // Set the arrow color to black
+          color: "#FFF", // Set the arrow color to black
           position: "absolute",
           top: "50%",
           left: "-25px",
@@ -132,6 +132,10 @@ const Home = () => {
 
   const handleClosePassresetModal = () => {
     setIsPassresetModalOpen(false);
+  };
+
+  const handleReadMore = () => {
+    navigate("/readmore")
   };
 
   return (
@@ -269,6 +273,7 @@ const Home = () => {
               >
                 <Button
                   variant='contained'
+                  onClick={handleReadMore}
                   sx={{
                     backgroundColor: "#001C43",
                     color: "#FFF",
@@ -314,20 +319,7 @@ const Home = () => {
                 zIndex: 2,
               }}
             >
-              <Typography
-                variant='body1'
-                sx={{
-                  fontFamily: "Montserrat, sans-serif",
-                  fontWeight: 600,
-                  fontSize: { xs: "1rem", md: "1.15rem" },
-                  color: "#F0F0F0",
-                  mb: 4,
-                  maxWidth: { xs: "100%", md: "80%" },
-                  alignSelf: "center",
-                }}
-              >
-                Knowledge Graph Here...
-              </Typography>
+              
             </Box>
           </Box>
         </Box>

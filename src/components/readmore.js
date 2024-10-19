@@ -17,6 +17,7 @@ import homeBg from "../assets/home_bg.png";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import navLogo from "../assets/MMCL_Logo_Horizontal.png";
 
 const modalStyle = {
   position: "absolute",
@@ -30,7 +31,7 @@ const modalStyle = {
   borderRadius: "10px",
 };
 
-const ResearchThrust = () => {
+const ReadMore = () => {
   const [userData, setUserData] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -118,7 +119,7 @@ const ResearchThrust = () => {
   useEffect(() => {
     fetchUserData();
   }, []);
-  
+
   const handleOpenModal = () => {
     setIsModalOpen(true);
   };
@@ -186,7 +187,7 @@ const ResearchThrust = () => {
                   zIndex: 2,
                 }}
               >
-                Research Thrusts
+                Read More
               </Typography>
             </Box>
           </Box>
@@ -194,80 +195,89 @@ const ResearchThrust = () => {
           {/* Content Section */}
           <Box
             sx={{
-              display: "flex",
-              flexDirection: "column",
-              padding: 4,
-              width: "100%",
+              flexGrow: 1,
+              mt: 12
             }}
           >
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                paddingLeft: "12rem"
-              }}
-            >
-              {/* Search Bar */}
-              <TextField
-                variant='outlined'
-                placeholder='Search...'
-                value={searchQuery}
-                onChange={handleSearchChange}
-                sx={{ width: "30rem", paddingLeft: 5}}
-              />
-              <Box
-                sx={{
-                  display: "flex",
-                  flexWrap: "wrap",
-                  width: "90%",
-                }}
-              >
-                {departments.map((department) => (
-                  <Box key={department.id} sx={{ px: 3 }}>
-                    <Paper
-                      elevation={3}
-                      sx={{
-                        padding: 2,
-                        textAlign: "center",
-                        display: "flex",
-                        width: "20rem",
-                        margin: 2,
-                        flexDirection: "column",
-                        alignItems: "center",
-                      }}
-                    >
-                      <img
-                        src={department.image}
-                        style={{
-                          width: "10rem",
-                          height: "8rem",
-                          padding: "1em",
-                        }}
-                        alt={department.name}
-                      />
-                      <Typography
-                        variant='h7'
-                        sx={{
-                          fontWeight: 600,
-                          fontFamily: "Montserrat, sans-serif",
-                          color: "#08397C",
-                          minHeight: "3rem",
-                          lineHeight: 1.2,
-                          WebkitBoxOrient: "vertical",
-                        }}
-                      >
-                        {department.name}
-                      </Typography>
-                    </Paper>
-                  </Box>
-                ))}
-              </Box>
-            </Box>
-          </Box>
+            <Grid2 container sx={{ paddingLeft: 25, height: "100%" }}>
+              <Grid2 display="flex" flexDirection="column" justifyContent="flex-end" size={6}>
+                <Typography
+                    variant='h3'
+                    sx={{
+                        fontFamily: "Montserrat, sans-serif",
+                        fontWeight: 600,
+                        fontSize: { xs: "2.5rem", md: "4.375rem" },
+                        color: "#001C43",
+                        lineHeight: 1.25,
+                        maxWidth: "80%",
+                    }}
+                >
+                    A centralized hub for all your
+                        <Box
+                            sx={{
+                                backgroundColor: "#DF031D",
+                                width: "33rem"
+                            }}
+                        >
+                            <Typography
+                                align="center"
+                                sx={{
+                                    fontFamily: "Montserrat, sans-serif",
+                                    fontWeight:600,
+                                    fontSize: { xs: "2.5rem", md: "4rem" },
+                                    color: "#FFF",
+                                    lineHeight: 1.25,
+                                }}
+                            >
+                                research needs
+                            </Typography> 
+                        </Box>
+                </Typography>        
+                <Typography
+                    variant='body1'
+                    sx={{
+                    fontFamily: "Montserrat, sans-serif",
+                    fontWeight: 500,
+                    fontSize: { xs: "1rem", md: "1.5rem" },
+                    color: "#001C43",
+                    width: "80%",
+                    mt: 4
+                    }}
+                >
+                    A platform for researches by the Mapúa MCL researchers
+                </Typography>      
+                 
+              </Grid2>
+              <Grid2 display="flex" flexDirection="column" align="center" size={6}>
+                <img
+                    src={navLogo}
+                    alt='Logo'
+                    style={{
+                        width: "80%",
+                        height: "80%",
+                        objectFit: "contain",
+                    }}
+                />
+                <Typography
+                    variant='body1'
+                    sx={{
+                    fontFamily: "Montserrat, sans-serif",
+                    fontWeight: 300,
+                    fontSize: { xs: "1rem", md: "1.25rem" },
+                    color: "#001C43",
+                    width: "80%",
+                    mt: 6
+                    }}
+                >
+                    Our research repository offers seamless platform to gather, store, analyze, and share valuable data and insights.
+                </Typography> 
+              </Grid2>
+            </Grid2>
+           </Box>
         </Box>
       </Box>
     </>
   );
 };
 
-export default ResearchThrust;
+export default ReadMore;

@@ -47,10 +47,6 @@ const ManageUsers = () => {
     fetchUsers();
   }, []);
 
-  const handleNavigateHome = () => {
-    navigate("/main");
-  };
-
   const handleSearchChange = (e) => {
     const query = e.target.value.toLowerCase();
     setSearchQuery(query);
@@ -127,7 +123,7 @@ const ManageUsers = () => {
             />
             <Box sx={{ display: "flex", ml: "5rem", zIndex: 3 }}>
               <IconButton
-                onClick={handleNavigateHome}
+                onClick={() => navigate(-1)}
                 sx={{
                   color: "#fff",
                 }}

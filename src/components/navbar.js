@@ -18,6 +18,7 @@ import {
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import navLogo from "../assets/MMCL_Logo_Nav.png";
+import LoginModal from "./loginmodal";
 
 const Navbar = () => {
   const [anchorElNav, setAnchorElNav] = useState(null);
@@ -32,6 +33,10 @@ const Navbar = () => {
   const navigate = useNavigate();
   const isLoggedIn = !!localStorage.getItem("token");
 
+  const [isModalLoginOpen, setIsLoginModalOpen] = useState(false);
+  const [isModalSignupOpen, setIsSignupModalOpen] = useState(false);
+  const [isModalPassresetOpen, setIsPassresetModalOpen] = useState(false);
+
   const isMobile = useMediaQuery("(max-width:600px)");
 
   {/*****************Event Handlers******************/}
@@ -42,8 +47,28 @@ const Navbar = () => {
     }
 
   const handleLogin = () => {
-      navigate("/login");
-    };
+    setIsLoginModalOpen(true);
+  };
+
+  const handleCloseLoginModal = () => {
+    setIsLoginModalOpen(false);
+  };
+
+  const handleOpenSignupModal = () => {
+    setIsSignupModalOpen(true);
+  };
+
+  const handleCloseSignupModal = () => {
+    setIsSignupModalOpen(false);
+  };
+
+  const handleOpenPassresetModal = () => {
+    setIsPassresetModalOpen(true);
+  };
+
+  const handleClosePassresetModal = () => {
+    setIsPassresetModalOpen(false);
+  };
 
 
   {/*Logged In*/}
@@ -120,10 +145,6 @@ const Navbar = () => {
     navigate("/managepapers");
   };
 
-  const handleNavigateMain = () => {
-    navigate("/main");
-  };
-
   const handleNavigateHome = () => {
     navigate("/home");
   };
@@ -171,7 +192,7 @@ const Navbar = () => {
       >
         <Box sx={{ display: "flex", alignItems: "center", mb: "0rem" }}>
           <IconButton
-            onClick={handleNavigateMain}
+            onClick={null}
             sx={{
               p: 0,
               width: { xs: "2.5rem", md: "5rem" },
@@ -207,7 +228,7 @@ const Navbar = () => {
               alignItems: "left",
               cursor: "pointer",
             }}
-            onClick={handleNavigateMain}
+            onClick={null}
           >
             <Typography
               variant='h6'
@@ -479,6 +500,12 @@ const Navbar = () => {
           </MenuItem>
         </Menu>
       </Toolbar>
+      <LoginModal
+          isOpen={isModalLoginOpen}
+          handleClose={handleCloseLoginModal}
+          handleOpenSignup={handleOpenSignupModal}
+          handleOpenPassreset={handleOpenPassresetModal}
+        />
     </AppBar>
   );
 };

@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
-import Signup from "./components/signup";
-import Login from "./components/login";
 import Home from "./components/home";
-import Main from "./components/main";
+import ReadMore from "./components/readmore";
 import Profile from "./components/profile";
 import PrivateRoute from "./components/privateroute";
 import ManageUsers from "./components/manageusers";
@@ -21,18 +19,21 @@ import PubDash from "./components/pubdash";
 
 function App() {
   const [data, setData] = useState([{}]);
+  const isLoggedIn = !!localStorage.getItem("token");
 
   return (
     <ModalProvider>
       <Router>
         <CssBaseline />
         <Routes>
-          <Route path='/' element={<Home />} />
-          <Route path='/login' element={<Login />} />
-          <Route path='/signup' element={<Signup />} />
+          {!isLoggedIn ? (
+            <Route path='/' element={<Home />} />
+          ):(
+            <Route path='/' element={<ManagePapers />} />
+          )}
           <Route path='/collection' element={<Collection />} />
           <Route path='/home' element={<Home />} />
-          <Route path='/main' element={<Main />} />
+          <Route path='/readmore' element={<ReadMore/>} />
 
           <Route path='/resetpassword' element={<PasswordReset />} />
           <Route path='/knowledgegraph' element={<KnowledgeGraph />} />

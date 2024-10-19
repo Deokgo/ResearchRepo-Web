@@ -34,9 +34,6 @@ const DepartmentCollection = () => {
   const [selectedFormats, setSelectedFormats] = useState([]);
   const itemsPerPage = 5;
 
-  const handleNavigateHome = () => {
-    navigate("/main");
-  };
   const handleNavigateKnowledgeGraph = () => {
     navigate("/knowledgegraph");
   };
@@ -223,7 +220,7 @@ const DepartmentCollection = () => {
             />
             <Box sx={{ display: "flex", ml: "5rem", zIndex: 3 }}>
               <IconButton
-                onClick={handleNavigateHome}
+                onClick={() => navigate(-1)}
                 sx={{
                   color: "#fff",
                 }}
