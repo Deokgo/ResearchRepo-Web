@@ -74,6 +74,7 @@ const MainDash = () => {
             />
           </Box>
         </Box>
+        <Footer />
       </Box>
     </>
   );
