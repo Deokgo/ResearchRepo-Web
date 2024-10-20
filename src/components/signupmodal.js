@@ -50,7 +50,8 @@ const SignUpModal = () => {
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    width: 600,
+    width: "auto",
+    height: "auto",
     bgcolor: "background.paper",
     boxShadow: 24,
     p: 4,
@@ -108,13 +109,13 @@ const SignUpModal = () => {
           <form onSubmit={handleSignup}>
             <Box
               sx={{
-                width: "100%",
+                width: "auto",
                 justifyContent: "center",
-                padding: "2em",
+                padding: "1em",
               }}
             >
               <Grid2 container spacing={{ xs: 0, md: 2 }}>
-                <Grid2 item size={{ xs: 12, md: 6 }}>
+                <Grid2 item size={{ xs: 12, md: 4 }}>
                   <TextField
                     fullWidth
                     label='First Name'
@@ -134,7 +135,7 @@ const SignUpModal = () => {
                     }}
                   ></TextField>
                 </Grid2>
-                <Grid2 item size={{ xs: 12, md: 6 }}>
+                <Grid2 item size={{ xs: 12, md: 4 }}>
                   <TextField
                     fullWidth
                     label='Middle Name'
@@ -154,13 +155,14 @@ const SignUpModal = () => {
                     }}
                   />
                 </Grid2>
-                <Grid2 item size={{ xs: 12, md: 6 }}>
+                <Grid2 item size={{ xs: 12, md: 4 }}>
                   <TextField
                     fullWidth
                     label='Last Name'
                     name='lastName'
                     value={formData.lastName}
                     onChange={handleChange}
+                    margin='normal'
                     variant='outlined'
                     InputProps={{
                       endAdornment: (
@@ -173,7 +175,7 @@ const SignUpModal = () => {
                     }}
                   ></TextField>
                 </Grid2>
-                <Grid2 item size={{ xs: 12, md: 6 }}>
+                <Grid2 item size={{ xs: 12, md: 4 }}>
                   <TextField
                     fullWidth
                     label='Suffix'
@@ -192,26 +194,28 @@ const SignUpModal = () => {
                     }}
                   ></TextField>
                 </Grid2>
+                <Grid2 item size={{ xs: 12, md: 8 }}>
+                  <TextField
+                    fullWidth
+                    label='Email'
+                    name='email'
+                    type='email'
+                    value={formData.email}
+                    onChange={handleChange}
+                    variant='outlined'
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position='end'>
+                          <IconButton onClick={() => clearField("email")}>
+                            <ClearIcon />
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
+                  ></TextField>
+                </Grid2>
               </Grid2>
-              <TextField
-                fullWidth
-                label='Email'
-                name='email'
-                type='email'
-                value={formData.email}
-                onChange={handleChange}
-                margin='normal'
-                variant='outlined'
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position='end'>
-                      <IconButton onClick={() => clearField("email")}>
-                        <ClearIcon />
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
-              ></TextField>
+              
               <TextField
                 fullWidth
                 label='Institution'

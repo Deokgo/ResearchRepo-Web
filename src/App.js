@@ -26,6 +26,7 @@ function App() {
       <Router>
         <CssBaseline />
         <Routes>
+          {/**Add more condition here which depends on the user role (e.g. if sysadmin the view is manage papers)*/}
           {!isLoggedIn ? (
             <Route path='/' element={<Home />} />
           ):(

@@ -254,7 +254,7 @@ const Navbar = () => {
                 paddingBottom: "0.75rem"
               }}
             >
-              Repository
+              Research Repository
             </Typography>
           </Box>
         </Box>

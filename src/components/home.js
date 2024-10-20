@@ -4,6 +4,11 @@ import { useNavigate } from "react-router-dom";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import placeholderImage from "../assets/placeholder_image.png";
+import CAS from "../assets/CAS.jpg";
+import CCIS from "../assets/CCIS.jpg";
+import CHS from "../assets/CHS.jpg";
+import ETYCB from "../assets/ETYCB.jpg";
+import MITL from "../assets/MITL.jpg";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -11,6 +16,7 @@ import Navbar from "./navbar";
 import LoginModal from "./loginmodal";
 import SignupModal from "./signupmodal";
 import PasswordResetModal from "./passresetmodal";
+import DummyKG from "../assets/dummy_kg.png";
 import {
   Box,
   Button,
@@ -34,33 +40,33 @@ const Home = () => {
       id: 1,
       name: "Mapúa Institute of Technology at Laguna",
       description: "Leading the future of engineering and technology.",
-      image: placeholderImage, // Placeholder for image path
+      image: MITL, // Placeholder for image path
     },
     {
       id: 2,
       name: "College of Computer and Information Science",
       description: "Innovating through computer science and IT.",
-      image: placeholderImage, // Placeholder for image path
+      image: CCIS, // Placeholder for image path
     },
     {
       id: 3,
       name: "College of Arts and Science",
       description: "Fostering creativity and scientific knowledge.",
-      image: placeholderImage, // Placeholder for image path
+      image: CAS, // Placeholder for image path
     },
     {
       id: 4,
       name: "E.T. Yuchengco College of Business",
       description:
         "Amplifying student voices; nurturing student leaders — for success in today's business world.",
-      image: placeholderImage,
+      image: ETYCB,
     }, // Placeholder for image path
     {
       id: 5,
       name: "College of Health Sciences",
       description:
         "Amplifying student voices; nurturing student leaders — for success in today's business world.",
-      image: placeholderImage,
+      image: CHS,
     }, // Placeholder for image path
   ];
   const NextArrow = ({ onClick }) => {
@@ -98,8 +104,9 @@ const Home = () => {
     dots: true,
     infinite: true,
     speed: 500,
-    slidesToShow: isMobile ? 1 : 1,
     slidesToScroll: 1,
+    autoplay: true,
+    autoplaySpeed: 3000,
     nextArrow: <NextArrow />, // Use custom NextArrow
     prevArrow: <PrevArrow />,
   };
@@ -198,14 +205,16 @@ const Home = () => {
                 sx={{
                   display: "flex",
                   justifyContent: "center",
+                  alignContent: "center",
+                  alignItems: "center",
                   width: "50rem",
-                  mb: "1rem",
-                  padding: "2em",
+                  mb: "3rem",
+                  paddingLeft: "4em",
                 }}
               >
                 <Slider
                   {...settings}
-                  style={{ width: isMobile ? "60%" : "70%" }}
+                  style={{ width: isMobile ? "60%" : "95%"}}
                 >
                   {departments.map((department) => (
                     <Box key={department.id} sx={{ px: 3 }}>
@@ -215,30 +224,24 @@ const Home = () => {
                           padding: 2,
                           textAlign: "center",
                           width: { xs: "70%", md: "100%" },
-                          height: "auto",
+                          height: "20rem",
                           display: "flex",
                           flexDirection: "column",
                           alignItems: "center",
-                          justifyContent: "center",
+                          justifyContent:"end",
+                          backgroundImage: `url(${department.image})`,
+                          backgroundSize: "cover",
                         }}
                       >
-                        <img
-                          src={department.image}
-                          style={{
-                            width: "50%",
-                            height: "auto",
-                            padding: "1em",
-                          }}
-                          alt={department.name}
-                        />
                         <Typography
-                          variant='h7'
+                          variant='h5'
                           sx={{
                             fontWeight: 600,
                             fontFamily: "Montserrat, sans-serif",
-                            color: "#08397C",
+                            color: "#FFF",
                             minHeight: "3rem",
                             lineHeight: 1.2,
+                            textShadow: 10,
                             WebkitBoxOrient: "vertical",
                           }}
                         >
@@ -281,7 +284,7 @@ const Home = () => {
                     fontWeight: 600,
                     textTransform: "none",
                     fontSize: { xs: "0.875rem", md: "1.375rem" },
-                    padding: { xs: "0.5rem 1rem", md: "0.75rem 2rem" },
+                    padding: { xs: "0.5rem 1rem", md: "1.5rem 2rem" },
                     borderRadius: "100px",
                     maxHeight: "3rem",
                   }}
@@ -300,7 +303,7 @@ const Home = () => {
                     fontWeight: 600,
                     textTransform: "none",
                     fontSize: { xs: "0.875rem", md: "1.375rem" },
-                    padding: { xs: "0.5rem 1rem", md: "0.75rem 2rem" },
+                    padding: { xs: "0.5rem 1rem", md: "1.5rem 2rem" },
                     borderRadius: "100px",
                     maxHeight: "3rem",
                   }}
@@ -316,10 +319,17 @@ const Home = () => {
                 display: { xs: "none", md: "flex" },
                 justifyContent: "center",
                 alignItems: "center",
-                zIndex: 2,
               }}
             >
-              
+              <img
+                    src={DummyKG}
+                    alt='Dummy Knowledge Graph'
+                    style={{
+                        width: "70%",
+                        height: "auto",
+                        objectFit: "contain",
+                    }}
+                />
             </Box>
           </Box>
         </Box>
