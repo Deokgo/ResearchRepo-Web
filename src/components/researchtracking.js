@@ -34,7 +34,7 @@ const ResearchTracking = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
-  const rowsPerPage = 5; // Changed to a constant
+  const rowsPerPage = 10; // Changed to a constant
   const navigate = useNavigate();
   const [openModal, setOpenModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -556,7 +556,7 @@ const ResearchTracking = () => {
                     <Typography>Loading...</Typography>
                   ) : (
                     <Virtuoso
-                      style={{ height: "425px" }}
+                      style={{ height: "400px" }}
                       data={paginatedResearch}
                       itemContent={(index, paper) => (
                         <Box
