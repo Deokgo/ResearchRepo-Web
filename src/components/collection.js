@@ -19,6 +19,7 @@ import { Search } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import axios from "axios";
+import { Virtuoso } from "react-virtuoso";
 
 const DepartmentCollection = () => {
   const navigate = useNavigate();
@@ -415,42 +416,40 @@ const DepartmentCollection = () => {
                       ),
                     }}
                   />
-
-                  {loading ? (
-                    <Typography>Loading...</Typography>
-                  ) : (
-                    <>
-                      {paginatedResearch.map((researchItem) => (
-                        <Box
-                          key={researchItem.research_id}
-                          sx={{ marginBottom: 2 }}
-                        >
-                          <Typography variant='h6'>
-                            {researchItem.title}
-                          </Typography>
-                          <Typography variant='body2'>
-                            {researchItem.program_name} |{" "}
-                            {researchItem.concatenated_authors} |{" "}
-                            {researchItem.year}
-                          </Typography>
-                          <Typography variant='caption'>
-                            {researchItem.journal}
-                          </Typography>
-                        </Box>
-                      ))}
-                      <Pagination
-                        count={Math.ceil(
-                          filteredResearch.length / itemsPerPage
+                  <Box sx={{ padding: 2, backgroundColor: "#F7F9FC" }}>
+                    {loading ? (
+                      <Typography>Loading...</Typography>
+                    ) : (
+                      <Virtuoso
+                        style={{ height: "50vh" }}
+                        data={paginatedResearch}
+                        itemContent={(index, researchItem) => (
+                          <Box
+                            key={researchItem.research_id}
+                            sx={{ marginBottom: 2 }}
+                          >
+                            <Typography variant='h6'>
+                              {researchItem.title}
+                            </Typography>
+                            <Typography variant='body2'>
+                              {researchItem.program_name} |{" "}
+                              {researchItem.concatenated_authors} |{" "}
+                              {researchItem.year}
+                            </Typography>
+                            <Typography variant='caption'>
+                              {researchItem.journal}
+                            </Typography>
+                          </Box>
                         )}
-                        page={currentPage}
-                        onChange={handleChangePage}
-                        sx={{
-                          mt: 2,
-                          alignSelf: "center",
-                        }}
                       />
-                    </>
-                  )}
+                    )}
+                  </Box>
+                  <Pagination
+                    count={Math.ceil(filteredResearch.length / itemsPerPage)}
+                    page={currentPage}
+                    onChange={handleChangePage}
+                    sx={{ mt: 2 }}
+                  />
                 </Box>
               </Grid2>
               <Grid2 size={3}>

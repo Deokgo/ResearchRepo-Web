@@ -51,15 +51,18 @@ const ResearchTracking = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [dateRange, setDateRange] = useState([2010, 2024]);
   const [selectedPrograms, setSelectedPrograms] = useState([]);
-  const [selectedCollege, setSelectedCollege] = useState([]);
   const itemsPerPage = 5;
-  const [selectedStatus, setSelectedStatus] = useState(["Submitted", "Accepted", "Published"]);
+  const [selectedStatus, setSelectedStatus] = useState([
+    "Submitted",
+    "Accepted",
+    "Published",
+  ]);
 
   const handleFormatChange = (event) => {
     const { value } = event.target;
-    setSelectedStatus((prevSelected) => 
-      prevSelected.includes(value) 
-        ? prevSelected.filter((status) => status !== value) 
+    setSelectedStatus((prevSelected) =>
+      prevSelected.includes(value)
+        ? prevSelected.filter((status) => status !== value)
         : [...prevSelected, value]
     );
   };
@@ -71,7 +74,7 @@ const ResearchTracking = () => {
       console.error("Error fetching colleges:", error);
     }
   };
-  
+
   const fetchAllPrograms = async () => {
     try {
       const response = await axios.get(`/deptprogs/fetch_programs`);
@@ -114,7 +117,7 @@ const ResearchTracking = () => {
         const response = await axios.get(`/accounts/users/${userId}`);
         const data = response.data;
         setUserDepartment(data.researcher.college_id);
-        setDepartment(data.researcher.department_name); 
+        setDepartment(data.researcher.department_name);
       } catch (error) {
         console.error("Error fetching user data:", error);
       }
@@ -123,22 +126,12 @@ const ResearchTracking = () => {
 
   const fetchAllResearchData = async () => {
     try {
-      const response = await axios.get("/dataset/fetch_dataset");
-      const fetchedResearch = response.data.dataset.map((paper) => ({
-        research_id: paper.research_id,
-        title: paper.title,
-        year: paper.year, 
-        college_name: paper.college_name,
-        program_name: paper.program_name,
-        journal: paper.journal, 
-        concatenated_authors: paper.concatenated_authors,
-        timestamp: paper.timestamp,
-        status: paper.status,
-      }));
+      const response = await axios.get(`/dataset/fetch_dataset`);
+      const fetchedResearch = response.data.dataset;
       setResearch(fetchedResearch);
-      setFilteredResearch(fetchedResearch); // Set state for filtered/paginated data
+      setFilteredResearch(fetchedResearch);
     } catch (error) {
-      console.error("Error fetching research data:", error);
+      console.error("Error fetching all research data:", error);
     } finally {
       setLoading(false);
     }
@@ -164,9 +157,9 @@ const ResearchTracking = () => {
     );
 
     // Filter by College
-    if (selectedCollege.length > 0) {
+    if (selectedColleges.length > 0) {
       filtered = filtered.filter((item) =>
-        selectedCollege.includes(item.college_name)
+        selectedColleges.includes(item.college_id)
       );
     }
 
@@ -334,7 +327,7 @@ const ResearchTracking = () => {
                 <ArrowBackIosIcon />
               </IconButton>
               <Typography
-                variant="h3"
+                variant='h3'
                 sx={{
                   fontFamily: "Montserrat, sans-serif",
                   fontWeight: 800,
@@ -359,11 +352,10 @@ const ResearchTracking = () => {
               mb: 2,
             }}
           >
-            <Grid2 container spacing={5} sx={{ height: "100%"}}>
-              
+            <Grid2 container spacing={5} sx={{ height: "100%" }}>
               {/* Filter Section (Left) */}
-              <Grid2 display="flex" justifyContent="flex-end" size={3}>
-              <Box
+              <Grid2 display='flex' justifyContent='flex-end' size={3}>
+                <Box
                   sx={{
                     border: "2px solid #0A438F",
                     padding: 2,
@@ -385,10 +377,13 @@ const ResearchTracking = () => {
                   >
                     {department}
                   </Typography>
-                  <Typography variant='h6' sx={{ mb: 2, fontWeight: "bold", color: "#F40824"}}>
+                  <Typography
+                    variant='h6'
+                    sx={{ mb: 2, fontWeight: "bold", color: "#F40824" }}
+                  >
                     Filters
                   </Typography>
-                  <Typography variant='body1' sx={{ mb: 1, color: "#08397C"}}>
+                  <Typography variant='body1' sx={{ mb: 1, color: "#08397C" }}>
                     Year Range:
                   </Typography>
                   <Slider
@@ -449,11 +444,17 @@ const ResearchTracking = () => {
                       />
                     ))}
                   </Box>
-                  <Divider orientation='horizontal'/>
+                  <Divider orientation='horizontal' />
                   <Typography variant='body1' sx={{ mb: 1, color: "#08397C" }}>
                     Research Status:
                   </Typography>
-                  {["Ready", "Submitted", "Accepted", "Published", "Pullout"].map((format) => (
+                  {[
+                    "Ready",
+                    "Submitted",
+                    "Accepted",
+                    "Published",
+                    "Pullout",
+                  ].map((format) => (
                     <FormControlLabel
                       key={format}
                       control={
@@ -468,8 +469,7 @@ const ResearchTracking = () => {
                   ))}
                 </Box>
               </Grid2>
-              <Grid2 display="flex" justifyContent="flex-start" size={9}>
-
+              <Grid2 display='flex' justifyContent='flex-start' size={9}>
                 {/* Container for Stats, Search Bar, and Virtuoso Table (Right) */}
                 <Box sx={{ flexBasis: "90%" }}>
                   {/* Stats Section */}
@@ -482,7 +482,7 @@ const ResearchTracking = () => {
                     }}
                   >
                     <Paper
-                      variant="outlined"
+                      variant='outlined'
                       square={false}
                       sx={{
                         textAlign: "center",
@@ -496,34 +496,34 @@ const ResearchTracking = () => {
                       }}
                     >
                       <Box sx={boxSettings}>
-                        <Typography variant="h3" sx={numberFontSettings}>
+                        <Typography variant='h3' sx={numberFontSettings}>
                           37
                         </Typography>
-                        <Typography variant="h3" sx={labelFontSettings}>
+                        <Typography variant='h3' sx={labelFontSettings}>
                           READY
                         </Typography>
                       </Box>
                       <Box sx={boxSettings}>
-                        <Typography variant="h3" sx={numberFontSettings}>
+                        <Typography variant='h3' sx={numberFontSettings}>
                           2
                         </Typography>
-                        <Typography variant="h3" sx={labelFontSettings}>
+                        <Typography variant='h3' sx={labelFontSettings}>
                           SUBMITTED
                         </Typography>
                       </Box>
                       <Box sx={boxSettings}>
-                        <Typography variant="h3" sx={numberFontSettings}>
+                        <Typography variant='h3' sx={numberFontSettings}>
                           187
                         </Typography>
-                        <Typography variant="h3" sx={labelFontSettings}>
+                        <Typography variant='h3' sx={labelFontSettings}>
                           ACCEPTED
                         </Typography>
                       </Box>
                       <Box sx={boxSettings}>
-                        <Typography variant="h3" sx={numberFontSettings}>
+                        <Typography variant='h3' sx={numberFontSettings}>
                           26
                         </Typography>
-                        <Typography variant="h3" sx={labelFontSettings}>
+                        <Typography variant='h3' sx={labelFontSettings}>
                           PUBLISHED
                         </Typography>
                       </Box>
@@ -532,18 +532,18 @@ const ResearchTracking = () => {
 
                   {/* Search Bar */}
                   <TextField
-                    variant="outlined"
-                    placeholder="Search by Title or Code"
+                    variant='outlined'
+                    placeholder='Search by Title or Code'
                     value={searchQuery}
                     onChange={handleSearchChange}
                     sx={{
                       width: "40%",
                       display: "flex",
-                      justifyContent: "flex-start"
+                      justifyContent: "flex-start",
                     }}
                     InputProps={{
                       startAdornment: (
-                        <InputAdornment position="start">
+                        <InputAdornment position='start'>
                           <Search />
                         </InputAdornment>
                       ),
@@ -552,36 +552,36 @@ const ResearchTracking = () => {
 
                   {/* Virtuoso Table */}
                   <Box sx={{ padding: 2, backgroundColor: "#F7F9FC" }}>
-                  {loading ? (
-                    <Typography>Loading...</Typography>
-                  ) : (
-                    <Virtuoso
-                      style={{ height: "400px" }}
-                      data={paginatedResearch}
-                      itemContent={(index, paper) => (
-                        <Box
-                          key={paper.research_id}
-                          sx={{
-                            padding: 2,
-                            borderBottom: "1px solid #ddd",
-                            cursor: "pointer",
-                          }}
-                          onClick={() => handleOpenModal(paper)}
-                        >
-                          <Typography variant="h6">{paper.title}</Typography>
-                          <Typography variant="body2" color="textSecondary">
-                            Status: {paper.status} | Last Updated: {paper.timestamp}
-                          </Typography>
-                        </Box>
-                      )}
-                    />
-                  )}
-
-                </Box>
+                    {loading ? (
+                      <Typography>Loading...</Typography>
+                    ) : (
+                      <Virtuoso
+                        style={{ height: "400px" }}
+                        data={paginatedResearch}
+                        itemContent={(index, paper) => (
+                          <Box
+                            key={paper.research_id}
+                            sx={{
+                              padding: 2,
+                              borderBottom: "1px solid #ddd",
+                              cursor: "pointer",
+                            }}
+                            onClick={() => handleOpenModal(paper)}
+                          >
+                            <Typography variant='h6'>{paper.title}</Typography>
+                            <Typography variant='body2' color='textSecondary'>
+                              Status: {paper.status} | Last Updated:{" "}
+                              {paper.timestamp}
+                            </Typography>
+                          </Box>
+                        )}
+                      />
+                    )}
+                  </Box>
 
                   {/* Pagination */}
                   <Pagination
-                    count={Math.ceil(filteredResearch.length / rowsPerPage)}  
+                    count={Math.ceil(filteredResearch.length / rowsPerPage)}
                     page={page}
                     onChange={handleChangePage}
                     sx={{ mt: 2 }}
@@ -607,20 +607,22 @@ const ResearchTracking = () => {
               transform: "translate(-50%, -50%)",
             }}
           >
-            <Typography variant="h6" component="h2">
+            <Typography variant='h6' component='h2'>
               Update Status
             </Typography>
             <TextField
-              variant="outlined"
+              variant='outlined'
               value={"(STATUS)"}
               onChange={(e) => setNewRole(e.target.value)}
               sx={{ mt: 2, width: "100%" }}
             />
-            <Box sx={{ display: "flex", justifyContent: "space-between", mt: 4 }}>
-              <Button variant="contained" onClick={handleSaveChanges}>
+            <Box
+              sx={{ display: "flex", justifyContent: "space-between", mt: 4 }}
+            >
+              <Button variant='contained' onClick={handleSaveChanges}>
                 Save
               </Button>
-              <Button variant="outlined" onClick={handleCloseModal}>
+              <Button variant='outlined' onClick={handleCloseModal}>
                 Cancel
               </Button>
             </Box>

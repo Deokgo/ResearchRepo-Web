@@ -19,27 +19,29 @@ import { Search } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import axios from "axios";
+import { Virtuoso } from "react-virtuoso";
 
 const DepartmentCollection = () => {
   const navigate = useNavigate();
+  const [userDepartment, setUserDepartment] = useState(null);
   const [department, setDepartment] = useState(null);
+  const [colleges, setColleges] = useState([]);
   const [research, setResearch] = useState([]);
   const [programs, setPrograms] = useState([]);
+  const [allPrograms, setAllPrograms] = useState([]);
   const [filteredResearch, setFilteredResearch] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [dateRange, setDateRange] = useState([2010, 2024]);
   const [selectedPrograms, setSelectedPrograms] = useState([]);
-  const [selectedCollege, setSelectedCollege] = useState([]);
+  const [selectedColleges, setSelectedColleges] = useState([]);
   const [selectedFormats, setSelectedFormats] = useState([]);
   const itemsPerPage = 5;
+  const [page, setPage] = useState(1);
 
   const handleNavigateHome = () => {
     navigate("/main");
-  };
-  const handleNavigateKnowledgeGraph = () => {
-    navigate("/knowledgegraph");
   };
 
   const getUserId = () => {
@@ -47,56 +49,81 @@ const DepartmentCollection = () => {
     return userId;
   };
 
-  useEffect(() => {
-    const fetchCollege = async () => {
-      if (department) {
-        try {
-          const response = await axios.get(`/deptprogs/college_depts`);
-          setDepartment(response.data.college_depts);
-        } catch (error) {
-          console.error("Error fetching department:", error);
-        }
-      }
-    };
-    fetchCollege();
-  }, [department]);
+  const fetchColleges = async () => {
+    try {
+      const response = await axios.get(`/deptprogs/college_depts`);
+      setColleges(response.data.colleges);
+    } catch (error) {
+      console.error("Error fetching colleges:", error);
+    }
+  };
 
-  useEffect(() => {
-    const fetchPrograms = async () => {
-      if (department) {
-        try {
-          const response = await axios.get(`/deptprogs/programs`, {
-            params: { department: department },
-          });
-          setPrograms(response.data.programs);
-        } catch (error) {
-          console.error("Error fetching programs for department:", error);
-        }
-      }
-    };
-    fetchPrograms();
-  }, [department]);
+  const fetchAllPrograms = async () => {
+    try {
+      const response = await axios.get(`/deptprogs/fetch_programs`);
+      setPrograms(response.data.programs);
+      setAllPrograms(response.data.programs);
+    } catch (error) {
+      console.error("Error fetching all programs:", error);
+    }
+  };
 
-  useEffect(() => {
-    const fetchDepartmentResearch = async () => {
-      if (department) {
-        try {
-          const response = await axios.put(
-            `/dataset/fetch_researches/${department}`
-          );
-          const fetchedResearch = response.data.dataset;
-          setResearch(fetchedResearch);
-          setFilteredResearch(fetchedResearch);
-        } catch (error) {
-          console.error("Error fetching data of research:", error);
-        } finally {
-          setLoading(false);
-        }
-      }
-    };
-    fetchDepartmentResearch();
-  }, [department]);
+  const fetchProgramsByCollege = async (collegeIds) => {
+    try {
+      if (collegeIds.length > 0) {
+        const promises = collegeIds.map((collegeId) =>
+          axios.get(`/deptprogs/programs`, {
+            params: { department: collegeId },
+          })
+        );
 
+        const results = await Promise.all(promises);
+        const allPrograms = results.flatMap((result) => result.data.programs);
+        setPrograms(allPrograms);
+      } else {
+        // If no college is selected, fetch all programs
+        setPrograms(allPrograms);
+      }
+    } catch (error) {
+      console.error("Error fetching programs by college:", error);
+    }
+  };
+
+  const fetchUserData = async () => {
+    const userId = getUserId();
+    if (userId) {
+      try {
+        const response = await axios.get(`/accounts/users/${userId}`);
+        const data = response.data;
+        setUserDepartment(data.researcher.college_id);
+        setDepartment(data.researcher.department_name);
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    }
+  };
+
+  const fetchAllResearchData = async () => {
+    try {
+      const response = await axios.get(`/dataset/fetch_dataset`);
+      const fetchedResearch = response.data.dataset;
+      setResearch(fetchedResearch);
+      setFilteredResearch(fetchedResearch);
+    } catch (error) {
+      console.error("Error fetching all research data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    fetchUserData();
+    fetchColleges();
+    fetchAllPrograms();
+    fetchAllResearchData();
+  }, []);
+  useEffect(() => {
+    fetchProgramsByCollege(selectedColleges);
+  }, [selectedColleges]);
   useEffect(() => {
     let filtered = research;
 
@@ -106,9 +133,9 @@ const DepartmentCollection = () => {
     );
 
     // Filter by College
-    if (selectedCollege.length > 0) {
+    if (selectedColleges.length > 0) {
       filtered = filtered.filter((item) =>
-        selectedCollege.includes(item.college_name)
+        selectedColleges.includes(String(item.college_id))
       );
     }
 
@@ -139,11 +166,24 @@ const DepartmentCollection = () => {
 
     setFilteredResearch(filtered);
     setCurrentPage(1); // Reset to the first page on filter change
-  }, [dateRange, selectedPrograms, selectedFormats, searchQuery, research]);
+  }, [
+    dateRange,
+    selectedColleges,
+    selectedPrograms,
+    selectedFormats,
+    searchQuery,
+    research,
+  ]);
 
   // Handle change in search query
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value.toLowerCase());
+  };
+  const handleCollegeChange = (e) => {
+    const { value, checked } = e.target;
+    setSelectedColleges((prev) =>
+      checked ? [...prev, value] : prev.filter((item) => item !== value)
+    );
   };
 
   // Handle change in date range filter
@@ -253,8 +293,8 @@ const DepartmentCollection = () => {
               mb: 2,
             }}
           >
-            <Grid2 container spacing={5} sx={{ height: "100%"}}>
-              <Grid2 display="flex" justifyContent="flex-end" size={3}>
+            <Grid2 container spacing={5} sx={{ height: "100%" }}>
+              <Grid2 display='flex' justifyContent='flex-end' size={3}>
                 <Box
                   sx={{
                     border: "2px solid #0A438F",
@@ -277,11 +317,14 @@ const DepartmentCollection = () => {
                   >
                     {department}
                   </Typography>
-                  <Typography variant='h6' sx={{ mb: 2, fontWeight: "bold", color: "#F40824"}}>
+                  <Typography
+                    variant='h6'
+                    sx={{ mb: 2, fontWeight: "bold", color: "#F40824" }}
+                  >
                     Filters
                   </Typography>
-                  <Typography variant='body1' sx={{ mb: 1, color: "#08397C"}}>
-                    Date Range:
+                  <Typography variant='body1' sx={{ mb: 1, color: "#08397C" }}>
+                    Year Range:
                   </Typography>
                   <Slider
                     value={dateRange}
@@ -291,11 +334,33 @@ const DepartmentCollection = () => {
                     max={2024}
                     sx={{ my: 3, width: "80%", alignSelf: "center" }}
                   />
-                  <Typography variant='body1' sx={{ mb: 1, color: "#08397C"}}>
-                    Colleges:
+                  <Typography variant='body1' sx={{ mb: 1, color: "#08397C" }}>
+                    College:
                   </Typography>
-                  
-                  <Typography variant='body1' sx={{ mb: 1, color: "#08397C"}}>
+                  <Box
+                    sx={{
+                      height: "8rem",
+                      overflowY: "auto",
+                    }}
+                  >
+                    {colleges.map((college) => (
+                      <FormControlLabel
+                        key={college.college_id}
+                        control={
+                          <Checkbox
+                            checked={selectedColleges.includes(
+                              college.college_id
+                            )}
+                            onChange={handleCollegeChange}
+                            value={college.college_id}
+                          />
+                        }
+                        label={college.college_name}
+                      />
+                    ))}
+                  </Box>
+
+                  <Typography variant='body1' sx={{ mb: 1, color: "#08397C" }}>
                     Program:
                   </Typography>
                   <Box
@@ -320,7 +385,7 @@ const DepartmentCollection = () => {
                       />
                     ))}
                   </Box>
-                  <Typography variant='body1' sx={{ color: "#08397C"}}>
+                  <Typography variant='body1' sx={{ color: "#08397C" }}>
                     Publication Format:
                   </Typography>
                   {["Journal", "Proceeding", "Unpublished"].map((format) => (
@@ -364,55 +429,55 @@ const DepartmentCollection = () => {
                           </InputAdornment>
                         ),
                       }}
-                    />                  
+                    />
                   </Box>
-                  
+
                   <Button variant='contained' color='primary' sx={{ ml: 2 }}>
                     Add New Paper
                   </Button>
-                </Box>              
+                </Box>
                 <Box
                   sx={{
                     display: "flex",
                     flexDirection: "column",
                     padding: 2,
+                    height: "60vh",
                   }}
                 >
-                  {loading ? (
-                    <Typography>Loading...</Typography>
-                  ) : (
-                    <>
-                      {paginatedResearch.map((researchItem) => (
-                        <Box
-                          key={researchItem.research_id}
-                          sx={{ marginBottom: 2 }}
-                        >
-                          <Typography variant='h6'>
-                            {researchItem.title}
-                          </Typography>
-                          <Typography variant='body2'>
-                            {researchItem.program_name} |{" "}
-                            {researchItem.concatenated_authors} |{" "}
-                            {researchItem.year}
-                          </Typography>
-                          <Typography variant='caption'>
-                            {researchItem.journal}
-                          </Typography>
-                        </Box>
-                      ))}
-                      <Pagination
-                        count={Math.ceil(
-                          filteredResearch.length / itemsPerPage
+                  <Box sx={{ padding: 2, backgroundColor: "#F7F9FC" }}>
+                    {loading ? (
+                      <Typography>Loading...</Typography>
+                    ) : (
+                      <Virtuoso
+                        style={{ height: "50vh" }}
+                        data={paginatedResearch}
+                        itemContent={(index, researchItem) => (
+                          <Box
+                            key={researchItem.research_id}
+                            sx={{ marginBottom: 2 }}
+                          >
+                            <Typography variant='h6'>
+                              {researchItem.title}
+                            </Typography>
+                            <Typography variant='body2'>
+                              {researchItem.program_name} |{" "}
+                              {researchItem.concatenated_authors} |{" "}
+                              {researchItem.year}
+                            </Typography>
+                            <Typography variant='caption'>
+                              {researchItem.journal}
+                            </Typography>
+                          </Box>
                         )}
-                        page={currentPage}
-                        onChange={handleChangePage}
-                        sx={{
-                          mt: 2,
-                          alignSelf: "center",
-                        }}
                       />
-                    </>
-                  )}
+                    )}
+                  </Box>
+                  <Pagination
+                    count={Math.ceil(filteredResearch.length / itemsPerPage)}
+                    page={currentPage}
+                    onChange={handleChangePage}
+                    sx={{ mt: 2 }}
+                  />
                 </Box>
               </Grid2>
             </Grid2>
