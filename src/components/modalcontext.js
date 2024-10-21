@@ -8,6 +8,7 @@ export const ModalProvider = ({ children }) => {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isSignupModalOpen, setIsSignupModalOpen] = useState(false);
   const [isPassresetModalOpen, setIsPassresetModalOpen] = useState(false);
+  const [isAddPaperModalOpen, setIsAddPaperModalOpen] = useState(false);
 
   const openLoginModal = () => setIsLoginModalOpen(true);
   const closeLoginModal = () => setIsLoginModalOpen(false);
@@ -15,6 +16,8 @@ export const ModalProvider = ({ children }) => {
   const closeSignupModal = () => setIsSignupModalOpen(false);
   const openPassresetModal = () => setIsPassresetModalOpen(true);
   const closePassresetModal = () => setIsPassresetModalOpen(false);
+  const openAddPaperModal = () => setIsAddPaperModalOpen(true);
+  const closeAddPaperModal = () => setIsAddPaperModalOpen(false);
 
   return (
     <ModalContext.Provider
@@ -27,7 +30,10 @@ export const ModalProvider = ({ children }) => {
         closeSignupModal,
         isPassresetModalOpen,
         openPassresetModal,
-        closePassresetModal
+        closePassresetModal,
+        isAddPaperModalOpen,
+        closeAddPaperModal,
+        openAddPaperModal,
       }}
     >
       {children}

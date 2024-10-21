@@ -20,8 +20,10 @@ import { useNavigate } from "react-router-dom";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import axios from "axios";
 import { Virtuoso } from "react-virtuoso";
+import AddPaperModal from "./addpapermodal";
+import { useModalContext } from "./modalcontext";
 
-const DepartmentCollection = () => {
+const ManagePapers = () => {
   const navigate = useNavigate();
   const [userDepartment, setUserDepartment] = useState(null);
   const [department, setDepartment] = useState(null);
@@ -43,7 +45,8 @@ const DepartmentCollection = () => {
   const handleNavigateHome = () => {
     navigate("/main");
   };
-
+  const { isAddPaperModalOpen, openAddPaperModal, closeAddPaperModal } =
+    useModalContext();
   const getUserId = () => {
     const userId = localStorage.getItem("user_id");
     return userId;
@@ -432,7 +435,12 @@ const DepartmentCollection = () => {
                     />
                   </Box>
 
-                  <Button variant='contained' color='primary' sx={{ ml: 2 }}>
+                  <Button
+                    variant='contained'
+                    color='primary'
+                    sx={{ ml: 2 }}
+                    onClick={openAddPaperModal}
+                  >
                     Add New Paper
                   </Button>
                 </Box>
@@ -482,10 +490,14 @@ const DepartmentCollection = () => {
               </Grid2>
             </Grid2>
           </Box>
+          <AddPaperModal
+            isOpen={isAddPaperModalOpen}
+            handleClose={closeAddPaperModal}
+          />
         </Box>
       </Box>
     </>
   );
 };
 
-export default DepartmentCollection;
+export default ManagePapers;
