@@ -8,7 +8,7 @@ import PasswordReset from "./components/passwordreset";
 import ResearchThrust from "./components/researchthrust";
 import ResearchTracking from "./components/researchtracking";
 import UpdateResearchInfo from "./components/updateresearchinfo";
-import Collection from "./components/departmentcollection";
+import Collection from "./components/collection";
 import ManagePapers from "./components/managepapers";
 import { CssBaseline } from "@mui/material"; // To remove default margin
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
@@ -29,12 +29,12 @@ function App() {
           {/**Add more condition here which depends on the user role (e.g. if sysadmin the view is manage papers)*/}
           {!isLoggedIn ? (
             <Route path='/' element={<Home />} />
-          ):(
+          ) : (
             <Route path='/' element={<ManagePapers />} />
           )}
           <Route path='/collection' element={<Collection />} />
           <Route path='/home' element={<Home />} />
-          <Route path='/readmore' element={<ReadMore/>} />
+          <Route path='/readmore' element={<ReadMore />} />
 
           <Route path='/resetpassword' element={<PasswordReset />} />
           <Route path='/knowledgegraph' element={<KnowledgeGraph />} />

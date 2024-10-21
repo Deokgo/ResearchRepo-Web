@@ -24,18 +24,61 @@ const DepartmentCollection = () => {
   const navigate = useNavigate();
   const [userDepartment, setUserDepartment] = useState(null);
   const [research, setResearch] = useState([]);
+  const [colleges, setColleges] = useState([]);
   const [programs, setPrograms] = useState([]);
+  const [allPrograms, setAllPrograms] = useState([]);
   const [filteredResearch, setFilteredResearch] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [dateRange, setDateRange] = useState([2010, 2024]);
+  const [selectedColleges, setSelectedColleges] = useState([]);
   const [selectedPrograms, setSelectedPrograms] = useState([]);
   const [selectedFormats, setSelectedFormats] = useState([]);
   const itemsPerPage = 5;
 
   const handleNavigateKnowledgeGraph = () => {
     navigate("/knowledgegraph");
+  };
+
+  const fetchColleges = async () => {
+    try {
+      const response = await axios.get(`/deptprogs/college_depts`);
+      setColleges(response.data.colleges);
+    } catch (error) {
+      console.error("Error fetching colleges:", error);
+    }
+  };
+  const fetchAllPrograms = async () => {
+    try {
+      const response = await axios.get(`/deptprogs/fetch_programs`);
+      setPrograms(response.data.programs);
+      setAllPrograms(response.data.programs);
+    } catch (error) {
+      console.error("Error fetching all programs:", error);
+    }
+  };
+
+  // Fetch programs based on selected colleges
+  const fetchProgramsByCollege = async (collegeIds) => {
+    try {
+      if (collegeIds.length > 0) {
+        const promises = collegeIds.map((collegeId) =>
+          axios.get(`/deptprogs/programs`, {
+            params: { department: collegeId },
+          })
+        );
+
+        const results = await Promise.all(promises);
+        const allPrograms = results.flatMap((result) => result.data.programs);
+        setPrograms(allPrograms);
+      } else {
+        // If no college is selected, fetch all programs
+        setPrograms(allPrograms);
+      }
+    } catch (error) {
+      console.error("Error fetching programs by college:", error);
+    }
   };
 
   const getUserId = () => {
@@ -55,46 +98,28 @@ const DepartmentCollection = () => {
       }
     }
   };
-
+  const fetchAllResearchData = async () => {
+    try {
+      const response = await axios.get(`/dataset/fetch_dataset`);
+      const fetchedResearch = response.data.dataset;
+      setResearch(fetchedResearch);
+      setFilteredResearch(fetchedResearch);
+    } catch (error) {
+      console.error("Error fetching all research data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
   useEffect(() => {
     fetchUserData();
+    fetchColleges();
+    fetchAllPrograms();
+    fetchAllResearchData();
   }, []);
 
   useEffect(() => {
-    const fetchPrograms = async () => {
-      if (userDepartment) {
-        try {
-          const response = await axios.get(`/deptprogs/programs`, {
-            params: { department: userDepartment },
-          });
-          setPrograms(response.data.programs);
-        } catch (error) {
-          console.error("Error fetching programs for department:", error);
-        }
-      }
-    };
-    fetchPrograms();
-  }, [userDepartment]);
-
-  useEffect(() => {
-    const fetchDepartmentResearch = async () => {
-      if (userDepartment) {
-        try {
-          const response = await axios.put(
-            `/dataset/fetch_researches/${userDepartment}`
-          );
-          const fetchedResearch = response.data.dataset;
-          setResearch(fetchedResearch);
-          setFilteredResearch(fetchedResearch);
-        } catch (error) {
-          console.error("Error fetching data of research:", error);
-        } finally {
-          setLoading(false);
-        }
-      }
-    };
-    fetchDepartmentResearch();
-  }, [userDepartment]);
+    fetchProgramsByCollege(selectedColleges);
+  }, [selectedColleges]);
 
   useEffect(() => {
     let filtered = research;
@@ -103,7 +128,11 @@ const DepartmentCollection = () => {
     filtered = filtered.filter(
       (item) => item.year >= dateRange[0] && item.year <= dateRange[1]
     );
-
+    if (selectedColleges.length > 0) {
+      filtered = filtered.filter((item) =>
+        selectedColleges.includes(String(item.college_id))
+      );
+    }
     // Filter by Selected Programs
     if (selectedPrograms.length > 0) {
       filtered = filtered.filter((item) =>
@@ -131,7 +160,14 @@ const DepartmentCollection = () => {
 
     setFilteredResearch(filtered);
     setCurrentPage(1); // Reset to the first page on filter change
-  }, [dateRange, selectedPrograms, selectedFormats, searchQuery, research]);
+  }, [
+    dateRange,
+    selectedColleges,
+    selectedPrograms,
+    selectedFormats,
+    searchQuery,
+    research,
+  ]);
 
   // Handle change in search query
   const handleSearchChange = (e) => {
@@ -142,7 +178,12 @@ const DepartmentCollection = () => {
   const handleDateRangeChange = (event, newValue) => {
     setDateRange(newValue);
   };
-
+  const handleCollegeChange = (event) => {
+    const { value, checked } = event.target;
+    setSelectedColleges((prev) =>
+      checked ? [...prev, value] : prev.filter((item) => item !== value)
+    );
+  };
   // Handle change in selected programs filter
   const handleProgramChange = (event) => {
     const { value, checked } = event.target;
@@ -254,7 +295,7 @@ const DepartmentCollection = () => {
             }}
           >
             <Grid2 container spacing={5} sx={{ height: "100%" }}>
-              <Grid2 display="flex" justifyContent="flex-end" size={3}>
+              <Grid2 display='flex' justifyContent='flex-end' size={3}>
                 <Box
                   sx={{
                     border: "2px solid #0A438F",
@@ -268,19 +309,11 @@ const DepartmentCollection = () => {
                 >
                   <Typography
                     variant='h6'
-                    sx={{
-                      mb: 2,
-                      fontWeight: "bold",
-                      color: "#0A438F",
-                      fontSize: "1.5rem",
-                    }}
+                    sx={{ mb: 2, fontWeight: "bold", color: "#F40824" }}
                   >
-                    {userDepartment}
-                  </Typography>
-                  <Typography variant='h6' sx={{ mb: 2, fontWeight: "bold", color: "#F40824"}}>
                     Filters
                   </Typography>
-                  <Typography variant='body1' sx={{ mb: 1, color: "#08397C"}}>
+                  <Typography variant='body1' sx={{ mb: 1, color: "#08397C" }}>
                     Date Range:
                   </Typography>
                   <Slider
@@ -291,10 +324,32 @@ const DepartmentCollection = () => {
                     max={2024}
                     sx={{ my: 3, width: "80%", alignSelf: "center" }}
                   />
-                  <Typography variant='body1' sx={{ mb: 1, color: "#08397C"}}>
+                  <Typography variant='body1' sx={{ mb: 1, color: "#08397C" }}>
                     College:
                   </Typography>
-                  <Typography variant='body1' sx={{ mb: 1, color: "#08397C"}}>
+                  <Box
+                    sx={{
+                      height: "8rem",
+                      overflowY: "auto",
+                    }}
+                  >
+                    {colleges.map((college) => (
+                      <FormControlLabel
+                        key={college.college_id}
+                        control={
+                          <Checkbox
+                            checked={selectedColleges.includes(
+                              college.college_id
+                            )}
+                            onChange={handleCollegeChange}
+                            value={college.college_id}
+                          />
+                        }
+                        label={college.college_name}
+                      />
+                    ))}
+                  </Box>
+                  <Typography variant='body1' sx={{ mb: 1, color: "#08397C" }}>
                     Program:
                   </Typography>
                   <Box
@@ -319,7 +374,7 @@ const DepartmentCollection = () => {
                       />
                     ))}
                   </Box>
-                  <Typography variant='body1' sx={{ color: "#08397C"}}>
+                  <Typography variant='body1' sx={{ color: "#08397C" }}>
                     Publication Format:
                   </Typography>
                   {["Journal", "Proceeding", "Unpublished"].map((format) => (
