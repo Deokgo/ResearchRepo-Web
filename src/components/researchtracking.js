@@ -451,7 +451,7 @@ const ResearchTracking = () => {
                   </Box>
                   <Divider orientation='horizontal'/>
                   <Typography variant='body1' sx={{ mb: 1, color: "#08397C" }}>
-                    Research Statuses:
+                    Research Status:
                   </Typography>
                   {["Ready", "Submitted", "Accepted", "Published", "Pullout"].map((format) => (
                     <FormControlLabel
