@@ -314,7 +314,7 @@ const DepartmentCollection = () => {
                     Filters
                   </Typography>
                   <Typography variant='body1' sx={{ mb: 1, color: "#08397C" }}>
-                    Date Range:
+                    Year Range:
                   </Typography>
                   <Slider
                     value={dateRange}
@@ -403,7 +403,7 @@ const DepartmentCollection = () => {
                 >
                   <TextField
                     variant='outlined'
-                    placeholder='Search Research...'
+                    placeholder='Search by Title or Authors'
                     value={searchQuery}
                     onChange={handleSearchChange}
                     sx={{ width: "30rem" }}

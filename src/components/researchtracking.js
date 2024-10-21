@@ -19,7 +19,7 @@ import {
   Slider,
   FormControlLabel,
   Checkbox,
-  Divider
+  Divider,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import homeBg from "../assets/home_bg.png";
@@ -34,12 +34,16 @@ const ResearchTracking = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
-  const rowsPerPage = 10; // Changed to a constant
+  const rowsPerPage = 5; // Changed to a constant
   const navigate = useNavigate();
   const [openModal, setOpenModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [newRole, setNewRole] = useState("");
 
+  const [userDepartment, setUserDepartment] = useState(null);
+  const [colleges, setColleges] = useState([]);
+  const [allPrograms, setAllPrograms] = useState([]);
+  const [selectedColleges, setSelectedColleges] = useState([]);
   const [department, setDepartment] = useState(null);
   const [research, setResearch] = useState([]);
   const [programs, setPrograms] = useState([]);
@@ -48,58 +52,108 @@ const ResearchTracking = () => {
   const [dateRange, setDateRange] = useState([2010, 2024]);
   const [selectedPrograms, setSelectedPrograms] = useState([]);
   const [selectedCollege, setSelectedCollege] = useState([]);
-  const [selectedFormats, setSelectedFormats] = useState([]);
   const itemsPerPage = 5;
+  const [selectedStatus, setSelectedStatus] = useState(["Submitted", "Accepted", "Published"]);
+
+  const handleFormatChange = (event) => {
+    const { value } = event.target;
+    setSelectedStatus((prevSelected) => 
+      prevSelected.includes(value) 
+        ? prevSelected.filter((status) => status !== value) 
+        : [...prevSelected, value]
+    );
+  };
+  const fetchColleges = async () => {
+    try {
+      const response = await axios.get(`/deptprogs/college_depts`);
+      setColleges(response.data.colleges);
+    } catch (error) {
+      console.error("Error fetching colleges:", error);
+    }
+  };
+  
+  const fetchAllPrograms = async () => {
+    try {
+      const response = await axios.get(`/deptprogs/fetch_programs`);
+      setPrograms(response.data.programs);
+      setAllPrograms(response.data.programs);
+    } catch (error) {
+      console.error("Error fetching all programs:", error);
+    }
+  };
+
+  const fetchProgramsByCollege = async (collegeIds) => {
+    try {
+      if (collegeIds.length > 0) {
+        const promises = collegeIds.map((collegeId) =>
+          axios.get(`/deptprogs/programs`, {
+            params: { department: collegeId },
+          })
+        );
+
+        const results = await Promise.all(promises);
+        const allPrograms = results.flatMap((result) => result.data.programs);
+        setPrograms(allPrograms);
+      } else {
+        setPrograms(allPrograms);
+      }
+    } catch (error) {
+      console.error("Error fetching programs by college:", error);
+    }
+  };
+
+  const getUserId = () => {
+    const userId = localStorage.getItem("user_id");
+    return userId;
+  };
+
+  const fetchUserData = async () => {
+    const userId = getUserId();
+    if (userId) {
+      try {
+        const response = await axios.get(`/accounts/users/${userId}`);
+        const data = response.data;
+        setUserDepartment(data.researcher.college_id);
+        setDepartment(data.researcher.department_name); 
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    }
+  };
+
+  const fetchAllResearchData = async () => {
+    try {
+      const response = await axios.get("/dataset/fetch_dataset");
+      const fetchedResearch = response.data.dataset.map((paper) => ({
+        research_id: paper.research_id,
+        title: paper.title,
+        year: paper.year, 
+        college_name: paper.college_name,
+        program_name: paper.program_name,
+        journal: paper.journal, 
+        concatenated_authors: paper.concatenated_authors,
+        timestamp: paper.timestamp,
+        status: paper.status,
+      }));
+      setResearch(fetchedResearch);
+      setFilteredResearch(fetchedResearch); // Set state for filtered/paginated data
+    } catch (error) {
+      console.error("Error fetching research data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchCollege = async () => {
-      if (department) {
-        try {
-          const response = await axios.get(`/deptprogs/college_depts`);
-          setDepartment(response.data.college_depts);
-        } catch (error) {
-          console.error("Error fetching department:", error);
-        }
-      }
-    };
-    fetchCollege();
-  }, [department]);
+    fetchUserData();
+    fetchColleges();
+    fetchAllPrograms();
+    fetchAllResearchData();
+  }, []);
 
   useEffect(() => {
-    const fetchPrograms = async () => {
-      if (department) {
-        try {
-          const response = await axios.get(`/deptprogs/programs`, {
-            params: { department: department },
-          });
-          setPrograms(response.data.programs);
-        } catch (error) {
-          console.error("Error fetching programs for department:", error);
-        }
-      }
-    };
-    fetchPrograms();
-  }, [department]);
-
-  useEffect(() => {
-    const fetchDepartmentResearch = async () => {
-      if (department) {
-        try {
-          const response = await axios.put(
-            `/dataset/fetch_researches/${department}`
-          );
-          const fetchedResearch = response.data.dataset;
-          setResearch(fetchedResearch);
-          setFilteredResearch(fetchedResearch);
-        } catch (error) {
-          console.error("Error fetching data of research:", error);
-        } finally {
-          setLoading(false);
-        }
-      }
-    };
-    fetchDepartmentResearch();
-  }, [department]);
+    fetchProgramsByCollege(selectedColleges);
+  }, [selectedColleges]);
 
   useEffect(() => {
     let filtered = research;
@@ -124,10 +178,10 @@ const ResearchTracking = () => {
     }
 
     // Filter by Selected Formats
-    if (selectedFormats.length > 0) {
+    if (selectedStatus.length > 0) {
       filtered = filtered.filter((item) =>
-        selectedFormats.some(
-          (format) => format.toLowerCase() === item.journal.toLowerCase()
+        selectedStatus.some(
+          (format) => format.toLowerCase() === item.status.toLowerCase()
         )
       );
     }
@@ -137,20 +191,28 @@ const ResearchTracking = () => {
       filtered = filtered.filter(
         (item) =>
           item.title.toLowerCase().includes(searchQuery) ||
-          item.concatenated_authors.toLowerCase().includes(searchQuery)
+          item.research_id.toLowerCase().includes(searchQuery)
       );
     }
 
     setFilteredResearch(filtered);
     setCurrentPage(1); // Reset to the first page on filter change
-  }, [dateRange, selectedPrograms, selectedFormats, searchQuery, research]);
+  }, [
+    dateRange,
+    selectedColleges,
+    selectedPrograms,
+    selectedStatus,
+    searchQuery,
+    research,
+  ]);
 
-  // Handle change in date range filter
-  const handleDateRangeChange = (event, newValue) => {
-    setDateRange(newValue);
+  const handleCollegeChange = (event) => {
+    const { value, checked } = event.target;
+    setSelectedColleges((prev) =>
+      checked ? [...prev, value] : prev.filter((item) => item !== value)
+    );
   };
 
-  // Handle change in selected programs filter
   const handleProgramChange = (event) => {
     const { value, checked } = event.target;
     setSelectedPrograms((prev) =>
@@ -158,46 +220,13 @@ const ResearchTracking = () => {
     );
   };
 
-  // Handle change in selected formats filter
-  const handleFormatChange = (event) => {
-    const { value, checked } = event.target;
-    setSelectedFormats((prev) =>
-      checked ? [...prev, value] : prev.filter((item) => item !== value)
-    );
+  const handleDateRangeChange = (event, newValue) => {
+    setDateRange(newValue);
   };
-
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const response = await axios.get("/dataset/fetch_dataset");
-        const fetchedUsers = response.data.dataset.map((user) => ({
-          research_id: user.research_id,
-          title: user.title,
-          timestamp: user.timestamp,
-          status: user.status,
-        }));
-        setUsers(fetchedUsers);
-        setFilteredUsers(fetchedUsers);
-      } catch (error) {
-        console.error("Error fetching data of users:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUsers();
-  }, []);
 
   const handleSearchChange = (e) => {
     const query = e.target.value.toLowerCase();
     setSearchQuery(query);
-    setFilteredUsers(
-      users.filter(
-        (user) =>
-          user.research_id.toLowerCase().includes(query) ||
-          user.title.toLowerCase().includes(query)
-      )
-    );
   };
 
   const handleOpenModal = (user) => {
@@ -218,7 +247,6 @@ const ResearchTracking = () => {
       "New Role:",
       newRole
     );
-    // Here, you might want to implement an API call to save the changes
     setOpenModal(false);
   };
 
@@ -226,9 +254,10 @@ const ResearchTracking = () => {
     setPage(newPage);
   };
 
-  // Sliced data for pagination
-  const paginatedUsers = filteredUsers.slice((page - 1) * rowsPerPage, page * rowsPerPage);
-
+  const paginatedResearch = filteredResearch.slice(
+    (page - 1) * rowsPerPage,
+    page * rowsPerPage
+  );
   const numberFontSettings = {
     fontFamily: "Montserrat, sans-serif",
     fontWeight: 500,
@@ -360,7 +389,7 @@ const ResearchTracking = () => {
                     Filters
                   </Typography>
                   <Typography variant='body1' sx={{ mb: 1, color: "#08397C"}}>
-                    Date Range:
+                    Year Range:
                   </Typography>
                   <Slider
                     value={dateRange}
@@ -370,11 +399,32 @@ const ResearchTracking = () => {
                     max={2024}
                     sx={{ my: 3, width: "80%", alignSelf: "center" }}
                   />
-                  <Typography variant='body1' sx={{ mb: 1, color: "#08397C"}}>
-                    Colleges:
+                  <Typography variant='body1' sx={{ mb: 1, color: "#08397C" }}>
+                    College:
                   </Typography>
-                  
-                  <Typography variant='body1' sx={{ mb: 1, color: "#08397C"}}>
+                  <Box
+                    sx={{
+                      height: "8rem",
+                      overflowY: "auto",
+                    }}
+                  >
+                    {colleges.map((college) => (
+                      <FormControlLabel
+                        key={college.college_id}
+                        control={
+                          <Checkbox
+                            checked={selectedColleges.includes(
+                              college.college_id
+                            )}
+                            onChange={handleCollegeChange}
+                            value={college.college_id}
+                          />
+                        }
+                        label={college.college_name}
+                      />
+                    ))}
+                  </Box>
+                  <Typography variant='body1' sx={{ mb: 1, color: "#08397C" }}>
                     Program:
                   </Typography>
                   <Box
@@ -400,12 +450,15 @@ const ResearchTracking = () => {
                     ))}
                   </Box>
                   <Divider orientation='horizontal'/>
-                  {["Sort by Date", "Sort by Title", "Sort by Research Code"].map((format) => (
+                  <Typography variant='body1' sx={{ mb: 1, color: "#08397C" }}>
+                    Research Statuses:
+                  </Typography>
+                  {["Ready", "Submitted", "Accepted", "Published", "Pullout"].map((format) => (
                     <FormControlLabel
                       key={format}
                       control={
                         <Checkbox
-                          checked={selectedFormats.includes(format)}
+                          checked={selectedStatus.includes(format)}
                           onChange={handleFormatChange}
                           value={format}
                         />
@@ -480,7 +533,7 @@ const ResearchTracking = () => {
                   {/* Search Bar */}
                   <TextField
                     variant="outlined"
-                    placeholder="Search ..."
+                    placeholder="Search by Title or Code"
                     value={searchQuery}
                     onChange={handleSearchChange}
                     sx={{
@@ -499,35 +552,36 @@ const ResearchTracking = () => {
 
                   {/* Virtuoso Table */}
                   <Box sx={{ padding: 2, backgroundColor: "#F7F9FC" }}>
-                    {loading ? (
-                      <Typography>Loading...</Typography>
-                    ) : (
-                      <Virtuoso
-                        style={{ height: "400px" }}
-                        data={paginatedUsers}
-                        itemContent={(index, user) => (
-                          <Box
-                            key={user.research_id}
-                            sx={{
-                              padding: 2,
-                              borderBottom: "1px solid #ddd",
-                              cursor: "pointer",
-                            }}
-                            onClick={() => handleOpenModal(user)}
-                          >
-                            <Typography variant="h6">{user.title}</Typography>
-                            <Typography variant="body2" color="textSecondary">
-                              Status: {user.status} | Last Updated: {user.timestamp}
-                            </Typography>
-                          </Box>
-                        )}
-                      />
-                    )}
-                  </Box>
+                  {loading ? (
+                    <Typography>Loading...</Typography>
+                  ) : (
+                    <Virtuoso
+                      style={{ height: "425px" }}
+                      data={paginatedResearch}
+                      itemContent={(index, paper) => (
+                        <Box
+                          key={paper.research_id}
+                          sx={{
+                            padding: 2,
+                            borderBottom: "1px solid #ddd",
+                            cursor: "pointer",
+                          }}
+                          onClick={() => handleOpenModal(paper)}
+                        >
+                          <Typography variant="h6">{paper.title}</Typography>
+                          <Typography variant="body2" color="textSecondary">
+                            Status: {paper.status} | Last Updated: {paper.timestamp}
+                          </Typography>
+                        </Box>
+                      )}
+                    />
+                  )}
+
+                </Box>
 
                   {/* Pagination */}
                   <Pagination
-                    count={Math.ceil(filteredUsers.length / rowsPerPage)}
+                    count={Math.ceil(filteredResearch.length / rowsPerPage)}  
                     page={page}
                     onChange={handleChangePage}
                     sx={{ mt: 2 }}
@@ -535,8 +589,6 @@ const ResearchTracking = () => {
                 </Box>
               </Grid2>
             </Grid2>
-
-            
           </Box>
         </Box>
 
