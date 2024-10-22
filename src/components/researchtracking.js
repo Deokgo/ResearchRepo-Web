@@ -53,40 +53,61 @@ const ResearchTracking = () => {
     "Published",
   ]);
 
+  const [badgeValues, setBadgeValues] = useState({
+    total_ready: 0,
+    total_submitted: 0,
+    total_accepted: 0,
+    total_published: 0,
+  });
+
   const steps = [
     {
       color: "#B0B0B0",
       hoverColor: "#888888",
       label: "READY",
       icon: "fa-solid fa-check-to-slot",
-      badge: 3,
+      badge: badgeValues.total_ready,
     },
     {
       color: "#FFC107",
       hoverColor: "#FFD54F",
       label: "SUBMITTED",
       icon: "fa-solid fa-paper-plane",
-      badge: 5,
+      badge: badgeValues.total_submitted,
     },
     {
       color: "#2196F3",
       hoverColor: "#64B5F6",
       label: "ACCEPTED",
       icon: "fa-solid fa-thumbs-up",
-      badge: 2,
+      badge: badgeValues.total_accepted,
     },
     {
       color: "#4CAF50",
       hoverColor: "#81C784",
       label: "PUBLISHED",
       icon: "fa-solid fa-file-arrow-up",
-      badge: 100,
-    }
+      badge: badgeValues.total_published,
+    },
   ];
 
   const handleStepClick = (selectedStep) => {
-    console.log("Selected Step:", selectedStep);
-    alert(`You selected: ${selectedStep.label}`);
+    const selectedStepStatus = selectedStep.label; //extract the label of the clicked step
+    console.log("Selected Step:", selectedStepStatus);
+
+    //update selectedStatus to filter the research data by the selected step's status
+    if (selectedStatus.includes(selectedStepStatus)) {
+      //if the status is already selected, remove it
+      setSelectedStatus((prevSelected) =>
+        prevSelected.filter((status) => status !== selectedStepStatus)
+      );
+    } else {
+      //otherwise, add the new status to the selected statuses
+      setSelectedStatus((prevSelected) => [
+        ...prevSelected,
+        selectedStepStatus,
+      ]);
+    }
   };
 
   const handleFormatChange = (event) => {
@@ -167,6 +188,22 @@ const ResearchTracking = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    axios.get("dataset/get_total")
+      .then((response) => {
+        const { totals } = response.data;
+        setBadgeValues({
+          total_ready: totals.total_ready,
+          total_submitted: totals.total_submitted,
+          total_accepted: totals.total_accepted,
+          total_published: totals.total_published,
+        });
+      })
+      .catch((error) => {
+        console.error("Error fetching totals: ", error);
+      });
+  }, []);
 
   useEffect(() => {
     fetchUserData();
