@@ -3,12 +3,6 @@ import Navbar from "./navbar";
 import Footer from "./footer";
 import {
   Box,
-  Button,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Modal,
-  Select,
   TextField,
   Typography,
   Paper,
@@ -24,7 +18,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import homeBg from "../assets/home_bg.png";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
-import { Search } from "@mui/icons-material";
+import { Search, Update } from "@mui/icons-material";
 import { Virtuoso } from "react-virtuoso";
 import axios from "axios";
 
@@ -222,25 +216,8 @@ const ResearchTracking = () => {
     setSearchQuery(query);
   };
 
-  const handleOpenModal = (user) => {
-    setSelectedUser(user);
-    setNewRole(user.role);
-    setOpenModal(true);
-  };
-
-  const handleCloseModal = () => {
-    setOpenModal(false);
-    setSelectedUser(null);
-  };
-
-  const handleSaveChanges = () => {
-    console.log(
-      "Saving changes for:",
-      selectedUser.research_id,
-      "New Role:",
-      newRole
-    );
-    setOpenModal(false);
+  const handleKey = (key) => {
+    navigate(`/updateresearchinfo/`,{state:{id:key}});
   };
 
   const handleChangePage = (event, newPage) => {
@@ -558,7 +535,7 @@ const ResearchTracking = () => {
                       <Virtuoso
                         style={{ height: "400px" }}
                         data={paginatedResearch}
-                        itemContent={(index, paper) => (
+                        itemContent={(index, paper, key) => (
                           <Box
                             key={paper.research_id}
                             sx={{
@@ -566,7 +543,7 @@ const ResearchTracking = () => {
                               borderBottom: "1px solid #ddd",
                               cursor: "pointer",
                             }}
-                            onClick={() => handleOpenModal(paper)}
+                            onClick={() => handleKey(key)}
                           >
                             <Typography variant='h6'>{paper.title}</Typography>
                             <Typography variant='body2' color='textSecondary'>
@@ -591,43 +568,6 @@ const ResearchTracking = () => {
             </Grid2>
           </Box>
         </Box>
-
-        {/* Modal for Updating Status */}
-        <Modal open={openModal} onClose={handleCloseModal}>
-          <Box
-            sx={{
-              width: "400px",
-              bgcolor: "background.paper",
-              p: 4,
-              borderRadius: 2,
-              boxShadow: 24,
-              position: "absolute",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-            }}
-          >
-            <Typography variant='h6' component='h2'>
-              Update Status
-            </Typography>
-            <TextField
-              variant='outlined'
-              value={"(STATUS)"}
-              onChange={(e) => setNewRole(e.target.value)}
-              sx={{ mt: 2, width: "100%" }}
-            />
-            <Box
-              sx={{ display: "flex", justifyContent: "space-between", mt: 4 }}
-            >
-              <Button variant='contained' onClick={handleSaveChanges}>
-                Save
-              </Button>
-              <Button variant='outlined' onClick={handleCloseModal}>
-                Cancel
-              </Button>
-            </Box>
-          </Box>
-        </Modal>
       </Box>
       <Footer />
     </>

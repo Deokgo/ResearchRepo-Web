@@ -27,17 +27,15 @@ import TimelineOppositeContent, {
     timelineOppositeContentClasses,
   } from '@mui/lab/TimelineOppositeContent';
 import { useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import homeBg from "../assets/home_bg.png";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import axios from "axios";
 
-const UpdateResearchInfo = () => {
+const UpdateResearchInfo = ({route,navigate}) => {
   const [users, setUsers] = useState([]);
-  const [filteredUsers, setFilteredUsers] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
-  const [openModal, setOpenModal] = useState(false);
+  const navpage = useNavigate();
+  const location = useLocation();
   const [selectedUser, setSelectedUser] = useState(null);
   const [newRole, setNewRole] = useState("");
   useEffect(() => {
@@ -46,47 +44,14 @@ const UpdateResearchInfo = () => {
         const response = await axios.get("/accounts/users");
         const fetchedUsers = response.data.researchers;
         setUsers(fetchedUsers);
-        setFilteredUsers(fetchedUsers);
       } catch (error) {
         console.error("Error fetching data of users:", error);
       } finally {
-        setLoading(false);
       }
     };
 
     fetchUsers();
   }, []);
-
-  const handleNavigateHome = () => {
-    navigate("/main");
-  };
-
-  const handleSearchChange = (e) => {
-    const query = e.target.value.toLowerCase();
-    setSearchQuery(query);
-    setFilteredUsers(
-      users.filter(
-        (user) =>
-          user.email.toLowerCase().includes(query) ||
-          user.researcher_id.toLowerCase().includes(query)
-      )
-    );
-  };
-  const handleOpenModal = (user) => {
-    setSelectedUser(user);
-    setNewRole(user.role);
-    setOpenModal(true);
-  };
-
-  const handleSaveChanges = () => {
-    console.log(
-      "Saving changes for:",
-      selectedUser.researcher_id,
-      "New Role:",
-      newRole
-    );
-    setOpenModal(false);
-  };
 
   return (
     <>
@@ -132,7 +97,7 @@ const UpdateResearchInfo = () => {
             
             <Box sx={{ display: "flex", flexDirection: "row", ml: "5rem", zIndex: 3 }}>
               <IconButton
-                onClick={() => navigate(-1)}
+                onClick={() => navpage(-1)}
                 sx={{
                   color: "#fff",
                 }}
@@ -167,6 +132,7 @@ const UpdateResearchInfo = () => {
                             sx={{
                                 border: "2px solid #0A438F",
                                 padding: 2,
+                                marginLeft: 10,
                                 display: "flex",
                                 flexDirection: "column",
                                 height: "auto",
@@ -186,8 +152,8 @@ const UpdateResearchInfo = () => {
                                         fullWidth
                                         label='Research Code'
                                         name='research code'
-                                        value={null}
-                                        onChange={null}
+                                        value={location.state.id}
+                                        disabled
                                         margin='normal'
                                         variant='outlined'
                                     ></TextField>
@@ -197,6 +163,7 @@ const UpdateResearchInfo = () => {
                                         fullWidth
                                         label='Title'
                                         name='title'
+                                        disabled
                                         value={null}
                                         onChange={null}
                                         margin='normal'
@@ -208,6 +175,7 @@ const UpdateResearchInfo = () => {
                                         fullWidth
                                         label='Authors'
                                         name='authors'
+                                        disabled
                                         value={null}
                                         onChange={null}
                                         margin='normal'
@@ -274,14 +242,20 @@ const UpdateResearchInfo = () => {
                                 >
                                     <Button
                                         fullWidth
-                                        variant='contained'
-                                        type='submit'
                                         sx={{
-                                            maxWidth: "200px",
-                                            marginTop: "20px",
-                                            padding: "15px",
-                                            borderRadius:100,
-                                            backgroundColor: "#EC1F28",
+                                          backgroundColor: "#CA031B",
+                                          color: "#FFF",
+                                          fontFamily: "Montserrat, sans-serif",
+                                          fontSize: { xs: "0.875rem", md: "1.2rem" },
+                                          padding: { xs: "0.5rem 1rem", md: "1.5rem" },
+                                          marginLeft: "2rem",
+                                          borderRadius: "100px",
+                                          maxHeight: "2rem",
+                                          width: "23%",
+                                          "&:hover": {
+                                            backgroundColor: "#A30417",
+                                            color: "#FFF",
+                                          },
                                         }}
                                     >
                                     Update Info
@@ -409,15 +383,20 @@ const UpdateResearchInfo = () => {
                             
                         </Box>
                         <Button
-                            fullWidth
-                            variant='contained'
-                            type='submit'
                             sx={{
-                                width: "80%",
-                                marginTop: "20px",
-                                padding: "15px",
-                                borderRadius:100,
-                                backgroundColor: "#EC1F28",
+                              backgroundColor: "#CA031B",
+                              color: "#FFF",
+                              fontFamily: "Montserrat, sans-serif",
+                              fontSize: { xs: "0.875rem", md: "1.2rem" },
+                              padding: { xs: "0.5rem 1rem", md: "1.5rem" },
+                              borderRadius: "100px",
+                              mt: 5,
+                              maxHeight: "2rem",
+
+                              "&:hover": {
+                                backgroundColor: "#A30417",
+                                color: "#FFF",
+                              },
                             }}
                         >
                         Update Status to: ACCEPTED
