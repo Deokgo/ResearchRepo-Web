@@ -234,7 +234,7 @@ const ManageProgram = () => {
                   </Typography>
                   <Box
                     sx={{
-                      height: "10rem",
+                      height: "40rem",
                     }}
                   >
                     {colleges.map((college) => (
