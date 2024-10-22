@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import ArrowSteps from "./arrowsteps";
 import Navbar from "./navbar";
 import Footer from "./footer";
 import {
@@ -51,6 +52,42 @@ const ResearchTracking = () => {
     "Accepted",
     "Published",
   ]);
+
+  const steps = [
+    {
+      color: "#B0B0B0",
+      hoverColor: "#888888",
+      label: "READY",
+      icon: "fa-solid fa-check-to-slot",
+      badge: 3,
+    },
+    {
+      color: "#FFC107",
+      hoverColor: "#FFD54F",
+      label: "SUBMITTED",
+      icon: "fa-solid fa-paper-plane",
+      badge: 5,
+    },
+    {
+      color: "#2196F3",
+      hoverColor: "#64B5F6",
+      label: "ACCEPTED",
+      icon: "fa-solid fa-thumbs-up",
+      badge: 2,
+    },
+    {
+      color: "#4CAF50",
+      hoverColor: "#81C784",
+      label: "PUBLISHED",
+      icon: "fa-solid fa-file-arrow-up",
+      badge: 100,
+    }
+  ];
+
+  const handleStepClick = (selectedStep) => {
+    console.log("Selected Step:", selectedStep);
+    alert(`You selected: ${selectedStep.label}`);
+  };
 
   const handleFormatChange = (event) => {
     const { value } = event.target;
@@ -446,66 +483,17 @@ const ResearchTracking = () => {
                   ))}
                 </Box>
               </Grid2>
+
+              
               <Grid2 display='flex' justifyContent='flex-start' size={9}>
                 {/* Container for Stats, Search Bar, and Virtuoso Table (Right) */}
+                
                 <Box sx={{ flexBasis: "90%" }}>
+                
                   {/* Stats Section */}
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      mb: 4,
-                    }}
-                  >
-                    <Paper
-                      variant='outlined'
-                      square={false}
-                      sx={{
-                        textAlign: "center",
-                        width: "100%",
-                        height: "auto",
-                        display: "flex",
-                        justifyContent: "space-around",
-                        padding: 2,
-                        borderRadius: 3,
-                        borderColor: "#001C43",
-                      }}
-                    >
-                      <Box sx={boxSettings}>
-                        <Typography variant='h3' sx={numberFontSettings}>
-                          37
-                        </Typography>
-                        <Typography variant='h3' sx={labelFontSettings}>
-                          READY
-                        </Typography>
-                      </Box>
-                      <Box sx={boxSettings}>
-                        <Typography variant='h3' sx={numberFontSettings}>
-                          2
-                        </Typography>
-                        <Typography variant='h3' sx={labelFontSettings}>
-                          SUBMITTED
-                        </Typography>
-                      </Box>
-                      <Box sx={boxSettings}>
-                        <Typography variant='h3' sx={numberFontSettings}>
-                          187
-                        </Typography>
-                        <Typography variant='h3' sx={labelFontSettings}>
-                          ACCEPTED
-                        </Typography>
-                      </Box>
-                      <Box sx={boxSettings}>
-                        <Typography variant='h3' sx={numberFontSettings}>
-                          26
-                        </Typography>
-                        <Typography variant='h3' sx={labelFontSettings}>
-                          PUBLISHED
-                        </Typography>
-                      </Box>
-                    </Paper>
-                  </Box>
+                  <div className="App">
+                    <ArrowSteps steps={steps} onStepClick={handleStepClick} />
+                  </div>
 
                   {/* Search Bar */}
                   <TextField
