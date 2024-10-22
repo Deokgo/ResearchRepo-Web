@@ -21,60 +21,57 @@ import { Search } from "@mui/icons-material";
 import { Virtuoso } from "react-virtuoso";
 import axios from "axios";
 
-const ManageUsers = () => {
-  const [users, setUsers] = useState([]);
-  const [filteredUsers, setFilteredUsers] = useState([]);
+const ManageCollege = () => {
+  const [colleges, setColleges] = useState([]);
+  const [filteredCollege, setFilteredCollege] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const [openModal, setOpenModal] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [newRole, setNewRole] = useState("");
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const response = await axios.get("/accounts/users");
-        const fetchedUsers = response.data.researchers;
-        setUsers(fetchedUsers);
-        setFilteredUsers(fetchedUsers);
-      } catch (error) {
-        console.error("Error fetching data of users:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const [selectedCollege, setSelectedCollege] = useState(null);
 
-    fetchUsers();
+  useEffect(() => {
+    const fetchColleges = async () => {
+        try {
+        const response = await axios.get(`/deptprogs/college_depts`);
+        const fetchColleges = response.data.colleges;
+        setColleges(fetchColleges);
+        setFilteredCollege(fetchColleges);
+        } catch (error) {
+        console.error("Error fetching colleges:", error); 
+        } finally {
+            setLoading(false);
+        }
+    };
+    
+    fetchColleges();
   }, []);
 
   const handleSearchChange = (e) => {
     const query = e.target.value.toLowerCase();
     setSearchQuery(query);
-    setFilteredUsers(
-      users.filter(
-        (user) =>
-          user.email.toLowerCase().includes(query) ||
-          user.researcher_id.toLowerCase().includes(query)
+    setFilteredCollege(
+      colleges.filter(
+        (college) =>
+          college.name.toLowerCase().includes(query) ||
+          college.college_id.toLowerCase().includes(query)
       )
     );
   };
-  const handleOpenModal = (user) => {
-    setSelectedUser(user);
-    setNewRole(user.role);
+  const handleOpenModal = (college) => {
+    setSelectedCollege(college);
     setOpenModal(true);
   };
 
   const handleCloseModal = () => {
     setOpenModal(false);
-    setSelectedUser(null);
+    setSelectedCollege(null);
   };
 
   const handleSaveChanges = () => {
     console.log(
       "Saving changes for:",
-      selectedUser.researcher_id,
-      "New Role:",
-      newRole
+      selectedCollege.college_id
     );
     setOpenModal(false);
   };
@@ -142,10 +139,11 @@ const ManageUsers = () => {
                   zIndex: 2,
                 }}
               >
-                Manage Users
+                Manage College
               </Typography>
             </Box>
           </Box>
+
           {/*Main Content */}
           <Box
             sx={{
@@ -159,15 +157,15 @@ const ManageUsers = () => {
               sx={{
                 width: "80%", // Center search bar and button
                 display: "flex",
-                paddingTop: 2,
-                paddingBottom: 2,
+                paddingTop: 3,
+                paddingBottom: 5,
                 justifyContent: "space-between",
                 alignItems: "center",
               }}
             >
               <TextField
                 variant='outlined'
-                placeholder='Search User...'
+                placeholder='Search College...'
                 value={searchQuery}
                 onChange={handleSearchChange}
                 sx={{ width: "30rem" }}
@@ -180,22 +178,22 @@ const ManageUsers = () => {
                 }}
               />
               <Button
-                variant='contained'
-                color='primary'
-                sx={{
-                  backgroundColor: "#F40824",
-                  color: "#FFF",
-                  fontFamily: "Montserrat, sans-serif",
-                  fontWeight: 600,
-                  textTransform: "none",
-                  fontSize: { xs: "0.875rem", md: "1.375rem" },
-                  padding: { xs: "0.5rem 1rem", md: "1.5rem" },
-                  marginLeft: "2rem",
-                  borderRadius: "100px",
-                  maxHeight: "3rem"
-                }}
+                    variant='contained'
+                    color='primary'
+                    sx={{
+                    backgroundColor: "#F40824",
+                    color: "#FFF",
+                    fontFamily: "Montserrat, sans-serif",
+                    fontWeight: 600,
+                    textTransform: "none",
+                    fontSize: { xs: "0.875rem", md: "1.375rem" },
+                    padding: { xs: "0.5rem 1rem", md: "1.5rem" },
+                    marginLeft: "2rem",
+                    borderRadius: "100px",
+                    maxHeight: "3rem"        
+                    }}    
               >
-                Add New User
+                Add New College
               </Button>
             </Box>
 
@@ -206,7 +204,7 @@ const ManageUsers = () => {
               ) : (
                 <Virtuoso
                   style={{ height: "500px" }}
-                  totalCount={filteredUsers.length}
+                  totalCount={filteredCollege.length}
                   components={{
                     Header: () => (
                       <Box
@@ -222,15 +220,15 @@ const ManageUsers = () => {
                           zIndex: 1000,
                         }}
                       >
-                        <Box sx={{ flex: 1 }}>User ID</Box>
-                        <Box sx={{ flex: 2 }}>Email</Box>
-                        <Box sx={{ flex: 1 }}>Role</Box>
+                        <Box sx={{ flex: 1 }}>College ID</Box>
+                        <Box sx={{ flex: 2 }}>Name</Box>
+                        <Box sx={{ flex: 1 }}>Color Attribute</Box>
                         <Box sx={{ flex: 1 }}>Action</Box>
                       </Box>
                     ),
                   }}
                   itemContent={(index) => {
-                    const user = filteredUsers[index];
+                    const college = filteredCollege[index];
                     return (
                       <Box
                         sx={{
@@ -240,14 +238,14 @@ const ManageUsers = () => {
                           borderBottom: "1px solid #ccc",
                         }}
                       >
-                        <Box sx={{ flex: 1 }}>{user.researcher_id}</Box>
-                        <Box sx={{ flex: 2 }}>{user.email}</Box>
-                        <Box sx={{ flex: 1 }}>{user.role || "N/A"}</Box>
+                        <Box sx={{ flex: 1 }}>{college.college_id}</Box>
+                        <Box sx={{ flex: 2 }}>{college.college_name}</Box>
+                        <Box sx={{ flex: 1 }}>{null}</Box>
                         <Box sx={{ flex: 1 }}>
                           <Button
                             variant='text'
                             color='primary'
-                            onClick={() => handleOpenModal(user)}
+                            onClick={() => handleOpenModal(college)}
                           >
                             Edit
                           </Button>
@@ -258,11 +256,10 @@ const ManageUsers = () => {
                 />
               )}
             </Box>
-            {selectedUser && (
+            {selectedCollege && (
               <Modal
                 open={openModal}
                 onClose={handleCloseModal}
-                aria-labelledby='edit-user-role-modal'
               >
                 <Box
                   sx={{
@@ -278,34 +275,21 @@ const ManageUsers = () => {
                   }}
                 >
                   <Typography variant='h5' mb={3}>
-                    Edit User Role
+                    Edit College
                   </Typography>
                   <TextField
-                    label='User ID'
-                    value={selectedUser.researcher_id}
+                    label='College ID'
+                    value={selectedCollege.college_id}
                     disabled
                     fullWidth
                     margin='normal'
                   />
                   <TextField
-                    label='Mapúa MCL Live Account'
-                    value={selectedUser.email}
-                    disabled
+                    label='Name'
+                    value={selectedCollege.college_name}
                     fullWidth
                     margin='normal'
                   />
-                  <FormControl fullWidth margin='normal'>
-                    <InputLabel>Role</InputLabel>
-                    <Select
-                      value={newRole}
-                      onChange={(e) => setNewRole(e.target.value)}
-                      label='Role'
-                    >
-                      <MenuItem value='Admin'>Admin</MenuItem>
-                      <MenuItem value='Researcher'>Researcher</MenuItem>
-                      <MenuItem value='Viewer'>Viewer</MenuItem>
-                    </Select>
-                  </FormControl>
                   <Box
                     sx={{
                       display: "flex",
@@ -339,4 +323,4 @@ const ManageUsers = () => {
   );
 };
 
-export default ManageUsers;
+export default ManageCollege;

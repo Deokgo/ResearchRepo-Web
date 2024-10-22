@@ -244,7 +244,7 @@ const DepartmentCollection = () => {
               gap: 4,
               backgroundSize: "cover",
               backgroundPosition: "center",
-              height: { xs: "5rem", md: "8rem" },
+              height: { xs: "5rem", md: "6rem" },
               backgroundColor: "#0A438F",
             }}
           >
@@ -276,7 +276,6 @@ const DepartmentCollection = () => {
                   fontWeight: 800,
                   fontSize: { xs: "1.5rem", sm: "2rem", md: "3rem" },
                   color: "#FFF",
-                  mb: 2,
                   lineHeight: 1.25,
                   alignSelf: "center",
                   zIndex: 2,

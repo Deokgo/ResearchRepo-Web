@@ -125,6 +125,14 @@ const Navbar = () => {
     navigate("/manage-users");
   };
 
+  const handleManageCollege = () => {
+    navigate("/managecollege");
+  };
+
+  const handleManageProgram = () => {
+    navigate("/manageprogram");
+  };
+
   const handleKnowledgeGraph = () => {
     navigate("/knowledgegraph");
   };
@@ -492,10 +500,10 @@ const Navbar = () => {
           <MenuItem onClick={handleManageUsers}>
             <Typography color="common.white" >Manage Users</Typography>
           </MenuItem>
-          <MenuItem onClick={null}>
+          <MenuItem onClick={handleManageCollege}>
             <Typography color="common.white" >Manage College</Typography>
           </MenuItem>
-          <MenuItem onClick={null}>
+          <MenuItem onClick={handleManageProgram}>
             <Typography color="common.white" >Manage Program</Typography>
           </MenuItem>
         </Menu>

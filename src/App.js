@@ -9,6 +9,8 @@ import ResearchTracking from "./components/researchtracking";
 import UpdateResearchInfo from "./components/updateresearchinfo";
 import Collection from "./components/collection";
 import ManagePapers from "./components/managepapers";
+import ManageCollege from "./components/managecollege"
+import ManageProgram from "./components/manageprogram"
 import { CssBaseline } from "@mui/material"; // To remove default margin
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import KnowledgeGraph from "./components/knowledgegraph";
@@ -42,6 +44,8 @@ function App() {
           <Route path='/researchtracking' element={<ResearchTracking />} />
           <Route path='/updateresearchinfo' element={<UpdateResearchInfo />} />
           <Route path='/managepapers' element={<ManagePapers />} />
+          <Route path='/managecollege' element={<ManageCollege />} />
+          <Route path='/manageprogram' element={<ManageProgram />} />
 
           <Route
             path='/profile'

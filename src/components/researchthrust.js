@@ -144,9 +144,11 @@ const ResearchThrust = () => {
               marginTop: { xs: "3.5rem", sm: "4rem", md: "6rem" },
               display: "flex",
               flexDirection: { xs: "column", md: "row" },
+              padding: 4,
+              gap: 4,
               backgroundSize: "cover",
               backgroundPosition: "center",
-              height: { xs: "5rem", md: "8rem" },
+              height: { xs: "5rem", md: "6rem" },
               backgroundColor: "#0A438F",
             }}
           >
@@ -162,27 +164,24 @@ const ResearchThrust = () => {
                 zIndex: 1,
               }}
             />
-            <Box sx={{ display: "flex", ml: "12rem", zIndex: 3 }}>
+            <Box sx={{ display: "flex", ml: "5rem", zIndex: 3 }}>
               <IconButton
                 onClick={() => navigate(-1)}
                 sx={{
                   color: "#fff",
                 }}
               >
-                <ArrowBackIosIcon></ArrowBackIosIcon>
+                <ArrowBackIosIcon />
               </IconButton>
               <Typography
                 variant='h3'
                 sx={{
                   fontFamily: "Montserrat, sans-serif",
                   fontWeight: 800,
-                  fontSize: { xs: "2rem", sm: "2.5rem", md: "3.5rem" },
+                  fontSize: { xs: "1.5rem", sm: "2rem", md: "3rem" },
                   color: "#FFF",
-                  mb: 2,
                   lineHeight: 1.25,
-                  maxWidth: { xs: "100%", md: "100%" },
                   alignSelf: "center",
-                  paddingLeft: 3,
                   zIndex: 2,
                 }}
               >
@@ -190,7 +189,6 @@ const ResearchThrust = () => {
               </Typography>
             </Box>
           </Box>
-
           {/* Content Section */}
           <Box
             sx={{

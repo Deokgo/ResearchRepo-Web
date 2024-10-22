@@ -147,7 +147,7 @@ const ReadMore = () => {
               flexDirection: { xs: "column", md: "row" },
               backgroundSize: "cover",
               backgroundPosition: "center",
-              height: { xs: "5rem", md: "8rem" },
+              height: { xs: "5rem", md: "6rem" },
               backgroundColor: "#0A438F",
             }}
           >
@@ -179,7 +179,6 @@ const ReadMore = () => {
                   fontWeight: 800,
                   fontSize: { xs: "2rem", sm: "2.5rem", md: "3.5rem" },
                   color: "#FFF",
-                  mb: 2,
                   lineHeight: 1.25,
                   maxWidth: { xs: "100%", md: "100%" },
                   alignSelf: "center",

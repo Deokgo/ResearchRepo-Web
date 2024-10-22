@@ -5,11 +5,6 @@ import {
   Box,
   Button,
   IconButton,
-  InputAdornment,
-  InputLabel,
-  MenuItem,
-  Modal,
-  Select,
   TextField,
   Typography,
   Grid2,
@@ -52,6 +47,8 @@ const UpdateResearchInfo = ({route,navigate}) => {
 
     fetchUsers();
   }, []);
+
+  const [value, setValue] = useState(null);
 
   return (
     <>
@@ -119,20 +116,21 @@ const UpdateResearchInfo = ({route,navigate}) => {
               </Typography>
             </Box>
           </Box>
+
           {/*Main Content */}
             <Box
                 sx={{
                 padding: 5,
-                mb: 2,
                 }}
             >
+              {/* Left-side Form Section*/}
                 <Grid2 container sx={{ display: "flex", flexDirection: "flex-start", height: "100%"}}>
                     <Grid2 display="flex" size={9}>
                         <Box
                             sx={{
                                 border: "2px solid #0A438F",
-                                padding: 2,
                                 marginLeft: 10,
+                                padding: 2,
                                 display: "flex",
                                 flexDirection: "column",
                                 height: "auto",
@@ -146,7 +144,8 @@ const UpdateResearchInfo = ({route,navigate}) => {
                                     justifyContent: "center",
                                 }}
                                 >
-                                <Grid2 container padding={3} spacing={{ xs: 0, md: 2 }}>
+                                <Typography variant='body1' padding={1} sx={{ color: "#08397C" }}>Research Output:</Typography>
+                                <Grid2 container padding={1} spacing={{ xs: 0, md: 3 }}>
                                     <Grid2 item size={{ xs: 12, md: 3 }}>
                                     <TextField
                                         fullWidth
@@ -184,12 +183,24 @@ const UpdateResearchInfo = ({route,navigate}) => {
                                     </Grid2>
                                 </Grid2>
                                 <Divider orientation='horizontal' flexItem />
-                                <Grid2 container padding={3} spacing={{ xs: 0, md: 2 }}>
+                                <Typography variant='body1' padding={1} sx={{ color: "#08397C" }}>Publication:</Typography>
+                                <Grid2 container padding={1} spacing={{ xs: 0, md: 3 }}>
+                                    <Grid2 item size={{ xs: 12, md: 3 }}>
+                                    <TextField
+                                        fullWidth
+                                        label='Publication Name'
+                                        name='publicationName'
+                                        value={null}
+                                        onChange={null}
+                                        margin='normal'
+                                        variant='outlined'
+                                    ></TextField>
+                                    </Grid2>
                                     <Grid2 item size={{ xs: 12, md: 3 }}>
                                     <TextField
                                         fullWidth
                                         label='Publication Format'
-                                        name='publicationformat'
+                                        name='publicationFormat'
                                         value={null}
                                         onChange={null}
                                         margin='normal'
@@ -199,18 +210,7 @@ const UpdateResearchInfo = ({route,navigate}) => {
                                     <Grid2 item size={{ xs: 12, md: 3 }}>
                                     <TextField
                                         fullWidth
-                                        label='Conference'
-                                        name='conference'
-                                        value={null}
-                                        onChange={null}
-                                        margin='normal'
-                                        variant='outlined'
-                                    ></TextField>
-                                    </Grid2>
-                                    <Grid2 item size={{ xs: 12, md: 3 }}>
-                                    <TextField
-                                        fullWidth
-                                        label='Funding Agency'
+                                        label='Published Date'
                                         name='fundingagency'
                                         value={null}
                                         onChange={null}
@@ -221,8 +221,8 @@ const UpdateResearchInfo = ({route,navigate}) => {
                                     <Grid2 item size={{ xs: 12, md: 3 }}>
                                     <TextField
                                         fullWidth
-                                        label='Publisher'
-                                        name='publisher'
+                                        label='Scopus'
+                                        name='scopus'
                                         value={null}
                                         onChange={null}
                                         margin='normal'
@@ -231,27 +231,61 @@ const UpdateResearchInfo = ({route,navigate}) => {
                                     </Grid2>
                                 </Grid2>
                                 <Divider orientation='horizontal' flexItem />
+                                <Typography variant='body1' padding={1} sx={{ color: "#08397C" }}>Conference:</Typography>
+                                <Grid2 container padding={1} spacing={{ xs: 0, md: 3 }}>
+                                    <Grid2 item size={{ xs: 12, md: 6 }}>
+                                    <TextField
+                                        fullWidth
+                                        label='Title'
+                                        name='publicationName'
+                                        value={null}
+                                        onChange={null}
+                                        margin='normal'
+                                        variant='outlined'
+                                    ></TextField>
+                                    </Grid2>
+                                    <Grid2 item size={{ xs: 12, md: 3 }}>
+                                    <TextField
+                                        fullWidth
+                                        label='Venue'
+                                        name='publicationFormat'
+                                        value={null}
+                                        onChange={null}
+                                        margin='normal'
+                                        variant='outlined'
+                                    ></TextField>
+                                    </Grid2>
+                                    <Grid2 item size={{ xs: 12, md: 3 }}>
+                                    <TextField 
+                                        fullWidth
+                                        label='Date'
+                                        name='data'
+                                        value={null}
+                                        onChange={null}
+                                        margin='normal'
+                                        variant='outlined' 
+                                    ></TextField>
+                                    </Grid2>
+                                </Grid2>
                                 <Box
                                     sx={{
                                     display: "flex",
                                     flexDirection: "column",
                                     alignItems: "flex-end",
-                                    p:4,
-                                    marginTop: "20px",
+                                    marginTop: 5,
                                     }}
                                 >
                                     <Button
                                         fullWidth
                                         sx={{
-                                          backgroundColor: "#CA031B",
+                                          backgroundColor: "#08397C",
                                           color: "#FFF",
                                           fontFamily: "Montserrat, sans-serif",
                                           fontSize: { xs: "0.875rem", md: "1.2rem" },
                                           padding: { xs: "0.5rem 1rem", md: "1.5rem" },
-                                          marginLeft: "2rem",
                                           borderRadius: "100px",
                                           maxHeight: "2rem",
-                                          width: "23%",
+                                          width: "20%",
                                           "&:hover": {
                                             backgroundColor: "#A30417",
                                             color: "#FFF",
@@ -265,6 +299,8 @@ const UpdateResearchInfo = ({route,navigate}) => {
                             </form>
                         </Box>
                     </Grid2>
+
+                    {/* Right-side Timeline Section*/}
                     <Grid2 sx={{ display: "flex", flexDirection: "column", height: "100%"}} size={3}>
                         <Box
                             sx={{
@@ -296,7 +332,7 @@ const UpdateResearchInfo = ({route,navigate}) => {
                                     </TimelineOppositeContent>
 
                                     <TimelineSeparator>
-                                        <TimelineDot variant={"outlined"} sx={{ width: 20, height: 20}}/>
+                                        <TimelineDot variant={"outlined"} sx={{ borderColor: "#EC1F28", width: 20, height: 20}}/>
                                         <TimelineConnector sx={{ backgroundColor: '#EC1F28'}}/>
                                     </TimelineSeparator>
 
@@ -320,7 +356,7 @@ const UpdateResearchInfo = ({route,navigate}) => {
                                     </TimelineOppositeContent>
 
                                     <TimelineSeparator>
-                                        <TimelineDot variant={"outlined"} sx={{ width: 20, height: 20}}/>
+                                        <TimelineDot variant={"outlined"} sx={{ borderColor: "#EC1F28", width: 20, height: 20}}/>
                                         <TimelineConnector sx={{ backgroundColor: '#EC1F28'}}/>
                                     </TimelineSeparator>
 
@@ -344,7 +380,7 @@ const UpdateResearchInfo = ({route,navigate}) => {
                                     </TimelineOppositeContent>
 
                                     <TimelineSeparator>
-                                        <TimelineDot variant={"outlined"} sx={{ backgroundColor: '#EC1F28', width: 20, height: 20}}/>
+                                        <TimelineDot sx={{ backgroundColor: '#EC1F28', width: 20, height: 20}}/>
                                         <TimelineConnector sx={{ backgroundColor: '#EC1F28'}}/>
                                     </TimelineSeparator>
 
@@ -367,7 +403,7 @@ const UpdateResearchInfo = ({route,navigate}) => {
                                     </TimelineOppositeContent>
 
                                     <TimelineSeparator>
-                                        <TimelineDot variant={"outlined"} sx={{ backgroundColor: '#EC1F28', width: 20, height: 20}}/>
+                                        <TimelineDot sx={{ backgroundColor: '#EC1F28', width: 20, height: 20}}/>
                                     </TimelineSeparator>
 
                                     <TimelineContent
