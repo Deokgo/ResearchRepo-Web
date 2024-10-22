@@ -4,7 +4,6 @@ import ReadMore from "./components/readmore";
 import Profile from "./components/profile";
 import PrivateRoute from "./components/privateroute";
 import ManageUsers from "./components/manageusers";
-import PasswordReset from "./components/passwordreset";
 import ResearchThrust from "./components/researchthrust";
 import ResearchTracking from "./components/researchtracking";
 import UpdateResearchInfo from "./components/updateresearchinfo";
@@ -36,7 +35,6 @@ function App() {
           <Route path='/home' element={<Home />} />
           <Route path='/readmore' element={<ReadMore />} />
 
-          <Route path='/resetpassword' element={<PasswordReset />} />
           <Route path='/knowledgegraph' element={<KnowledgeGraph />} />
           <Route path='/maindash' element={<MainDash />} />
           <Route path='/publication' element={<PubDash />} />

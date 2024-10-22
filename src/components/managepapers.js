@@ -438,7 +438,19 @@ const ManagePapers = () => {
                   <Button
                     variant='contained'
                     color='primary'
-                    sx={{ ml: 2 }}
+                    sx={{
+                      backgroundColor: "#08397C",
+                      color: "#FFF",
+                      fontFamily: "Montserrat, sans-serif",
+                      fontWeight: 600,
+                      textTransform: "none",
+                      fontSize: { xs: "0.875rem", md: "1.375rem" },
+                      padding: { xs: "0.5rem 1rem", md: "1.5rem" },
+                      marginLeft: "2rem",
+                      borderRadius: "100px",
+                      maxHeight: "3rem"
+                    }}
+                    
                     onClick={openAddPaperModal}
                   >
                     Add New Paper

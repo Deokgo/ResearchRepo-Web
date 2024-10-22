@@ -12,9 +12,9 @@ import {
   FormControl,
   IconButton,
 } from "@mui/material";
-import UploadFileIcon from "@mui/icons-material/UploadFile";
 import axios from "axios";
 import { useModalContext } from "./modalcontext";
+import FileUploader from './FileUploader';
 
 const AddPaperModal = ({ isOpen, handleClose }) => {
   const [colleges, setColleges] = useState([]);
@@ -23,6 +23,8 @@ const AddPaperModal = ({ isOpen, handleClose }) => {
   const [selectedProgram, setSelectedProgram] = useState("");
   const { isAddPaperModalOpen, closeAddPaperModal, openAddPaperModal } =
     useModalContext();
+  const [file, setFile] = useState(null);
+  
   // Fetch all colleges when the modal opens
   useEffect(() => {
     if (isAddPaperModalOpen) {
@@ -63,6 +65,14 @@ const AddPaperModal = ({ isOpen, handleClose }) => {
     setSelectedProgram(""); // Reset selected program when college changes
   };
 
+  const onSelectFileHandler = (e) => {
+    setFile(e.target.files[0]);
+  }
+  
+  const onDeleteFileHandler = () => {
+  
+  }
+
   return (
     <Modal
       open={isAddPaperModalOpen}
@@ -77,18 +87,23 @@ const AddPaperModal = ({ isOpen, handleClose }) => {
         sx={{
           bgcolor: "background.paper",
           boxShadow: 24,
-          p: 4,
+          p: 6,
           borderRadius: 2,
           width: "60%",
         }}
       >
         <Typography
-          variant='h4'
-          sx={{ fontWeight: "bold", mb: 3, color: "#08397C" }}
+          variant='h3'
+          color='#08397C'
+          fontWeight='1000'
+          mb={4}
+          sx={{
+            textAlign: { xs: "left", md: "bottom" },
+          }}
         >
           Add New Paper
         </Typography>
-        <Grid2 container spacing={3}>
+        <Grid2 container spacing={2}>
           <Grid2 size={3}>
             <TextField fullWidth label='Group Code' variant='filled' />
           </Grid2>
@@ -168,6 +183,7 @@ const AddPaperModal = ({ isOpen, handleClose }) => {
             />
           </Grid2>
           <Grid2 size={12}>
+            <Typography variant='body1' sx={{ color: "#8B8B8B" }}>Full Manuscript:</Typography>
             <Box
               sx={{
                 display: "flex",
@@ -180,11 +196,8 @@ const AddPaperModal = ({ isOpen, handleClose }) => {
                 gap: 2,
               }}
             >
-              <IconButton component='label'>
-                <UploadFileIcon />
-                <input type='file' hidden />
-              </IconButton>
-              <Typography>Browse or drop file</Typography>
+              <FileUploader onSelectFile={onSelectFileHandler}
+                onDeleteFile={onDeleteFileHandler} />
             </Box>
           </Grid2>
         </Grid2>
@@ -193,35 +206,47 @@ const AddPaperModal = ({ isOpen, handleClose }) => {
             display: "flex",
             justifyContent: "center",
             mt: 5,
-            gap: 3,
           }}
         >
           <Button
             variant='outlined'
-            color='secondary'
             onClick={closeAddPaperModal}
             sx={{
-              minWidth: "150px",
-              borderColor: "#000",
-              color: "#000",
+              backgroundColor: "#FFF",
+              color: "#08397C",
+              fontFamily: "Montserrat, sans-serif",
+              fontWeight: 600,
+              textTransform: "none",
+              fontSize: { xs: "0.875rem", md: "1.375rem" },
+              padding: { xs: "0.5rem", md: "1.5rem" },
+              marginLeft: "2rem",
+              borderRadius: "100px",
+              borderColor: "#8B8B8B",
+              maxHeight: "3rem",
               textTransform: "none",
               "&:hover": {
-                backgroundColor: "#F2F2F2",
-                borderColor: "#000",
+                backgroundColor: "#D4D4D6",
               },
             }}
           >
             Back
           </Button>
           <Button
-            variant='contained'
             sx={{
-              minWidth: "150px",
               backgroundColor: "#CA031B",
               color: "#FFF",
+              fontFamily: "Montserrat, sans-serif",
+              fontWeight: 600,
+              textTransform: "none",
+              fontSize: { xs: "0.875rem", md: "1.375rem" },
+              padding: { xs: "0.5rem 1rem", md: "1.5rem" },
+              marginLeft: "2rem",
+              borderRadius: "100px",
+              maxHeight: "3rem",
               textTransform: "none",
               "&:hover": {
-                backgroundColor: "#B20219",
+                backgroundColor: "#A30417",
+                color: "#FFF",
               },
             }}
           >

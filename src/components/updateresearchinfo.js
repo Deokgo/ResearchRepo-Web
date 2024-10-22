@@ -31,7 +31,7 @@ import homeBg from "../assets/home_bg.png";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import axios from "axios";
 
-const ManageUsers = () => {
+const UpdateResearchInfo = () => {
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -431,4 +431,4 @@ const ManageUsers = () => {
   );
 };
 
-export default ManageUsers;
+export default UpdateResearchInfo;
