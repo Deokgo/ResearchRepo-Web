@@ -67,6 +67,7 @@ const ResearchTracking = () => {
       label: "READY",
       icon: "fa-solid fa-check-to-slot",
       badge: badgeValues.total_ready,
+      activeColor: "#F44336"
     },
     {
       color: "#FFC107",
@@ -74,6 +75,7 @@ const ResearchTracking = () => {
       label: "SUBMITTED",
       icon: "fa-solid fa-paper-plane",
       badge: badgeValues.total_submitted,
+      activeColor: "#F44336"
     },
     {
       color: "#2196F3",
@@ -81,6 +83,7 @@ const ResearchTracking = () => {
       label: "ACCEPTED",
       icon: "fa-solid fa-thumbs-up",
       badge: badgeValues.total_accepted,
+      activeColor: "#F44336"
     },
     {
       color: "#4CAF50",
@@ -88,6 +91,7 @@ const ResearchTracking = () => {
       label: "PUBLISHED",
       icon: "fa-solid fa-file-arrow-up",
       badge: badgeValues.total_published,
+      activeColor: "#F44336"
     },
   ];
 
