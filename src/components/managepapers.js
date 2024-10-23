@@ -459,7 +459,7 @@ const ManagePapers = () => {
                   sx={{
                     display: "flex",
                     flexDirection: "column",
-                    padding: 2,
+                    paddingTop: 2,
                     height: "60vh",
                   }}
                 >
@@ -468,7 +468,7 @@ const ManagePapers = () => {
                       <Typography>Loading...</Typography>
                     ) : (
                       <Virtuoso
-                        style={{ height: "50vh" }}
+                        style={{ height: "28rem" }}
                         data={paginatedResearch}
                         itemContent={(index, researchItem) => (
                           <Box
@@ -495,7 +495,7 @@ const ManagePapers = () => {
                     count={Math.ceil(filteredResearch.length / itemsPerPage)}
                     page={currentPage}
                     onChange={handleChangePage}
-                    sx={{ mt: 2 }}
+                    sx={{ mt: 1 }}
                   />
                 </Box>
               </Grid2>

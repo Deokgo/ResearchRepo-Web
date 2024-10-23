@@ -20,6 +20,7 @@ import { useNavigate } from "react-router-dom";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import axios from "axios";
 import { Virtuoso } from "react-virtuoso";
+import DummyKG from "../assets/dummy_kg_keyword.png";
 
 const DepartmentCollection = () => {
   const navigate = useNavigate();
@@ -395,9 +396,7 @@ const DepartmentCollection = () => {
               <Grid2 size={6}>
                 <Box
                   sx={{
-                    border: "1px solid #ccc",
                     height: "100%",
-                    padding: 2,
                     boxSizing: "border-box",
                   }}
                 >
@@ -406,7 +405,7 @@ const DepartmentCollection = () => {
                     placeholder='Search by Title or Authors'
                     value={searchQuery}
                     onChange={handleSearchChange}
-                    sx={{ width: "30rem" }}
+                    sx={{ width: "30rem", paddingBottom: "1rem" }}
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position='start'>
@@ -420,7 +419,7 @@ const DepartmentCollection = () => {
                       <Typography>Loading...</Typography>
                     ) : (
                       <Virtuoso
-                        style={{ height: "50vh" }}
+                        style={{ height: "29rem" }}
                         data={paginatedResearch}
                         itemContent={(index, researchItem) => (
                           <Box
@@ -447,7 +446,7 @@ const DepartmentCollection = () => {
                     count={Math.ceil(filteredResearch.length / itemsPerPage)}
                     page={currentPage}
                     onChange={handleChangePage}
-                    sx={{ mt: 2 }}
+                    sx={{ mt: 1 }}
                   />
                 </Box>
               </Grid2>
@@ -456,7 +455,7 @@ const DepartmentCollection = () => {
                   onClick={handleNavigateKnowledgeGraph}
                   sx={{
                     width: "100%",
-                    height: "100%",
+                    height: "90%",
                     border: "1px solid #ccc",
                     padding: 0,
                     boxSizing: "border-box",
@@ -469,13 +468,21 @@ const DepartmentCollection = () => {
                     sx={{
                       width: "100%",
                       height: "100%",
-                      backgroundColor: "#E0E0E0",
+                      backgroundColor: "#FFF",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
                     }}
                   >
-                    <Typography variant='h5'>Knowledge Graph</Typography>
+                    <img
+                      src={DummyKG}
+                      alt='Dummy Knowledge Graph'
+                      style={{
+                          width: "100%",
+                          height: "auto",
+                          objectFit: "contain",
+                      }}
+                    />
                   </Box>
                 </Button>
               </Grid2>
