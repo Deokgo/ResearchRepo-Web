@@ -208,7 +208,7 @@ const ManageProgram = () => {
                     display: "flex",
                     flexDirection: "column",
                     width: "80%",
-                    height: "70%",
+                    height: "50%",
                     borderRadius: 3,
                   }}
                 >

@@ -294,35 +294,6 @@ const ResearchTracking = () => {
     (page - 1) * rowsPerPage,
     page * rowsPerPage
   );
-  const numberFontSettings = {
-    fontFamily: "Montserrat, sans-serif",
-    fontWeight: 500,
-    fontSize: { xs: "1.5rem", sm: "2rem", md: "3rem" },
-    color: "#08397C",
-    mb: 2,
-    lineHeight: 1.25,
-    alignSelf: "center",
-    zIndex: 2,
-  };
-
-  const labelFontSettings = {
-    fontFamily: "Montserrat, sans-serif",
-    fontWeight: 400,
-    fontSize: { xs: "1.5rem", sm: "2rem", md: "1.25rem" },
-    color: "#DF031D",
-    mb: 2,
-    lineHeight: 1.25,
-    alignSelf: "center",
-    zIndex: 2,
-  };
-
-  const boxSettings = {
-    display: "flex",
-    padding: 2,
-    flexDirection: "column",
-    justifyContent: "space-between",
-    alignItems: "center",
-  };
 
   return (
     <>
@@ -499,26 +470,51 @@ const ResearchTracking = () => {
                   <div className="App">
                     <ArrowSteps steps={steps} onStepClick={handleStepClick} />
                   </div>
-
+                
                   {/* Search Bar */}
-                  <TextField
-                    variant='outlined'
-                    placeholder='Search by Title or Code'
-                    value={searchQuery}
-                    onChange={handleSearchChange}
-                    sx={{
-                      width: "40%",
+                  <Box 
+                    sx={{ 
+                      width: "100%", // Center search bar and button
                       display: "flex",
-                      justifyContent: "flex-start",
+                      padding: 1,
+                      justifyContent: "space-between",
+                      alignItems: "center",
                     }}
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position='start'>
-                          <Search />
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
+                  >
+                    <TextField
+                      variant='outlined'
+                      placeholder='Search by Title or Code'
+                      value={searchQuery}
+                      onChange={handleSearchChange}
+                      sx={{ width: "30rem" }}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position='start'>
+                            <Search />
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                    
+                    <Box 
+                      sx={{ 
+                        display: "flex", 
+                      }}
+                    >
+                      <TextField
+                        variant='outlined'
+                        placeholder='Search by Title or Code'
+                        value={filteredResearch.length}
+                        disabled
+                        sx={{ width: "5rem", input: {textAlign: "center"}}}
+                      />
+                        <Typography padding={2} variant='h6' sx={{ justifyContent: "center", color: "#8B8B8B" }}>
+                          items found
+                        </Typography>
+                    </Box>       
+                    
+                  </Box>
+                  
 
                   {/* Virtuoso Table */}
                   <Box sx={{ padding: 2, backgroundColor: "#F7F9FC" }}>
