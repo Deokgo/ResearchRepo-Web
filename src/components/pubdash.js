@@ -121,7 +121,7 @@ const PubDash = () => {
               </Box>
             )}
             <iframe
-              id="dashboard-iframe" // Add an id to the iframe for easy access
+              id="dashboard1-iframe" // Add an id to the iframe for easy access
               src="http://localhost:5000/dashboard/publication"
               style={{
                 width: "100%",
