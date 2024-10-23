@@ -2,21 +2,22 @@ import React, { useState } from "react";
 import "../styles/arrowsteps.css"; // Ensure the CSS file is imported
 
 const ArrowSteps = ({ steps, onStepClick }) => {
-  const [hoveredIndex, setHoveredIndex] = useState(null);
-  const [activeIndex, setActiveIndex] = useState(null);
+  const [hoveredIndex, setHoveredIndex] = useState(null); // Track the hovered step
+  const [clickedIndices, setClickedIndices] = useState([]); // Track clicked steps
 
   const handleMouseEnter = (index) => setHoveredIndex(index);
   const handleMouseLeave = () => setHoveredIndex(null);
 
   const handleStepClick = (step, index) => {
-    if (activeIndex === index) {
-      // If the same button is clicked again, reset activeIndex to null
-      setActiveIndex(null);
-    } else {
-      // Set the clicked button as active
-      setActiveIndex(index);
-    }
-    onStepClick(step); // Trigger the onClick event
+    setClickedIndices((prevClicked) => {
+      if (prevClicked.includes(index)) {
+        return prevClicked.filter((clickedIndex) => clickedIndex !== index);
+      } else {
+        return [...prevClicked, index];
+      }
+    });
+
+    onStepClick(step); 
   };
 
   return (
@@ -27,8 +28,8 @@ const ArrowSteps = ({ steps, onStepClick }) => {
           className="arrow"
           style={{
             backgroundColor:
-              activeIndex === index // Check if the step is active
-                ? step.activeColor // Set active color when clicked
+              clickedIndices.includes(index) // Check if the step is clicked
+                ? step.activeColor // Set active color for clicked steps
                 : hoveredIndex === index // Set hover color when hovered
                 ? step.hoverColor
                 : step.color, // Default color

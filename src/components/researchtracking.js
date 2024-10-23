@@ -47,11 +47,7 @@ const ResearchTracking = () => {
   const [dateRange, setDateRange] = useState([2010, 2024]);
   const [selectedPrograms, setSelectedPrograms] = useState([]);
   const itemsPerPage = 5;
-  const [selectedStatus, setSelectedStatus] = useState([
-    "Submitted",
-    "Accepted",
-    "Published",
-  ]);
+  const [selectedStatus, setSelectedStatus] = useState([]);
 
   const [badgeValues, setBadgeValues] = useState({
     total_ready: 0,
@@ -114,14 +110,6 @@ const ResearchTracking = () => {
     }
   };
 
-  const handleFormatChange = (event) => {
-    const { value } = event.target;
-    setSelectedStatus((prevSelected) =>
-      prevSelected.includes(value)
-        ? prevSelected.filter((status) => status !== value)
-        : [...prevSelected, value]
-    );
-  };
   const fetchColleges = async () => {
     try {
       const response = await axios.get(`/deptprogs/college_depts`);
@@ -453,7 +441,7 @@ const ResearchTracking = () => {
                   </Typography>
                   <Box
                     sx={{
-                      height: "8rem",
+                      height: "15rem",
                       overflowY: "auto",
                     }}
                   >
@@ -478,7 +466,7 @@ const ResearchTracking = () => {
                   </Typography>
                   <Box
                     sx={{
-                      height: "8rem",
+                      height: "15rem",
                       overflowY: "auto",
                     }}
                   >
@@ -498,29 +486,6 @@ const ResearchTracking = () => {
                       />
                     ))}
                   </Box>
-                  <Divider orientation='horizontal' />
-                  <Typography variant='body1' sx={{ mb: 1, color: "#08397C" }}>
-                    Research Status:
-                  </Typography>
-                  {[
-                    "Ready",
-                    "Submitted",
-                    "Accepted",
-                    "Published",
-                    "Pullout",
-                  ].map((format) => (
-                    <FormControlLabel
-                      key={format}
-                      control={
-                        <Checkbox
-                          checked={selectedStatus.includes(format)}
-                          onChange={handleFormatChange}
-                          value={format}
-                        />
-                      }
-                      label={format}
-                    />
-                  ))}
                 </Box>
               </Grid2>
 
