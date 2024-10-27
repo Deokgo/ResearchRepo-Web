@@ -5,8 +5,12 @@ import { useModalContext } from "./modalcontext";
 
 const LoginModal = ({ isOpen, handleClose }) => {
   const navigate = useNavigate();
-  const { isLoginModalOpen, closeLoginModal, openSignupModal, openPassresetModal } =
-    useModalContext();
+  const {
+    isLoginModalOpen,
+    closeLoginModal,
+    openSignupModal,
+    openPassresetModal,
+  } = useModalContext();
 
   const [formValues, setFormValues] = useState({
     email: "",
@@ -34,6 +38,7 @@ const LoginModal = ({ isOpen, handleClose }) => {
   };
 
   // Handle form submission
+  // Handle form submission
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
@@ -56,9 +61,34 @@ const LoginModal = ({ isOpen, handleClose }) => {
       localStorage.setItem("token", data.token);
       localStorage.setItem("role", data.role);
       localStorage.setItem("user_id", data.user_id);
+
       alert(`Login Successfully`);
       handleClose();
-      navigate("/managepapers");
+
+      // Redirect based on role_id
+      const role_id = data.role;
+
+      switch (role_id) {
+        case "01":
+          navigate("/manage-users");
+          break;
+        case "02":
+        case "03":
+          navigate("/researchtracking");
+          break;
+        case "04":
+          navigate("/maindash");
+          break;
+        case "05":
+          navigate("/managepapers");
+          break;
+        case "06":
+          navigate("/collection");
+          break;
+        default:
+          alert("Unknown role, unable to navigate");
+          break;
+      }
     } catch (error) {
       alert(`Login failed: ${error.message}`);
     }
@@ -142,20 +172,20 @@ const LoginModal = ({ isOpen, handleClose }) => {
                   Log in
                 </Button>
 
-                <Typography sx={{ marginTop: "20px" }}> 
-                    {" "}
-                    <a
-                        href='#'
-                        onClick={(e) => {
-                        e.preventDefault();
-                        closeLoginModal();
-                        openPassresetModal();
-                        }}
-                        style={{ color: "#3393EA" }}
-                    >
+                <Typography sx={{ marginTop: "20px" }}>
+                  {" "}
+                  <a
+                    href='#'
+                    onClick={(e) => {
+                      e.preventDefault();
+                      closeLoginModal();
+                      openPassresetModal();
+                    }}
+                    style={{ color: "#3393EA" }}
+                  >
                     Forgot Password
-                    </a>
-                </Typography>   
+                  </a>
+                </Typography>
                 <Typography sx={{ marginTop: "20px" }}>
                   Don’t have an account?{" "}
                   <a
