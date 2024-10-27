@@ -103,10 +103,10 @@ const Home = () => {
   const settings = {
     dots: true,
     infinite: true,
-    speed: 500,
+    speed: 1000,
     slidesToScroll: 1,
     autoplay: true,
-    autoplaySpeed: 3000,
+    autoplaySpeed: 4000,
     nextArrow: <NextArrow />, // Use custom NextArrow
     prevArrow: <PrevArrow />,
   };
@@ -207,9 +207,9 @@ const Home = () => {
                   justifyContent: "center",
                   alignContent: "center",
                   alignItems: "center",
-                  width: "50rem",
+                  width: "75rem",
                   mb: "3rem",
-                  paddingLeft: "4em",
+                  paddingLeft: "1em",
                 }}
               >
                 <Slider
@@ -224,7 +224,7 @@ const Home = () => {
                           padding: 2,
                           textAlign: "center",
                           width: { xs: "70%", md: "100%" },
-                          height: "20rem",
+                          height: "32rem",
                           display: "flex",
                           flexDirection: "column",
                           alignItems: "center",
@@ -252,26 +252,11 @@ const Home = () => {
                   ))}
                 </Slider>
               </Box>
-              <Typography
-                variant='body1'
-                sx={{
-                  fontFamily: "Montserrat, sans-serif",
-                  fontWeight: 300,
-                  fontSize: { xs: "1rem", md: "1.15rem" },
-                  color: "#F0F0F0",
-                  mb: 4,
-                  maxWidth: { xs: "100%", md: "80%" },
-                  alignSelf: "center",
-                }}
-              >
-                A platform for researches by the Mapúa MCL researchers
-              </Typography>
               <Box
                 sx={{
                   display: "flex",
                   gap: 7,
                   justifyContent: { xs: "center" },
-                  marginTop: { xs: 0, md: "2rem" },
                 }}
               >
                 <Button
@@ -313,23 +298,42 @@ const Home = () => {
                 </Button>
               </Box>
             </Box>
+
+            {/* Knowledge Graph */}
             <Box
               sx={{
                 flex: 1,
                 display: { xs: "none", md: "flex" },
+                flexDirection: "column",
                 justifyContent: "center",
                 alignItems: "center",
+                alignSelf: "center"
               }}
             >
               <img
                     src={DummyKG}
                     alt='Dummy Knowledge Graph'
                     style={{
-                        width: "70%",
+                        width: "90%",
                         height: "auto",
                         objectFit: "contain",
+                        paddingTop: "5rem"
                     }}
                 />
+                <Typography
+                  variant='body1'
+                  sx={{
+                    fontFamily: "Montserrat, sans-serif",
+                    fontWeight: 300,
+                    fontSize: { xs: "1rem", md: "1.15rem" },
+                    color: "#F0F0F0",
+                    maxWidth: { xs: "100%", md: "80%" },
+                    paddingTop: "5rem",
+                    paddingLeft: "5rem"
+                  }}
+                >
+                  A platform for researches by the Mapúa MCL researchers
+              </Typography>
             </Box>
           </Box>
         </Box>

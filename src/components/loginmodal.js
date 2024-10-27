@@ -70,6 +70,16 @@ const LoginModal = ({ isOpen, handleClose }) => {
       <Modal open={isOpen} onClose={handleClose}>
         <Box sx={modalStyle}>
           <Typography
+            variant='h6'
+            color='#0A438F'
+            fontWeight='500'
+            sx={{
+              textAlign: { xs: "center", md: "bottom" },
+            }}
+          >
+            Mapúa MCL Research Repository
+          </Typography>
+          <Typography
             variant='h2'
             color='#F40824'
             fontWeight='700'

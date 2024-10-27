@@ -339,7 +339,7 @@ const ResearchTracking = () => {
                 sx={{
                   fontFamily: "Montserrat, sans-serif",
                   fontWeight: 800,
-                  fontSize: { xs: "1.5rem", sm: "2rem", md: "3rem" },
+                  fontSize: { xs: "1.5rem", sm: "2rem", md: "2.575rem" },
                   color: "#FFF",
                   lineHeight: 1.25,
                   alignSelf: "center",

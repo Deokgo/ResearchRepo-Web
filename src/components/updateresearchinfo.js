@@ -26,6 +26,7 @@ import { useLocation } from "react-router-dom";
 import homeBg from "../assets/home_bg.png";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import axios from "axios";
+import FileUploader from './FileUploader';
 
 const UpdateResearchInfo = ({route,navigate}) => {
   const [users, setUsers] = useState([]);
@@ -33,6 +34,7 @@ const UpdateResearchInfo = ({route,navigate}) => {
   const location = useLocation();
   const [selectedUser, setSelectedUser] = useState(null);
   const [newRole, setNewRole] = useState("");
+
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -49,6 +51,16 @@ const UpdateResearchInfo = ({route,navigate}) => {
   }, []);
 
   const [value, setValue] = useState(null);
+
+  const [file, setFile] = useState(null);
+
+  const onSelectFileHandler = (e) => {
+    setFile(e.target.files[0]);
+  }
+  
+  const onDeleteFileHandler = () => {
+  
+  }
 
   return (
     <>
@@ -70,12 +82,14 @@ const UpdateResearchInfo = ({route,navigate}) => {
           <Box
             sx={{
               position: "relative",
+              marginBottom: 2,
               display: "flex",
-              flexDirection: { xs: "column", md: "column" },
+              flexDirection: { xs: "column", md: "row" },
               padding: 4,
+              gap: 4,
               backgroundSize: "cover",
               backgroundPosition: "center",
-              height: { xs: "5rem", md: "8rem" },
+              height: { xs: "5rem", md: "6rem" },
               backgroundColor: "#0A438F",
             }}
           >
@@ -106,7 +120,7 @@ const UpdateResearchInfo = ({route,navigate}) => {
                 sx={{
                   fontFamily: "Montserrat, sans-serif",
                   fontWeight: 800,
-                  fontSize: { xs: "1.5rem", sm: "2rem", md: "3rem" },
+                  fontSize: { xs: "1.5rem", sm: "2rem", md: "2.575rem" },
                   color: "#FFF",
                   alignSelf: "center",
                   zIndex: 2,
@@ -130,7 +144,8 @@ const UpdateResearchInfo = ({route,navigate}) => {
                             sx={{
                                 border: "2px solid #0A438F",
                                 marginLeft: 10,
-                                padding: 2,
+                                marginRight: 5,
+                                padding: 3,
                                 display: "flex",
                                 flexDirection: "column",
                                 height: "auto",
@@ -145,7 +160,7 @@ const UpdateResearchInfo = ({route,navigate}) => {
                                 }}
                                 >
                                 <Typography variant='body1' padding={1} sx={{ color: "#08397C" }}>Research Output:</Typography>
-                                <Grid2 container padding={1} spacing={{ xs: 0, md: 3 }}>
+                                <Grid2 container spacing={{ xs: 0, md: 3 }}>
                                     <Grid2 item size={{ xs: 12, md: 3 }}>
                                     <TextField
                                         fullWidth
@@ -228,6 +243,25 @@ const UpdateResearchInfo = ({route,navigate}) => {
                                         margin='normal'
                                         variant='outlined'
                                     ></TextField>
+                                    </Grid2>
+                                    <Grid2 item size={{ xs: 12, md: 12 }}>
+                                    <Typography variant='body1' sx={{ color: "#8B8B8B" }}>Upload Extended Abstract:</Typography>
+                                      <Box
+                                        sx={{
+                                          display: "flex",
+                                          alignItems: "center",
+                                          border: "1px dashed #ccc",
+                                          borderRadius: 1,
+                                          p: 1,
+                                          cursor: "pointer",
+                                          justifyContent: "center",
+                                          gap: 2,
+                                          mb: 1
+                                        }}
+                                      >
+                                        <FileUploader onSelectFile={onSelectFileHandler}
+                                          onDeleteFile={onDeleteFileHandler} />
+                                      </Box>
                                     </Grid2>
                                 </Grid2>
                                 <Divider orientation='horizontal' flexItem />

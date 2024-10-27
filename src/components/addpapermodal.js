@@ -150,14 +150,25 @@ const AddPaperModal = ({ isOpen, handleClose }) => {
               </Select>
             </FormControl>
           </Grid2>
-          <Grid2 size={6}>
+          <Grid2 size={3}>
+            <TextField
+              fullWidth
+              label='Date Approved'
+              variant='filled'
+            />
+          </Grid2>     
+          <Grid2 size={3}>
             <FormControl fullWidth variant='filled'>
               <InputLabel>Adviser</InputLabel>
               <Select>
                 <MenuItem value='Khristian G. Kikuchi'>
                   Khristian G. Kikuchi
                 </MenuItem>
-                <MenuItem value='Other Adviser'>Other Adviser</MenuItem>
+                <MenuItem value='AddNewAdviser' sx={{
+                    fontFamily: "Montserrat, sans-serif",
+                    fontWeight: 300,
+                    color: "#0A438F",
+                  }}>+ Add New Adviser</MenuItem>
               </Select>
             </FormControl>
           </Grid2>
@@ -183,7 +194,7 @@ const AddPaperModal = ({ isOpen, handleClose }) => {
             />
           </Grid2>
           <Grid2 size={12}>
-            <Typography variant='body1' sx={{ color: "#8B8B8B" }}>Full Manuscript:</Typography>
+            <Typography variant='body1' sx={{ color: "#8B8B8B" }}>Upload Full Manuscript:</Typography>
             <Box
               sx={{
                 display: "flex",

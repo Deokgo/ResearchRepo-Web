@@ -143,7 +143,7 @@ const Profile = () => {
                 sx={{
                   fontFamily: "Montserrat, sans-serif",
                   fontWeight: 800,
-                  fontSize: { xs: "2rem", sm: "2.5rem", md: "3.5rem" },
+                  fontSize: { xs: "1.5rem", sm: "2rem", md: "2.575rem" },
                   color: "#FFF",
                   mb: 2,
                   lineHeight: 1.25,
