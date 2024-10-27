@@ -182,22 +182,6 @@ const ResearchTracking = () => {
   };
 
   useEffect(() => {
-    axios.get("dataset/get_total")
-      .then((response) => {
-        const { totals } = response.data;
-        setBadgeValues({
-          total_ready: totals.total_ready,
-          total_submitted: totals.total_submitted,
-          total_accepted: totals.total_accepted,
-          total_published: totals.total_published,
-        });
-      })
-      .catch((error) => {
-        console.error("Error fetching totals: ", error);
-      });
-  }, []);
-
-  useEffect(() => {
     fetchUserData();
     fetchColleges();
     fetchAllPrograms();
@@ -230,7 +214,7 @@ const ResearchTracking = () => {
       );
     }
 
-    // Filter by Selected Formats
+    // Filter by Selected Formats (statuses)
     if (selectedStatus.length > 0) {
       filtered = filtered.filter((item) =>
         selectedStatus.some(
@@ -250,6 +234,16 @@ const ResearchTracking = () => {
 
     setFilteredResearch(filtered);
     setCurrentPage(1); // Reset to the first page on filter change
+
+    //update badge counts based on the filtered data
+    const updatedBadgeValues = {
+      total_ready: filtered.filter(item => item.status.toLowerCase() === 'ready').length,
+      total_submitted: filtered.filter(item => item.status.toLowerCase() === 'submitted').length,
+      total_accepted: filtered.filter(item => item.status.toLowerCase() === 'accepted').length,
+      total_published: filtered.filter(item => item.status.toLowerCase() === 'published').length,
+    };
+
+    setBadgeValues(updatedBadgeValues);
   }, [
     dateRange,
     selectedColleges,
