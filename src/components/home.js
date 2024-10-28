@@ -314,7 +314,7 @@ const Home = () => {
                     src={DummyKG}
                     alt='Dummy Knowledge Graph'
                     style={{
-                        width: "90%",
+                        width: "100%",
                         height: "auto",
                         objectFit: "contain",
                         paddingTop: "5rem"
