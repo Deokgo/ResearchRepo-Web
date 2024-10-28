@@ -552,7 +552,6 @@ const ResearchTracking = () => {
           </Box>
         </Box>
       </Box>
-      <Footer />
     </>
   );
 };
