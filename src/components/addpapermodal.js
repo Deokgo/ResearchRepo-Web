@@ -14,9 +14,9 @@ import {
 } from "@mui/material";
 import axios from "axios";
 import { useModalContext } from "./modalcontext";
-import FileUploader from './FileUploader';
+import FileUploader from "./FileUploader";
 
-const AddPaperModal = ({ isOpen, handleClose }) => {
+const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
   const [colleges, setColleges] = useState([]);
   const [programs, setPrograms] = useState([]);
   const [selectedCollege, setSelectedCollege] = useState("");
@@ -30,7 +30,7 @@ const AddPaperModal = ({ isOpen, handleClose }) => {
   const { isAddPaperModalOpen, closeAddPaperModal, openAddPaperModal } =
     useModalContext();
   const [file, setFile] = useState(null);
-  
+
   // Fetch all colleges when the modal opens
   useEffect(() => {
     if (isAddPaperModalOpen) {
@@ -73,15 +73,13 @@ const AddPaperModal = ({ isOpen, handleClose }) => {
 
   const onSelectFileHandler = (e) => {
     setFile(e.target.files[0]);
-  }
-  
-  const onDeleteFileHandler = () => {
-  
-  }
+  };
+
+  const onDeleteFileHandler = () => {};
 
   const handleAddPaper = async () => {
     try {
-      const response = await axios.post('paper/add_paper', {
+      const response = await axios.post("paper/add_paper", {
         research_id: groupCode,
         college_id: selectedCollege,
         program_id: selectedProgram,
@@ -93,6 +91,9 @@ const AddPaperModal = ({ isOpen, handleClose }) => {
       });
       console.log("Response:", response.data);
       alert("Paper added successfully!");
+      if (onPaperAdded) {
+        onPaperAdded();
+      }
       closeAddPaperModal();
     } catch (error) {
       console.error("Error adding paper:", error);
@@ -132,12 +133,12 @@ const AddPaperModal = ({ isOpen, handleClose }) => {
         </Typography>
         <Grid2 container spacing={2}>
           <Grid2 size={3}>
-            <TextField 
-            fullWidth
-            label="Group Code"
-            variant="filled"
-            value={groupCode}
-            onChange={(e) => setGroupCode(e.target.value)}
+            <TextField
+              fullWidth
+              label='Group Code'
+              variant='filled'
+              value={groupCode}
+              onChange={(e) => setGroupCode(e.target.value)}
             />
           </Grid2>
           <Grid2 size={3}>
@@ -189,14 +190,14 @@ const AddPaperModal = ({ isOpen, handleClose }) => {
           <Grid2 size={3}>
             <TextField
               fullWidth
-              label="Date Approved"
-              variant="filled"
-              type="date"
+              label='Date Approved'
+              variant='filled'
+              type='date'
               value={dateApproved}
               onChange={(e) => setDateApproved(e.target.value)}
               InputLabelProps={{ shrink: true }}
             />
-          </Grid2>     
+          </Grid2>
           <Grid2 size={3}>
             <FormControl fullWidth variant='filled'>
               <InputLabel>Adviser</InputLabel>
@@ -204,11 +205,16 @@ const AddPaperModal = ({ isOpen, handleClose }) => {
                 <MenuItem value='Khristian G. Kikuchi'>
                   Khristian G. Kikuchi
                 </MenuItem>
-                <MenuItem value='AddNewAdviser' sx={{
+                <MenuItem
+                  value='AddNewAdviser'
+                  sx={{
                     fontFamily: "Montserrat, sans-serif",
                     fontWeight: 300,
                     color: "#0A438F",
-                  }}>+ Add New Adviser</MenuItem>
+                  }}
+                >
+                  + Add New Adviser
+                </MenuItem>
               </Select>
             </FormControl>
           </Grid2>
@@ -216,39 +222,41 @@ const AddPaperModal = ({ isOpen, handleClose }) => {
             <TextField fullWidth label='Panels' variant='filled' />
           </Grid2>
           <Grid2 size={6}>
-            <TextField 
+            <TextField
               fullWidth
-              label="SDG"
-              variant="filled"
+              label='SDG'
+              variant='filled'
               value={sdg}
               onChange={(e) => setSDG(e.target.value)}
-             />
+            />
           </Grid2>
           <Grid2 size={6}>
             <TextField fullWidth label='Keywords' variant='filled' />
           </Grid2>
           <Grid2 size={12}>
-            <TextField 
+            <TextField
               fullWidth
-              label="Title"
-              variant="filled"
+              label='Title'
+              variant='filled'
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-             />
+            />
           </Grid2>
           <Grid2 size={12}>
             <TextField
               fullWidth
-              label="Abstract"
+              label='Abstract'
               multiline
               rows={4}
-              variant="filled"
+              variant='filled'
               value={abstract}
               onChange={(e) => setAbstract(e.target.value)}
             />
           </Grid2>
           <Grid2 size={12}>
-            <Typography variant='body1' sx={{ color: "#8B8B8B" }}>Upload Full Manuscript:</Typography>
+            <Typography variant='body1' sx={{ color: "#8B8B8B" }}>
+              Upload Full Manuscript:
+            </Typography>
             <Box
               sx={{
                 display: "flex",
@@ -261,8 +269,10 @@ const AddPaperModal = ({ isOpen, handleClose }) => {
                 gap: 2,
               }}
             >
-              <FileUploader onSelectFile={onSelectFileHandler}
-                onDeleteFile={onDeleteFileHandler} />
+              <FileUploader
+                onSelectFile={onSelectFileHandler}
+                onDeleteFile={onDeleteFileHandler}
+              />
             </Box>
           </Grid2>
         </Grid2>

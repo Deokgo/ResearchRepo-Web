@@ -26,7 +26,7 @@ import { useModalContext } from "./modalcontext";
 const ManagePapers = () => {
   const navigate = useNavigate();
   const [userDepartment, setUserDepartment] = useState(null);
-  const [department, setDepartment] = useState(null);
+  const [userProgram, setUserProgram] = useState(null);
   const [colleges, setColleges] = useState([]);
   const [research, setResearch] = useState([]);
   const [programs, setPrograms] = useState([]);
@@ -99,7 +99,7 @@ const ManagePapers = () => {
         const response = await axios.get(`/accounts/users/${userId}`);
         const data = response.data;
         setUserDepartment(data.researcher.college_id);
-        setDepartment(data.researcher.department_name);
+        setUserProgram(data.researcher.program_id);
       } catch (error) {
         console.error("Error fetching user data:", error);
       }
@@ -117,6 +117,9 @@ const ManagePapers = () => {
     } finally {
       setLoading(false);
     }
+  };
+  const refreshResearchData = () => {
+    fetchAllResearchData();
   };
   useEffect(() => {
     fetchUserData();
@@ -177,7 +180,19 @@ const ManagePapers = () => {
     searchQuery,
     research,
   ]);
-
+  useEffect(() => {
+    if (userDepartment) {
+      setSelectedColleges([userDepartment]);
+    }
+    if (userProgram) {
+      const program = allPrograms.find(
+        (prog) => String(prog.program_id) === String(userProgram)
+      );
+      if (program) {
+        setSelectedPrograms([program.program_name]);
+      }
+    }
+  }, [userDepartment, userProgram, allPrograms]);
   // Handle change in search query
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value.toLowerCase());
@@ -317,7 +332,7 @@ const ManagePapers = () => {
                       fontSize: "1.5rem",
                     }}
                   >
-                    {department}
+                    {userProgram}
                   </Typography>
                   <Typography
                     variant='h6'
@@ -447,9 +462,8 @@ const ManagePapers = () => {
                       padding: { xs: "0.5rem 1rem", md: "1.5rem" },
                       marginLeft: "2rem",
                       borderRadius: "100px",
-                      maxHeight: "3rem"
+                      maxHeight: "3rem",
                     }}
-                    
                     onClick={openAddPaperModal}
                   >
                     Add New Paper
@@ -504,6 +518,7 @@ const ManagePapers = () => {
           <AddPaperModal
             isOpen={isAddPaperModalOpen}
             handleClose={closeAddPaperModal}
+            onPaperAdded={refreshResearchData}
           />
         </Box>
       </Box>
