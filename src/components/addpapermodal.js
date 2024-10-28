@@ -26,6 +26,7 @@ const AddPaperModal = ({ isOpen, handleClose }) => {
   const [title, setTitle] = useState("");
   const [groupCode, setGroupCode] = useState("");
   const [abstract, setAbstract] = useState("");
+  const [sdg, setSDG] = useState("");
   const { isAddPaperModalOpen, closeAddPaperModal, openAddPaperModal } =
     useModalContext();
   const [file, setFile] = useState(null);
@@ -88,6 +89,7 @@ const AddPaperModal = ({ isOpen, handleClose }) => {
         abstract: abstract,
         date_approved: dateApproved,
         research_type: researchType,
+        sdg: sdg,
       });
       console.log("Response:", response.data);
       alert("Paper added successfully!");
@@ -214,7 +216,13 @@ const AddPaperModal = ({ isOpen, handleClose }) => {
             <TextField fullWidth label='Panels' variant='filled' />
           </Grid2>
           <Grid2 size={6}>
-            <TextField fullWidth label='Targeted SDG/s' variant='filled' />
+            <TextField 
+              fullWidth
+              label="SDG"
+              variant="filled"
+              value={sdg}
+              onChange={(e) => setSDG(e.target.value)}
+             />
           </Grid2>
           <Grid2 size={6}>
             <TextField fullWidth label='Keywords' variant='filled' />
