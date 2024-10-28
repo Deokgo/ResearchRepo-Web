@@ -61,6 +61,8 @@ const LoginModal = ({ isOpen, handleClose }) => {
       localStorage.setItem("token", data.token);
       localStorage.setItem("role", data.role);
       localStorage.setItem("user_id", data.user_id);
+      localStorage.setItem("college", data.college);
+      localStorage.setItem("program", data.program);
 
       alert(`Login Successfully`);
       handleClose();
