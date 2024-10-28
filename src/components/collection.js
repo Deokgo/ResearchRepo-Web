@@ -102,7 +102,7 @@ const DepartmentCollection = () => {
   };
   const fetchAllResearchData = async () => {
     try {
-      const response = await axios.get(`/dataset/fetch_dataset`);
+      const response = await axios.get(`/dataset/fetch_ordered_dataset`);
       const fetchedResearch = response.data.dataset;
       setResearch(fetchedResearch);
       setFilteredResearch(fetchedResearch);

@@ -21,6 +21,11 @@ const AddPaperModal = ({ isOpen, handleClose }) => {
   const [programs, setPrograms] = useState([]);
   const [selectedCollege, setSelectedCollege] = useState("");
   const [selectedProgram, setSelectedProgram] = useState("");
+  const [researchType, setResearchType] = useState("");
+  const [dateApproved, setDateApproved] = useState("");
+  const [title, setTitle] = useState("");
+  const [groupCode, setGroupCode] = useState("");
+  const [abstract, setAbstract] = useState("");
   const { isAddPaperModalOpen, closeAddPaperModal, openAddPaperModal } =
     useModalContext();
   const [file, setFile] = useState(null);
@@ -73,6 +78,26 @@ const AddPaperModal = ({ isOpen, handleClose }) => {
   
   }
 
+  const handleAddPaper = async () => {
+    try {
+      const response = await axios.post('paper/add_paper', {
+        research_id: groupCode,
+        college_id: selectedCollege,
+        program_id: selectedProgram,
+        title: title,
+        abstract: abstract,
+        date_approved: dateApproved,
+        research_type: researchType,
+      });
+      console.log("Response:", response.data);
+      alert("Paper added successfully!");
+      closeAddPaperModal();
+    } catch (error) {
+      console.error("Error adding paper:", error);
+      alert("Failed to add paper. Please try again.");
+    }
+  };
+
   return (
     <Modal
       open={isAddPaperModalOpen}
@@ -105,7 +130,13 @@ const AddPaperModal = ({ isOpen, handleClose }) => {
         </Typography>
         <Grid2 container spacing={2}>
           <Grid2 size={3}>
-            <TextField fullWidth label='Group Code' variant='filled' />
+            <TextField 
+            fullWidth
+            label="Group Code"
+            variant="filled"
+            value={groupCode}
+            onChange={(e) => setGroupCode(e.target.value)}
+            />
           </Grid2>
           <Grid2 size={3}>
             <FormControl fullWidth variant='filled'>
@@ -143,18 +174,25 @@ const AddPaperModal = ({ isOpen, handleClose }) => {
           <Grid2 size={3}>
             <FormControl fullWidth variant='filled'>
               <InputLabel>Research Type</InputLabel>
-              <Select>
-                <MenuItem value='College-Driven'>Integrative Course</MenuItem>
-                <MenuItem value='College-Driven'>College-Driven</MenuItem>
-                <MenuItem value='Department-Driven'>Faculty-Driven</MenuItem>
+              <Select
+                value={researchType}
+                onChange={(e) => setResearchType(e.target.value)}
+              >
+                <MenuItem value='COLLEGE-DRIVEN'>COLLEGE-DRIVEN</MenuItem>
+                <MenuItem value='INTEGRATIVE'>INTEGRATIVE</MenuItem>
+                <MenuItem value='EXTRAMURAL'>EXTRAMURAL</MenuItem>
               </Select>
             </FormControl>
           </Grid2>
           <Grid2 size={3}>
             <TextField
               fullWidth
-              label='Date Approved'
-              variant='filled'
+              label="Date Approved"
+              variant="filled"
+              type="date"
+              value={dateApproved}
+              onChange={(e) => setDateApproved(e.target.value)}
+              InputLabelProps={{ shrink: true }}
             />
           </Grid2>     
           <Grid2 size={3}>
@@ -182,15 +220,23 @@ const AddPaperModal = ({ isOpen, handleClose }) => {
             <TextField fullWidth label='Keywords' variant='filled' />
           </Grid2>
           <Grid2 size={12}>
-            <TextField fullWidth label='Title' variant='filled' />
+            <TextField 
+              fullWidth
+              label="Title"
+              variant="filled"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+             />
           </Grid2>
           <Grid2 size={12}>
             <TextField
               fullWidth
-              label='Abstract'
+              label="Abstract"
               multiline
               rows={4}
-              variant='filled'
+              variant="filled"
+              value={abstract}
+              onChange={(e) => setAbstract(e.target.value)}
             />
           </Grid2>
           <Grid2 size={12}>
@@ -243,6 +289,7 @@ const AddPaperModal = ({ isOpen, handleClose }) => {
             Back
           </Button>
           <Button
+            onClick={handleAddPaper}
             sx={{
               backgroundColor: "#CA031B",
               color: "#FFF",
