@@ -96,24 +96,36 @@ const Profile = () => {
     <>
       <Box
         sx={{
+          margin: 0,
+          padding: 0,
+          height: "100vh",
           display: "flex",
           flexDirection: "column",
-          minHeight: "100vh",
         }}
       >
         <Navbar />
-        <Box sx={{ flexGrow: 1 }}>
+        <Box 
+        sx={{
+            flexGrow: 1,
+            display: "flex",
+            flexDirection: "column",
+            height: { xs: "100%", md: "calc(100vh - 9rem)" },
+            marginTop: { xs: "3.5rem", sm: "4rem", md: "6rem" },
+          }}
+        >
+
+          {/* Header Section */}
           <Box
             sx={{
               position: "relative",
-              marginTop: { xs: "3.5rem", sm: "4rem", md: "6rem" },
+              marginBottom: 2,
               display: "flex",
               flexDirection: { xs: "column", md: "row" },
               padding: 4,
               gap: 4,
               backgroundSize: "cover",
               backgroundPosition: "center",
-              height: { xs: "5rem", md: "8rem" },
+              height: { xs: "5rem", md: "6rem" },
               backgroundColor: "#0A438F",
             }}
           >
@@ -125,18 +137,19 @@ const Profile = () => {
                 right: 0,
                 bottom: 0,
                 backgroundImage: `url(${homeBg})`,
+                backgroundSize: "cover",
                 opacity: 0.25,
                 zIndex: 1,
               }}
             />
-            <Box sx={{ display: "flex", ml: "12rem", zIndex: 3 }}>
+            <Box sx={{ display: "flex", ml: "5rem", zIndex: 3 }}>
               <IconButton
-                onClick={handleNavigateHome}
-                sx={{
-                  color: "#fff",
-                }}
-              >
-                <ArrowBackIosIcon></ArrowBackIosIcon>
+                  onClick={() => navigate(-1)}
+                  sx={{
+                    color: "#fff",
+                  }}
+                >
+                <ArrowBackIosIcon />
               </IconButton>
               <Typography
                 variant='h3'
@@ -145,11 +158,8 @@ const Profile = () => {
                   fontWeight: 800,
                   fontSize: { xs: "1.5rem", sm: "2rem", md: "2.575rem" },
                   color: "#FFF",
-                  mb: 2,
                   lineHeight: 1.25,
-                  maxWidth: { xs: "100%", md: "80%" },
                   alignSelf: "center",
-                  paddingLeft: 5,
                   zIndex: 2,
                 }}
               >

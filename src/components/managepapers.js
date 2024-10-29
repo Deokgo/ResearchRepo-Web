@@ -280,11 +280,20 @@ const ManagePapers = () => {
                 right: 0,
                 bottom: 0,
                 backgroundImage: `url(${homeBg})`,
+                backgroundSize: "cover",
                 opacity: 0.25,
                 zIndex: 1,
               }}
             />
             <Box sx={{ display: "flex", ml: "5rem", zIndex: 3 }}>
+              <IconButton
+                  onClick={() => navigate(-1)}
+                  sx={{
+                    color: "#fff",
+                  }}
+                >
+                <ArrowBackIosIcon />
+              </IconButton>
               <Typography
                 variant='h3'
                 sx={{

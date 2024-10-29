@@ -321,6 +321,7 @@ const ResearchTracking = () => {
                 right: 0,
                 bottom: 0,
                 backgroundImage: `url(${homeBg})`,
+                backgroundSize: "cover",
                 opacity: 0.25,
                 zIndex: 1,
               }}
