@@ -435,7 +435,7 @@ const ManagePapers = () => {
                   >
                     <TextField
                       variant='outlined'
-                      placeholder='Search Research...'
+                      placeholder='Search by Title or Authors'
                       value={searchQuery}
                       onChange={handleSearchChange}
                       sx={{ width: "30rem" }}
