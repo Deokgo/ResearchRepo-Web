@@ -26,7 +26,11 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
   const [title, setTitle] = useState("");
   const [groupCode, setGroupCode] = useState("");
   const [abstract, setAbstract] = useState("");
-  const [sdg, setSDG] = useState("");
+  const [sdg, setSDG] = useState(""); // should allow multiple SDG
+  const [adviser, setAdviser] = useState(""); // loaded based on the college dept of the user
+  const [panels, setPanel] = useState(""); // loaded in a combobox
+  const[keywords, setKeywords] = useState(""); // should allow multiple keywords
+  const [fullManus, setFullManus] = useState("") // for the path of the manus
   const { isAddPaperModalOpen, closeAddPaperModal, openAddPaperModal } =
     useModalContext();
   const [file, setFile] = useState(null);
@@ -78,7 +82,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
   const onDeleteFileHandler = () => {};
 
   const handleAddPaper = async () => {
-    try {
+    try { 
       const response = await axios.post("paper/add_paper", {
         research_id: groupCode,
         college_id: selectedCollege,

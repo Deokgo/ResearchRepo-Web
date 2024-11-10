@@ -507,7 +507,7 @@ const ManagePapers = () => {
                               {researchItem.year}
                             </Typography>
                             <Typography variant='caption'>
-                              {researchItem.journal}
+                              {researchItem.journal} 
                             </Typography>
                           </Box>
                         )}
