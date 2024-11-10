@@ -29,8 +29,8 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
   const [sdg, setSDG] = useState(""); // should allow multiple SDG
   const [adviser, setAdviser] = useState(""); // loaded based on the college dept of the user
   const [panels, setPanel] = useState(""); // loaded in a combobox
-  const[keywords, setKeywords] = useState(""); // should allow multiple keywords
-  const [fullManus, setFullManus] = useState("") // for the path of the manus
+  const [keywords, setKeywords] = useState(""); // should allow multiple keywords
+  const [fullManus, setFullManus] = useState(""); // for the path of the manus
   const { isAddPaperModalOpen, closeAddPaperModal, openAddPaperModal } =
     useModalContext();
   const [file, setFile] = useState(null);
@@ -82,7 +82,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
   const onDeleteFileHandler = () => {};
 
   const handleAddPaper = async () => {
-    try { 
+    try {
       const response = await axios.post("paper/add_paper", {
         research_id: groupCode,
         college_id: selectedCollege,
@@ -93,6 +93,20 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
         research_type: researchType,
         sdg: sdg,
       });
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("research_type", researchType);
+      formData.append("year", new Date(dateApproved).getFullYear());
+      formData.append("department", selectedCollege);
+      formData.append("program", selectedProgram);
+      formData.append("group_code", `${groupCode}_manuscript`);
+
+      await axios.post("/paper/upload_manuscript", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
       console.log("Response:", response.data);
       alert("Paper added successfully!");
       if (onPaperAdded) {
