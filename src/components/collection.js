@@ -43,6 +43,10 @@ const DepartmentCollection = () => {
     navigate("/knowledgegraph");
   };
 
+  const handleKey = (key) => {
+    navigate(`/displayresearchinfo/`,{state:{id:key}}); // change the page for viewing research output details
+  };
+
   const fetchColleges = async () => {
     try {
       const response = await axios.get(`/deptprogs/college_depts`);
@@ -425,7 +429,8 @@ const DepartmentCollection = () => {
                         itemContent={(index, researchItem) => (
                           <Box
                             key={researchItem.research_id}
-                            sx={{ marginBottom: 2 }}
+                            sx={{ marginBottom: 2, cursor: "pointer" }}
+                            onClick={() => handleKey(researchItem.research_id)} // Define this function to handle clicks
                           >
                             <Typography variant='h6'>
                               {researchItem.title}

@@ -209,6 +209,10 @@ const ManagePapers = () => {
     setDateRange(newValue);
   };
 
+  const handleKey = (key) => {
+    navigate(`/displayresearchinfo/`,{state:{id:key}}); // change the page for viewing research output details
+  };
+
   // Handle change in selected programs filter
   const handleProgramChange = (event) => {
     const { value, checked } = event.target;
@@ -496,7 +500,8 @@ const ManagePapers = () => {
                         itemContent={(index, researchItem) => (
                           <Box
                             key={researchItem.research_id}
-                            sx={{ marginBottom: 2 }}
+                            sx={{ marginBottom: 2, cursor: "pointer" }}
+                            onClick={() => handleKey(researchItem.research_id)} // Define this function to handle clicks
                           >
                             <Typography variant='h6'>
                               {researchItem.title}

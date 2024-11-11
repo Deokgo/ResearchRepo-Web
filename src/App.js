@@ -17,6 +17,7 @@ import KnowledgeGraph from "./components/knowledgegraph";
 import { ModalProvider } from "./components/modalcontext";
 import MainDash from "./components/maindash";
 import PubDash from "./components/pubdash";
+import DisplayResearchInfo from "./components/displayresearchinfo";
 
 function App() {
   const [data, setData] = useState([{}]);
@@ -46,6 +47,7 @@ function App() {
           <Route path='/managepapers' element={<ManagePapers />} />
           <Route path='/managecollege' element={<ManageCollege />} />
           <Route path='/manageprogram' element={<ManageProgram />} />
+          <Route path='/displayresearchinfo' element={<DisplayResearchInfo />} />
 
           <Route
             path='/profile'
