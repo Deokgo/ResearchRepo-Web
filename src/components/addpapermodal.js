@@ -99,7 +99,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
       formData.append("year", new Date(dateApproved).getFullYear());
       formData.append("department", selectedCollege);
       formData.append("program", selectedProgram);
-      formData.append("group_code", `${groupCode}_manuscript`);
+      formData.append("group_code", groupCode);
 
       await axios.post("/paper/upload_manuscript", formData, {
         headers: {

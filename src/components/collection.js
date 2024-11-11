@@ -21,6 +21,7 @@ import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import axios from "axios";
 import { Virtuoso } from "react-virtuoso";
 import DummyKG from "../assets/dummy_kg_keyword.png";
+import Modal from "@mui/material/Modal";
 
 const DepartmentCollection = () => {
   const navigate = useNavigate();
@@ -37,16 +38,22 @@ const DepartmentCollection = () => {
   const [selectedColleges, setSelectedColleges] = useState([]);
   const [selectedPrograms, setSelectedPrograms] = useState([]);
   const [selectedFormats, setSelectedFormats] = useState([]);
+  const [selectedResearchItem, setSelectedResearchItem] = useState(null);
   const itemsPerPage = 5;
 
   const handleNavigateKnowledgeGraph = () => {
     navigate("/knowledgegraph");
   };
 
-  const handleKey = (key) => {
-    navigate(`/displayresearchinfo/`,{state:{id:key}}); // change the page for viewing research output details
+  // const handleKey = (key) => {
+  //   navigate(`/displayresearchinfo/`,{state:{id:key}}); // change the page for viewing research output details
+  // };
+  const handleResearchItemClick = (item) => {
+    setSelectedResearchItem(item);
   };
-
+  const handleCloseModal = () => {
+    setSelectedResearchItem(null);
+  };
   const fetchColleges = async () => {
     try {
       const response = await axios.get(`/deptprogs/college_depts`);
@@ -216,6 +223,16 @@ const DepartmentCollection = () => {
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
+
+  const handleViewManuscript = (researchItem) => {
+    const { research_id } = researchItem;
+    if (research_id) {
+      const url = `/paper/view_manuscript/${research_id}`;
+      window.open(url, "_blank");
+    } else {
+      alert("No manuscript available for this research.");
+    }
+  };
 
   return (
     <>
@@ -430,7 +447,10 @@ const DepartmentCollection = () => {
                           <Box
                             key={researchItem.research_id}
                             sx={{ marginBottom: 2, cursor: "pointer" }}
-                            onClick={() => handleKey(researchItem.research_id)} // Define this function to handle clicks
+                            // onClick={() => handleKey(researchItem.research_id)} // Define this function to handle clicks
+                            onClick={() =>
+                              handleResearchItemClick(researchItem)
+                            }
                           >
                             <Typography variant='h6'>
                               {researchItem.title}
@@ -484,9 +504,9 @@ const DepartmentCollection = () => {
                       src={DummyKG}
                       alt='Dummy Knowledge Graph'
                       style={{
-                          width: "100%",
-                          height: "auto",
-                          objectFit: "contain",
+                        width: "100%",
+                        height: "auto",
+                        objectFit: "contain",
                       }}
                     />
                   </Box>
@@ -496,6 +516,52 @@ const DepartmentCollection = () => {
           </Box>
         </Box>
       </Box>
+      {/* Expanded Details Modal */}
+      <Modal open={Boolean(selectedResearchItem)} onClose={handleCloseModal}>
+        <Box
+          sx={{
+            p: 4,
+            width: "60%",
+            bgcolor: "background.paper",
+            mx: "auto",
+            mt: "10%",
+          }}
+        >
+          {selectedResearchItem && (
+            <>
+              <Typography variant='h4' gutterBottom>
+                {selectedResearchItem.title}
+              </Typography>
+              <Typography variant='body1'>
+                <strong>Authors:</strong>{" "}
+                {selectedResearchItem.concatenated_authors}
+              </Typography>
+              <Typography variant='body1'>
+                <strong>Program:</strong> {selectedResearchItem.program_name}
+              </Typography>
+              <Typography variant='body1'>
+                <strong>Year:</strong> {selectedResearchItem.year}
+              </Typography>
+              <Typography variant='body1'>
+                <strong>Abstract:</strong>{" "}
+                {selectedResearchItem.abstract || "No abstract available"}
+              </Typography>
+              <Typography variant='body1'>
+                <strong>Keywords:</strong>{" "}
+                {selectedResearchItem.concatenated_keywords ||
+                  "No keywords available"}
+              </Typography>
+              <Button
+                variant='contained'
+                sx={{ mt: 3 }}
+                onClick={() => handleViewManuscript(selectedResearchItem)}
+              >
+                View Manuscript
+              </Button>
+            </>
+          )}
+        </Box>
+      </Modal>
     </>
   );
 };
