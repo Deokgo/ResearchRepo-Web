@@ -224,11 +224,28 @@ const DepartmentCollection = () => {
     currentPage * itemsPerPage
   );
 
-  const handleViewManuscript = (researchItem) => {
+  const handleViewManuscript = async (researchItem) => {
     const { research_id } = researchItem;
     if (research_id) {
-      const url = `/paper/view_manuscript/${research_id}`;
-      window.open(url, "_blank");
+      try {
+        // Make the API request to get the PDF as a Blob kasi may proxy issue if directly window.open, so padaanin muna natin kay axios
+        const response = await axios.get(
+          `/paper/view_manuscript/${research_id}`,
+          {
+            responseType: "blob", // Get the response as a binary Blob (PDF)
+          }
+        );
+
+        // Create a URL for the Blob and open it in a new tab
+        const blob = new Blob([response.data], { type: "application/pdf" });
+        const url = window.URL.createObjectURL(blob);
+
+        // Open the PDF in a new tab
+        window.open(url, "_blank");
+      } catch (error) {
+        console.error("Error fetching the manuscript:", error);
+        alert("Failed to retrieve the manuscript. Please try again.");
+      }
     } else {
       alert("No manuscript available for this research.");
     }
