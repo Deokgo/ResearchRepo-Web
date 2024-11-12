@@ -533,44 +533,86 @@ const DepartmentCollection = () => {
           </Box>
         </Box>
       </Box>
-      {/* Expanded Details Modal */}
+
+      {/* View Research Details */}
       <Modal open={Boolean(selectedResearchItem)} onClose={handleCloseModal}>
         <Box
           sx={{
-            p: 4,
-            width: "60%",
+            display: "flex",
+            flexDirection: "column",
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: "auto",
             bgcolor: "background.paper",
-            mx: "auto",
-            mt: "10%",
+            boxShadow: 24,
+            borderRadius: 2,
+            padding: 7
           }}
         >
           {selectedResearchItem && (
             <>
-              <Typography variant='h4' gutterBottom>
+              <Typography variant='h3' fontWeight='700' sx={{ mb: "2rem" }} gutterBottom>
                 {selectedResearchItem.title}
               </Typography>
-              <Typography variant='body1'>
+              <Typography variant='body1' sx={{ mb: "1rem" }}>
+                <strong>College Department:</strong> {selectedResearchItem.college_id}
+              </Typography>
+              <Typography variant='body1' sx={{ mb: "1rem" }}>
+                <strong>Program:</strong> {selectedResearchItem.program_name}
+              </Typography>
+              <Typography variant='body1' sx={{ mb: "1rem" }}>
                 <strong>Authors:</strong>{" "}
                 {selectedResearchItem.concatenated_authors}
               </Typography>
-              <Typography variant='body1'>
-                <strong>Program:</strong> {selectedResearchItem.program_name}
-              </Typography>
-              <Typography variant='body1'>
-                <strong>Year:</strong> {selectedResearchItem.year}
-              </Typography>
-              <Typography variant='body1'>
+              <Typography variant='body1' sx={{ mb: "1rem" }}>
                 <strong>Abstract:</strong>{" "}
                 {selectedResearchItem.abstract || "No abstract available"}
               </Typography>
-              <Typography variant='body1'>
+              <Typography variant='body1' sx={{ mb: "1rem" }}>
                 <strong>Keywords:</strong>{" "}
                 {selectedResearchItem.concatenated_keywords ||
                   "No keywords available"}
               </Typography>
-              <Button
+              <Typography variant='body1' sx={{ mb: "1rem" }}>
+                <strong>Journal:</strong>{" "}
+                {selectedResearchItem.journal}
+              </Typography>
+              <Typography variant='body1' sx={{ mb: "1rem" }}>
+                <strong>Research Type:</strong>{" "}
+                {selectedResearchItem.research_type}
+              </Typography>
+              <Typography variant='body1' sx={{ mb: "1rem" }}>
+                <strong>SDG:</strong>{" "}
+                {selectedResearchItem.sdg}
+              </Typography>
+              <Typography variant='body1' sx={{ mb: "1rem" }}>
+                <strong>Year:</strong> {selectedResearchItem.year}
+              </Typography>
+              <Typography variant='body1' sx={{ mb: "1rem" }}>
+                <strong>Download Count:</strong> {selectedResearchItem.download_count}
+              </Typography>
+              <Typography variant='body1' sx={{ mb: "1rem" }}>
+                <strong>View Count:</strong> {selectedResearchItem.view_count}
+              </Typography>
+              <Button 
                 variant='contained'
-                sx={{ mt: 3 }}
+                color='primary'
+                sx={{
+                  backgroundColor: "#08397C",
+                  color: "#FFF",
+                  fontFamily: "Montserrat, sans-serif",
+                  fontWeight: 400,
+                  textTransform: "none",
+                  fontSize: { xs: "0.875rem", md: "1rem" },
+                  padding: { xs: "0.5rem 1rem", md: "1rem" },
+                  marginTop: "2rem",
+                  width: "13rem",
+                  alignSelf: "center",
+                  borderRadius: "100px",
+                  maxHeight: "3rem",
+                }}
                 onClick={() => handleViewManuscript(selectedResearchItem)}
               >
                 View Manuscript
