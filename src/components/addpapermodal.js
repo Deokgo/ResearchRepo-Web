@@ -29,10 +29,12 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
   const [abstract, setAbstract] = useState("");
   const [sdg, setSDG] = useState(""); // should allow multiple SDG
   const [adviser, setAdviser] = useState(null);
-  const [inputValue, setInputValue] = useState("");
-  const [panels, setPanel] = useState(""); // loaded in a combobox
+  const [adviserInputValue, setAdviserInputValue] = useState("");
+  const [panels, setPanels] = useState([]);
+  const [panelInputValue, setPanelInputValue] = useState("");
   const [keywords, setKeywords] = useState(""); // should allow multiple keywords
   const [adviserOptions, setAdviserOptions] = useState([]);
+  const [panelOptions, setPanelOptions] = useState([]);
   const { isAddPaperModalOpen, closeAddPaperModal, openAddPaperModal } =
     useModalContext();
   const [file, setFile] = useState(null);
@@ -72,7 +74,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
   const handleAdviserSearch = async (query) => {
     if (query.length > 2) {
       try {
-        const response = await axios.get("/accounts/search_advisers", {
+        const response = await axios.get("/accounts/search_user", {
           params: { query },
         });
         setAdviserOptions(response.data.advisers); // Update options with matching advisers
@@ -81,6 +83,21 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
       }
     } else {
       setAdviserOptions([]); // Clear options when input is empty
+    }
+  };
+
+  const handlePanelSearch = async (query) => {
+    if (query.length > 2) {
+      try {
+        const response = await axios.get("/accounts/search_user", {
+          params: { query },
+        });
+        setPanelOptions(response.data.advisers); // Update options with matching users for panels
+      } catch (error) {
+        console.error("Error fetching panel members:", error);
+      }
+    } else {
+      setPanelOptions([]);
     }
   };
   const handleCollegeChange = (event) => {
@@ -108,6 +125,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
         research_type: researchType,
         adviser_id: adviser?.user_id,
         sdg: sdg,
+        panel_ids: panels.map((panel) => panel.user_id),
       });
       const formData = new FormData();
       formData.append("file", file);
@@ -243,9 +261,9 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
               }
               value={adviser}
               onChange={(event, newValue) => setAdviser(newValue)}
-              inputValue={inputValue}
+              inputValue={adviserInputValue}
               onInputChange={(event, newInputValue) => {
-                setInputValue(newInputValue);
+                setAdviserInputValue(newInputValue);
                 handleAdviserSearch(newInputValue);
               }}
               renderInput={(params) => (
@@ -254,7 +272,25 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
             />
           </Grid2>
           <Grid2 size={6}>
-            <TextField fullWidth label='Panels' variant='filled' />
+            <Autocomplete
+              multiple
+              options={panelOptions} // Use the same options as for adviser search since it's for users
+              getOptionLabel={(option) =>
+                `${option.first_name || ""} ${option.last_name || ""} (${
+                  option.email || ""
+                })`
+              }
+              value={panels}
+              onChange={(event, newValue) => setPanels(newValue)}
+              inputValue={panelInputValue}
+              onInputChange={(event, newInputValue) => {
+                setPanelInputValue(newInputValue);
+                handlePanelSearch(newInputValue);
+              }}
+              renderInput={(params) => (
+                <TextField {...params} label='Panels' variant='filled' />
+              )}
+            />
           </Grid2>
           <Grid2 size={6}>
             <TextField
