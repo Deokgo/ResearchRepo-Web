@@ -11,6 +11,7 @@ import {
   InputLabel,
   FormControl,
   IconButton,
+  Autocomplete,
 } from "@mui/material";
 import axios from "axios";
 import { useModalContext } from "./modalcontext";
@@ -27,10 +28,11 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
   const [groupCode, setGroupCode] = useState("");
   const [abstract, setAbstract] = useState("");
   const [sdg, setSDG] = useState(""); // should allow multiple SDG
-  const [adviser, setAdviser] = useState(""); // loaded based on the college dept of the user
+  const [adviser, setAdviser] = useState(null);
+  const [inputValue, setInputValue] = useState("");
   const [panels, setPanel] = useState(""); // loaded in a combobox
   const [keywords, setKeywords] = useState(""); // should allow multiple keywords
-  const [fullManus, setFullManus] = useState(""); // for the path of the manus
+  const [adviserOptions, setAdviserOptions] = useState([]);
   const { isAddPaperModalOpen, closeAddPaperModal, openAddPaperModal } =
     useModalContext();
   const [file, setFile] = useState(null);
@@ -67,7 +69,20 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
       setPrograms([]);
     }
   };
-
+  const handleAdviserSearch = async (query) => {
+    if (query.length > 2) {
+      try {
+        const response = await axios.get("/accounts/search_advisers", {
+          params: { query },
+        });
+        setAdviserOptions(response.data.advisers); // Update options with matching advisers
+      } catch (error) {
+        console.error("Error fetching advisers:", error);
+      }
+    } else {
+      setAdviserOptions([]); // Clear options when input is empty
+    }
+  };
   const handleCollegeChange = (event) => {
     const selectedCollegeId = event.target.value;
     setSelectedCollege(selectedCollegeId);
@@ -91,6 +106,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
         abstract: abstract,
         date_approved: dateApproved,
         research_type: researchType,
+        adviser_id: adviser?.user_id,
         sdg: sdg,
       });
       const formData = new FormData();
@@ -217,24 +233,25 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
             />
           </Grid2>
           <Grid2 size={3}>
-            <FormControl fullWidth variant='filled'>
-              <InputLabel>Adviser</InputLabel>
-              <Select>
-                <MenuItem value='Khristian G. Kikuchi'>
-                  Khristian G. Kikuchi
-                </MenuItem>
-                <MenuItem
-                  value='AddNewAdviser'
-                  sx={{
-                    fontFamily: "Montserrat, sans-serif",
-                    fontWeight: 300,
-                    color: "#0A438F",
-                  }}
-                >
-                  + Add New Adviser
-                </MenuItem>
-              </Select>
-            </FormControl>
+            <Autocomplete
+              freeSolo
+              options={adviserOptions}
+              getOptionLabel={(option) =>
+                `${option.first_name || ""} ${option.last_name || ""} (${
+                  option.email || ""
+                })`
+              }
+              value={adviser}
+              onChange={(event, newValue) => setAdviser(newValue)}
+              inputValue={inputValue}
+              onInputChange={(event, newInputValue) => {
+                setInputValue(newInputValue);
+                handleAdviserSearch(newInputValue);
+              }}
+              renderInput={(params) => (
+                <TextField {...params} label='Adviser' variant='filled' />
+              )}
+            />
           </Grid2>
           <Grid2 size={6}>
             <TextField fullWidth label='Panels' variant='filled' />
