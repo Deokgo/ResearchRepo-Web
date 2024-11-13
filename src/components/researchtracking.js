@@ -527,7 +527,7 @@ const ResearchTracking = () => {
                               borderBottom: "1px solid #ddd",
                               cursor: "pointer",
                             }}
-                            onClick={() => handleKey(key)}
+                            onClick={() => handleKey(paper.research_id)}
                           >
                             <Typography variant='h6'>{paper.title}</Typography>
                             <Typography variant='body2' color='textSecondary'>

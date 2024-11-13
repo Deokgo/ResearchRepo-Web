@@ -573,7 +573,7 @@ const DepartmentCollection = () => {
         >
           {selectedResearchItem && (
             <>
-              <Typography variant='h3' fontWeight='700' sx={{ mb: "2rem" }} gutterBottom>
+              <Typography variant='h3' fontWeight='700' sx={{ color: "#08397C", mb: "2rem" }} gutterBottom>
                 {selectedResearchItem.title}
               </Typography>
               <Typography variant='body1' sx={{ mb: "1rem" }}>

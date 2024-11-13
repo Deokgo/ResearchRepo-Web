@@ -32,8 +32,33 @@ const UpdateResearchInfo = ({route,navigate}) => {
   const [users, setUsers] = useState([]);
   const navpage = useNavigate();
   const location = useLocation();
+  const { id } = location.state || {}; // Default to an empty object if state is undefined
+  const [data, setData] = useState(null); // Start with null to represent no data
   const [selectedUser, setSelectedUser] = useState(null);
   const [newRole, setNewRole] = useState("");
+  const [loading, setLoading] = useState(true); // Track loading state
+
+  useEffect(() => {
+    if (id) {
+        const fetchData = async () => {
+            try {
+                const response = await axios.get(`/dataset/fetch_ordered_dataset/${id}`);
+                const fetchedDataset = response.data.dataset || []; // Use empty array if dataset is undefined
+                console.log("Fetched data:", fetchedDataset);
+                setData({ dataset: fetchedDataset });
+            } catch (error) {
+                console.error("Error fetching data:", error);
+                setData({ dataset: [] }); // Set an empty dataset on error
+            } finally {
+                setLoading(false); // Stop loading regardless of success or failure
+            }
+        };
+        fetchData();
+    } else {
+        console.warn("ID is undefined or null:", id);
+        setLoading(false);
+    }
+  }, [id]);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -61,6 +86,32 @@ const UpdateResearchInfo = ({route,navigate}) => {
   const onDeleteFileHandler = () => {
   
   }
+  const handleViewManuscript = async (researchItem) => {
+    const { research_id } = researchItem;
+    if (research_id) {
+      try {
+        // Make the API request to get the PDF as a Blob kasi may proxy issue if directly window.open, so padaanin muna natin kay axios
+        const response = await axios.get(
+          `/paper/view_manuscript/${research_id}`,
+          {
+            responseType: "blob", // Get the response as a binary Blob (PDF)
+          }
+        );
+
+        // Create a URL for the Blob and open it in a new tab
+        const blob = new Blob([response.data], { type: "application/pdf" });
+        const url = window.URL.createObjectURL(blob);
+
+        // Open the PDF in a new tab
+        window.open(url, "_blank");
+      } catch (error) {
+        console.error("Error fetching the manuscript:", error);
+        alert("Failed to retrieve the manuscript. Please try again.");
+      }
+    } else {
+      alert("No manuscript available for this research.");
+    }
+  };
 
   return (
     <>
@@ -160,44 +211,93 @@ const UpdateResearchInfo = ({route,navigate}) => {
                                     justifyContent: "center",
                                 }}
                                 >
-                                <Typography variant='body1' padding={1} sx={{ color: "#08397C" }}>Research Output:</Typography>
-                                <Grid2 container spacing={{ xs: 0, md: 3 }}>
-                                    <Grid2 item size={{ xs: 12, md: 3 }}>
-                                    <TextField
-                                        fullWidth
-                                        label='Research Code'
-                                        name='research code'
-                                        value={location.state.id}
-                                        disabled
-                                        margin='normal'
-                                        variant='outlined'
-                                    ></TextField>
-                                    </Grid2>
-                                    <Grid2 item size={{ xs: 12, md: 6 }}>
-                                    <TextField
-                                        fullWidth
-                                        label='Title'
-                                        name='title'
-                                        disabled
-                                        value={null}
-                                        onChange={null}
-                                        margin='normal'
-                                        variant='outlined'
-                                    ></TextField>
-                                    </Grid2>
-                                    <Grid2 item size={{ xs: 12, md: 3 }}>
-                                    <TextField
-                                        fullWidth
-                                        label='Authors'
-                                        name='authors'
-                                        disabled
-                                        value={null}
-                                        onChange={null}
-                                        margin='normal'
-                                        variant='outlined'
-                                    ></TextField>
-                                    </Grid2>
-                                </Grid2>
+                                <Typography variant='body1' padding={1} sx={{ color: "#08397C" }}>Research Output:</Typography>                               
+                                    <Grid2 container spacing={{ xs: 0, md: 3 }} sx={{ mb: "1rem" }}>   
+                                      {data && data.dataset && data.dataset.length > 0 ? (
+                                        data.dataset.map((item, index) => (                            
+                                        <Box
+                                          sx={{
+                                            display: "flex",
+                                            flexDirection: "column",
+                                            width: "auto",
+                                            padding: 1
+                                          }}
+                                        >
+                                          <Typography variant='h3' fontWeight='700' sx={{ color: "#08397C", mb: "2rem" }} gutterBottom>
+                                            {item.title}
+                                          </Typography>
+                                          <Typography variant='body1' sx={{ mb: "1rem" }}>
+                                            <strong>College Department:</strong> {item.college_id}
+                                          </Typography>
+                                          <Typography variant='body1' sx={{ mb: "1rem" }}>
+                                            <strong>Program:</strong> {item.program_name}
+                                          </Typography>
+                                          <Typography variant='body1' sx={{ mb: "1rem" }}>
+                                            <strong>Authors:</strong>{" "}
+                                            {item.concatenated_authors}
+                                          </Typography>
+                                          <Typography variant='body1' sx={{ mb: "1rem" }}>
+                                            <strong>Abstract:</strong>{" "}
+                                            {item.abstract || "No abstract available"}
+                                          </Typography>
+                                          <Typography variant='body1' sx={{ mb: "1rem" }}>
+                                            <strong>Keywords:</strong>{" "}
+                                            {item.concatenated_keywords ||
+                                              "No keywords available"}
+                                          </Typography>
+                                          <Typography variant='body1' sx={{ mb: "1rem" }}>
+                                            <strong>Journal:</strong>{" "}
+                                            {item.journal}
+                                          </Typography>
+                                          <Typography variant='body1' sx={{ mb: "1rem" }}>
+                                            <strong>Research Type:</strong>{" "}
+                                            {item.research_type}
+                                          </Typography>
+                                          <Typography variant='body1' sx={{ mb: "1rem" }}>
+                                            <strong>SDG:</strong>{" "}
+                                            {item.sdg}
+                                          </Typography>
+                                          <Typography variant='body1' sx={{ mb: "1rem" }}>
+                                            <strong>Year:</strong> {item.year}
+                                          </Typography>
+                                          <Typography variant='body1' sx={{ mb: "1rem" }}>
+                                            <strong>Download Count:</strong> {item.download_count}
+                                          </Typography>
+                                          <Typography variant='body1' sx={{ mb: "1rem" }}>
+                                            <strong>View Count:</strong> {item.view_count}
+                                          </Typography>
+                                          <Button 
+                                            variant='contained'
+                                            color='primary'
+                                            sx={{
+                                              backgroundColor: "#08397C",
+                                              color: "#FFF",
+                                              fontFamily: "Montserrat, sans-serif",
+                                              fontWeight: 400,
+                                              textTransform: "none",
+                                              fontSize: { xs: "0.875rem", md: "1rem" },
+                                              padding: { xs: "0.5rem 1rem", md: "1rem" },
+                                              marginTop: "1rem",
+                                              width: "13rem",
+                                              borderRadius: "100px",
+                                              maxHeight: "3rem",
+                                              "&:hover": {
+                                                backgroundColor: "#052045",
+                                                color: "#FFF",
+                                              },
+                                            }}
+                                            onClick={() => handleViewManuscript(item)}
+                                          >
+                                            View Manuscript
+                                          </Button>
+                                        </Box>
+                                        ))
+                                    ) : (
+                                        <div>
+                                            <p>No research information available.</p>
+                                        </div>
+                                    )}    
+                                    </Grid2> 
                                 <Divider orientation='horizontal' flexItem />
                                 <Typography variant='body1' padding={1} sx={{ color: "#08397C" }}>Publication:</Typography>
                                 <Grid2 container padding={1} spacing={{ xs: 0, md: 3 }}>
@@ -267,7 +367,31 @@ const UpdateResearchInfo = ({route,navigate}) => {
                                 </Grid2>
                                 <Divider orientation='horizontal' flexItem />
                                 <Typography variant='body1' padding={1} sx={{ color: "#08397C" }}>Conference:</Typography>
-                                <Grid2 container padding={1} spacing={{ xs: 0, md: 3 }}>
+                                <Grid2 container paddingLeft={1} spacing={{ xs: 0, md: 3 }}>
+                                  <Grid2 item size={{ xs: 12, md: 12 }}>
+                                      <Button 
+                                        variant='text'
+                                        color='primary'
+                                        sx={{
+                                          color: "#d4041d",
+                                          fontFamily: "Montserrat, sans-serif",
+                                          fontWeight: 400,
+                                          textTransform: "none",
+                                          fontSize: { xs: "0.875rem", md: "1rem" },
+                                          width: "13rem",
+                                          marginTop: "1rem",
+                                          alignSelf: "center",
+                                          borderRadius: "100px",
+                                          maxHeight: "3rem",
+                                          "&:hover": {
+                                            color: "#A30417",
+                                          },
+                                        }}
+                                      >
+                                        + Add Conference
+                                      </Button>
+                                  </Grid2>
+                                    
                                     <Grid2 item size={{ xs: 12, md: 6 }}>
                                     <TextField
                                         fullWidth
@@ -310,24 +434,28 @@ const UpdateResearchInfo = ({route,navigate}) => {
                                     marginTop: 5,
                                     }}
                                 >
-                                    <Button
-                                        fullWidth
-                                        sx={{
-                                          backgroundColor: "#08397C",
+                                    <Button 
+                                      variant='contained'
+                                      color='primary'
+                                      sx={{
+                                        backgroundColor: "#08397C",
+                                        color: "#FFF",
+                                        fontFamily: "Montserrat, sans-serif",
+                                        fontWeight: 400,
+                                        textTransform: "none",
+                                        fontSize: { xs: "0.875rem", md: "1.375rem" },
+                                        padding: { xs: "0.5rem 1rem", md: "1rem" },
+                                        marginTop: "1rem",
+                                        width: "13rem",
+                                        borderRadius: "100px",
+                                        maxHeight: "3rem",
+                                        "&:hover": {
+                                          backgroundColor: "#052045",
                                           color: "#FFF",
-                                          fontFamily: "Montserrat, sans-serif",
-                                          fontSize: { xs: "0.875rem", md: "1.2rem" },
-                                          padding: { xs: "0.5rem 1rem", md: "1.5rem" },
-                                          borderRadius: "100px",
-                                          maxHeight: "2rem",
-                                          width: "20%",
-                                          "&:hover": {
-                                            backgroundColor: "#A30417",
-                                            color: "#FFF",
-                                          },
-                                        }}
+                                        },
+                                      }}
                                     >
-                                    Update Info
+                                      Update Info
                                     </Button>
                                 </Box>
                             </Box>
@@ -453,24 +581,28 @@ const UpdateResearchInfo = ({route,navigate}) => {
                             </Timeline>
                             
                         </Box>
-                        <Button
-                            sx={{
-                              backgroundColor: "#CA031B",
-                              color: "#FFF",
-                              fontFamily: "Montserrat, sans-serif",
-                              fontSize: { xs: "0.875rem", md: "1.2rem" },
-                              padding: { xs: "0.5rem 1rem", md: "1.5rem" },
-                              borderRadius: "100px",
-                              mt: 5,
-                              maxHeight: "2rem",
-
-                              "&:hover": {
+                        <Button 
+                          variant='contained'
+                          color='primary'
+                          sx={{
+                            backgroundColor: "#d40821",
+                            color: "#FFF",
+                            fontFamily: "Montserrat, sans-serif",
+                            fontWeight: 400,
+                            textTransform: "none",
+                            fontSize: { xs: "0.875rem", md: "1.375rem" },
+                            padding: { xs: "0.5rem 1rem", md: "1rem" },
+                            marginTop: "1rem",
+                            width: "auto",
+                            borderRadius: "100px",
+                            maxHeight: "3rem",
+                            "&:hover": {
                                 backgroundColor: "#A30417",
                                 color: "#FFF",
                               },
-                            }}
+                          }}
                         >
-                        Update Status to: ACCEPTED
+                          Update Status to: Accepted
                         </Button>
                     </Grid2>
                 </Grid2>
