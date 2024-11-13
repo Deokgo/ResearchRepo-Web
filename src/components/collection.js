@@ -47,29 +47,28 @@ const DepartmentCollection = () => {
 
   const handleResearchItemClick = async (item) => {
     try {
-        // Call the API to increment the view count
-        const response = await fetch(`/paper/increment_views/${item.research_id}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-        
-        if (!response.ok) {
-            throw new Error('Failed to increment view count');
+      const userId = localStorage.getItem("user_id");
+      const response = await axios.put(
+        `/paper/increment_views/${item.research_id}`,
+        {
+          user_id: userId,
         }
+      );
 
-        // If the response is successful, get the updated view count from the response
-        const data = await response.json();
-        console.log(data.message);  // Optionally log the response message
-
-        // Update the view count in the item object
-        const updatedItem = { ...item, view_count: data.updated_views, download_count: data.download_count };
-
-        // Set the updated item in the state to reflect the change in real-time
-        setSelectedResearchItem(updatedItem);
+      const updatedItem = {
+        ...item,
+        view_count: response.data.updated_views,
+        download_count: response.data.download_count,
+      };
+      setSelectedResearchItem(updatedItem);
     } catch (error) {
-        console.error('Error:', error.message);
+      console.error("Error incrementing view count:", {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+        item: item,
+      });
+      setSelectedResearchItem(item);
     }
   };
   const handleCloseModal = () => {
@@ -248,44 +247,46 @@ const DepartmentCollection = () => {
   const handleViewManuscript = async (researchItem) => {
     const { research_id } = researchItem;
     if (research_id) {
-        try {
-            // Call the API to increment the download count
-            const incrementResponse = await fetch(`/paper/increment_downloads/${research_id}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
+      try {
+        const userId = localStorage.getItem("user_id");
+        // Call the API to increment the download count using axios
+        const incrementResponse = await axios.put(
+          `/paper/increment_downloads/${research_id}`,
+          {
+            user_id: userId,
+          }
+        );
 
-            if (!incrementResponse.ok) {
-                throw new Error('Failed to increment download count');
-            }
+        // Update the download count in the researchItem object
+        const updatedItem = {
+          ...researchItem,
+          download_count: incrementResponse.data.updated_downloads,
+        };
+        setSelectedResearchItem(updatedItem);
 
-            // If the response is successful, get the updated download count from the response
-            const incrementData = await incrementResponse.json();
-            console.log(incrementData.message);  // Optionally log the response message
+        // Make the API request to get the PDF as a Blob
+        const response = await axios.get(
+          `/paper/view_manuscript/${research_id}`,
+          {
+            responseType: "blob",
+          }
+        );
 
-            // Update the download count in the researchItem object
-            const updatedItem = { ...researchItem, download_count: incrementData.updated_downloads };
-            setSelectedResearchItem(updatedItem);  // Update state if using a state management library
-
-            // Make the API request to get the PDF as a Blob
-            const response = await axios.get(`/paper/view_manuscript/${research_id}`, {
-                responseType: "blob" // Get the response as a binary Blob (PDF)
-            });
-
-            // Create a URL for the Blob and open it in a new tab
-            const blob = new Blob([response.data], { type: "application/pdf" });
-            const url = window.URL.createObjectURL(blob);
-
-            // Open the PDF in a new tab
-            window.open(url, "_blank");
-        } catch (error) {
-            console.error('Error fetching the manuscript:', error);
-            alert('Failed to retrieve the manuscript. Please try again.');
-        }
+        // Create a URL for the Blob and open it in a new tab
+        const blob = new Blob([response.data], { type: "application/pdf" });
+        const url = window.URL.createObjectURL(blob);
+        window.open(url, "_blank");
+      } catch (error) {
+        console.error("Error handling manuscript:", {
+          message: error.message,
+          response: error.response?.data,
+          status: error.response?.status,
+          item: researchItem,
+        });
+        alert("Failed to retrieve the manuscript. Please try again.");
+      }
     } else {
-        alert('No manuscript available for this research.');
+      alert("No manuscript available for this research.");
     }
   };
 
@@ -585,16 +586,22 @@ const DepartmentCollection = () => {
             bgcolor: "background.paper",
             boxShadow: 24,
             borderRadius: 2,
-            padding: 7
+            padding: 7,
           }}
         >
           {selectedResearchItem && (
             <>
-              <Typography variant='h3' fontWeight='700' sx={{ color: "#08397C", mb: "2rem" }} gutterBottom>
+              <Typography
+                variant='h3'
+                fontWeight='700'
+                sx={{ color: "#08397C", mb: "2rem" }}
+                gutterBottom
+              >
                 {selectedResearchItem.title}
               </Typography>
               <Typography variant='body1' sx={{ mb: "1rem" }}>
-                <strong>College Department:</strong> {selectedResearchItem.college_id}
+                <strong>College Department:</strong>{" "}
+                {selectedResearchItem.college_id}
               </Typography>
               <Typography variant='body1' sx={{ mb: "1rem" }}>
                 <strong>Program:</strong> {selectedResearchItem.program_name}
@@ -613,27 +620,26 @@ const DepartmentCollection = () => {
                   "No keywords available"}
               </Typography>
               <Typography variant='body1' sx={{ mb: "1rem" }}>
-                <strong>Journal:</strong>{" "}
-                {selectedResearchItem.journal}
+                <strong>Journal:</strong> {selectedResearchItem.journal}
               </Typography>
               <Typography variant='body1' sx={{ mb: "1rem" }}>
                 <strong>Research Type:</strong>{" "}
                 {selectedResearchItem.research_type}
               </Typography>
               <Typography variant='body1' sx={{ mb: "1rem" }}>
-                <strong>SDG:</strong>{" "}
-                {selectedResearchItem.sdg}
+                <strong>SDG:</strong> {selectedResearchItem.sdg}
               </Typography>
               <Typography variant='body1' sx={{ mb: "1rem" }}>
                 <strong>Year:</strong> {selectedResearchItem.year}
               </Typography>
               <Typography variant='body1' sx={{ mb: "1rem" }}>
-                <strong>Download Count:</strong> {selectedResearchItem.download_count}
+                <strong>Download Count:</strong>{" "}
+                {selectedResearchItem.download_count}
               </Typography>
               <Typography variant='body1' sx={{ mb: "1rem" }}>
                 <strong>View Count:</strong> {selectedResearchItem.view_count}
               </Typography>
-              <Button 
+              <Button
                 variant='contained'
                 color='primary'
                 sx={{
