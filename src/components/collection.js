@@ -45,11 +45,32 @@ const DepartmentCollection = () => {
     navigate("/knowledgegraph");
   };
 
-  // const handleKey = (key) => {
-  //   navigate(`/displayresearchinfo/`,{state:{id:key}}); // change the page for viewing research output details
-  // };
-  const handleResearchItemClick = (item) => {
-    setSelectedResearchItem(item);
+  const handleResearchItemClick = async (item) => {
+    try {
+        // Call the API to increment the view count
+        const response = await fetch(`/paper/increment_views/${item.research_id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error('Failed to increment view count');
+        }
+
+        // If the response is successful, get the updated view count from the response
+        const data = await response.json();
+        console.log(data.message);  // Optionally log the response message
+
+        // Update the view count in the item object
+        const updatedItem = { ...item, view_count: data.updated_views };
+
+        // Set the updated item in the state to reflect the change in real-time
+        setSelectedResearchItem(updatedItem);
+    } catch (error) {
+        console.error('Error:', error.message);
+    }
   };
   const handleCloseModal = () => {
     setSelectedResearchItem(null);
@@ -464,7 +485,6 @@ const DepartmentCollection = () => {
                           <Box
                             key={researchItem.research_id}
                             sx={{ marginBottom: 2, cursor: "pointer" }}
-                            // onClick={() => handleKey(researchItem.research_id)} // Define this function to handle clicks
                             onClick={() =>
                               handleResearchItemClick(researchItem)
                             }
