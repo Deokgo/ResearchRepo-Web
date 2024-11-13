@@ -64,7 +64,7 @@ const DepartmentCollection = () => {
         console.log(data.message);  // Optionally log the response message
 
         // Update the view count in the item object
-        const updatedItem = { ...item, view_count: data.updated_views };
+        const updatedItem = { ...item, view_count: data.updated_views, download_count: data.download_count };
 
         // Set the updated item in the state to reflect the change in real-time
         setSelectedResearchItem(updatedItem);
