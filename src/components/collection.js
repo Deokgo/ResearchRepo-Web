@@ -248,27 +248,44 @@ const DepartmentCollection = () => {
   const handleViewManuscript = async (researchItem) => {
     const { research_id } = researchItem;
     if (research_id) {
-      try {
-        // Make the API request to get the PDF as a Blob kasi may proxy issue if directly window.open, so padaanin muna natin kay axios
-        const response = await axios.get(
-          `/paper/view_manuscript/${research_id}`,
-          {
-            responseType: "blob", // Get the response as a binary Blob (PDF)
-          }
-        );
+        try {
+            // Call the API to increment the download count
+            const incrementResponse = await fetch(`/paper/increment_downloads/${research_id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
 
-        // Create a URL for the Blob and open it in a new tab
-        const blob = new Blob([response.data], { type: "application/pdf" });
-        const url = window.URL.createObjectURL(blob);
+            if (!incrementResponse.ok) {
+                throw new Error('Failed to increment download count');
+            }
 
-        // Open the PDF in a new tab
-        window.open(url, "_blank");
-      } catch (error) {
-        console.error("Error fetching the manuscript:", error);
-        alert("Failed to retrieve the manuscript. Please try again.");
-      }
+            // If the response is successful, get the updated download count from the response
+            const incrementData = await incrementResponse.json();
+            console.log(incrementData.message);  // Optionally log the response message
+
+            // Update the download count in the researchItem object
+            const updatedItem = { ...researchItem, download_count: incrementData.updated_downloads };
+            setSelectedResearchItem(updatedItem);  // Update state if using a state management library
+
+            // Make the API request to get the PDF as a Blob
+            const response = await axios.get(`/paper/view_manuscript/${research_id}`, {
+                responseType: "blob" // Get the response as a binary Blob (PDF)
+            });
+
+            // Create a URL for the Blob and open it in a new tab
+            const blob = new Blob([response.data], { type: "application/pdf" });
+            const url = window.URL.createObjectURL(blob);
+
+            // Open the PDF in a new tab
+            window.open(url, "_blank");
+        } catch (error) {
+            console.error('Error fetching the manuscript:', error);
+            alert('Failed to retrieve the manuscript. Please try again.');
+        }
     } else {
-      alert("No manuscript available for this research.");
+        alert('No manuscript available for this research.');
     }
   };
 
