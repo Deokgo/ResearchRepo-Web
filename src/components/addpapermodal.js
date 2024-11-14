@@ -33,7 +33,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
   const [adviserInputValue, setAdviserInputValue] = useState("");
   const [panels, setPanels] = useState([]);
   const [panelInputValue, setPanelInputValue] = useState("");
-  const [keywords, setKeywords] = useState(""); // should allow multiple keywords
+  const [keywords, setKeywords] = useState([]); // Change to array for multiple keywords
   const [adviserOptions, setAdviserOptions] = useState([]);
   const [panelOptions, setPanelOptions] = useState([]);
   const { isAddPaperModalOpen, closeAddPaperModal, openAddPaperModal } =
@@ -115,6 +115,10 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
 
   const onDeleteFileHandler = () => {};
 
+  const handleKeywordsChange = (event, newValue) => {
+    setKeywords(newValue);
+  };
+
   const handleAddPaper = async () => {
     try {
       const formData = new FormData();
@@ -135,6 +139,9 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
       panels.forEach((panel) => {
         formData.append("panel_ids[]", panel.user_id);
       });
+
+      // Add keywords
+      formData.append("keywords", keywords.join(";")); // Join keywords with semicolon
 
       // Send the paper data
       const response = await axios.post("/paper/add_paper", formData, {
@@ -279,14 +286,19 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
                 handleAdviserSearch(newInputValue);
               }}
               renderInput={(params) => (
-                <TextField {...params} label='Adviser' variant='filled' />
+                <TextField
+                  {...params}
+                  label='Adviser'
+                  variant='filled'
+                  helperText='Type at least 3 characters to search for an adviser'
+                />
               )}
             />
           </Grid2>
           <Grid2 size={6}>
             <Autocomplete
               multiple
-              options={panelOptions} // Use the same options as for adviser search since it's for users
+              options={panelOptions}
               getOptionLabel={(option) =>
                 `${option.first_name || ""} ${option.last_name || ""} (${
                   option.email || ""
@@ -300,7 +312,12 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
                 handlePanelSearch(newInputValue);
               }}
               renderInput={(params) => (
-                <TextField {...params} label='Panels' variant='filled' />
+                <TextField
+                  {...params}
+                  label='Panels'
+                  variant='filled'
+                  helperText='Type at least 3 characters to search and select multiple panel members'
+                />
               )}
             />
           </Grid2>
@@ -329,7 +346,21 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
             />
           </Grid2>
           <Grid2 size={6}>
-            <TextField fullWidth label='Keywords' variant='filled' />
+            <Autocomplete
+              multiple
+              freeSolo
+              options={[]} // Empty array since keywords are free-form
+              value={keywords}
+              onChange={handleKeywordsChange}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label='Keywords'
+                  variant='filled'
+                  helperText='Type and press Enter to add multiple keywords'
+                />
+              )}
+            />
           </Grid2>
           <Grid2 size={12}>
             <TextField
