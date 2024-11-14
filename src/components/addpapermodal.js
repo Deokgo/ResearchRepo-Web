@@ -16,6 +16,7 @@ import {
 import axios from "axios";
 import { useModalContext } from "./modalcontext";
 import FileUploader from "./FileUploader";
+import sdgGoalsData from "../data/sdgGoals.json";
 
 const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
   const [colleges, setColleges] = useState([]);
@@ -38,6 +39,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
   const { isAddPaperModalOpen, closeAddPaperModal, openAddPaperModal } =
     useModalContext();
   const [file, setFile] = useState(null);
+  const [selectedSDGs, setSelectedSDGs] = useState([]);
 
   // Fetch all colleges when the modal opens
   useEffect(() => {
@@ -115,27 +117,27 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
 
   const handleAddPaper = async () => {
     try {
-      const response = await axios.post("paper/add_paper", {
-        research_id: groupCode,
-        college_id: selectedCollege,
-        program_id: selectedProgram,
-        title: title,
-        abstract: abstract,
-        date_approved: dateApproved,
-        research_type: researchType,
-        adviser_id: adviser?.user_id,
-        sdg: sdg,
-        panel_ids: panels.map((panel) => panel.user_id),
-      });
       const formData = new FormData();
-      formData.append("file", file);
-      formData.append("research_type", researchType);
-      formData.append("year", new Date(dateApproved).getFullYear());
-      formData.append("department", selectedCollege);
-      formData.append("program", selectedProgram);
-      formData.append("group_code", groupCode);
 
-      await axios.post("/paper/upload_manuscript", formData, {
+      // Add all required fields to formData
+      formData.append("research_id", groupCode);
+      formData.append("college_id", selectedCollege);
+      formData.append("program_id", selectedProgram);
+      formData.append("title", title);
+      formData.append("abstract", abstract);
+      formData.append("date_approved", dateApproved);
+      formData.append("research_type", researchType);
+      formData.append("adviser_id", adviser?.user_id || "");
+      formData.append("sdg", selectedSDGs.map((sdg) => sdg.id).join(";"));
+      formData.append("file", file);
+
+      // Add panel IDs
+      panels.forEach((panel) => {
+        formData.append("panel_ids[]", panel.user_id);
+      });
+
+      // Send the paper data
+      const response = await axios.post("/paper/add_paper", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -149,7 +151,17 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
       closeAddPaperModal();
     } catch (error) {
       console.error("Error adding paper:", error);
-      alert("Failed to add paper. Please try again.");
+      if (error.response) {
+        // Log more detailed error information
+        console.error("Error response:", error.response.data);
+        alert(
+          `Failed to add paper: ${
+            error.response.data.error || "Please try again."
+          }`
+        );
+      } else {
+        alert("Failed to add paper. Please try again.");
+      }
     }
   };
 
@@ -293,12 +305,27 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
             />
           </Grid2>
           <Grid2 size={6}>
-            <TextField
-              fullWidth
-              label='SDG'
-              variant='filled'
-              value={sdg}
-              onChange={(e) => setSDG(e.target.value)}
+            <Autocomplete
+              multiple
+              options={sdgGoalsData.sdgGoals}
+              getOptionLabel={(option) => `${option.id} - ${option.title}`}
+              value={selectedSDGs}
+              onChange={(event, newValue) => setSelectedSDGs(newValue)}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label='SDG Goals'
+                  variant='filled'
+                  helperText='Select one or more SDG goals'
+                />
+              )}
+              renderOption={(props, option) => (
+                <li {...props}>
+                  <Typography variant='body2'>
+                    <strong>{option.id}</strong> - {option.title}
+                  </Typography>
+                </li>
+              )}
             />
           </Grid2>
           <Grid2 size={6}>
