@@ -220,7 +220,7 @@ const UpdateResearchInfo = ({route,navigate}) => {
                                             display: "flex",
                                             flexDirection: "column",
                                             width: "auto",
-                                            padding: 1
+                                            paddingLeft: 3
                                           }}
                                         >
                                           <Typography variant='h3' fontWeight='700' sx={{ color: "#08397C", mb: "2rem" }} gutterBottom>
@@ -441,7 +441,7 @@ const UpdateResearchInfo = ({route,navigate}) => {
                                         backgroundColor: "#08397C",
                                         color: "#FFF",
                                         fontFamily: "Montserrat, sans-serif",
-                                        fontWeight: 400,
+                                        fontWeight: 600,
                                         textTransform: "none",
                                         fontSize: { xs: "0.875rem", md: "1.275rem" },
                                         padding: { xs: "0.5rem 1rem", md: "1.5rem" },
@@ -588,7 +588,7 @@ const UpdateResearchInfo = ({route,navigate}) => {
                             backgroundColor: "#d40821",
                             color: "#FFF",
                             fontFamily: "Montserrat, sans-serif",
-                            fontWeight: 400,
+                            fontWeight: 600,
                             textTransform: "none",
                             fontSize: { xs: "0.875rem", md: "1.275rem" },
                             padding: { xs: "0.5rem 1rem", md: "1.5rem" },

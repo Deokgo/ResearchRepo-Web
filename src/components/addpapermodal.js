@@ -34,6 +34,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
   const [panels, setPanels] = useState([]);
   const [panelInputValue, setPanelInputValue] = useState("");
   const [keywords, setKeywords] = useState([]); // Change to array for multiple keywords
+  const [authors, setAuthors] = useState([]); // Change to array for multiple authors
   const [adviserOptions, setAdviserOptions] = useState([]);
   const [panelOptions, setPanelOptions] = useState([]);
   const { isAddPaperModalOpen, closeAddPaperModal, openAddPaperModal } =
@@ -143,6 +144,9 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
       // Add keywords
       formData.append("keywords", keywords.join(";")); // Join keywords with semicolon
 
+      // Add authors
+      //formData.append("authors", authors.join(";")); // Join authors with semicolon
+
       // Send the paper data
       const response = await axios.post("/paper/add_paper", formData, {
         headers: {
@@ -186,7 +190,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
         sx={{
           bgcolor: "background.paper",
           boxShadow: 24,
-          p: 4,
+          p: 5,
           borderRadius: 2,
           width: "auto",
           margin: "10rem"
@@ -327,6 +331,15 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
               fullWidth
               label='Authors'
               variant='filled'
+              value={authors}
+              onChange={(e) => setAuthors(e.target.value)}
+            />
+          </Grid2>
+          <Grid2 size={12}>
+            <TextField
+              fullWidth
+              label='Title'
+              variant='filled'
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
@@ -372,16 +385,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
               )}
             />
           </Grid2>
-          <Grid2 size={12}>
-            <TextField
-              fullWidth
-              label='Title'
-              variant='filled'
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-            />
-          </Grid2>
-          <Grid2 size={12}>
+          <Grid2 size={6}>
             <TextField
               fullWidth
               label='Abstract'
@@ -392,7 +396,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
               onChange={(e) => setAbstract(e.target.value)}
             />
           </Grid2>
-          <Grid2 size={12}>
+          <Grid2 size={6}>
             <Typography variant='body1' sx={{ color: "#8B8B8B" }}>
               Upload Full Manuscript:
             </Typography>
@@ -401,7 +405,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
                 display: "flex",
                 alignItems: "center",
                 border: "1px dashed #ccc",
-                p: 1,
+                p: 3,
                 cursor: "pointer",
                 justifyContent: "center",
                 gap: 2,

@@ -379,6 +379,10 @@ const DisplayResearchInfo = () => {
                                 alignSelf: "center",
                                 borderRadius: "100px",
                                 maxHeight: "3rem",
+                                "&:hover": {
+                                    backgroundColor: "#052045",
+                                    color: "#FFF",
+                                },
                             }}
                             onClick={editDetails}
                         >
@@ -388,7 +392,7 @@ const DisplayResearchInfo = () => {
                             variant='contained'
                             color='primary'
                             sx={{
-                                backgroundColor: "#A30417",
+                                backgroundColor: "#d40821",
                                 color: "#FFF",
                                 fontFamily: "Montserrat, sans-serif",
                                 fontWeight: 600,
@@ -398,7 +402,11 @@ const DisplayResearchInfo = () => {
                                 alignSelf: "center",
                                 borderRadius: "100px",
                                 maxHeight: "3rem",
-                                marginLeft: "2rem"
+                                marginLeft: "2rem",
+                                "&:hover": {
+                                    backgroundColor: "#A30417",
+                                    color: "#FFF",
+                                },
                             }}
                             visible={isVisible}
                         >

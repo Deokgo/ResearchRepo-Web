@@ -471,7 +471,7 @@ const ManagePapers = () => {
                       fontFamily: "Montserrat, sans-serif",
                       fontWeight: 600,
                       textTransform: "none",
-                      fontSize: { xs: "0.875rem", md: "1.375rem" },
+                      fontSize: { xs: "0.875rem", md: "1.275rem" },
                       padding: { xs: "0.5rem 1rem", md: "1.5rem" },
                       marginLeft: "2rem",
                       borderRadius: "100px",
@@ -482,7 +482,7 @@ const ManagePapers = () => {
                     }}
                     onClick={openAddPaperModal}
                   >
-                    Add New Paper
+                    + Add New Paper
                   </Button>
                 </Box>
                 <Box
