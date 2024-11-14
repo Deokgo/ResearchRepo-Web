@@ -211,7 +211,7 @@ const UpdateResearchInfo = ({route,navigate}) => {
                                     justifyContent: "center",
                                 }}
                                 >
-                                <Typography variant='body1' padding={1} sx={{ color: "#08397C" }}>Research Output:</Typography>                               
+                                <Typography variant='body1' padding={1} sx={{ color: "#08397C" }}>Research Output Details:</Typography>                               
                                     <Grid2 container spacing={{ xs: 0, md: 3 }} sx={{ mb: "1rem" }}>   
                                       {data && data.dataset && data.dataset.length > 0 ? (
                                         data.dataset.map((item, index) => (                            
@@ -443,10 +443,10 @@ const UpdateResearchInfo = ({route,navigate}) => {
                                         fontFamily: "Montserrat, sans-serif",
                                         fontWeight: 400,
                                         textTransform: "none",
-                                        fontSize: { xs: "0.875rem", md: "1.375rem" },
-                                        padding: { xs: "0.5rem 1rem", md: "1rem" },
+                                        fontSize: { xs: "0.875rem", md: "1.275rem" },
+                                        padding: { xs: "0.5rem 1rem", md: "1.5rem" },
                                         marginTop: "1rem",
-                                        width: "13rem",
+                                        width: "auto",
                                         borderRadius: "100px",
                                         maxHeight: "3rem",
                                         "&:hover": {
@@ -590,8 +590,8 @@ const UpdateResearchInfo = ({route,navigate}) => {
                             fontFamily: "Montserrat, sans-serif",
                             fontWeight: 400,
                             textTransform: "none",
-                            fontSize: { xs: "0.875rem", md: "1.375rem" },
-                            padding: { xs: "0.5rem 1rem", md: "1rem" },
+                            fontSize: { xs: "0.875rem", md: "1.275rem" },
+                            padding: { xs: "0.5rem 1rem", md: "1.5rem" },
                             marginTop: "1rem",
                             width: "auto",
                             borderRadius: "100px",

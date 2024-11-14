@@ -655,6 +655,9 @@ const DepartmentCollection = () => {
                   alignSelf: "center",
                   borderRadius: "100px",
                   maxHeight: "3rem",
+                  "&:hover": {
+                    backgroundColor: "#072d61"
+                  },
                 }}
                 onClick={() => handleViewManuscript(selectedResearchItem)}
               >

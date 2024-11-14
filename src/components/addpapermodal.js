@@ -186,9 +186,10 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
         sx={{
           bgcolor: "background.paper",
           boxShadow: 24,
-          p: 6,
+          p: 4,
           borderRadius: 2,
-          width: "60%",
+          width: "auto",
+          margin: "10rem"
         }}
       >
         <Typography
@@ -203,7 +204,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
           Add New Paper
         </Typography>
         <Grid2 container spacing={2}>
-          <Grid2 size={3}>
+          <Grid2 size={2}>
             <TextField
               fullWidth
               label='Group Code'
@@ -245,7 +246,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
               </Select>
             </FormControl>
           </Grid2>
-          <Grid2 size={3}>
+          <Grid2 size={2}>
             <FormControl fullWidth variant='filled'>
               <InputLabel>Research Type</InputLabel>
               <Select
@@ -258,7 +259,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
               </Select>
             </FormControl>
           </Grid2>
-          <Grid2 size={3}>
+          <Grid2 size={2}>
             <TextField
               fullWidth
               label='Date Approved'
@@ -295,7 +296,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
               )}
             />
           </Grid2>
-          <Grid2 size={6}>
+          <Grid2 size={5}>
             <Autocomplete
               multiple
               options={panelOptions}
@@ -319,6 +320,15 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
                   helperText='Type at least 3 characters to search and select multiple panel members'
                 />
               )}
+            />
+          </Grid2>
+          <Grid2 size={4}>
+            <TextField
+              fullWidth
+              label='Authors'
+              variant='filled'
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
             />
           </Grid2>
           <Grid2 size={6}>
@@ -391,8 +401,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
                 display: "flex",
                 alignItems: "center",
                 border: "1px dashed #ccc",
-                borderRadius: 1,
-                p: 2,
+                p: 1,
                 cursor: "pointer",
                 justifyContent: "center",
                 gap: 2,
@@ -413,23 +422,20 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
           }}
         >
           <Button
-            variant='outlined'
             onClick={closeAddPaperModal}
             sx={{
-              backgroundColor: "#FFF",
-              color: "#08397C",
+              backgroundColor: "#08397C",
+              color: "#FFF",
               fontFamily: "Montserrat, sans-serif",
               fontWeight: 600,
-              textTransform: "none",
-              fontSize: { xs: "0.875rem", md: "1.375rem" },
+              fontSize: { xs: "0.875rem", md: "1.275rem" },
               padding: { xs: "0.5rem", md: "1.5rem" },
               marginLeft: "2rem",
               borderRadius: "100px",
-              borderColor: "#8B8B8B",
               maxHeight: "3rem",
               textTransform: "none",
               "&:hover": {
-                backgroundColor: "#D4D4D6",
+                backgroundColor: "#072d61"
               },
             }}
           >
@@ -443,12 +449,11 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
               fontFamily: "Montserrat, sans-serif",
               fontWeight: 600,
               textTransform: "none",
-              fontSize: { xs: "0.875rem", md: "1.375rem" },
+              fontSize: { xs: "0.875rem", md: "1.275rem" },
               padding: { xs: "0.5rem 1rem", md: "1.5rem" },
               marginLeft: "2rem",
               borderRadius: "100px",
               maxHeight: "3rem",
-              textTransform: "none",
               "&:hover": {
                 backgroundColor: "#A30417",
                 color: "#FFF",
