@@ -31,10 +31,12 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
   const [sdg, setSDG] = useState(""); // should allow multiple SDG
   const [adviser, setAdviser] = useState(null);
   const [adviserInputValue, setAdviserInputValue] = useState("");
+  const [authorInputValue, setAuthorInputValue] = useState("");
   const [panels, setPanels] = useState([]);
   const [panelInputValue, setPanelInputValue] = useState("");
   const [keywords, setKeywords] = useState([]); // Change to array for multiple keywords
   const [authors, setAuthors] = useState([]); // Change to array for multiple authors
+  const [authorOptions, setAuthorOptions] = useState([]);
   const [adviserOptions, setAdviserOptions] = useState([]);
   const [panelOptions, setPanelOptions] = useState([]);
   const { isAddPaperModalOpen, closeAddPaperModal, openAddPaperModal } =
@@ -74,18 +76,30 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
       setPrograms([]);
     }
   };
+  const handleAuthorSearch = async (query) => {
+    if (query.length > 2) {
+      try {
+        const response = await axios.get("/accounts/search_user", {
+          params: { query },
+        });
+        setAuthorOptions(response.data.users);
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      }
+    }
+  };
   const handleAdviserSearch = async (query) => {
     if (query.length > 2) {
       try {
         const response = await axios.get("/accounts/search_user", {
           params: { query },
         });
-        setAdviserOptions(response.data.advisers); // Update options with matching advisers
+        setAdviserOptions(response.data.users);
       } catch (error) {
-        console.error("Error fetching advisers:", error);
+        console.error("Error fetching users:", error);
       }
     } else {
-      setAdviserOptions([]); // Clear options when input is empty
+      setAdviserOptions([]);
     }
   };
 
@@ -95,9 +109,9 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
         const response = await axios.get("/accounts/search_user", {
           params: { query },
         });
-        setPanelOptions(response.data.advisers); // Update options with matching users for panels
+        setPanelOptions(response.data.users);
       } catch (error) {
-        console.error("Error fetching panel members:", error);
+        console.error("Error fetching users:", error);
       }
     } else {
       setPanelOptions([]);
@@ -193,7 +207,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
           p: 5,
           borderRadius: 2,
           width: "auto",
-          margin: "10rem"
+          margin: "10rem",
         }}
       >
         <Typography
@@ -274,6 +288,32 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
               InputLabelProps={{ shrink: true }}
             />
           </Grid2>
+          <Grid2 size={4}>
+            <Autocomplete
+              multiple
+              options={authorOptions}
+              getOptionLabel={(option) =>
+                `${option.first_name || ""} ${option.last_name || ""} (${
+                  option.email || ""
+                })`
+              }
+              value={authors}
+              onChange={(event, newValue) => setAuthors(newValue)}
+              inputValue={authorInputValue}
+              onInputChange={(event, newInputValue) => {
+                setAuthorInputValue(newInputValue);
+                handleAuthorSearch(newInputValue);
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label='Authors'
+                  variant='filled'
+                  helperText='Type at least 3 characters to search and select author/s'
+                />
+              )}
+            />
+          </Grid2>
           <Grid2 size={3}>
             <Autocomplete
               freeSolo
@@ -324,15 +364,6 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
                   helperText='Type at least 3 characters to search and select multiple panel members'
                 />
               )}
-            />
-          </Grid2>
-          <Grid2 size={4}>
-            <TextField
-              fullWidth
-              label='Authors'
-              variant='filled'
-              value={authors}
-              onChange={(e) => setAuthors(e.target.value)}
             />
           </Grid2>
           <Grid2 size={12}>
@@ -439,7 +470,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
               maxHeight: "3rem",
               textTransform: "none",
               "&:hover": {
-                backgroundColor: "#072d61"
+                backgroundColor: "#072d61",
               },
             }}
           >
