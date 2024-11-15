@@ -189,9 +189,9 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
       formData.append("sdg", selectedSDGs.map((sdg) => sdg.id).join(";"));
       formData.append("file", file);
 
-      // Add panel IDs
+      // Add panel IDs without []
       panels.forEach((panel) => {
-        formData.append("panel_ids[]", panel.user_id);
+        formData.append("panel_ids", panel.user_id);
       });
 
       // Add keywords
