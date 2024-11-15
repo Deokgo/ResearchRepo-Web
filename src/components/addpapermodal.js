@@ -136,7 +136,46 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
 
   const handleAddPaper = async () => {
     try {
+      // Validate required fields
+      const requiredFields = {
+        "Group Code": groupCode,
+        Department: selectedCollege,
+        Program: selectedProgram,
+        "Research Type": researchType,
+        "Date Approved": dateApproved,
+        Title: title,
+        Abstract: abstract,
+        Adviser: adviser,
+        "SDG Goals": selectedSDGs,
+        Keywords: keywords,
+        Panels: panels,
+        File: file,
+      };
+
+      const missingFields = Object.entries(requiredFields)
+        .filter(([_, value]) => {
+          if (Array.isArray(value)) {
+            return value.length === 0;
+          }
+          return !value;
+        })
+        .map(([key]) => key);
+
+      if (missingFields.length > 0) {
+        alert(
+          `Please fill in all required fields: ${missingFields.join(", ")}`
+        );
+        return;
+      }
+
       const formData = new FormData();
+
+      // Get user_id from localStorage
+      const storedUser = JSON.parse(localStorage.getItem("user")) || {};
+      const userId = storedUser.user_id || "anonymous";
+
+      // Add user_id to formData
+      formData.append("user_id", userId);
 
       // Add all required fields to formData
       formData.append("research_id", groupCode);
@@ -156,10 +195,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
       });
 
       // Add keywords
-      formData.append("keywords", keywords.join(";")); // Join keywords with semicolon
-
-      // Add authors
-      //formData.append("authors", authors.join(";")); // Join authors with semicolon
+      formData.append("keywords", keywords.join(";"));
 
       // Send the paper data
       const response = await axios.post("/paper/add_paper", formData, {
@@ -177,7 +213,6 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
     } catch (error) {
       console.error("Error adding paper:", error);
       if (error.response) {
-        // Log more detailed error information
         console.error("Error response:", error.response.data);
         alert(
           `Failed to add paper: ${
@@ -189,6 +224,25 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
       }
     }
   };
+
+  // Add a cleanup function to reset form state when modal closes
+  useEffect(() => {
+    if (!isAddPaperModalOpen) {
+      setGroupCode("");
+      setSelectedCollege("");
+      setSelectedProgram("");
+      setResearchType("");
+      setDateApproved("");
+      setTitle("");
+      setAbstract("");
+      setAdviser(null);
+      setSelectedSDGs([]);
+      setKeywords([]);
+      setPanels([]);
+      setFile(null);
+      setAuthors([]);
+    }
+  }, [isAddPaperModalOpen]);
 
   return (
     <Modal
