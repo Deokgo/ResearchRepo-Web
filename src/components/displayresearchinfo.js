@@ -58,6 +58,7 @@ const DisplayResearchInfo = () => {
     const [isDisabled, setIsDisabled] = useState(true);
     const [isVisible, setIsVisible] = useState(false);
     const [isLabel, setIsLabel] = useState("Edit Details");
+    const [initialData, setInitialData] = useState(null);
 
     const editDetails = () => {
         setIsDisabled(!isDisabled);
@@ -94,6 +95,10 @@ const DisplayResearchInfo = () => {
     useEffect(() => {
         if (data && data.dataset && data.dataset.length > 0) {
             const item = data.dataset[0];
+            const selectedCollegeId = item.college_id || "";
+            setSelectedCollege(selectedCollegeId);
+            fetchProgramsByCollege(selectedCollegeId);
+            setSelectedProgram(item.program_id || "");
             setTitle(item.title || "");
             setGroupCode(item.research_id || "");
             setAbstract(item.abstract || "");
@@ -117,11 +122,39 @@ const DisplayResearchInfo = () => {
                 setSelectedSDGs([]);
             }
 
-            // Handling full_manuscript
+            // Handling full_manuscript, authors, panels, adviser
 
-            //
+            // Save the initial data to compare later
+            setInitialData({
+                title: item.title || "",
+                research_id: item.research_id || "",
+                abstract: item.abstract || "",
+                research_type: item.research_type || "",
+                date_approved: item.date_approved || "",
+                keywords: item.concatenated_keywords || "",
+                sdg: item.sdg || ""
+            });
         }
     }, [data]);
+
+    const handleSaveDetails = () => {
+        // Check if there are any changes by comparing the current state with initial data
+        const hasChanges = title !== initialData?.title ||
+            groupCode !== initialData?.research_id ||
+            abstract !== initialData?.abstract ||
+            researchType !== initialData?.research_type ||
+            dateApproved !== initialData?.date_approved 
+            // include
+            //keywords.join(';') !== initialData?.keywords ||
+            //selectedSDGs.join(';') !== initialData?.sdg;
+
+        if (!hasChanges) {
+            alert('No changes are made');
+        } else {
+            alert('Changes saved successfully!');
+            // Your save logic here
+        }
+    };
 
     // Mapping SDG IDs to full SDG objects
     const selectedSDGObjects = selectedSDGs.map(sdgId => 
@@ -220,10 +253,6 @@ const DisplayResearchInfo = () => {
         setKeywords(newValue);
     };
 
-    const handleSaveDetails = () => {
-        // Add code for saving updated details
-    };
-
     return (
         <Box sx={{ height: "100vh", display: "flex", flexDirection: "column" }}>
             <Navbar />
@@ -267,7 +296,7 @@ const DisplayResearchInfo = () => {
                                     <Grid item xs={3}>
                                         <FormControl fullWidth variant='filled'>
                                             <InputLabel>Program</InputLabel>
-                                            <Select value={selectedProgram} onChange={(e) => setSelectedProgram(e.target.value)} label='Program' disabled={!selectedCollege}>
+                                            <Select value={selectedProgram} onChange={(e) => setSelectedProgram(e.target.value)} label='Program' disabled={isDisabled}>
                                                 {programs.map((program) => (
                                                     <MenuItem key={program.program_id} value={program.program_id}>{program.program_name}</MenuItem>
                                                 ))}
