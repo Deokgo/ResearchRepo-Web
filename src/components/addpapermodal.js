@@ -170,9 +170,8 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
 
       const formData = new FormData();
 
-      // Get user_id from localStorage
-      const storedUser = JSON.parse(localStorage.getItem("user")) || {};
-      const userId = storedUser.user_id || "anonymous";
+      // Get user_id directly from localStorage without JSON parsing
+      const userId = localStorage.getItem("user_id");
 
       // Add user_id to formData
       formData.append("user_id", userId);
@@ -189,7 +188,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
       formData.append("sdg", selectedSDGs.map((sdg) => sdg.id).join(";"));
       formData.append("file", file);
 
-      // Add panel IDs without []
+      // Add panel IDs
       panels.forEach((panel) => {
         formData.append("panel_ids", panel.user_id);
       });
