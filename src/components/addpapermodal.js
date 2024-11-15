@@ -149,6 +149,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
         "SDG Goals": selectedSDGs,
         Keywords: keywords,
         Panels: panels,
+        Authors: authors,
         File: file,
       };
 
@@ -170,10 +171,8 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
 
       const formData = new FormData();
 
-      // Get user_id directly from localStorage without JSON parsing
+      // Get user_id from localStorage
       const userId = localStorage.getItem("user_id");
-
-      // Add user_id to formData
       formData.append("user_id", userId);
 
       // Add all required fields to formData
@@ -187,6 +186,11 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
       formData.append("adviser_id", adviser?.user_id || "");
       formData.append("sdg", selectedSDGs.map((sdg) => sdg.id).join(";"));
       formData.append("file", file);
+
+      // Add authors without order
+      authors.forEach((author) => {
+        formData.append("author_ids", author.user_id);
+      });
 
       // Add panel IDs
       panels.forEach((panel) => {
