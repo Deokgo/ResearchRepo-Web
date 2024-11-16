@@ -578,7 +578,7 @@ const DepartmentCollection = () => {
           sx={{
             display: "flex",
             flexDirection: "column",
-            position: "absolute",
+            position:'absolute',
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
@@ -586,7 +586,10 @@ const DepartmentCollection = () => {
             bgcolor: "background.paper",
             boxShadow: 24,
             borderRadius: 2,
-            padding: 7,
+            padding: 5,
+            height:"45rem", // fixed the height
+            overflow: "hidden",
+            overflowY: "scroll" // added scroll
           }}
         >
           {selectedResearchItem && (

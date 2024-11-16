@@ -153,9 +153,98 @@ const DisplayResearchInfo = () => {
         } else {
             alert('Changes saved successfully!');
             // Your save logic here
+            updateResearchDetails()
         }
     };
 
+    const updateResearchDetails = async () => {
+        try {
+            // Validate required fields
+            const requiredFields = {
+              Department: selectedCollege,
+              Program: selectedProgram,
+              "Research Type": researchType,
+              "Date Approved": dateApproved,
+              Title: title,
+              Abstract: abstract,
+              Adviser: adviser,
+              "SDG Goals": selectedSDGs,
+              Keywords: keywords,
+              Panels: panels,
+              Authors: authors,
+              File: file,
+            };
+      
+            const missingFields = Object.entries(requiredFields)
+              .filter(([_, value]) => {
+                if (Array.isArray(value)) {
+                  return value.length === 0;
+                }
+                return !value;
+              })
+              .map(([key]) => key);
+      
+            if (missingFields.length > 0) {
+              alert(
+                `Please fill in all required fields: ${missingFields.join(", ")}`
+              );
+              return;
+            }
+      
+            const formData = new FormData();
+      
+            // Get user_id from localStorage
+            const userId = localStorage.getItem("user_id");
+            formData.append("user_id", userId);
+      
+            // Add all required fields to formData
+            formData.append("college_id", selectedCollege);
+            formData.append("program_id", selectedProgram);
+            formData.append("title", title);
+            formData.append("abstract", abstract);
+            formData.append("date_approved", dateApproved);
+            formData.append("research_type", researchType);
+            formData.append("adviser_id", adviser?.user_id || "");
+            formData.append("sdg", selectedSDGs.map((sdg) => sdg.id).join(";"));
+            formData.append("file", file);
+      
+            // Add authors without order
+            authors.forEach((author) => {
+              formData.append("author_ids", author.user_id);
+            });
+      
+            // Add panel IDs
+            panels.forEach((panel) => {
+              formData.append("panel_ids", panel.user_id);
+            });
+      
+            // Add keywords
+            formData.append("keywords", keywords.join(";"));
+      
+            // Send the paper data
+            const response = await axios.put(`/paper/update_paper/${groupCode}`, formData, {
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
+            });
+      
+            console.log("Response:", response.data);
+            alert("Paper updated successfully!");
+
+          } catch (error) {
+            console.error("Error updating paper:", error);
+            if (error.response) {
+              console.error("Error response:", error.response.data);
+              alert(
+                `Failed to update paper: ${
+                  error.response.data.error || "Please try again."
+                }`
+              );
+            } else {
+              alert("Failed to update paper. Please try again.");
+            }
+          }
+    };
     // Mapping SDG IDs to full SDG objects
     const selectedSDGObjects = selectedSDGs.map(sdgId => 
         sdgGoalsData.sdgGoals.find(sdg => sdg.id === sdgId)
@@ -279,7 +368,7 @@ const DisplayResearchInfo = () => {
                                             label='Group Code'
                                             variant='filled'
                                             value={groupCode}
-                                            disabled={isDisabled}
+                                            disabled
                                             onChange={(e) => setGroupCode(e.target.value)}
                                         />
                                     </Grid>
@@ -506,7 +595,7 @@ const DisplayResearchInfo = () => {
                             {isLabel}
                         </Button>
                         {isVisible && (
-                            <Button variant='contained' color='primary' sx={{ backgroundColor: "#d40821", color: "#FFF", fontFamily: "Montserrat, sans-serif", fontWeight: 600, textTransform: "none", fontSize: { xs: "0.875rem", md: "1.275rem" }, width: "10rem", alignSelf: "center", borderRadius: "100px", maxHeight: "3rem", ml: 2, "&:hover": { backgroundColor: "#8a0b14", color: "#FFF" } }} onClick={handleSaveDetails}>
+                            <Button variant='contained' color='primary' sx={{ backgroundColor: "#d40821", color: "#FFF", fontFamily: "Montserrat, sans-serif", fontWeight: 600, textTransform: "none", fontSize: { xs: "0.875rem", md: "1.275rem" }, width: "12rem", alignSelf: "center", borderRadius: "100px", maxHeight: "3rem", ml: 2, "&:hover": { backgroundColor: "#8a0b14", color: "#FFF" } }} onClick={handleSaveDetails}>
                                 Save Changes
                             </Button>
                         )}

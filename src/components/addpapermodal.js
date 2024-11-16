@@ -28,7 +28,6 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
   const [title, setTitle] = useState("");
   const [groupCode, setGroupCode] = useState("");
   const [abstract, setAbstract] = useState("");
-  const [sdg, setSDG] = useState(""); // should allow multiple SDG
   const [adviser, setAdviser] = useState(null);
   const [adviserInputValue, setAdviserInputValue] = useState("");
   const [authorInputValue, setAuthorInputValue] = useState("");
