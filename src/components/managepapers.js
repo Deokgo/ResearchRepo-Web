@@ -106,26 +106,26 @@ const ManagePapers = () => {
     }
   };
 
-  const fetchAllResearchData = async () => {
+  const fetchResearchData = async () => {
     try {
-      const response = await axios.get(`/dataset/fetch_ordered_dataset`);
-      const fetchedResearch = response.data.dataset;
-      setResearch(fetchedResearch);
-      setFilteredResearch(fetchedResearch);
+      setLoading(true);
+      const response = await axios.get("/dataset/fetch_ordered_dataset");
+      console.log("Fetched research data:", response.data);
+      if (response.data && response.data.dataset) {
+        setResearch(response.data.dataset);
+      }
     } catch (error) {
-      console.error("Error fetching all research data:", error);
+      console.error("Error fetching research:", error);
     } finally {
       setLoading(false);
     }
   };
-  const refreshResearchData = () => {
-    fetchAllResearchData();
-  };
+
   useEffect(() => {
     fetchUserData();
     fetchColleges();
     fetchAllPrograms();
-    fetchAllResearchData();
+    fetchResearchData();
   }, []);
   useEffect(() => {
     fetchProgramsByCollege(selectedColleges);
@@ -163,11 +163,13 @@ const ManagePapers = () => {
 
     // Filter by Search Query
     if (searchQuery) {
-      filtered = filtered.filter(
-        (item) =>
-          item.title.toLowerCase().includes(searchQuery) ||
-          item.concatenated_authors.toLowerCase().includes(searchQuery)
-      );
+      filtered = filtered.filter((item) => {
+        const titleMatch = item.title.toLowerCase().includes(searchQuery);
+        const authorMatch = item.authors.some((author) =>
+          `${author.name} (${author.email})`.toLowerCase().includes(searchQuery)
+        );
+        return titleMatch || authorMatch;
+      });
     }
 
     setFilteredResearch(filtered);
@@ -210,7 +212,7 @@ const ManagePapers = () => {
   };
 
   const handleKey = (key) => {
-    navigate(`/displayresearchinfo/`,{state:{id:key}}); // change the page for viewing research output details
+    navigate(`/displayresearchinfo/`, { state: { id: key } }); // change the page for viewing research output details
   };
 
   // Handle change in selected programs filter
@@ -291,11 +293,11 @@ const ManagePapers = () => {
             />
             <Box sx={{ display: "flex", ml: "5rem", zIndex: 3 }}>
               <IconButton
-                  onClick={() => navigate(-1)}
-                  sx={{
-                    color: "#fff",
-                  }}
-                >
+                onClick={() => navigate(-1)}
+                sx={{
+                  color: "#fff",
+                }}
+              >
                 <ArrowBackIosIcon />
               </IconButton>
               <Typography
@@ -477,7 +479,7 @@ const ManagePapers = () => {
                       borderRadius: "100px",
                       maxHeight: "3rem",
                       "&:hover": {
-                        backgroundColor: "#072d61"
+                        backgroundColor: "#072d61",
                       },
                     }}
                     onClick={openAddPaperModal}
@@ -496,6 +498,8 @@ const ManagePapers = () => {
                   <Box sx={{ padding: 2, backgroundColor: "#F7F9FC" }}>
                     {loading ? (
                       <Typography>Loading...</Typography>
+                    ) : research.length === 0 ? (
+                      <Typography>No research papers found.</Typography>
                     ) : (
                       <Virtuoso
                         style={{ height: "28rem" }}
@@ -504,18 +508,22 @@ const ManagePapers = () => {
                           <Box
                             key={researchItem.research_id}
                             sx={{ marginBottom: 2, cursor: "pointer" }}
-                            onClick={() => handleKey(researchItem.research_id)} // Define this function to handle clicks
+                            onClick={() => handleKey(researchItem.research_id)}
                           >
                             <Typography variant='h6'>
                               {researchItem.title}
                             </Typography>
                             <Typography variant='body2'>
                               {researchItem.program_name} |{" "}
-                              {researchItem.concatenated_authors} |{" "}
-                              {researchItem.year}
+                              {Array.isArray(researchItem.authors)
+                                ? researchItem.authors
+                                    .map((author) => `${author.name}`)
+                                    .join("; ")
+                                : "No authors available"}{" "}
+                              | {researchItem.year}
                             </Typography>
                             <Typography variant='caption'>
-                              {researchItem.journal} 
+                              {researchItem.journal}
                             </Typography>
                           </Box>
                         )}
@@ -535,7 +543,7 @@ const ManagePapers = () => {
           <AddPaperModal
             isOpen={isAddPaperModalOpen}
             handleClose={closeAddPaperModal}
-            onPaperAdded={refreshResearchData}
+            onPaperAdded={fetchResearchData}
           />
         </Box>
       </Box>

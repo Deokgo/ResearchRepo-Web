@@ -184,11 +184,17 @@ const DepartmentCollection = () => {
 
     // Filter by Search Query
     if (searchQuery) {
-      filtered = filtered.filter(
-        (item) =>
-          item.title.toLowerCase().includes(searchQuery) ||
-          item.concatenated_authors.toLowerCase().includes(searchQuery)
-      );
+      filtered = filtered.filter((item) => {
+        const titleMatch = item.title
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase());
+        const authorMatch = item.authors.some(
+          (author) =>
+            author.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            author.email.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+        return titleMatch || authorMatch;
+      });
     }
 
     setFilteredResearch(filtered);
@@ -512,8 +518,10 @@ const DepartmentCollection = () => {
                             </Typography>
                             <Typography variant='body2'>
                               {researchItem.program_name} |{" "}
-                              {researchItem.concatenated_authors} |{" "}
-                              {researchItem.year}
+                              {researchItem.authors
+                                .map((author) => author.name)
+                                .join("; ")}{" "}
+                              | {researchItem.year}
                             </Typography>
                             <Typography variant='caption'>
                               {researchItem.journal}
@@ -578,7 +586,7 @@ const DepartmentCollection = () => {
           sx={{
             display: "flex",
             flexDirection: "column",
-            position:'absolute',
+            position: "absolute",
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
@@ -587,9 +595,9 @@ const DepartmentCollection = () => {
             boxShadow: 24,
             borderRadius: 2,
             padding: 5,
-            height:"45rem", // fixed the height
+            height: "45rem",
             overflow: "hidden",
-            overflowY: "scroll" // added scroll
+            overflowY: "scroll",
           }}
         >
           {selectedResearchItem && (
@@ -611,7 +619,11 @@ const DepartmentCollection = () => {
               </Typography>
               <Typography variant='body1' sx={{ mb: "1rem" }}>
                 <strong>Authors:</strong>{" "}
-                {selectedResearchItem.concatenated_authors}
+                {Array.isArray(selectedResearchItem.authors)
+                  ? selectedResearchItem.authors
+                      .map((author) => `${author.name} (${author.email})`)
+                      .join("; ")
+                  : "No authors available"}
               </Typography>
               <Typography variant='body1' sx={{ mb: "1rem" }}>
                 <strong>Abstract:</strong>{" "}
@@ -619,8 +631,9 @@ const DepartmentCollection = () => {
               </Typography>
               <Typography variant='body1' sx={{ mb: "1rem" }}>
                 <strong>Keywords:</strong>{" "}
-                {selectedResearchItem.concatenated_keywords ||
-                  "No keywords available"}
+                {Array.isArray(selectedResearchItem.keywords)
+                  ? selectedResearchItem.keywords.join("; ")
+                  : "No keywords available"}
               </Typography>
               <Typography variant='body1' sx={{ mb: "1rem" }}>
                 <strong>Journal:</strong> {selectedResearchItem.journal}
@@ -642,6 +655,21 @@ const DepartmentCollection = () => {
               <Typography variant='body1' sx={{ mb: "1rem" }}>
                 <strong>View Count:</strong> {selectedResearchItem.view_count}
               </Typography>
+              <Typography variant='body1' sx={{ mb: "1rem" }}>
+                <strong>Adviser:</strong>{" "}
+                {selectedResearchItem.adviser
+                  ? `${selectedResearchItem.adviser.name} (${selectedResearchItem.adviser.email})`
+                  : "No adviser available"}
+              </Typography>
+              <Typography variant='body1' sx={{ mb: "1rem" }}>
+                <strong>Panel Members:</strong>{" "}
+                {Array.isArray(selectedResearchItem.panels) &&
+                selectedResearchItem.panels.length > 0
+                  ? selectedResearchItem.panels
+                      .map((panel) => `${panel.name} (${panel.email})`)
+                      .join("; ")
+                  : "No panel members available"}
+              </Typography>
               <Button
                 variant='contained'
                 color='primary'
@@ -659,7 +687,7 @@ const DepartmentCollection = () => {
                   borderRadius: "100px",
                   maxHeight: "3rem",
                   "&:hover": {
-                    backgroundColor: "#072d61"
+                    backgroundColor: "#072d61",
                   },
                 }}
                 onClick={() => handleViewManuscript(selectedResearchItem)}
