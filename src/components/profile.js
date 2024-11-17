@@ -32,6 +32,7 @@ const modalStyle = {
 const Profile = () => {
   const [userData, setUserData] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false);
   const navigate = useNavigate();
   // Retrieve user_id from cookie/localStorage
   const getUserId = () => {
@@ -47,6 +48,12 @@ const Profile = () => {
     program: "",
     email: "",
     role: "",
+  });
+
+  const [passwordValues, setPasswordValues] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
   });
 
   const fetchUserData = async () => {
@@ -76,10 +83,17 @@ const Profile = () => {
   useEffect(() => {
     fetchUserData();
   }, []);
+  
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormValues({ ...formValues, [name]: value });
   };
+
+  const handlePasswordInputChange = (e) => {
+    const { name, value } = e.target;
+    setPasswordValues({ ...passwordValues, [name]: value });
+  };
+
   const handleNavigateHome = () => {
     navigate("/main");
   };
@@ -90,6 +104,14 @@ const Profile = () => {
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
+  };
+
+  const handleOpenChangePasswordModal = () => {
+    setIsChangePasswordModalOpen(true);
+  };
+
+  const handleCloseChangePasswordModal = () => {
+    setIsChangePasswordModalOpen(false);
   };
 
   return (
@@ -179,16 +201,32 @@ const Profile = () => {
               width: "100%",
             }}
           >
-            <Box sx={{ width: "60%", mb: "1.5rem" }}>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                width: "60%",
+                mb: "1.5rem",
+              }}
+            >
               <Button
-                variant='outlined'
+                variant="outlined"
                 startIcon={<EditIcon />}
                 onClick={handleOpenModal}
                 sx={{ fontWeight: 600 }}
               >
                 Edit Profile
               </Button>
+              <Button
+                variant="outlined"
+                startIcon={<EditIcon />}
+                onClick={handleOpenChangePasswordModal}
+                sx={{ fontWeight: 600 }}
+              >
+                Change Password
+              </Button>
             </Box>
+
             <Grid2 container spacing={2} sx={{ width: "60%" }}>
               {userData ? (
                 [
@@ -257,6 +295,7 @@ const Profile = () => {
               )}
             </Grid2>
           </Box>
+
           <Modal open={isModalOpen} onClose={handleCloseModal}>
             <Box sx={modalStyle}>
               <Typography
@@ -360,6 +399,81 @@ const Profile = () => {
                     backgroundColor: "#CA031B",
                     color: "#FFF",
                     fontWeight: 600,
+                  }}
+                >
+                  Save Changes
+                </Button>
+              </Box>
+            </Box>
+          </Modal>
+
+          {/* Change Password Modal */}
+          <Modal
+            open={isChangePasswordModalOpen}
+            onClose={handleCloseChangePasswordModal}
+          >
+            <Box sx={modalStyle}>
+              <Typography
+                variant="h4"
+                sx={{ mb: 4, fontWeight: 800, color: "#08397C" }}
+              >
+                Change Password
+              </Typography>
+              <Grid2 container spacing={2}>
+                <Grid2 size={{ xs: 12 }}>
+                  <TextField
+                    label="Current Password"
+                    fullWidth
+                    name="currentPassword"
+                    value={passwordValues.currentPassword}
+                    onChange={handlePasswordInputChange}
+                    type="password"
+                  />
+                </Grid2>
+                <Grid2 size={{ xs: 12 }}>
+                  <TextField
+                    label="New Password"
+                    fullWidth
+                    name="newPassword"
+                    value={passwordValues.newPassword}
+                    onChange={handlePasswordInputChange}
+                    type="password"
+                  />
+                </Grid2>
+                <Grid2 size={{ xs: 12 }}>
+                  <TextField
+                    label="Confirm Password"
+                    fullWidth
+                    name="confirmPassword"
+                    value={passwordValues.confirmPassword}
+                    onChange={handlePasswordInputChange}
+                    type="password"
+                  />
+                </Grid2>
+              </Grid2>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  marginTop: "1.5rem",
+                }}
+              >
+                <Button
+                  variant="outlined"
+                  onClick={handleCloseChangePasswordModal}
+                  sx={{ fontWeight: 600 }}
+                >
+                  Back
+                </Button>
+                <Button
+                  variant="contained"
+                  sx={{
+                    backgroundColor: "#CA031B",
+                    color: "#FFF",
+                    fontWeight: 600,
+                  }}
+                  onClick={() => {
+                    // Handle password change logic
                   }}
                 >
                   Save Changes
