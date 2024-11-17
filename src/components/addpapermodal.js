@@ -285,6 +285,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
               variant='filled'
               value={groupCode}
               onChange={(e) => setGroupCode(e.target.value)}
+              inputProps={{ maxLength: 15 }} // Limits input to 15 characters
             />
           </Grid2>
           <Grid2 size={3}>
