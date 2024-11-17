@@ -91,6 +91,21 @@ const DisplayResearchInfo = () => {
                 : ""
             );
 
+            // Also fetch the programs for the selected college
+            if (item.college_id) {
+              try {
+                const programsResponse = await axios.get(
+                  `/deptprogs/programs`,
+                  {
+                    params: { department: item.college_id },
+                  }
+                );
+                setPrograms(programsResponse.data.programs);
+              } catch (error) {
+                console.error("Error fetching programs:", error);
+              }
+            }
+
             // Set authors with proper format
             if (item.authors && Array.isArray(item.authors)) {
               const formattedAuthors = item.authors.map((author) => ({
@@ -156,6 +171,23 @@ const DisplayResearchInfo = () => {
   useEffect(() => {
     fetchColleges();
   }, []);
+
+  useEffect(() => {
+    const fetchProgramsForCollege = async () => {
+      if (selectedCollege) {
+        try {
+          const response = await axios.get(`/deptprogs/programs`, {
+            params: { department: selectedCollege },
+          });
+          setPrograms(response.data.programs);
+        } catch (error) {
+          console.error("Error fetching programs:", error);
+        }
+      }
+    };
+
+    fetchProgramsForCollege();
+  }, [selectedCollege]);
 
   const handleSaveDetails = () => {
     // Check if there are any changes by comparing the current state with initial data
@@ -474,7 +506,7 @@ const DisplayResearchInfo = () => {
                     >
                       <InputLabel>Program</InputLabel>
                       <Select
-                        value={selectedProgram}
+                        value={selectedProgram || ""}
                         onChange={(e) => setSelectedProgram(e.target.value)}
                       >
                         {programs.map((program) => (
