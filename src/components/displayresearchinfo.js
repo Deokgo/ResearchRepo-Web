@@ -13,7 +13,6 @@ import {
 } from "@mui/material";
 import FileUploader from "./FileUploader";
 import sdgGoalsData from "../data/sdgGoals.json";
-import Divider from "@mui/material/Divider";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Navbar from "./navbar";
@@ -90,6 +89,9 @@ const DisplayResearchInfo = () => {
                 ? new Date(item.date_approved).toISOString().split("T")[0]
                 : ""
             );
+
+            // Fetch file name
+            setFile(item.full_manuscript|| "")
 
             // Also fetch the programs for the selected college
             if (item.college_id) {
@@ -192,20 +194,22 @@ const DisplayResearchInfo = () => {
   const handleSaveDetails = () => {
     // Check if there are any changes by comparing the current state with initial data
     const hasChanges =
+      selectedCollege !== initialData?.college_id ||
+      selectedProgram !== initialData?.program_id ||
       title !== initialData?.title ||
-      groupCode !== initialData?.research_id ||
       abstract !== initialData?.abstract ||
       researchType !== initialData?.research_type ||
-      dateApproved !== initialData?.date_approved;
-    // include
-    //keywords.join(';') !== initialData?.keywords ||
-    //selectedSDGs.join(';') !== initialData?.sdg;
+      dateApproved !== initialData?.date_approved ||
+      keywords.join(';') !== initialData?.keywords ||
+      selectedSDGs.join(';') !== initialData?.sdg ||
+      adviser !== initialData?.adviser ||
+      panels.join(';') !== initialData?.panels ||
+      authors.join(';') !== initialData?.authors ||
+      file.join(';') !== initialData?.full_manuscript;
 
     if (!hasChanges) {
       alert("No changes are made");
     } else {
-      alert("Changes saved successfully!");
-      // Your save logic here
       updateResearchDetails();
     }
   };
@@ -276,7 +280,7 @@ const DisplayResearchInfo = () => {
 
       // Send the paper data
       const response = await axios.put(
-        `/paper/update_paper/${groupCode}`,
+        `/paper/update_paper/${research_id}`,
         formData,
         {
           headers: {
@@ -301,10 +305,6 @@ const DisplayResearchInfo = () => {
       }
     }
   };
-  // Mapping SDG IDs to full SDG objects
-  const selectedSDGObjects = selectedSDGs
-    .map((sdgId) => sdgGoalsData.sdgGoals.find((sdg) => sdg.id === sdgId))
-    .filter(Boolean); // Filter out any undefined values
 
   const fetchColleges = async () => {
     try {
@@ -335,14 +335,6 @@ const DisplayResearchInfo = () => {
     setSelectedCollege(selectedCollegeId);
     fetchProgramsByCollege(selectedCollegeId);
     setSelectedProgram("");
-  };
-
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0"); // Ensure two-digit month
-    const day = String(date.getDate()).padStart(2, "0"); // Ensure two-digit day
-    return `${year}-${month}-${day}`; // Return the formatted date as yyyy-MM-dd
   };
 
   const onSelectFileHandler = (e) => {
@@ -396,6 +388,32 @@ const DisplayResearchInfo = () => {
 
   const handleKeywordsChange = (event, newValue) => {
     setKeywords(newValue);
+  };
+
+  const handleViewManuscript = async () => {
+    if (research_id) {
+      try {
+        // Make the API request to get the PDF as a Blob kasi may proxy issue if directly window.open, so padaanin muna natin kay axios
+        const response = await axios.get(
+          `/paper/view_manuscript/${research_id}`,
+          {
+            responseType: "blob", // Get the response as a binary Blob (PDF)
+          }
+        );
+
+        // Create a URL for the Blob and open it in a new tab
+        const blob = new Blob([response.data], { type: "application/pdf" });
+        const url = window.URL.createObjectURL(blob);
+
+        // Open the PDF in a new tab
+        window.open(url, "_blank");
+      } catch (error) {
+        console.error("Error fetching the manuscript:", error);
+        alert("Failed to retrieve the manuscript. Please try again.");
+      }
+    } else {
+      alert("No manuscript available for this research.");
+    }
   };
 
   return (
@@ -456,7 +474,7 @@ const DisplayResearchInfo = () => {
             </Typography>
           </Box>
         </Box>
-        <Box sx={{ marginLeft: 15, marginRight: 15, padding: 4 }}>
+        <Box sx={{ marginLeft: 10, marginRight: 10, padding: 4 }}>
           {loading ? (
             <Typography>Loading research details...</Typography>
           ) : (
@@ -534,7 +552,7 @@ const DisplayResearchInfo = () => {
                         onChange={(e) => setResearchType(e.target.value)}
                       >
                         <MenuItem value='EXTRAMURAL'>EXTRAMURAL</MenuItem>
-                        <MenuItem value='INTRAMURAL'>INTRAMURAL</MenuItem>
+                        <MenuItem value='COLLEGE-DRIVEN'>COLLEGE-DRIVEN</MenuItem>
                         <MenuItem value='INTEGRATIVE'>INTEGRATIVE</MenuItem>
                       </Select>
                     </FormControl>
@@ -659,24 +677,58 @@ const DisplayResearchInfo = () => {
                     disabled={isDisabled}
                   />
                 </Grid2>
-                <Grid2 size={6}>
-                  <Autocomplete
-                    multiple
-                    value={selectedSDGs}
-                    onChange={(event, newValue) => setSelectedSDGs(newValue)}
-                    options={sdgGoalsData.sdgGoals}
-                    getOptionLabel={(option) =>
-                      `${option.id} - ${option.title}`
-                    }
+                <Grid2 size={4}>
+                  <Typography variant='body1' sx={{ color: "#8B8B8B" }}>
+                    Full Manuscript:
+                  </Typography>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      border: "1px dashed #ccc",
+                      width: "25rem", 
+                      height: "5rem", 
+                      maxWidth: "25rem", 
+                      maxHeight: "5rem", 
+                      p: 3,
+                      cursor: "pointer",
+                      justifyContent: "center",
+                      gap: 2,
+                    }}
+                  >
+                    <FileUploader
+                      onSelectFile={onSelectFileHandler}
+                      onDeleteFile={onDeleteFileHandler}
+                      disabled={isDisabled}
+                    />
+                  </Box>
+                </Grid2>
+                <Grid2 size={2} display="flex" justifyContent="center">
+                  <Button 
+                    variant='contained'
+                    color='primary'
                     disabled={isDisabled}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        label='SDG Goals'
-                        variant='filled'
-                      />
-                    )}
-                  />
+                    sx={{
+                      backgroundColor: "#08397C",
+                      color: "#FFF",
+                      fontFamily: "Montserrat, sans-serif",
+                      fontWeight: 400,
+                      textTransform: "none",
+                      fontSize: { xs: "0.875rem", md: "1rem" },
+                      padding: { xs: "0.5rem 1rem", md: "1rem" },
+                      marginTop: "2.5rem",
+                      width: "13rem",
+                      borderRadius: "100px",
+                      maxHeight: "3rem",
+                      "&:hover": {
+                        backgroundColor: "#052045",
+                        color: "#FFF",
+                      },
+                    }}
+                    onClick={handleViewManuscript}
+                  >
+                    View Manuscript
+                  </Button>
                 </Grid2>
                 <Grid2 size={6}>
                   <Autocomplete
@@ -696,35 +748,71 @@ const DisplayResearchInfo = () => {
                   />
                 </Grid2>
                 <Grid2 size={6}>
-                  <FileUploader
-                    onSelectFile={onSelectFileHandler}
-                    onDeleteFile={onDeleteFileHandler}
+                  <Autocomplete
+                    multiple
+                    value={selectedSDGs}
+                    onChange={(event, newValue) => setSelectedSDGs(newValue)}
+                    options={sdgGoalsData.sdgGoals}
+                    getOptionLabel={(option) =>
+                      `${option.id} - ${option.title}`
+                    }
                     disabled={isDisabled}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label='SDG Goals'
+                        variant='filled'
+                      />
+                    )}
                   />
                 </Grid2>
               </Grid2>
               <Box
                 sx={{ display: "flex", justifyContent: "flex-start", mt: 2 }}
               >
-                <Button
-                  variant='contained'
+                <Button 
+                  variant='contained' 
+                  color='primary' 
+                  sx={{ 
+                    backgroundColor: "#08397C", 
+                    color: "#FFF", 
+                    fontFamily: "Montserrat, sans-serif", 
+                    fontWeight: 600, 
+                    textTransform: "none", 
+                    fontSize: { xs: "0.875rem", md: "1.275rem" }, 
+                    width: "10rem", 
+                    alignSelf: "center", 
+                    borderRadius: "100px", 
+                    maxHeight: "3rem", 
+                    "&:hover": { 
+                      backgroundColor: "#052045", 
+                      color: "#FFF" } 
+                  }} 
                   onClick={editDetails}
-                  sx={{
-                    backgroundColor: "#08397C",
-                    "&:hover": { backgroundColor: "#072d61" },
-                  }}
                 >
                   {isLabel}
                 </Button>
                 {isVisible && (
-                  <Button
-                    variant='contained'
+                  <Button 
+                    variant='contained' 
+                    color='primary' 
+                    sx={{ 
+                      backgroundColor: "#d40821", 
+                      color: "#FFF", 
+                      fontFamily: "Montserrat, sans-serif", 
+                      fontWeight: 600, 
+                      textTransform: "none", 
+                      fontSize: { xs: "0.875rem", md: "1.275rem" }, 
+                      width: "12rem", 
+                      alignSelf: "center", 
+                      borderRadius: "100px", 
+                      maxHeight: "3rem", 
+                      ml: 2, 
+                      "&:hover": { 
+                        backgroundColor: "#8a0b14", 
+                        color: "#FFF" } 
+                    }} 
                     onClick={handleSaveDetails}
-                    sx={{
-                      marginLeft: 2,
-                      backgroundColor: "#08397C",
-                      "&:hover": { backgroundColor: "#072d61" },
-                    }}
                   >
                     Save Changes
                   </Button>

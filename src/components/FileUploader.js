@@ -3,6 +3,40 @@ import React, { useRef, useState } from "react";
 import AttachmentIcon from "@mui/icons-material/Attachment";
 import DeleteIcon from "@mui/icons-material/Delete";
 
+// Add styles
+const styles = {
+  fileUploader: {
+    width: '100%',
+    maxWidth: '500px', // Adjust this value as needed
+  },
+  fileDiv: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderRadius: '4px',
+    padding: '8px',
+    '&.disabled': {
+      backgroundColor: '#f5f5f5',
+      cursor: 'not-allowed',
+    },
+  },
+  attachmentButton: {
+    display: 'flex',
+    alignItems: 'center',
+    textTransform: 'none',
+    flex: 1,
+  },
+  fileName: {
+    marginLeft: '8px',
+    maxWidth: '300px', // Adjust this value as needed
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+    fontSize: '0.90rem',        // Default font size
+    fontWeight: 700, 
+  },
+};
+
 function FileUploader(props) {
   const { accept, onSelectFile, onDeleteFile, disabled } = props;
   const hiddenFileInput = useRef(null);
@@ -24,10 +58,10 @@ function FileUploader(props) {
   };
 
   return (
-    <div className="file-uploader">
-      <div className={`file-div ${disabled && "disabled"}`}>
+    <Box sx={styles.fileUploader}>
+      <Box sx={styles.fileDiv} className={disabled ? 'disabled' : ''}>
         <Button
-          className="attachment-icon"
+          sx={styles.attachmentButton}
           onClick={handleClick}
           disabled={disabled}
         >
@@ -42,9 +76,9 @@ function FileUploader(props) {
             disabled={disabled}
             data-testid="file-upload-input"
           />
-          <div className="file-name">
-            {file ? <div>{file?.name}</div> : <div>Choose file</div>}
-          </div>
+          <Box sx={styles.fileName}>
+            {file ? file.name : 'CHOOSE FILE'}
+          </Box>
         </Button>
         <IconButton
           aria-label="delete"
@@ -54,8 +88,8 @@ function FileUploader(props) {
         >
           <DeleteIcon />
         </IconButton>
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
 }
 
