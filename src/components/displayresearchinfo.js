@@ -443,7 +443,11 @@ const DisplayResearchInfo = () => {
                 </Grid2>
                 <Grid2 size={3}>
                   <Box sx={{ height: "100%" }}>
-                    <FormControl fullWidth variant='filled' disabled={true}>
+                    <FormControl
+                      fullWidth
+                      variant='filled'
+                      disabled={isDisabled}
+                    >
                       <InputLabel>Department</InputLabel>
                       <Select
                         value={selectedCollege}
@@ -463,7 +467,11 @@ const DisplayResearchInfo = () => {
                 </Grid2>
                 <Grid2 size={3}>
                   <Box sx={{ height: "100%" }}>
-                    <FormControl fullWidth variant='filled' disabled={true}>
+                    <FormControl
+                      fullWidth
+                      variant='filled'
+                      disabled={isDisabled}
+                    >
                       <InputLabel>Program</InputLabel>
                       <Select
                         value={selectedProgram}
@@ -483,7 +491,11 @@ const DisplayResearchInfo = () => {
                 </Grid2>
                 <Grid2 size={2}>
                   <Box sx={{ height: "100%" }}>
-                    <FormControl fullWidth variant='filled' disabled={true}>
+                    <FormControl
+                      fullWidth
+                      variant='filled'
+                      disabled={isDisabled}
+                    >
                       <InputLabel>Research Type</InputLabel>
                       <Select
                         value={researchType}
@@ -505,7 +517,7 @@ const DisplayResearchInfo = () => {
                       variant='filled'
                       value={dateApproved}
                       onChange={(e) => setDateApproved(e.target.value)}
-                      disabled={true}
+                      disabled={isDisabled}
                       InputLabelProps={{ shrink: true }}
                     />
                   </Box>
@@ -525,7 +537,7 @@ const DisplayResearchInfo = () => {
                       getOptionLabel={(option) =>
                         option ? `${option.name} (${option.email})` : ""
                       }
-                      disabled={true}
+                      disabled={isDisabled}
                       renderInput={(params) => (
                         <TextField
                           {...params}
@@ -552,7 +564,7 @@ const DisplayResearchInfo = () => {
                       getOptionLabel={(option) =>
                         option ? `${option.name} (${option.email})` : ""
                       }
-                      disabled={true}
+                      disabled={isDisabled}
                       renderInput={(params) => (
                         <TextField
                           {...params}
@@ -580,7 +592,7 @@ const DisplayResearchInfo = () => {
                       getOptionLabel={(option) =>
                         option ? `${option.name} (${option.email})` : ""
                       }
-                      disabled={true}
+                      disabled={isDisabled}
                       renderInput={(params) => (
                         <TextField
                           {...params}
@@ -600,7 +612,7 @@ const DisplayResearchInfo = () => {
                     variant='filled'
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    disabled={true}
+                    disabled={isDisabled}
                   />
                 </Grid2>
                 <Grid2 size={6}>
@@ -612,7 +624,7 @@ const DisplayResearchInfo = () => {
                     rows={4}
                     value={abstract}
                     onChange={(e) => setAbstract(e.target.value)}
-                    disabled={true}
+                    disabled={isDisabled}
                   />
                 </Grid2>
                 <Grid2 size={6}>
@@ -624,7 +636,7 @@ const DisplayResearchInfo = () => {
                     getOptionLabel={(option) =>
                       `${option.id} - ${option.title}`
                     }
-                    disabled={true}
+                    disabled={isDisabled}
                     renderInput={(params) => (
                       <TextField
                         {...params}
@@ -641,7 +653,7 @@ const DisplayResearchInfo = () => {
                     value={keywords}
                     onChange={handleKeywordsChange}
                     options={[]}
-                    disabled={true}
+                    disabled={isDisabled}
                     renderInput={(params) => (
                       <TextField
                         {...params}
@@ -655,7 +667,7 @@ const DisplayResearchInfo = () => {
                   <FileUploader
                     onSelectFile={onSelectFileHandler}
                     onDeleteFile={onDeleteFileHandler}
-                    disabled={true}
+                    disabled={isDisabled}
                   />
                 </Grid2>
               </Grid2>
