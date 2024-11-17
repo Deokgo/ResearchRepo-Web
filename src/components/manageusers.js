@@ -13,6 +13,10 @@ import {
   Select,
   TextField,
   Typography,
+  FormControlLabel,
+  Radio,
+  RadioGroup,
+  FormLabel,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import homeBg from "../assets/home_bg.png";
@@ -30,7 +34,19 @@ const ManageUsers = () => {
   const [openModal, setOpenModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [newRole, setNewRole] = useState("");
+  const [roles, setRoles] = useState([]); 
+  const [accountStatus, setAccountStatus] = useState("");
+
   useEffect(() => {
+    const fetchRoles = async () => {
+      try {
+        const response = await axios.get(`/accounts/fetch_roles`);
+        setRoles(response.data.roles);
+      } catch (error) {
+        console.error("Error fetching roles:", error);
+      }
+    };
+  
     const fetchUsers = async () => {
       try {
         const response = await axios.get("/accounts/users");
@@ -43,7 +59,8 @@ const ManageUsers = () => {
         setLoading(false);
       }
     };
-
+  
+    fetchRoles(); // Call fetchRoles here
     fetchUsers();
   }, []);
 
@@ -60,9 +77,11 @@ const ManageUsers = () => {
   };
   const handleOpenModal = (user) => {
     setSelectedUser(user);
-    setNewRole(user.role);
+    setNewRole(user.role); // Set the newRole state with the selected user's role
+    setAccountStatus(user.acc_status); // Set account status for the selected user
     setOpenModal(true);
   };
+  
 
   const handleCloseModal = () => {
     setOpenModal(false);
@@ -295,17 +314,37 @@ const ManageUsers = () => {
                     fullWidth
                     margin='normal'
                   />
-                  <FormControl fullWidth margin='normal'>
+                  <FormControl fullWidth margin="normal">
                     <InputLabel>Role</InputLabel>
                     <Select
-                      value={newRole}
-                      onChange={(e) => setNewRole(e.target.value)}
-                      label='Role'
+                      value={newRole} // Bind to newRole state
+                      onChange={(e) => setNewRole(e.target.value)} // Update newRole when selection changes
+                      label="Role"
                     >
-                      <MenuItem value='Admin'>Admin</MenuItem>
-                      <MenuItem value='Researcher'>Researcher</MenuItem>
-                      <MenuItem value='Viewer'>Viewer</MenuItem>
+                      {roles.map((role) => (
+                        <MenuItem key={role.id} value={role.role_name}>
+                          {role.role_name}
+                        </MenuItem>
+                      ))}
                     </Select>
+                  </FormControl>
+                  <FormControl component='fieldset' margin='normal'>
+                    <FormLabel component='legend'>Account Status</FormLabel>
+                    <RadioGroup
+                      value={selectedUser.acc_status}
+                      onChange={(e) => setAccountStatus(e.target.value)}
+                    >
+                      <FormControlLabel
+                        value='ACTIVATED'
+                        control={<Radio />}
+                        label='Activated'
+                      />
+                      <FormControlLabel
+                        value='DEACTIVATED'
+                        control={<Radio />}
+                        label='Deactivated'
+                      />
+                    </RadioGroup>
                   </FormControl>
                   <Box
                     sx={{
