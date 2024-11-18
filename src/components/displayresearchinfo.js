@@ -576,6 +576,7 @@ const DisplayResearchInfo = () => {
                   <Box sx={{ height: "100%" }}>
                     <Autocomplete
                       multiple
+                      options={authorOptions}
                       value={authors}
                       onChange={(event, newValue) => setAuthors(newValue)}
                       inputValue={authorInputValue}
@@ -583,9 +584,10 @@ const DisplayResearchInfo = () => {
                         setAuthorInputValue(newInputValue);
                         handleAuthorSearch(newInputValue);
                       }}
-                      options={authorOptions}
                       getOptionLabel={(option) =>
-                        option ? `${option.name} (${option.email})` : ""
+                        `${option.first_name || ""} ${option.last_name || ""} (${
+                          option.email || ""
+                        })`
                       }
                       disabled={isDisabled}
                       renderInput={(params) => (
@@ -594,6 +596,7 @@ const DisplayResearchInfo = () => {
                           label='Authors'
                           variant='filled'
                           sx={{ height: "100%" }}
+                          helperText='Type at least 3 characters to search and select author/s'
                         />
                       )}
                       sx={{ height: "100%" }}
@@ -612,7 +615,9 @@ const DisplayResearchInfo = () => {
                       }}
                       options={adviserOptions}
                       getOptionLabel={(option) =>
-                        option ? `${option.name} (${option.email})` : ""
+                        `${option.first_name || ""} ${option.last_name || ""} (${
+                          option.email || ""
+                        })`
                       }
                       disabled={isDisabled}
                       renderInput={(params) => (
@@ -621,6 +626,7 @@ const DisplayResearchInfo = () => {
                           label='Adviser'
                           variant='filled'
                           sx={{ height: "100%" }}
+                          helperText='Type at least 3 characters to search for an adviser'
                         />
                       )}
                       sx={{ height: "100%" }}
@@ -640,7 +646,9 @@ const DisplayResearchInfo = () => {
                       }}
                       options={panelOptions}
                       getOptionLabel={(option) =>
-                        option ? `${option.name} (${option.email})` : ""
+                        `${option.first_name || ""} ${option.last_name || ""} (${
+                          option.email || ""
+                        })`
                       }
                       disabled={isDisabled}
                       renderInput={(params) => (
@@ -649,7 +657,8 @@ const DisplayResearchInfo = () => {
                           label='Panel Members'
                           variant='filled'
                           sx={{ height: "100%" }}
-                        />
+                          helperText='Type at least 3 characters to search and select multiple panel members'
+                          />
                       )}
                       sx={{ height: "100%" }}
                     />
@@ -743,7 +752,8 @@ const DisplayResearchInfo = () => {
                         {...params}
                         label='Keywords'
                         variant='filled'
-                      />
+                        helperText='Type and press Enter to add multiple keywords'
+                        />
                     )}
                   />
                 </Grid2>
@@ -753,16 +763,15 @@ const DisplayResearchInfo = () => {
                     value={selectedSDGs}
                     onChange={(event, newValue) => setSelectedSDGs(newValue)}
                     options={sdgGoalsData.sdgGoals}
-                    getOptionLabel={(option) =>
-                      `${option.id} - ${option.title}`
-                    }
+                    getOptionLabel={(option) => `${option.id} - ${option.title}`}
                     disabled={isDisabled}
                     renderInput={(params) => (
                       <TextField
                         {...params}
                         label='SDG Goals'
                         variant='filled'
-                      />
+                        helperText='Select one or more SDG goals'
+                        />
                     )}
                   />
                 </Grid2>
