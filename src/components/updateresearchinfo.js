@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "./navbar";
 import DynamicTimeline from "./Timeline";
+import StatusUpdateButton from "./StatusUpdateButton";
+import { CircularProgress } from "@mui/material";
 import {
   Box,
   Button,
@@ -64,6 +66,7 @@ const UpdateResearchInfo = ({route,navigate}) => {
       setSingleCity(""); // Reset city when country changes
     }
   };
+
 
   useEffect(() => {
     fetchCountries();
@@ -157,6 +160,52 @@ const UpdateResearchInfo = ({route,navigate}) => {
       alert("No manuscript available for this research.");
     }
   };
+  
+  const [status, setStatus] = useState(null);
+  const [error, setError] = useState(null);
+  const [isButtonDisabled, setIsButtonDisabled] = useState(false);
+  const [refreshTimeline, setRefreshTimeline] = useState(false); // Track refresh state
+
+  useEffect(() => {
+    const fetchStatus = async () => {
+      try {
+        const response = await axios.get(`/track/next_status/${id}`); // Replace with your API endpoint
+        console.log("API Response:", response.data);  // Log the raw response (string)
+        
+        setStatus(response.data);  // Directly set the response if it's a string
+      } catch (err) {
+        console.error(err);
+        setError("Failed to fetch status.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStatus();
+  }, []);
+
+  useEffect(() => {
+    // Disable the button if the status is "PUBLISHED" or "PULLED OUT"
+    if (status === "COMPLETED" || status === "PULLOUT" || status === "READY") {
+      setIsButtonDisabled(true);
+    } else {
+      setIsButtonDisabled(false);
+    }
+  }, [status]);
+  // Handle status update and refresh timeline
+  const handleStatusUpdate = async (newStatus) => {
+    try {
+      await axios.post(`/track/research_status/${id}`, { status: newStatus });
+      setStatus(newStatus); // Update the status
+      setRefreshTimeline((prev) => !prev); // Trigger re-fetch of timeline data
+    } catch (err) {
+      console.error(err);
+      setError("Failed to update status.");
+    }
+  };
+
+  
+
 
   return (
     <>
@@ -662,6 +711,7 @@ const UpdateResearchInfo = ({route,navigate}) => {
                       >
                         <DynamicTimeline
                           researchId={id}
+                          refresh={refreshTimeline} 
                           sx={{
                             alignItems: "flex-start", // Align items to the start
                             "& .MuiTimelineContent-root": {
@@ -670,30 +720,20 @@ const UpdateResearchInfo = ({route,navigate}) => {
                           }}
                         />
                       </Box>
-
-                      <Button
-                        variant="contained"
-                        color="primary"
-                        sx={{
-                          backgroundColor: "#d40821",
-                          color: "#FFF",
-                          fontFamily: "Montserrat, sans-serif",
-                          fontWeight: 600,
-                          textTransform: "none",
-                          fontSize: { xs: "0.875rem", md: "1.275rem" },
-                          padding: { xs: "0.5rem 1rem", md: "1.5rem" },
-                          marginTop: "1rem",
-                          width: "auto",
-                          borderRadius: "100px",
-                          maxHeight: "3rem",
-                          "&:hover": {
-                            backgroundColor: "#A30417",
-                            color: "#FFF",
-                          },
-                        }}
-                      >
-                        Update Status to: Accepted
-                      </Button>
+                      {loading ? (
+                            <CircularProgress />
+                          ) : error ? (
+                            <div style={{ color: "red" }}>{error}</div>
+                          ) : (
+                            status && (
+                              <StatusUpdateButton
+                                apiUrl={`/track/research_status/${id}`} // Make sure this endpoint is correct for status update
+                                statusToUpdate={status}
+                                disabled={isButtonDisabled}  // Disable the button based on the status
+                                onStatusUpdate={handleStatusUpdate}
+                              />
+                            )
+                          )}
                     </Grid2>
 
                 </Grid2>

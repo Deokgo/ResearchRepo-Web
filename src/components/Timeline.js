@@ -7,12 +7,12 @@ import TimelineContent from "@mui/lab/TimelineContent";
 import TimelineDot from "@mui/lab/TimelineDot";
 import { Box } from "@mui/material";
 
-export default function DynamicTimeline({ researchId }) {
+export default function DynamicTimeline({ researchId, refresh }) {
   const [events, setEvents] = useState([]); // Initialize as an empty array
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch data from the API
+  // Fetch data from the API whenever researchId or refresh changes
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -33,8 +33,9 @@ export default function DynamicTimeline({ researchId }) {
       }
     };
 
+    // Call fetchData whenever the `refresh` or `researchId` changes
     fetchData();
-  }, [researchId]); // Re-run when researchId changes
+  }, [researchId, refresh]); // Re-run when researchId or refresh changes
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
@@ -42,7 +43,7 @@ export default function DynamicTimeline({ researchId }) {
   // Render the Timeline component when data is available
   return (
     <Box sx={{ width: "100%", margin: "" }}>
-      <Timeline sx={{ paddingLeft: "15%" ,"& .MuiTimelineItem-root:before": { display: "none" },}}>
+      <Timeline sx={{ paddingLeft: "15%", "& .MuiTimelineItem-root:before": { display: "none" } }}>
         {events.length === 0 ? (
           <TimelineItem>
             <TimelineContent>No events found</TimelineContent>
