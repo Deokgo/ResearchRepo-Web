@@ -36,6 +36,7 @@ const ManageUsers = () => {
   const [newRole, setNewRole] = useState("");
   const [roles, setRoles] = useState([]); 
   const [accountStatus, setAccountStatus] = useState("");
+  const [initialData, setInitialData] = useState(null);
 
   useEffect(() => {
     const fetchRoles = async () => {
@@ -77,25 +78,82 @@ const ManageUsers = () => {
   };
   const handleOpenModal = (user) => {
     setSelectedUser(user);
-    setNewRole(user.role); // Set the newRole state with the selected user's role
+
+    // Set the initial data for comparison in handleSaveChanges
+    setInitialData({
+      role_name: user.role_name, 
+      accountStatus: user.acc_status,
+    });
+  
+    // Find and set the role_id for the selected user
+    const matchingRole = roles.find((role_id) => role_id.role_name === user.role_name);
+    if (matchingRole) {
+      setNewRole(matchingRole.role_id); // Set the newRole state with the role_id
+    } else {
+      setNewRole(""); // Fallback in case no matching role is found
+    }
+
+    console.log("Selected User:", user);
+    console.log("Matching Role (if found):", matchingRole);
+  
     setAccountStatus(user.acc_status); // Set account status for the selected user
     setOpenModal(true);
   };
-  
 
   const handleCloseModal = () => {
     setOpenModal(false);
     setSelectedUser(null);
   };
 
-  const handleSaveChanges = () => {
-    console.log(
-      "Saving changes for:",
-      selectedUser.researcher_id,
-      "New Role:",
-      newRole
-    );
-    setOpenModal(false);
+   // Function to get role by role_id
+  const getRoleById = (roleId) => {
+    return roles.find(role => role.role_id === roleId);
+  };
+
+  const handleSaveChanges = async () => {
+    const newRoleName = getRoleById(newRole);
+    console.log("newRoleName:", newRoleName.role_name);
+
+    const hasChanges =
+      newRoleName.role_name !== initialData?.role_name ||
+      accountStatus !== initialData?.accountStatus;
+
+    if (!hasChanges) {
+      alert("No changes are made");
+    } else {
+      updateChanges();
+    }
+    
+  };   
+
+  const updateChanges = async () => {
+    try {
+      await axios.put(`/accounts/update_acc/${selectedUser.researcher_id}`, {
+        role_id: newRole, // Corrected key to 'role_id'
+        acc_status: accountStatus,
+      });
+      
+      const selectedRole = roles.find(role => role.role_id === newRole);
+      const roleName = selectedRole ? selectedRole.role_name : "N/A";  // Default to "N/A" if not found
+      console.log("Selected Role Name: ", roleName);  
+
+      // Update users state to reflect changes without re-fetching
+      const updatedUsers = users.map((user) =>
+        user.researcher_id === selectedUser.researcher_id
+          ? { ...user, role_name: roleName, acc_status: accountStatus }
+          : user
+      );
+  
+      // Update the state to trigger a re-render
+      setUsers(updatedUsers);
+      setFilteredUsers(updatedUsers);
+  
+      console.log("New Role ID: ", newRole); // Optional for debugging
+    } catch (error) {
+      console.error("Error saving changes:", error);
+    } finally {
+      setOpenModal(false);
+    }
   };
 
   return (
@@ -262,7 +320,7 @@ const ManageUsers = () => {
                       >
                         <Box sx={{ flex: 1 }}>{user.researcher_id}</Box>
                         <Box sx={{ flex: 2 }}>{user.email}</Box>
-                        <Box sx={{ flex: 1 }}>{user.role || "N/A"}</Box>
+                        <Box sx={{ flex: 1 }}>{user.role_name || "N/A"}</Box>
                         <Box sx={{ flex: 1 }}>
                           <Button
                             variant='text'
@@ -317,35 +375,35 @@ const ManageUsers = () => {
                   <FormControl fullWidth margin="normal">
                     <InputLabel>Role</InputLabel>
                     <Select
-                      value={newRole} // Bind to newRole state
-                      onChange={(e) => setNewRole(e.target.value)} // Update newRole when selection changes
+                      value={newRole} // This should hold role_id
+                      onChange={(e) => setNewRole(e.target.value)} // Update newRole with role_id
                       label="Role"
                     >
                       {roles.map((role) => (
-                        <MenuItem key={role.id} value={role.role_name}>
-                          {role.role_name}
+                        <MenuItem key={role.role_id} value={role.role_id}> {/* Value is role_id */}
+                          {role.role_name}  {/* Display role_name */}
                         </MenuItem>
                       ))}
                     </Select>
                   </FormControl>
                   <FormControl component='fieldset' margin='normal'>
-                    <FormLabel component='legend'>Account Status</FormLabel>
-                    <RadioGroup
-                      value={selectedUser.acc_status}
-                      onChange={(e) => setAccountStatus(e.target.value)}
-                    >
-                      <FormControlLabel
-                        value='ACTIVATED'
-                        control={<Radio />}
-                        label='Activated'
-                      />
-                      <FormControlLabel
-                        value='DEACTIVATED'
-                        control={<Radio />}
-                        label='Deactivated'
-                      />
-                    </RadioGroup>
-                  </FormControl>
+                  <FormLabel component='legend'>Account Status</FormLabel>
+                  <RadioGroup
+                    value={accountStatus}  // Use state variable here
+                    onChange={(e) => setAccountStatus(e.target.value)}
+                  >
+                    <FormControlLabel
+                      value='ACTIVATED'
+                      control={<Radio />}
+                      label='Activated'
+                    />
+                    <FormControlLabel
+                      value='DEACTIVATED'
+                      control={<Radio />}
+                      label='Deactivated'
+                    />
+                  </RadioGroup>
+                </FormControl>
                   <Box
                     sx={{
                       display: "flex",
