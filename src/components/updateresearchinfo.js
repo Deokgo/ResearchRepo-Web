@@ -197,7 +197,7 @@ const UpdateResearchInfo = ({route,navigate}) => {
                                 border: "2px solid #0A438F",
                                 marginLeft: 10,
                                 marginRight: 5,
-                                padding: 3,
+                                padding: 4,
                                 display: "flex",
                                 flexDirection: "column",
                                 height: "auto",
@@ -211,7 +211,7 @@ const UpdateResearchInfo = ({route,navigate}) => {
                                     justifyContent: "center",
                                 }}
                                 >
-                                <Typography variant='body1' padding={1} sx={{ color: "#08397C" }}>Research Output Details:</Typography>                               
+                                <Typography variant='body1' padding={1} sx={{ color: "#d40821" }}>Research Output Details:</Typography>                               
                                     <Grid2 container spacing={{ xs: 0, md: 3 }} sx={{ mb: "1rem" }}>   
                                       {data && data.dataset && data.dataset.length > 0 ? (
                                         data.dataset.map((item, index) => (                            
@@ -234,7 +234,26 @@ const UpdateResearchInfo = ({route,navigate}) => {
                                           </Typography>
                                           <Typography variant='body1' sx={{ mb: "1rem" }}>
                                             <strong>Authors:</strong>{" "}
-                                            {item.concatenated_authors}
+                                            {Array.isArray(item.authors)
+                                              ? item.authors
+                                                  .map((author) => `${author.name} (${author.email})`)
+                                                  .join("; ")
+                                              : "No authors available"}
+                                          </Typography>
+                                          <Typography variant='body1' sx={{ mb: "1rem" }}>
+                                            <strong>Adviser:</strong>{" "}
+                                            {item.adviser
+                                              ? `${item.adviser.name} (${item.adviser.email})`
+                                              : "No adviser available"}
+                                          </Typography>
+                                          <Typography variant='body1' sx={{ mb: "1rem" }}>
+                                            <strong>Panel Members:</strong>{" "}
+                                            {Array.isArray(item.panels) &&
+                                            item.panels.length > 0
+                                              ? item.panels
+                                                  .map((panel) => `${panel.name} (${panel.email})`)
+                                                  .join("; ")
+                                              : "No panel members available"}
                                           </Typography>
                                           <Typography variant='body1' sx={{ mb: "1rem" }}>
                                             <strong>Abstract:</strong>{" "}
@@ -242,8 +261,9 @@ const UpdateResearchInfo = ({route,navigate}) => {
                                           </Typography>
                                           <Typography variant='body1' sx={{ mb: "1rem" }}>
                                             <strong>Keywords:</strong>{" "}
-                                            {item.concatenated_keywords ||
-                                              "No keywords available"}
+                                            {Array.isArray(item.keywords)
+                                              ? item.keywords.join("; ")
+                                              : "No keywords available"}
                                           </Typography>
                                           <Typography variant='body1' sx={{ mb: "1rem" }}>
                                             <strong>Journal:</strong>{" "}
@@ -278,6 +298,7 @@ const UpdateResearchInfo = ({route,navigate}) => {
                                               fontSize: { xs: "0.875rem", md: "1rem" },
                                               padding: { xs: "0.5rem 1rem", md: "1rem" },
                                               marginTop: "1rem",
+                                              marginBottom: "1rem",
                                               width: "13rem",
                                               borderRadius: "100px",
                                               maxHeight: "3rem",
@@ -299,7 +320,7 @@ const UpdateResearchInfo = ({route,navigate}) => {
                                     )}    
                                     </Grid2> 
                                 <Divider orientation='horizontal' flexItem />
-                                <Typography variant='body1' padding={1} sx={{ color: "#08397C" }}>Publication:</Typography>
+                                <Typography variant='body1' padding={1} sx={{ color: "#d40821" }}>Publication:</Typography>
                                 <Grid2 container padding={1} spacing={{ xs: 0, md: 3 }}>
                                     <Grid2 item size={{ xs: 12, md: 3 }}>
                                     <TextField
@@ -366,65 +387,79 @@ const UpdateResearchInfo = ({route,navigate}) => {
                                     </Grid2>
                                 </Grid2>
                                 <Divider orientation='horizontal' flexItem />
-                                <Typography variant='body1' padding={1} sx={{ color: "#08397C" }}>Conference:</Typography>
+                                <Typography variant='body1' padding={1} sx={{ color: "#d40821" }}>Conference:</Typography>
                                 <Grid2 container paddingLeft={1} spacing={{ xs: 0, md: 3 }}>
+                                  <Grid2 item size={{ xs: 12, md: 6 }}>
+                                  <TextField
+                                      fullWidth
+                                      label='Title'
+                                      name='publicationName'
+                                      value={null}
+                                      onChange={null}
+                                      margin='normal'
+                                      variant='outlined'
+                                  ></TextField>
+                                  </Grid2>
+                                  <Grid2 item size={{ xs: 12, md: 3 }}>
+                                  <TextField
+                                      fullWidth
+                                      label='Venue'
+                                      name='publicationFormat'
+                                      value={null}
+                                      onChange={null}
+                                      margin='normal'
+                                      variant='outlined'
+                                  ></TextField>
+                                  </Grid2>
+                                  <Grid2 item size={{ xs: 12, md: 3 }}>
+                                  <TextField 
+                                      fullWidth
+                                      label='Date'
+                                      name='data'
+                                      value={null}
+                                      onChange={null}
+                                      margin='normal'
+                                      variant='outlined' 
+                                  ></TextField>
+                                  </Grid2>
                                   <Grid2 item size={{ xs: 12, md: 12 }}>
+                                    <Box
+                                      sx={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        border: "1px dashed #ccc",
+                                        width: "25rem",
+                                        height: "3rem",
+                                        maxWidth: "25rem",
+                                        maxHeight: "3rem",
+                                        p: 3,
+                                        cursor: "pointer",
+                                        justifyContent: "center",
+                                        gap: 2,
+                                      }}
+                                    >
                                       <Button 
                                         variant='text'
                                         color='primary'
                                         sx={{
-                                          color: "#d4041d",
+                                          color: "#08397C",
                                           fontFamily: "Montserrat, sans-serif",
                                           fontWeight: 400,
                                           textTransform: "none",
                                           fontSize: { xs: "0.875rem", md: "1rem" },
                                           width: "13rem",
-                                          marginTop: "1rem",
                                           alignSelf: "center",
                                           borderRadius: "100px",
                                           maxHeight: "3rem",
                                           "&:hover": {
-                                            color: "#A30417",
+                                            color: "#052045",
                                           },
                                         }}
                                       >
                                         + Add Conference
                                       </Button>
+                                    </Box>
                                   </Grid2>
-                                    
-                                    <Grid2 item size={{ xs: 12, md: 6 }}>
-                                    <TextField
-                                        fullWidth
-                                        label='Title'
-                                        name='publicationName'
-                                        value={null}
-                                        onChange={null}
-                                        margin='normal'
-                                        variant='outlined'
-                                    ></TextField>
-                                    </Grid2>
-                                    <Grid2 item size={{ xs: 12, md: 3 }}>
-                                    <TextField
-                                        fullWidth
-                                        label='Venue'
-                                        name='publicationFormat'
-                                        value={null}
-                                        onChange={null}
-                                        margin='normal'
-                                        variant='outlined'
-                                    ></TextField>
-                                    </Grid2>
-                                    <Grid2 item size={{ xs: 12, md: 3 }}>
-                                    <TextField 
-                                        fullWidth
-                                        label='Date'
-                                        name='data'
-                                        value={null}
-                                        onChange={null}
-                                        margin='normal'
-                                        variant='outlined' 
-                                    ></TextField>
-                                    </Grid2>
                                 </Grid2>
                                 <Box
                                     sx={{
@@ -462,6 +497,8 @@ const UpdateResearchInfo = ({route,navigate}) => {
                             </form>
                         </Box>
                     </Grid2>
+
+                    
 
                     {/* Right-side Timeline Section*/}
                     <Grid2 sx={{ display: "flex", flexDirection: "column", height: "100%"}} size={3}>

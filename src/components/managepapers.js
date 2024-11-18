@@ -326,14 +326,14 @@ const ManagePapers = () => {
           <Box
             sx={{
               flex: 1,
-              padding: 2,
+              padding: 5,
               overflow: "hidden",
               height: "calc(100% - 48px)",
             }}
           >
             <Grid2
               container
-              spacing={2}
+              spacing={4}
               sx={{
                 height: "100%",
                 flexWrap: "nowrap",
@@ -345,7 +345,7 @@ const ManagePapers = () => {
                     border: "2px solid #0A438F",
                     height: "100%",
                     borderRadius: 3,
-                    padding: 2,
+                    padding: 3,
                     overflow: "hidden",
                     display: "flex",
                     flexDirection: "column",
@@ -353,26 +353,62 @@ const ManagePapers = () => {
                 >
                   <Typography
                     variant='h6'
-                    sx={{ mb: 2, fontWeight: "bold", color: "#F40824" }}
+                    sx={{ mb: 3, fontWeight: "bold", color: "#F40824" }}
                   >
                     Filters
                   </Typography>
-                  <Typography variant='body1' sx={{ mb: 1, color: "#08397C" }}>
+                  <Box sx={{ mb: 4 }}>
+                    <Typography
+                    variant='body1'
+                    sx={{
+                      mb: 2,
+                      color: "#08397C",
+                      position: "relative",
+                      zIndex: 2,
+                    }}
+                  >
                     Year Range:
                   </Typography>
-                  <Slider
-                    value={dateRange}
-                    onChange={handleDateRangeChange}
-                    valueLabelDisplay='on'
-                    min={2010}
-                    max={2024}
-                    sx={{ my: 3, width: "80%", alignSelf: "center" }}
-                  />
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      width: "100%",
+                      mt: 4,
+                    }}
+                    >
+                      <Slider
+                        value={dateRange}
+                        onChange={handleDateRangeChange}
+                        valueLabelDisplay='on'
+                        min={2010}
+                        max={2024}
+                        sx={{
+                          width: "90%",
+                          "& .MuiSlider-valueLabel": {
+                            backgroundColor: "#08397C",
+                          },
+                          "& .MuiSlider-rail": {
+                            backgroundColor: "#ccc",
+                          },
+                          "& .MuiSlider-track": {
+                            backgroundColor: "#08397C",
+                          },
+                          "& .MuiSlider-thumb": {
+                            backgroundColor: "#08397C",
+                          },
+                        }}
+                      />
+                    </Box>
+                  </Box>               
                   <Typography variant='body1' sx={{ mb: 1, color: "#08397C" }}>
                     College:
                   </Typography>
                   <Box
                     sx={{
+                      display: "flex",
+                      flexDirection: "column",
                       height: "25%",
                       overflowY: "auto",
                       mb: 2,
@@ -411,6 +447,8 @@ const ManagePapers = () => {
                   </Typography>
                   <Box
                     sx={{
+                      display: "flex",
+                      flexDirection: "column",
                       height: "30%",
                       overflowY: "auto",
                       mb: 2,
@@ -596,7 +634,7 @@ const ManagePapers = () => {
                           sx={{
                             display: "flex",
                             justifyContent: "center",
-                            py: 1,
+                            pt: 1,
                             backgroundColor: "#fff",
                             borderTop: "1px solid #eee",
                           }}

@@ -380,14 +380,14 @@ const DepartmentCollection = () => {
           <Box
             sx={{
               flex: 1,
-              padding: 2,
+              padding: 5,
               overflow: "hidden",
               height: "calc(100% - 48px)",
             }}
           >
             <Grid2
               container
-              spacing={2}
+              spacing={4}
               sx={{
                 height: "100%",
                 flexWrap: "nowrap",
@@ -400,7 +400,7 @@ const DepartmentCollection = () => {
                     border: "2px solid #0A438F",
                     height: "100%",
                     borderRadius: 3,
-                    padding: 2,
+                    padding: 3,
                     overflow: "hidden",
                     display: "flex",
                     flexDirection: "column",
@@ -462,6 +462,8 @@ const DepartmentCollection = () => {
                   </Typography>
                   <Box
                     sx={{
+                      display: "flex",
+                      flexDirection: "column",
                       height: "25%",
                       overflowY: "auto",
                       mb: 2,
@@ -499,6 +501,8 @@ const DepartmentCollection = () => {
                   </Typography>
                   <Box
                     sx={{
+                      display: "flex",
+                      flexDirection: "column",
                       height: "30%",
                       overflowY: "auto",
                       mb: 2,
@@ -531,27 +535,22 @@ const DepartmentCollection = () => {
                       />
                     ))}
                   </Box>
-                  <Box sx={{ mt: "auto" }}>
-                    <Typography
-                      variant='body1'
-                      sx={{ mb: 1, color: "#08397C" }}
-                    >
-                      Publication Format:
-                    </Typography>
-                    {["Journal", "Proceeding", "Unpublished"].map((format) => (
-                      <FormControlLabel
-                        key={format}
-                        control={
-                          <Checkbox
-                            checked={selectedFormats.includes(format)}
-                            onChange={handleFormatChange}
-                            value={format}
-                          />
-                        }
-                        label={format}
-                      />
-                    ))}
-                  </Box>
+                  <Typography variant='body1' sx={{ color: "#08397C" }}>
+                    Publication Format:
+                  </Typography>
+                  {["Journal", "Proceeding", "Unpublished"].map((format) => (
+                    <FormControlLabel
+                      key={format}
+                      control={
+                        <Checkbox
+                          checked={selectedFormats.includes(format)}
+                          onChange={handleFormatChange}
+                          value={format}
+                        />
+                      }
+                      label={format}
+                    />
+                  ))}
                 </Box>
               </Grid2>
 
@@ -756,6 +755,21 @@ const DepartmentCollection = () => {
                   : "No authors available"}
               </Typography>
               <Typography variant='body1' sx={{ mb: "1rem" }}>
+                <strong>Adviser:</strong>{" "}
+                {selectedResearchItem.adviser
+                  ? `${selectedResearchItem.adviser.name} (${selectedResearchItem.adviser.email})`
+                  : "No adviser available"}
+              </Typography>
+              <Typography variant='body1' sx={{ mb: "1rem" }}>
+                <strong>Panel Members:</strong>{" "}
+                {Array.isArray(selectedResearchItem.panels) &&
+                selectedResearchItem.panels.length > 0
+                  ? selectedResearchItem.panels
+                      .map((panel) => `${panel.name} (${panel.email})`)
+                      .join("; ")
+                  : "No panel members available"}
+              </Typography>
+              <Typography variant='body1' sx={{ mb: "1rem" }}>
                 <strong>Abstract:</strong>{" "}
                 {selectedResearchItem.abstract || "No abstract available"}
               </Typography>
@@ -784,21 +798,6 @@ const DepartmentCollection = () => {
               </Typography>
               <Typography variant='body1' sx={{ mb: "1rem" }}>
                 <strong>View Count:</strong> {selectedResearchItem.view_count}
-              </Typography>
-              <Typography variant='body1' sx={{ mb: "1rem" }}>
-                <strong>Adviser:</strong>{" "}
-                {selectedResearchItem.adviser
-                  ? `${selectedResearchItem.adviser.name} (${selectedResearchItem.adviser.email})`
-                  : "No adviser available"}
-              </Typography>
-              <Typography variant='body1' sx={{ mb: "1rem" }}>
-                <strong>Panel Members:</strong>{" "}
-                {Array.isArray(selectedResearchItem.panels) &&
-                selectedResearchItem.panels.length > 0
-                  ? selectedResearchItem.panels
-                      .map((panel) => `${panel.name} (${panel.email})`)
-                      .join("; ")
-                  : "No panel members available"}
               </Typography>
               <Button
                 variant='contained'
