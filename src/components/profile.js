@@ -94,6 +94,56 @@ const Profile = () => {
     setPasswordValues({ ...passwordValues, [name]: value });
   };
 
+  const handleSaveNewPassword = async () => {
+    const { currentPassword, newPassword, confirmPassword } = passwordValues;
+    const userId = getUserId();
+  
+    // Validate input fields
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      alert("All fields are required.");
+      return;
+    }
+  
+    if (newPassword !== confirmPassword) {
+      alert("Passwords do not match.");
+      return;
+    }
+  
+    try {
+      // Send request to the server
+      const response = await axios.put(`/accounts/update_password/${userId}`, {
+        currentPassword,
+        newPassword,
+        confirmPassword,
+      });
+  
+      // Handle server response
+      if (response.status === 200) {
+        alert("Password successfully updated.");
+        
+        // Reset fields and close modal
+        setPasswordValues({
+          currentPassword: "",
+          newPassword: "",
+          confirmPassword: "",
+        });
+        handleCloseChangePasswordModal();
+      } else {
+        // Display server-provided error message
+        alert(response.data.message || "Something went wrong.");
+      }
+    } catch (error) {
+      console.error("Error updating password:", error);
+  
+      // Handle server errors or network issues
+      if (error.response && error.response.data.message) {
+        alert(error.response.data.message);
+      } else {
+        alert("An error occurred while updating the password. Please try again later.");
+      }
+    }
+  };  
+
   const handleNavigateHome = () => {
     navigate("/main");
   };
@@ -112,6 +162,11 @@ const Profile = () => {
 
   const handleCloseChangePasswordModal = () => {
     setIsChangePasswordModalOpen(false);
+    setPasswordValues({
+      currentPassword: "",
+      newPassword: "",
+      confirmPassword: "",
+    });
   };
 
   return (
@@ -472,9 +527,7 @@ const Profile = () => {
                     color: "#FFF",
                     fontWeight: 600,
                   }}
-                  onClick={() => {
-                    // Handle password change logic
-                  }}
+                  onClick={handleSaveNewPassword}
                 >
                   Save Changes
                 </Button>
