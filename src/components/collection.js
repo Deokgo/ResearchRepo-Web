@@ -327,8 +327,10 @@ const DepartmentCollection = () => {
           <Box
             sx={{
               position: "relative",
-              height: "48px",
+              height: { xs: "5rem", md: "6rem" },
               backgroundColor: "#0A438F",
+              backgroundSize: "cover",
+              backgroundPosition: "center",
               display: "flex",
               alignItems: "center",
               padding: 2,
@@ -602,6 +604,11 @@ const DepartmentCollection = () => {
                               sx={{
                                 p: 2,
                                 cursor: "pointer",
+                                minHeight: "calc((100% - 48px) / 5)",
+                                display: "flex",
+                                flexDirection: "column",
+                                justifyContent: "center",
+                                borderBottom: "1px solid rgba(0, 0, 0, 0.1)",
                                 "&:hover": {
                                   backgroundColor: "rgba(0, 0, 0, 0.04)",
                                 },
@@ -610,17 +617,36 @@ const DepartmentCollection = () => {
                                 handleResearchItemClick(researchItem)
                               }
                             >
-                              <Typography variant='h6'>
+                              <Typography
+                                variant='h6'
+                                sx={{
+                                  mb: 1.5,
+                                  fontSize: "1.1rem",
+                                  fontWeight: 500,
+                                }}
+                              >
                                 {researchItem.title}
                               </Typography>
-                              <Typography variant='body2'>
+                              <Typography
+                                variant='body2'
+                                sx={{
+                                  mb: 1,
+                                  color: "#666",
+                                }}
+                              >
                                 {researchItem.program_name} |{" "}
                                 {researchItem.authors
                                   .map((author) => author.name)
                                   .join("; ")}{" "}
                                 | {researchItem.year}
                               </Typography>
-                              <Typography variant='caption'>
+                              <Typography
+                                variant='caption'
+                                sx={{
+                                  color: "#0A438F",
+                                  fontWeight: 500,
+                                }}
+                              >
                                 {researchItem.journal}
                               </Typography>
                             </Box>
@@ -628,16 +654,23 @@ const DepartmentCollection = () => {
                         />
                       )}
                     </Box>
-                    <Pagination
-                      count={Math.ceil(filteredResearch.length / itemsPerPage)}
-                      page={currentPage}
-                      onChange={handleChangePage}
+                    <Box
                       sx={{
+                        display: "flex",
+                        justifyContent: "center",
                         py: 1,
                         backgroundColor: "#fff",
                         borderTop: "1px solid #eee",
                       }}
-                    />
+                    >
+                      <Pagination
+                        count={Math.ceil(
+                          filteredResearch.length / itemsPerPage
+                        )}
+                        page={currentPage}
+                        onChange={handleChangePage}
+                      />
+                    </Box>
                   </Box>
                 </Box>
               </Grid2>

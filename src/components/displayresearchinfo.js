@@ -91,7 +91,7 @@ const DisplayResearchInfo = () => {
             );
 
             // Fetch file name
-            setFile(item.full_manuscript|| "")
+            setFile(item.full_manuscript || "");
 
             // Also fetch the programs for the selected college
             if (item.college_id) {
@@ -200,12 +200,12 @@ const DisplayResearchInfo = () => {
       abstract !== initialData?.abstract ||
       researchType !== initialData?.research_type ||
       dateApproved !== initialData?.date_approved ||
-      keywords.join(';') !== initialData?.keywords ||
-      selectedSDGs.join(';') !== initialData?.sdg ||
+      keywords.join(";") !== initialData?.keywords ||
+      selectedSDGs.join(";") !== initialData?.sdg ||
       adviser !== initialData?.adviser ||
-      panels.join(';') !== initialData?.panels ||
-      authors.join(';') !== initialData?.authors ||
-      file.join(';') !== initialData?.full_manuscript;
+      panels.join(";") !== initialData?.panels ||
+      authors.join(";") !== initialData?.authors ||
+      file.join(";") !== initialData?.full_manuscript;
 
     if (!hasChanges) {
       alert("No changes are made");
@@ -552,7 +552,9 @@ const DisplayResearchInfo = () => {
                         onChange={(e) => setResearchType(e.target.value)}
                       >
                         <MenuItem value='EXTRAMURAL'>EXTRAMURAL</MenuItem>
-                        <MenuItem value='COLLEGE-DRIVEN'>COLLEGE-DRIVEN</MenuItem>
+                        <MenuItem value='COLLEGE-DRIVEN'>
+                          COLLEGE-DRIVEN
+                        </MenuItem>
                         <MenuItem value='INTEGRATIVE'>INTEGRATIVE</MenuItem>
                       </Select>
                     </FormControl>
@@ -573,96 +575,85 @@ const DisplayResearchInfo = () => {
                   </Box>
                 </Grid2>
                 <Grid2 size={4}>
-                  <Box sx={{ height: "100%" }}>
-                    <Autocomplete
-                      multiple
-                      options={authorOptions}
-                      value={authors}
-                      onChange={(event, newValue) => setAuthors(newValue)}
-                      inputValue={authorInputValue}
-                      onInputChange={(event, newInputValue) => {
-                        setAuthorInputValue(newInputValue);
-                        handleAuthorSearch(newInputValue);
-                      }}
-                      getOptionLabel={(option) =>
-                        `${option.first_name || ""} ${option.last_name || ""} (${
-                          option.email || ""
-                        })`
-                      }
-                      disabled={isDisabled}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          label='Authors'
-                          variant='filled'
-                          sx={{ height: "100%" }}
-                          helperText='Type at least 3 characters to search and select author/s'
-                        />
-                      )}
-                      sx={{ height: "100%" }}
-                    />
-                  </Box>
+                  <Autocomplete
+                    multiple
+                    options={authorOptions}
+                    value={authors}
+                    onChange={(event, newValue) => setAuthors(newValue)}
+                    inputValue={authorInputValue}
+                    onInputChange={(event, newInputValue) => {
+                      setAuthorInputValue(newInputValue);
+                      handleAuthorSearch(newInputValue);
+                    }}
+                    getOptionLabel={(option) =>
+                      `${option.name} (${option.email})`
+                    }
+                    disabled={isDisabled}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label='Authors'
+                        variant='filled'
+                        sx={{ height: "100%" }}
+                        helperText='Type at least 3 characters to search and select author/s'
+                      />
+                    )}
+                    sx={{ height: "100%" }}
+                  />
                 </Grid2>
                 <Grid2 size={4}>
-                  <Box sx={{ height: "100%" }}>
-                    <Autocomplete
-                      value={adviser}
-                      onChange={(event, newValue) => setAdviser(newValue)}
-                      inputValue={adviserInputValue}
-                      onInputChange={(event, newInputValue) => {
-                        setAdviserInputValue(newInputValue);
-                        handleAdviserSearch(newInputValue);
-                      }}
-                      options={adviserOptions}
-                      getOptionLabel={(option) =>
-                        `${option.first_name || ""} ${option.last_name || ""} (${
-                          option.email || ""
-                        })`
-                      }
-                      disabled={isDisabled}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          label='Adviser'
-                          variant='filled'
-                          sx={{ height: "100%" }}
-                          helperText='Type at least 3 characters to search for an adviser'
-                        />
-                      )}
-                      sx={{ height: "100%" }}
-                    />
-                  </Box>
+                  <Autocomplete
+                    freeSolo
+                    options={adviserOptions}
+                    value={adviser}
+                    onChange={(event, newValue) => setAdviser(newValue)}
+                    inputValue={adviserInputValue}
+                    onInputChange={(event, newInputValue) => {
+                      setAdviserInputValue(newInputValue);
+                      handleAdviserSearch(newInputValue);
+                    }}
+                    getOptionLabel={(option) =>
+                      `${option.name} (${option.email})`
+                    }
+                    disabled={isDisabled}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label='Adviser'
+                        variant='filled'
+                        sx={{ height: "100%" }}
+                        helperText='Type at least 3 characters to search for an adviser'
+                      />
+                    )}
+                    sx={{ height: "100%" }}
+                  />
                 </Grid2>
                 <Grid2 size={4}>
-                  <Box sx={{ height: "100%" }}>
-                    <Autocomplete
-                      multiple
-                      value={panels}
-                      onChange={(event, newValue) => setPanels(newValue)}
-                      inputValue={panelInputValue}
-                      onInputChange={(event, newInputValue) => {
-                        setPanelInputValue(newInputValue);
-                        handlePanelSearch(newInputValue);
-                      }}
-                      options={panelOptions}
-                      getOptionLabel={(option) =>
-                        `${option.first_name || ""} ${option.last_name || ""} (${
-                          option.email || ""
-                        })`
-                      }
-                      disabled={isDisabled}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          label='Panel Members'
-                          variant='filled'
-                          sx={{ height: "100%" }}
-                          helperText='Type at least 3 characters to search and select multiple panel members'
-                          />
-                      )}
-                      sx={{ height: "100%" }}
-                    />
-                  </Box>
+                  <Autocomplete
+                    multiple
+                    value={panels}
+                    onChange={(event, newValue) => setPanels(newValue)}
+                    inputValue={panelInputValue}
+                    onInputChange={(event, newInputValue) => {
+                      setPanelInputValue(newInputValue);
+                      handlePanelSearch(newInputValue);
+                    }}
+                    options={panelOptions}
+                    getOptionLabel={(option) =>
+                      `${option.name} (${option.email})`
+                    }
+                    disabled={isDisabled}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label='Panel Members'
+                        variant='filled'
+                        sx={{ height: "100%" }}
+                        helperText='Type at least 3 characters to search and select multiple panel members'
+                      />
+                    )}
+                    sx={{ height: "100%" }}
+                  />
                 </Grid2>
                 <Grid2 size={12}>
                   <TextField
@@ -675,30 +666,74 @@ const DisplayResearchInfo = () => {
                   />
                 </Grid2>
                 <Grid2 size={6}>
+                  <Autocomplete
+                    multiple
+                    value={selectedSDGs}
+                    onChange={(event, newValue) => setSelectedSDGs(newValue)}
+                    options={sdgGoalsData.sdgGoals}
+                    getOptionLabel={(option) =>
+                      `${option.id} - ${option.title}`
+                    }
+                    disabled={isDisabled}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label='SDG Goals'
+                        variant='filled'
+                        helperText='Select one or more SDG goals'
+                      />
+                    )}
+                  />
+                </Grid2>
+                <Grid2 size={6}>
+                  <Autocomplete
+                    multiple
+                    freeSolo
+                    value={keywords}
+                    onChange={handleKeywordsChange}
+                    options={[]}
+                    disabled={isDisabled}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label='Keywords'
+                        variant='filled'
+                        helperText='Type and press Enter to add multiple keywords'
+                      />
+                    )}
+                  />
+                </Grid2>
+                <Grid2 size={6}>
                   <TextField
                     fullWidth
                     label='Abstract'
-                    variant='filled'
                     multiline
                     rows={4}
                     value={abstract}
                     onChange={(e) => setAbstract(e.target.value)}
                     disabled={isDisabled}
+                    variant='filled'
                   />
                 </Grid2>
-                <Grid2 size={4}>
-                  <Typography variant='body1' sx={{ color: "#8B8B8B" }}>
+                <Grid2
+                  size={4}
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    height: "100%",
+                  }}
+                >
+                  <Typography variant='body1' sx={{ color: "#8B8B8B", mb: 1 }}>
                     Full Manuscript:
                   </Typography>
                   <Box
                     sx={{
                       display: "flex",
                       alignItems: "center",
-                      border: "1px dashed #ccc",
-                      width: "25rem", 
-                      height: "5rem", 
-                      maxWidth: "25rem", 
-                      maxHeight: "5rem", 
+                      // border: "1px dashed #ccc",
+                      width: "100%",
+                      flex: 1,
+                      minHeight: "5rem",
                       p: 3,
                       cursor: "pointer",
                       justifyContent: "center",
@@ -712,11 +747,10 @@ const DisplayResearchInfo = () => {
                     />
                   </Box>
                 </Grid2>
-                <Grid2 size={2} display="flex" justifyContent="center">
-                  <Button 
+                <Grid2 size={2} display='flex' justifyContent='center'>
+                  <Button
                     variant='contained'
                     color='primary'
-                    disabled={isDisabled}
                     sx={{
                       backgroundColor: "#08397C",
                       color: "#FFF",
@@ -739,88 +773,54 @@ const DisplayResearchInfo = () => {
                     View Manuscript
                   </Button>
                 </Grid2>
-                <Grid2 size={6}>
-                  <Autocomplete
-                    multiple
-                    freeSolo
-                    value={keywords}
-                    onChange={handleKeywordsChange}
-                    options={[]}
-                    disabled={isDisabled}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        label='Keywords'
-                        variant='filled'
-                        helperText='Type and press Enter to add multiple keywords'
-                        />
-                    )}
-                  />
-                </Grid2>
-                <Grid2 size={6}>
-                  <Autocomplete
-                    multiple
-                    value={selectedSDGs}
-                    onChange={(event, newValue) => setSelectedSDGs(newValue)}
-                    options={sdgGoalsData.sdgGoals}
-                    getOptionLabel={(option) => `${option.id} - ${option.title}`}
-                    disabled={isDisabled}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        label='SDG Goals'
-                        variant='filled'
-                        helperText='Select one or more SDG goals'
-                        />
-                    )}
-                  />
-                </Grid2>
               </Grid2>
               <Box
                 sx={{ display: "flex", justifyContent: "flex-start", mt: 2 }}
               >
-                <Button 
-                  variant='contained' 
-                  color='primary' 
-                  sx={{ 
-                    backgroundColor: "#08397C", 
-                    color: "#FFF", 
-                    fontFamily: "Montserrat, sans-serif", 
-                    fontWeight: 600, 
-                    textTransform: "none", 
-                    fontSize: { xs: "0.875rem", md: "1.275rem" }, 
-                    width: "10rem", 
-                    alignSelf: "center", 
-                    borderRadius: "100px", 
-                    maxHeight: "3rem", 
-                    "&:hover": { 
-                      backgroundColor: "#052045", 
-                      color: "#FFF" } 
-                  }} 
+                <Button
+                  variant='contained'
+                  color='primary'
+                  sx={{
+                    backgroundColor: "#08397C",
+                    color: "#FFF",
+                    fontFamily: "Montserrat, sans-serif",
+                    fontWeight: 600,
+                    textTransform: "none",
+                    fontSize: { xs: "0.875rem", md: "1.275rem" },
+                    width: "10rem",
+                    alignSelf: "center",
+                    borderRadius: "100px",
+                    maxHeight: "3rem",
+                    "&:hover": {
+                      backgroundColor: "#052045",
+                      color: "#FFF",
+                    },
+                  }}
                   onClick={editDetails}
                 >
                   {isLabel}
                 </Button>
                 {isVisible && (
-                  <Button 
-                    variant='contained' 
-                    color='primary' 
-                    sx={{ 
-                      backgroundColor: "#d40821", 
-                      color: "#FFF", 
-                      fontFamily: "Montserrat, sans-serif", 
-                      fontWeight: 600, 
-                      textTransform: "none", 
-                      fontSize: { xs: "0.875rem", md: "1.275rem" }, 
-                      width: "12rem", 
-                      alignSelf: "center", 
-                      borderRadius: "100px", 
-                      maxHeight: "3rem", 
-                      ml: 2, 
-                      "&:hover": { 
-                        backgroundColor: "#8a0b14", 
-                        color: "#FFF" } 
-                    }} 
+                  <Button
+                    variant='contained'
+                    color='primary'
+                    sx={{
+                      backgroundColor: "#d40821",
+                      color: "#FFF",
+                      fontFamily: "Montserrat, sans-serif",
+                      fontWeight: 600,
+                      textTransform: "none",
+                      fontSize: { xs: "0.875rem", md: "1.275rem" },
+                      width: "12rem",
+                      alignSelf: "center",
+                      borderRadius: "100px",
+                      maxHeight: "3rem",
+                      ml: 2,
+                      "&:hover": {
+                        backgroundColor: "#8a0b14",
+                        color: "#FFF",
+                      },
+                    }}
                     onClick={handleSaveDetails}
                   >
                     Save Changes

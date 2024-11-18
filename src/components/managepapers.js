@@ -251,6 +251,7 @@ const ManagePapers = () => {
           height: "100vh",
           display: "flex",
           flexDirection: "column",
+          overflow: "hidden",
         }}
       >
         <Navbar />
@@ -259,19 +260,23 @@ const ManagePapers = () => {
             flexGrow: 1,
             display: "flex",
             flexDirection: "column",
-            height: { xs: "100%", md: "calc(100vh - 9rem)" },
             marginTop: { xs: "3.5rem", sm: "4rem", md: "6rem" },
+            height: {
+              xs: "calc(100vh - 3.5rem)",
+              sm: "calc(100vh - 4rem)",
+              md: "calc(100vh - 6rem)",
+            },
+            overflow: "hidden",
           }}
         >
           {/* Header Section */}
           <Box
             sx={{
               position: "relative",
-              marginBottom: 2,
               display: "flex",
               flexDirection: { xs: "column", md: "row" },
-              padding: 4,
-              gap: 4,
+              padding: 2,
+              // gap: 4,
               backgroundSize: "cover",
               backgroundPosition: "center",
               height: { xs: "5rem", md: "6rem" },
@@ -320,35 +325,32 @@ const ManagePapers = () => {
           {/* Main Content Section */}
           <Box
             sx={{
-              flexGrow: 1,
+              flex: 1,
               padding: 2,
-              mb: 2,
+              overflow: "hidden",
+              height: "calc(100% - 48px)",
             }}
           >
-            <Grid2 container spacing={5} sx={{ height: "100%" }}>
-              <Grid2 display='flex' justifyContent='flex-end' size={3}>
+            <Grid2
+              container
+              spacing={2}
+              sx={{
+                height: "100%",
+                flexWrap: "nowrap",
+              }}
+            >
+              <Grid2 size={3}>
                 <Box
                   sx={{
                     border: "2px solid #0A438F",
+                    height: "100%",
+                    borderRadius: 3,
                     padding: 2,
+                    overflow: "hidden",
                     display: "flex",
                     flexDirection: "column",
-                    width: "80%",
-                    height: "auto",
-                    borderRadius: 3,
                   }}
                 >
-                  <Typography
-                    variant='h6'
-                    sx={{
-                      mb: 2,
-                      fontWeight: "bold",
-                      color: "#0A438F",
-                      fontSize: "1.5rem",
-                    }}
-                  >
-                    {userProgram}
-                  </Typography>
                   <Typography
                     variant='h6'
                     sx={{ mb: 2, fontWeight: "bold", color: "#F40824" }}
@@ -371,8 +373,20 @@ const ManagePapers = () => {
                   </Typography>
                   <Box
                     sx={{
-                      height: "8rem",
+                      height: "25%",
                       overflowY: "auto",
+                      mb: 2,
+                      "&::-webkit-scrollbar": {
+                        width: "8px",
+                      },
+                      "&::-webkit-scrollbar-track": {
+                        background: "#f1f1f1",
+                        borderRadius: "4px",
+                      },
+                      "&::-webkit-scrollbar-thumb": {
+                        background: "#08397C",
+                        borderRadius: "4px",
+                      },
                     }}
                   >
                     {colleges.map((college) => (
@@ -397,8 +411,20 @@ const ManagePapers = () => {
                   </Typography>
                   <Box
                     sx={{
-                      height: "8rem",
+                      height: "30%",
                       overflowY: "auto",
+                      mb: 2,
+                      "&::-webkit-scrollbar": {
+                        width: "8px",
+                      },
+                      "&::-webkit-scrollbar-track": {
+                        background: "#f1f1f1",
+                        borderRadius: "4px",
+                      },
+                      "&::-webkit-scrollbar-thumb": {
+                        background: "#08397C",
+                        borderRadius: "4px",
+                      },
                     }}
                   >
                     {programs.map((program) => (
@@ -438,104 +464,154 @@ const ManagePapers = () => {
               <Grid2 size={9}>
                 <Box
                   sx={{
-                    display: "flex",
-                    flexDirection: "row",
-                  }}
-                >
-                  <Box
-                    sx={{
-                      display: "flex",
-                      flexDirection: "row",
-                    }}
-                  >
-                    <TextField
-                      variant='outlined'
-                      placeholder='Search by Title or Authors'
-                      value={searchQuery}
-                      onChange={handleSearchChange}
-                      sx={{ width: "30rem" }}
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position='start'>
-                            <Search />
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                  </Box>
-
-                  <Button
-                    variant='contained'
-                    color='primary'
-                    sx={{
-                      backgroundColor: "#08397C",
-                      color: "#FFF",
-                      fontFamily: "Montserrat, sans-serif",
-                      fontWeight: 600,
-                      textTransform: "none",
-                      fontSize: { xs: "0.875rem", md: "1.275rem" },
-                      padding: { xs: "0.5rem 1rem", md: "1.5rem" },
-                      marginLeft: "2rem",
-                      borderRadius: "100px",
-                      maxHeight: "3rem",
-                      "&:hover": {
-                        backgroundColor: "#072d61",
-                      },
-                    }}
-                    onClick={openAddPaperModal}
-                  >
-                    + Add New Paper
-                  </Button>
-                </Box>
-                <Box
-                  sx={{
+                    height: "100%",
                     display: "flex",
                     flexDirection: "column",
-                    paddingTop: 2,
-                    height: "60vh",
                   }}
                 >
-                  <Box sx={{ padding: 2, backgroundColor: "#F7F9FC" }}>
+                  <Box sx={{ mb: 2 }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexDirection: "row",
+                      }}
+                    >
+                      <TextField
+                        variant='outlined'
+                        placeholder='Search by Title or Authors'
+                        value={searchQuery}
+                        onChange={handleSearchChange}
+                        sx={{ width: "30rem" }}
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position='start'>
+                              <Search />
+                            </InputAdornment>
+                          ),
+                        }}
+                      />
+
+                      <Button
+                        variant='contained'
+                        color='primary'
+                        sx={{
+                          backgroundColor: "#08397C",
+                          color: "#FFF",
+                          fontFamily: "Montserrat, sans-serif",
+                          fontWeight: 600,
+                          textTransform: "none",
+                          fontSize: { xs: "0.875rem", md: "1.275rem" },
+                          padding: { xs: "0.5rem 1rem", md: "1.5rem" },
+                          marginLeft: "2rem",
+                          borderRadius: "100px",
+                          maxHeight: "3rem",
+                          "&:hover": {
+                            backgroundColor: "#072d61",
+                          },
+                        }}
+                        onClick={openAddPaperModal}
+                      >
+                        + Add New Paper
+                      </Button>
+                    </Box>
+                  </Box>
+                  <Box
+                    sx={{
+                      flex: 1,
+                      backgroundColor: "#F7F9FC",
+                      borderRadius: 1,
+                      overflow: "hidden",
+                      display: "flex",
+                      flexDirection: "column",
+                    }}
+                  >
                     {loading ? (
                       <Typography>Loading...</Typography>
                     ) : research.length === 0 ? (
                       <Typography>No research papers found.</Typography>
                     ) : (
-                      <Virtuoso
-                        style={{ height: "28rem" }}
-                        data={paginatedResearch}
-                        itemContent={(index, researchItem) => (
-                          <Box
-                            key={researchItem.research_id}
-                            sx={{ marginBottom: 2, cursor: "pointer" }}
-                            onClick={() => handleKey(researchItem.research_id)}
-                          >
-                            <Typography variant='h6'>
-                              {researchItem.title}
-                            </Typography>
-                            <Typography variant='body2'>
-                              {researchItem.program_name} |{" "}
-                              {Array.isArray(researchItem.authors)
-                                ? researchItem.authors
-                                    .map((author) => `${author.name}`)
-                                    .join("; ")
-                                : "No authors available"}{" "}
-                              | {researchItem.year}
-                            </Typography>
-                            <Typography variant='caption'>
-                              {researchItem.journal}
-                            </Typography>
-                          </Box>
-                        )}
-                      />
+                      <>
+                        <Box sx={{ flex: 1, overflow: "hidden" }}>
+                          <Virtuoso
+                            style={{ height: "100%" }}
+                            data={paginatedResearch}
+                            itemContent={(index, researchItem) => (
+                              <Box
+                                key={researchItem.research_id}
+                                sx={{
+                                  p: 2,
+                                  cursor: "pointer",
+                                  height: "120px",
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  justifyContent: "center",
+                                  borderBottom: "1px solid rgba(0, 0, 0, 0.1)",
+                                  "&:hover": {
+                                    backgroundColor: "rgba(0, 0, 0, 0.04)",
+                                  },
+                                }}
+                                onClick={() =>
+                                  handleKey(researchItem.research_id)
+                                }
+                              >
+                                <Typography
+                                  variant='h6'
+                                  sx={{
+                                    mb: 1.5,
+                                    fontSize: "1.1rem",
+                                    fontWeight: 500,
+                                  }}
+                                >
+                                  {researchItem.title}
+                                </Typography>
+                                <Typography
+                                  variant='body2'
+                                  sx={{
+                                    mb: 1,
+                                    color: "#666",
+                                  }}
+                                >
+                                  {researchItem.program_name} |{" "}
+                                  {Array.isArray(researchItem.authors)
+                                    ? researchItem.authors
+                                        .map((author) => `${author.name}`)
+                                        .join("; ")
+                                    : "No authors available"}{" "}
+                                  | {researchItem.year}
+                                </Typography>
+                                <Typography
+                                  variant='caption'
+                                  sx={{
+                                    color: "#0A438F",
+                                    fontWeight: 500,
+                                  }}
+                                >
+                                  {researchItem.journal}
+                                </Typography>
+                              </Box>
+                            )}
+                          />
+                        </Box>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "center",
+                            py: 1,
+                            backgroundColor: "#fff",
+                            borderTop: "1px solid #eee",
+                          }}
+                        >
+                          <Pagination
+                            count={Math.ceil(
+                              filteredResearch.length / itemsPerPage
+                            )}
+                            page={currentPage}
+                            onChange={handleChangePage}
+                          />
+                        </Box>
+                      </>
                     )}
                   </Box>
-                  <Pagination
-                    count={Math.ceil(filteredResearch.length / itemsPerPage)}
-                    page={currentPage}
-                    onChange={handleChangePage}
-                    sx={{ mt: 1 }}
-                  />
                 </Box>
               </Grid2>
             </Grid2>
