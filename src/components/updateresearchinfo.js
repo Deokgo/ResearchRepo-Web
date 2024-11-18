@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "./navbar";
+import DynamicTimeline from "./Timeline";
 import {
   Box,
   Button,
@@ -640,147 +641,61 @@ const UpdateResearchInfo = ({route,navigate}) => {
                     </Modal>
 
                     {/* Right-side Timeline Section*/}
-                    <Grid2 sx={{ display: "flex", flexDirection: "column", height: "100%"}} size={3}>
-                        <Box
-                            sx={{
-                                border: "2px solid #0A438F",
-                                display: "flex",
-                                flexDIrection: "column",
-                                padding: 2,
-                                width: "100%",
-                                height: "auto",
-                                borderRadius: 3,
-                            }}
-                            >
-                            <Timeline
-                                sx={{
-                                    alignContent: "center", 
-                                    [`& .${timelineOppositeContentClasses.root}`]: {
-                                    flex: 0.8,
-                                    },
-                                }}
-                                >
-                                <TimelineItem>
-                                    <TimelineOppositeContent
-                                    sx={{
-                                        fontFamily: "Montserrat, sans-serif",
-                                        fontSize: { md: "1rem" },
-                                        alignItems: "center"
-                                    }}
-                                    > 
-                                    </TimelineOppositeContent>
-
-                                    <TimelineSeparator>
-                                        <TimelineDot variant={"outlined"} sx={{ borderColor: "#EC1F28", width: 20, height: 20}}/>
-                                        <TimelineConnector sx={{ backgroundColor: '#EC1F28'}}/>
-                                    </TimelineSeparator>
-
-                                    <TimelineContent 
-                                        sx={{
-                                            fontFamily: "Montserrat, sans-serif",
-                                            fontWeight: 600,
-                                            fontSize: { md: "1.25rem" },
-                                        }}
-                                    > PUBLISHED
-                                    </TimelineContent>
-                                </TimelineItem>
-                                <TimelineItem>
-                                    <TimelineOppositeContent
-                                    sx={{
-                                        fontFamily: "Montserrat, sans-serif",
-                                        fontSize: { md: "1rem" },
-                                        alignItems: "center"
-                                    }}
-                                    > 
-                                    </TimelineOppositeContent>
-
-                                    <TimelineSeparator>
-                                        <TimelineDot variant={"outlined"} sx={{ borderColor: "#EC1F28", width: 20, height: 20}}/>
-                                        <TimelineConnector sx={{ backgroundColor: '#EC1F28'}}/>
-                                    </TimelineSeparator>
-
-                                    <TimelineContent 
-                                        sx={{
-                                            fontFamily: "Montserrat, sans-serif",
-                                            fontWeight: 600,
-                                            fontSize: { md: "1.25rem" },
-                                        }}
-                                    > ACCEPTED
-                                    </TimelineContent>
-                                </TimelineItem>
-                                <TimelineItem>
-                                    <TimelineOppositeContent
-                                    sx={{
-                                        fontFamily: "Montserrat, sans-serif",
-                                        fontSize: { md: "1rem" },
-                                        alignItems: "center"
-                                    }}
-                                    > 2024-10-05
-                                    </TimelineOppositeContent>
-
-                                    <TimelineSeparator>
-                                        <TimelineDot sx={{ backgroundColor: '#EC1F28', width: 20, height: 20}}/>
-                                        <TimelineConnector sx={{ backgroundColor: '#EC1F28'}}/>
-                                    </TimelineSeparator>
-
-                                    <TimelineContent 
-                                        sx={{
-                                            fontFamily: "Montserrat, sans-serif",
-                                            fontWeight: 600,
-                                            fontSize: { md: "1.25rem" },
-                                        }}
-                                    > SUBMITTED
-                                    </TimelineContent>
-                                </TimelineItem>
-                                <TimelineItem>
-                                    <TimelineOppositeContent
-                                        sx={{
-                                            fontFamily: "Montserrat, sans-serif",
-                                            fontSize: { md: "1rem" },
-                                        }}
-                                    >   2024-10-10
-                                    </TimelineOppositeContent>
-
-                                    <TimelineSeparator>
-                                        <TimelineDot sx={{ backgroundColor: '#EC1F28', width: 20, height: 20}}/>
-                                    </TimelineSeparator>
-
-                                    <TimelineContent
-                                        sx={{
-                                            fontFamily: "Montserrat, sans-serif",
-                                            fontWeight: 600,
-                                            fontSize: { md: "1.25rem" },
-                                        }}
-                                    >   READY
-                                    </TimelineContent>
-                                </TimelineItem>
-                            </Timeline>
-                            
-                        </Box>
-                        <Button 
-                          variant='contained'
-                          color='primary'
+                    <Grid2
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        height: "100%",
+                      }}
+                      size={3}
+                    >
+                      <Box
+                        sx={{
+                          border: "2px solid #0A438F",
+                          display: "flex",
+                          flexDirection: "column",
+                          width: "100%",
+                          height: "auto",
+                          borderRadius: 3,
+                          padding: "1rem", // Optional padding for a better layout
+                        }}
+                      >
+                        <DynamicTimeline
+                          researchId={id}
                           sx={{
-                            backgroundColor: "#d40821",
-                            color: "#FFF",
-                            fontFamily: "Montserrat, sans-serif",
-                            fontWeight: 600,
-                            textTransform: "none",
-                            fontSize: { xs: "0.875rem", md: "1.275rem" },
-                            padding: { xs: "0.5rem 1rem", md: "1.5rem" },
-                            marginTop: "1rem",
-                            width: "auto",
-                            borderRadius: "100px",
-                            maxHeight: "3rem",
-                            "&:hover": {
-                                backgroundColor: "#A30417",
-                                color: "#FFF",
-                              },
+                            alignItems: "flex-start", // Align items to the start
+                            "& .MuiTimelineContent-root": {
+                              textAlign: "left", // Ensure content aligns left
+                            },
                           }}
-                        >
-                          Update Status to: Accepted
-                        </Button>
+                        />
+                      </Box>
+
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        sx={{
+                          backgroundColor: "#d40821",
+                          color: "#FFF",
+                          fontFamily: "Montserrat, sans-serif",
+                          fontWeight: 600,
+                          textTransform: "none",
+                          fontSize: { xs: "0.875rem", md: "1.275rem" },
+                          padding: { xs: "0.5rem 1rem", md: "1.5rem" },
+                          marginTop: "1rem",
+                          width: "auto",
+                          borderRadius: "100px",
+                          maxHeight: "3rem",
+                          "&:hover": {
+                            backgroundColor: "#A30417",
+                            color: "#FFF",
+                          },
+                        }}
+                      >
+                        Update Status to: Accepted
+                      </Button>
                     </Grid2>
+
                 </Grid2>
             </Box>
         </Box>
