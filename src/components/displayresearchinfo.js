@@ -59,10 +59,35 @@ const DisplayResearchInfo = () => {
   const [isLabel, setIsLabel] = useState("Edit Details");
   const [initialData, setInitialData] = useState(null);
 
+  // Add state for initial values
+  const [initialValues, setInitialValues] = useState(null);
+
   const editDetails = () => {
-    setIsDisabled(!isDisabled);
-    setIsVisible(!isVisible);
-    setIsLabel(isDisabled ? "Cancel" : "Edit Details");
+    if (isDisabled) {
+      // Entering edit mode
+      setIsDisabled(false);
+      setIsVisible(true);
+      setIsLabel("Cancel");
+    } else {
+      // Canceling - reset all form fields to initial values
+      setTitle(initialValues.title);
+      setSelectedCollege(initialValues.college_id);
+      setSelectedProgram(initialValues.program_id);
+      setAbstract(initialValues.abstract);
+      setResearchType(initialValues.research_type);
+      setDateApproved(initialValues.date_approved);
+      setSelectedSDGs(initialValues.sdgs);
+      setKeywords(initialValues.keywords);
+      setAuthors(initialValues.authors);
+      setAdviser(initialValues.adviser);
+      setPanels(initialValues.panels);
+      setFile(initialValues.file);
+
+      // Reset edit mode
+      setIsDisabled(true);
+      setIsVisible(false);
+      setIsLabel("Edit Details");
+    }
   };
 
   useEffect(() => {
@@ -76,22 +101,65 @@ const DisplayResearchInfo = () => {
           if (response.data.dataset && response.data.dataset.length > 0) {
             const item = response.data.dataset[0];
             console.log("Fetched research data:", item);
-
-            // Set basic fields
-            setTitle(item.title || "");
-            setResearchCode(item.research_id || "");
-            setSelectedCollege(item.college_id || "");
-            setSelectedProgram(item.program_id || "");
-            setAbstract(item.abstract || "");
-            setResearchType(item.research_type || "");
-            setDateApproved(
-              item.date_approved
+            // Store initial values when first loading the data
+            const initialData = {
+              group_code: item.research_id || "",
+              title: item.title || "",
+              college_id: item.college_id || "",
+              program_id: item.program_id || "",
+              abstract: item.abstract || "",
+              research_type: item.research_type || "",
+              date_approved: item.date_approved
                 ? new Date(item.date_approved).toISOString().split("T")[0]
-                : ""
-            );
+                : "",
+              sdgs: item.sdg
+                ? item.sdg.split(";").map((sdgId) => ({
+                    id: sdgId,
+                    title:
+                      sdgGoalsData.sdgGoals.find((goal) => goal.id === sdgId)
+                        ?.title || "",
+                  }))
+                : [],
+              keywords: item.keywords || [],
+              authors: item.authors
+                ? item.authors.map((author) => ({
+                    user_id: author.user_id,
+                    name: author.name,
+                    email: author.email,
+                  }))
+                : [],
+              adviser: item.adviser
+                ? {
+                    user_id: item.adviser.user_id,
+                    name: item.adviser.name,
+                    email: item.adviser.email,
+                  }
+                : null,
+              panels: item.panels
+                ? item.panels.map((panel) => ({
+                    user_id: panel.user_id,
+                    name: panel.name,
+                    email: panel.email,
+                  }))
+                : [],
+              file: item.full_manuscript || "",
+            };
+            setInitialValues(initialData);
 
-            // Fetch file name
-            setFile(item.full_manuscript || "");
+            // Set current values
+            setResearchCode(initialData.group_code);
+            setTitle(initialData.title);
+            setSelectedCollege(initialData.college_id);
+            setSelectedProgram(initialData.program_id);
+            setAbstract(initialData.abstract);
+            setResearchType(initialData.research_type);
+            setDateApproved(initialData.date_approved);
+            setSelectedSDGs(initialData.sdgs);
+            setKeywords(initialData.keywords);
+            setAuthors(initialData.authors);
+            setAdviser(initialData.adviser);
+            setPanels(initialData.panels);
+            setFile(initialData.file);
 
             // Also fetch the programs for the selected college
             if (item.college_id) {
@@ -577,28 +645,50 @@ const DisplayResearchInfo = () => {
                 <Grid2 size={4}>
                   <Autocomplete
                     multiple
-                    options={authorOptions}
                     value={authors}
-                    onChange={(event, newValue) => setAuthors(newValue)}
+                    onChange={(event, newValue) => {
+                      // Transform the selected values to a consistent format
+                      const formattedAuthors = newValue.map((author) => {
+                        if (author.name) {
+                          // Already in the correct format
+                          return author;
+                        } else {
+                          // Transform from search result format
+                          return {
+                            name: `${author.first_name} ${author.last_name}`,
+                            user_id: author.user_id || author.researcher_id,
+                            email: author.email,
+                          };
+                        }
+                      });
+                      setAuthors(formattedAuthors);
+                    }}
                     inputValue={authorInputValue}
                     onInputChange={(event, newInputValue) => {
                       setAuthorInputValue(newInputValue);
                       handleAuthorSearch(newInputValue);
                     }}
-                    getOptionLabel={(option) =>
-                      `${option.name} (${option.email})`
-                    }
+                    options={authorOptions}
+                    getOptionLabel={(option) => {
+                      // Handle both formats for display
+                      if (option.name) {
+                        return `${option.name} (${option.email})`;
+                      }
+                      return `${option.first_name} ${option.last_name} (${option.email})`;
+                    }}
+                    isOptionEqualToValue={(option, value) => {
+                      // Compare by email since it's unique
+                      return option.email === value.email;
+                    }}
                     disabled={isDisabled}
                     renderInput={(params) => (
                       <TextField
                         {...params}
                         label='Authors'
                         variant='filled'
-                        sx={{ height: "100%" }}
                         helperText='Type at least 3 characters to search and select author/s'
                       />
                     )}
-                    sx={{ height: "100%" }}
                   />
                 </Grid2>
                 <Grid2 size={4}>
@@ -606,53 +696,96 @@ const DisplayResearchInfo = () => {
                     freeSolo
                     options={adviserOptions}
                     value={adviser}
-                    onChange={(event, newValue) => setAdviser(newValue)}
+                    onChange={(event, newValue) => {
+                      // Transform the selected value to a consistent format
+                      if (newValue) {
+                        const formattedAdviser = newValue.name
+                          ? newValue // Already in correct format
+                          : {
+                              name: `${newValue.first_name} ${newValue.last_name}`,
+                              user_id:
+                                newValue.user_id || newValue.researcher_id,
+                              email: newValue.email,
+                            };
+                        setAdviser(formattedAdviser);
+                      } else {
+                        setAdviser(null);
+                      }
+                    }}
                     inputValue={adviserInputValue}
                     onInputChange={(event, newInputValue) => {
                       setAdviserInputValue(newInputValue);
                       handleAdviserSearch(newInputValue);
                     }}
-                    getOptionLabel={(option) =>
-                      `${option.name} (${option.email})`
-                    }
+                    getOptionLabel={(option) => {
+                      // Handle both formats for display
+                      if (option.name) {
+                        return `${option.name} (${option.email})`;
+                      }
+                      return `${option.first_name} ${option.last_name} (${option.email})`;
+                    }}
+                    isOptionEqualToValue={(option, value) => {
+                      // Compare by email since it's unique
+                      return option.email === value.email;
+                    }}
                     disabled={isDisabled}
                     renderInput={(params) => (
                       <TextField
                         {...params}
                         label='Adviser'
                         variant='filled'
-                        sx={{ height: "100%" }}
                         helperText='Type at least 3 characters to search for an adviser'
                       />
                     )}
-                    sx={{ height: "100%" }}
                   />
                 </Grid2>
                 <Grid2 size={4}>
                   <Autocomplete
                     multiple
                     value={panels}
-                    onChange={(event, newValue) => setPanels(newValue)}
+                    onChange={(event, newValue) => {
+                      // Transform the selected values to a consistent format
+                      const formattedPanels = newValue.map((panel) => {
+                        if (panel.name) {
+                          // Already in the correct format
+                          return panel;
+                        } else {
+                          // Transform from search result format
+                          return {
+                            name: `${panel.first_name} ${panel.last_name}`,
+                            user_id: panel.user_id || panel.researcher_id,
+                            email: panel.email,
+                          };
+                        }
+                      });
+                      setPanels(formattedPanels);
+                    }}
                     inputValue={panelInputValue}
                     onInputChange={(event, newInputValue) => {
                       setPanelInputValue(newInputValue);
                       handlePanelSearch(newInputValue);
                     }}
                     options={panelOptions}
-                    getOptionLabel={(option) =>
-                      `${option.name} (${option.email})`
-                    }
+                    getOptionLabel={(option) => {
+                      // Handle both formats for display
+                      if (option.name) {
+                        return `${option.name} (${option.email})`;
+                      }
+                      return `${option.first_name} ${option.last_name} (${option.email})`;
+                    }}
+                    isOptionEqualToValue={(option, value) => {
+                      // Compare by email since it's unique
+                      return option.email === value.email;
+                    }}
                     disabled={isDisabled}
                     renderInput={(params) => (
                       <TextField
                         {...params}
                         label='Panel Members'
                         variant='filled'
-                        sx={{ height: "100%" }}
                         helperText='Type at least 3 characters to search and select multiple panel members'
                       />
                     )}
-                    sx={{ height: "100%" }}
                   />
                 </Grid2>
                 <Grid2 size={12}>
