@@ -119,7 +119,7 @@ const ManageUsers = () => {
       accountStatus !== initialData?.accountStatus;
 
     if (!hasChanges) {
-      alert("No changes are made");
+      alert("No changes detected. Please modify user's details before saving.");
     } else {
       updateChanges();
     }

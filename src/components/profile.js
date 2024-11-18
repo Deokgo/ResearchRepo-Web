@@ -10,6 +10,9 @@ import {
   IconButton,
   TextField,
   Modal,
+  MenuItem,
+  InputLabel,
+  Select,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import homeBg from "../assets/home_bg.png";
@@ -22,7 +25,7 @@ const modalStyle = {
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  width: 600,
+  width: "40%",
   bgcolor: "background.paper",
   boxShadow: 24,
   p: 4,
@@ -32,7 +35,12 @@ const modalStyle = {
 const Profile = () => {
   const [userData, setUserData] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedCollege, setSelectedCollege] = useState("");
+  const [selectedProgram, setSelectedProgram] = useState("");
   const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false);
+  const [colleges, setColleges] = useState([]);
+  const [programs, setPrograms] = useState([]);
+  const [initialData, setInitialData] = useState(null);
   const navigate = useNavigate();
   // Retrieve user_id from cookie/localStorage
   const getUserId = () => {
@@ -62,7 +70,11 @@ const Profile = () => {
       try {
         const response = await axios.get(`/accounts/users/${userId}`);
         const data = response.data;
+  
+        // Set user data for later use
         setUserData(data);
+  
+        // Set form values
         setFormValues({
           firstName: data.researcher.first_name || "",
           middleName: data.researcher.middle_name || "",
@@ -73,11 +85,35 @@ const Profile = () => {
           email: data.account.email || "",
           role: data.account.role || "",
         });
+  
+        // Set initial data for comparison
+        setInitialData({
+          firstName: data.researcher.first_name || "",
+          middleName: data.researcher.middle_name || "",
+          lastName: data.researcher.last_name || "",
+          suffix: data.researcher.suffix || "",
+          department: data.researcher.college_id || "",
+          program: data.researcher.program_id || "",
+        });
+        
+        console.log("Initial data set:", initialData); // Check if this is correct
+  
+        // Fetch programs for the initially set department if present
+        if (data.researcher.college_id) {
+          fetchProgramsByCollege(data.researcher.college_id);
+        }
       } catch (error) {
         console.error("Error fetching user data:", error);
       }
     }
-  };
+  };  
+
+  // Effect to check selected department (console log)
+  useEffect(() => {
+    if (formValues.department) {
+      console.log('Selected College on load:', formValues.department);
+    }
+  }, [formValues.department]);
 
   // Fetch user data on component mount
   useEffect(() => {
@@ -92,6 +128,79 @@ const Profile = () => {
   const handlePasswordInputChange = (e) => {
     const { name, value } = e.target;
     setPasswordValues({ ...passwordValues, [name]: value });
+  };
+
+  const handleSaveUserChanges = async () => {
+    try {
+        const userId = getUserId();
+        
+        // Extract relevant data from formValues
+        const {
+            firstName,
+            middleName,
+            lastName,
+            suffix,
+            department: college_id,
+            program: program_id,
+        } = formValues;
+
+        // Construct the payload
+        const payload = {
+            first_name: firstName,
+            middle_name: middleName,
+            last_name: lastName,
+            suffix,
+            college_id,
+            program_id,
+        };
+
+        const hasChanges =
+          firstName !== initialData?.firstName ||
+          middleName !== initialData?.middleName ||
+          lastName !== initialData?.lastName ||
+          suffix !== initialData?.suffix ||
+          college_id !== initialData?.department ||
+          program_id !== initialData?.program;
+
+        if (!hasChanges) {
+          alert("No changes detected. Please modify your profile before saving.");
+        }else{
+          // Validation to ensure no empty values (adjust as per requirements)
+        const missingFields = Object.entries(payload).filter(([key, value]) => !value && key !== 'middle_name' && key !== 'suffix');
+        if (missingFields.length > 0) {
+            alert(`Missing fields: ${missingFields.map(([key]) => key).join(', ')}`);
+            return;
+        }
+
+        // API call
+        const response = await fetch(`/accounts/update_account/${userId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload),
+        });
+
+        // Handle response
+        if (response.ok) {
+            const data = await response.json();
+            alert('Profile updated successfully.');
+            console.log('Updated data:', data);
+            fetchUserData();
+            handleCloseModal();
+        } else {
+            const errorData = await response.json();
+            alert(`Failed to update profile: ${errorData.message || 'Unknown error'}`);
+            
+            if (errorData.missing_fields) {
+                console.log('Missing fields:', errorData.missing_fields);
+            }
+          }
+        }        
+    } catch (error) {
+        console.error('Error updating profile:', error);
+        alert('An error occurred while updating the profile.');
+    }
   };
 
   const handleSaveNewPassword = async () => {
@@ -148,12 +257,53 @@ const Profile = () => {
     navigate("/main");
   };
 
-  const handleOpenModal = () => {
+  const handleOpenModal = async () => {
     setIsModalOpen(true);
+    await fetchUserData(); 
   };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
+  };
+
+  // Fetch all colleges when the modal opens
+  useEffect(() => {
+    if (isModalOpen) {
+      fetchColleges();
+    }
+  }, [isModalOpen]);
+
+  // Fetch all colleges
+  const fetchColleges = async () => {
+    try {
+      const response = await axios.get(`/deptprogs/college_depts`);
+      setColleges(response.data.colleges);
+    } catch (error) {
+      console.error("Error fetching colleges:", error);
+    }
+  };
+
+  // Fetch programs based on selected college
+  const fetchProgramsByCollege = async (collegeId) => {
+    if (collegeId) {
+      try {
+        const response = await axios.get(`/deptprogs/programs`, {
+          params: { department: collegeId },
+        });
+        setPrograms(response.data.programs);
+      } catch (error) {
+        console.error("Error fetching programs by college:", error);
+      }
+    } else {
+      setPrograms([]);
+    }
+  };
+
+  const handleCollegeChange = (event) => {
+    const selectedCollegeId = event.target.value;
+    setSelectedCollege(selectedCollegeId);
+    fetchProgramsByCollege(selectedCollegeId);
+    setSelectedProgram(""); // Reset selected program when college changes
   };
 
   const handleOpenChangePasswordModal = () => {
@@ -291,7 +441,7 @@ const Profile = () => {
                   },
                   {
                     label: "Middle Name",
-                    value: userData.researcher.middle_name,
+                    value: userData.researcher.middle_name || "N/A",
                   },
                   {
                     label: "Last Name",
@@ -415,22 +565,64 @@ const Profile = () => {
                   />
                 </Grid2>
                 <Grid2 size={{ xs: 12, sm: 6 }}>
-                  <TextField
+                  <InputLabel>Department</InputLabel>
+                  <Select
+                    value={formValues.department || ''} // Use an empty string as fallback
+                    onChange={(e) => {
+                      const selectedDepartment = e.target.value;
+                      console.log('Selected Department:', selectedDepartment); // Debug
+                      handleCollegeChange(e); // Update department value
+                      setFormValues((prevValues) => ({
+                        ...prevValues,
+                        department: selectedDepartment, // Update form state
+                        program: '', // Reset program when department changes
+                      }));
+                    }}
                     label='Department'
-                    fullWidth
-                    name='department'
-                    value={formValues.department}
-                    onChange={handleInputChange}
-                  />
+                    sx={{
+                      width: '280px', // Set a fixed width
+                      minWidth: '200px', // Optional: Set a minimum width for responsiveness
+                    }}
+                  >
+                    {colleges.map((college) => (
+                      <MenuItem key={college.college_id} value={college.college_id}>
+                        {college.college_name}
+                      </MenuItem>
+                    ))}
+                  </Select>
                 </Grid2>
+
                 <Grid2 size={{ xs: 12, sm: 6 }}>
-                  <TextField
+                  <InputLabel>Program</InputLabel>
+                  <Select
+                    value={formValues.program || ''} // Use an empty string as fallback
+                    onChange={(e) => {
+                      const selectedProgram = e.target.value;
+                      console.log('Selected Program:', selectedProgram); // Debug
+                      setSelectedProgram(selectedProgram); // Update selected program
+                      setFormValues((prevValues) => ({
+                        ...prevValues,
+                        program: selectedProgram, // Update form state
+                      }));
+                    }}
                     label='Program'
-                    fullWidth
-                    name='program'
-                    value={formValues.program}
-                    onChange={handleInputChange}
-                  />
+                    sx={{
+                      width: '280px', // Set a fixed width
+                      minWidth: '200px', // Optional: Set a minimum width for responsiveness
+                    }}
+                  >
+                    {programs
+                      .filter((program) => {
+                        const isMatch = program.college_id === formValues.department;
+                        console.log('Filtering Programs:', program, isMatch); // Debug
+                        return isMatch;
+                      })
+                      .map((program) => (
+                        <MenuItem key={program.program_id} value={program.program_id}>
+                          {program.program_name}
+                        </MenuItem>
+                      ))}
+                  </Select>
                 </Grid2>
               </Grid2>
               <Box
@@ -449,7 +641,7 @@ const Profile = () => {
                 </Button>
                 <Button
                   variant='contained'
-                  onClick={handleCloseModal}
+                  onClick={handleSaveUserChanges}
                   sx={{
                     backgroundColor: "#CA031B",
                     color: "#FFF",
