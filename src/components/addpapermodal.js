@@ -238,6 +238,9 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
       setTitle("");
       setAbstract("");
       setAdviser(null);
+      setAdviserInputValue("");
+      setAuthorInputValue("");
+      setPanelInputValue("");
       setSelectedSDGs([]);
       setKeywords([]);
       setPanels([]);
@@ -493,10 +496,10 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
                 display: "flex",
                 alignItems: "center",
                 border: "1px dashed #ccc",
-                width: "25rem", 
-                height: "5rem", 
-                maxWidth: "25rem", 
-                maxHeight: "5rem", 
+                width: "25rem",
+                height: "5rem",
+                maxWidth: "25rem",
+                maxHeight: "5rem",
                 p: 3,
                 cursor: "pointer",
                 justifyContent: "center",
