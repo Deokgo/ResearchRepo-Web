@@ -305,6 +305,7 @@ const DepartmentCollection = () => {
           height: "100vh",
           display: "flex",
           flexDirection: "column",
+          overflow: "hidden",
         }}
       >
         <Navbar />
@@ -313,23 +314,25 @@ const DepartmentCollection = () => {
             flexGrow: 1,
             display: "flex",
             flexDirection: "column",
-            height: { xs: "100%", md: "calc(100vh - 9rem)" },
             marginTop: { xs: "3.5rem", sm: "4rem", md: "6rem" },
+            height: {
+              xs: "calc(100vh - 3.5rem)",
+              sm: "calc(100vh - 4rem)",
+              md: "calc(100vh - 6rem)",
+            },
+            overflow: "hidden",
           }}
         >
-          {/* Header Section */}
+          {/* Header with back button */}
           <Box
             sx={{
               position: "relative",
-              marginBottom: 2,
-              display: "flex",
-              flexDirection: { xs: "column", md: "row" },
-              padding: 4,
-              gap: 4,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-              height: { xs: "5rem", md: "6rem" },
+              height: "48px",
               backgroundColor: "#0A438F",
+              display: "flex",
+              alignItems: "center",
+              padding: 2,
+              zIndex: 1,
             }}
           >
             <Box
@@ -371,51 +374,106 @@ const DepartmentCollection = () => {
             </Box>
           </Box>
 
-          {/* Main Content Section */}
+          {/* Main content area */}
           <Box
             sx={{
-              flexGrow: 1,
+              flex: 1,
               padding: 2,
-              mb: 2,
+              overflow: "hidden",
+              height: "calc(100% - 48px)",
             }}
           >
-            <Grid2 container spacing={5} sx={{ height: "100%" }}>
-              <Grid2 display='flex' justifyContent='flex-end' size={3}>
+            <Grid2
+              container
+              spacing={2}
+              sx={{
+                height: "100%",
+                flexWrap: "nowrap",
+              }}
+            >
+              {/* Filters Section */}
+              <Grid2 size={3}>
                 <Box
                   sx={{
                     border: "2px solid #0A438F",
+                    height: "100%",
+                    borderRadius: 3,
                     padding: 2,
+                    overflow: "hidden",
                     display: "flex",
                     flexDirection: "column",
-                    width: "80%",
-                    height: "auto",
-                    borderRadius: 3,
                   }}
                 >
                   <Typography
                     variant='h6'
-                    sx={{ mb: 2, fontWeight: "bold", color: "#F40824" }}
+                    sx={{ mb: 3, fontWeight: "bold", color: "#F40824" }}
                   >
                     Filters
                   </Typography>
-                  <Typography variant='body1' sx={{ mb: 1, color: "#08397C" }}>
-                    Year Range:
-                  </Typography>
-                  <Slider
-                    value={dateRange}
-                    onChange={handleDateRangeChange}
-                    valueLabelDisplay='on'
-                    min={2010}
-                    max={2024}
-                    sx={{ my: 3, width: "80%", alignSelf: "center" }}
-                  />
+                  <Box sx={{ mb: 4 }}>
+                    <Typography
+                      variant='body1'
+                      sx={{
+                        mb: 2,
+                        color: "#08397C",
+                        position: "relative",
+                        zIndex: 2,
+                      }}
+                    >
+                      Year Range:
+                    </Typography>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        width: "100%",
+                        mt: 4,
+                      }}
+                    >
+                      <Slider
+                        value={dateRange}
+                        onChange={handleDateRangeChange}
+                        valueLabelDisplay='on'
+                        min={2010}
+                        max={2024}
+                        sx={{
+                          width: "90%",
+                          "& .MuiSlider-valueLabel": {
+                            backgroundColor: "#08397C",
+                          },
+                          "& .MuiSlider-rail": {
+                            backgroundColor: "#ccc",
+                          },
+                          "& .MuiSlider-track": {
+                            backgroundColor: "#08397C",
+                          },
+                          "& .MuiSlider-thumb": {
+                            backgroundColor: "#08397C",
+                          },
+                        }}
+                      />
+                    </Box>
+                  </Box>
                   <Typography variant='body1' sx={{ mb: 1, color: "#08397C" }}>
                     College:
                   </Typography>
                   <Box
                     sx={{
-                      height: "8rem",
+                      height: "25%",
                       overflowY: "auto",
+                      mb: 2,
+                      "&::-webkit-scrollbar": {
+                        width: "8px",
+                      },
+                      "&::-webkit-scrollbar-track": {
+                        background: "#f1f1f1",
+                        borderRadius: "4px",
+                      },
+                      "&::-webkit-scrollbar-thumb": {
+                        background: "#08397C",
+                        borderRadius: "4px",
+                      },
                     }}
                   >
                     {colleges.map((college) => (
@@ -439,8 +497,20 @@ const DepartmentCollection = () => {
                   </Typography>
                   <Box
                     sx={{
-                      height: "8rem",
+                      height: "30%",
                       overflowY: "auto",
+                      mb: 2,
+                      "&::-webkit-scrollbar": {
+                        width: "8px",
+                      },
+                      "&::-webkit-scrollbar-track": {
+                        background: "#f1f1f1",
+                        borderRadius: "4px",
+                      },
+                      "&::-webkit-scrollbar-thumb": {
+                        background: "#08397C",
+                        borderRadius: "4px",
+                      },
                     }}
                   >
                     {programs.map((program) => (
@@ -459,29 +529,37 @@ const DepartmentCollection = () => {
                       />
                     ))}
                   </Box>
-                  <Typography variant='body1' sx={{ color: "#08397C" }}>
-                    Publication Format:
-                  </Typography>
-                  {["Journal", "Proceeding", "Unpublished"].map((format) => (
-                    <FormControlLabel
-                      key={format}
-                      control={
-                        <Checkbox
-                          checked={selectedFormats.includes(format)}
-                          onChange={handleFormatChange}
-                          value={format}
-                        />
-                      }
-                      label={format}
-                    />
-                  ))}
+                  <Box sx={{ mt: "auto" }}>
+                    <Typography
+                      variant='body1'
+                      sx={{ mb: 1, color: "#08397C" }}
+                    >
+                      Publication Format:
+                    </Typography>
+                    {["Journal", "Proceeding", "Unpublished"].map((format) => (
+                      <FormControlLabel
+                        key={format}
+                        control={
+                          <Checkbox
+                            checked={selectedFormats.includes(format)}
+                            onChange={handleFormatChange}
+                            value={format}
+                          />
+                        }
+                        label={format}
+                      />
+                    ))}
+                  </Box>
                 </Box>
               </Grid2>
+
+              {/* Research List Section */}
               <Grid2 size={6}>
                 <Box
                   sx={{
                     height: "100%",
-                    boxSizing: "border-box",
+                    display: "flex",
+                    flexDirection: "column",
                   }}
                 >
                   <TextField
@@ -489,7 +567,10 @@ const DepartmentCollection = () => {
                     placeholder='Search by Title or Authors'
                     value={searchQuery}
                     onChange={handleSearchChange}
-                    sx={{ width: "30rem", paddingBottom: "1rem" }}
+                    sx={{
+                      width: "100%",
+                      mb: 2,
+                    }}
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position='start'>
@@ -498,69 +579,85 @@ const DepartmentCollection = () => {
                       ),
                     }}
                   />
-                  <Box sx={{ padding: 2, backgroundColor: "#F7F9FC" }}>
-                    {loading ? (
-                      <Typography>Loading...</Typography>
-                    ) : (
-                      <Virtuoso
-                        style={{ height: "29rem" }}
-                        data={paginatedResearch}
-                        itemContent={(index, researchItem) => (
-                          <Box
-                            key={researchItem.research_id}
-                            sx={{ marginBottom: 2, cursor: "pointer" }}
-                            onClick={() =>
-                              handleResearchItemClick(researchItem)
-                            }
-                          >
-                            <Typography variant='h6'>
-                              {researchItem.title}
-                            </Typography>
-                            <Typography variant='body2'>
-                              {researchItem.program_name} |{" "}
-                              {researchItem.authors
-                                .map((author) => author.name)
-                                .join("; ")}{" "}
-                              | {researchItem.year}
-                            </Typography>
-                            <Typography variant='caption'>
-                              {researchItem.journal}
-                            </Typography>
-                          </Box>
-                        )}
-                      />
-                    )}
+                  <Box
+                    sx={{
+                      flex: 1,
+                      backgroundColor: "#F7F9FC",
+                      borderRadius: 1,
+                      overflow: "hidden",
+                      display: "flex",
+                      flexDirection: "column",
+                    }}
+                  >
+                    <Box sx={{ flex: 1, overflow: "hidden" }}>
+                      {loading ? (
+                        <Typography>Loading...</Typography>
+                      ) : (
+                        <Virtuoso
+                          style={{ height: "100%" }}
+                          data={paginatedResearch}
+                          itemContent={(index, researchItem) => (
+                            <Box
+                              key={researchItem.research_id}
+                              sx={{
+                                p: 2,
+                                cursor: "pointer",
+                                "&:hover": {
+                                  backgroundColor: "rgba(0, 0, 0, 0.04)",
+                                },
+                              }}
+                              onClick={() =>
+                                handleResearchItemClick(researchItem)
+                              }
+                            >
+                              <Typography variant='h6'>
+                                {researchItem.title}
+                              </Typography>
+                              <Typography variant='body2'>
+                                {researchItem.program_name} |{" "}
+                                {researchItem.authors
+                                  .map((author) => author.name)
+                                  .join("; ")}{" "}
+                                | {researchItem.year}
+                              </Typography>
+                              <Typography variant='caption'>
+                                {researchItem.journal}
+                              </Typography>
+                            </Box>
+                          )}
+                        />
+                      )}
+                    </Box>
+                    <Pagination
+                      count={Math.ceil(filteredResearch.length / itemsPerPage)}
+                      page={currentPage}
+                      onChange={handleChangePage}
+                      sx={{
+                        py: 1,
+                        backgroundColor: "#fff",
+                        borderTop: "1px solid #eee",
+                      }}
+                    />
                   </Box>
-                  <Pagination
-                    count={Math.ceil(filteredResearch.length / itemsPerPage)}
-                    page={currentPage}
-                    onChange={handleChangePage}
-                    sx={{ mt: 1 }}
-                  />
                 </Box>
               </Grid2>
+
+              {/* Knowledge Graph Section */}
               <Grid2 size={3}>
-                <Button
-                  onClick={handleNavigateKnowledgeGraph}
+                <Box
                   sx={{
-                    width: "100%",
-                    height: "90%",
+                    height: "100%",
                     border: "1px solid #ccc",
-                    padding: 0,
-                    boxSizing: "border-box",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
+                    borderRadius: 3,
+                    overflow: "hidden",
                   }}
                 >
-                  <Box
+                  <Button
+                    onClick={handleNavigateKnowledgeGraph}
                     sx={{
                       width: "100%",
                       height: "100%",
-                      backgroundColor: "#FFF",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
+                      p: 0,
                     }}
                   >
                     <img
@@ -568,12 +665,12 @@ const DepartmentCollection = () => {
                       alt='Dummy Knowledge Graph'
                       style={{
                         width: "100%",
-                        height: "auto",
-                        objectFit: "contain",
+                        height: "100%",
+                        objectFit: "cover",
                       }}
                     />
-                  </Box>
-                </Button>
+                  </Button>
+                </Box>
               </Grid2>
             </Grid2>
           </Box>
