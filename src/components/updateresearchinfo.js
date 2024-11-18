@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "./navbar";
-import Footer from "./footer";
 import {
   Box,
   Button,
@@ -9,6 +8,8 @@ import {
   Typography,
   Grid2,
   Divider,
+  Modal,
+  MenuItem
 } from "@mui/material";
 import {
     Timeline,
@@ -32,11 +33,40 @@ const UpdateResearchInfo = ({route,navigate}) => {
   const [users, setUsers] = useState([]);
   const navpage = useNavigate();
   const location = useLocation();
+  const [openModal, setOpenModal] = useState(false);
   const { id } = location.state || {}; // Default to an empty object if state is undefined
   const [data, setData] = useState(null); // Start with null to represent no data
   const [selectedUser, setSelectedUser] = useState(null);
   const [newRole, setNewRole] = useState("");
   const [loading, setLoading] = useState(true); // Track loading state
+
+  const [conferenceTitle, setConferenceTitle] = useState("");
+  const [singleCountry, setSingleCountry] = useState("");
+  const [singleCity, setSingleCity] = useState("");
+  const [countries, setCountries] = useState([]);
+  const [Cities, setCities] = useState([]);
+  const [dateApproved, setDateApproved] = useState("");
+
+  const fetchCountries = async () => {
+    let country = await axios.get(
+      "https://countriesnow.space/api/v0.1/countries"
+    );
+    console.log(country);
+
+    setCountries(country.data.data);
+  };
+
+  const fetchCities = (country) => {
+    const selectedCountry = countries.find((c) => c.country === country);
+    if (selectedCountry) {
+      setCities(selectedCountry.cities);
+      setSingleCity(""); // Reset city when country changes
+    }
+  };
+
+  useEffect(() => {
+    fetchCountries();
+  }, []);
 
   useEffect(() => {
     if (id) {
@@ -75,7 +105,21 @@ const UpdateResearchInfo = ({route,navigate}) => {
     fetchUsers();
   }, []);
 
-  const [value, setValue] = useState(null);
+  const handleOpenModal = () => {
+    setOpenModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setConferenceTitle("");
+    setSingleCountry("");
+    setSingleCity("");
+    setDateApproved("");
+    setOpenModal(false);
+  };
+
+  const handleAddConference = () => {
+    // Insert Add Conference Logic Here...
+  };
 
   const [file, setFile] = useState(null);
 
@@ -329,7 +373,6 @@ const UpdateResearchInfo = ({route,navigate}) => {
                                         name='publicationName'
                                         value={null}
                                         onChange={null}
-                                        margin='normal'
                                         variant='outlined'
                                     ></TextField>
                                     </Grid2>
@@ -340,7 +383,6 @@ const UpdateResearchInfo = ({route,navigate}) => {
                                         name='publicationFormat'
                                         value={null}
                                         onChange={null}
-                                        margin='normal'
                                         variant='outlined'
                                     ></TextField>
                                     </Grid2>
@@ -351,7 +393,6 @@ const UpdateResearchInfo = ({route,navigate}) => {
                                         name='fundingagency'
                                         value={null}
                                         onChange={null}
-                                        margin='normal'
                                         variant='outlined'
                                     ></TextField>
                                     </Grid2>
@@ -362,7 +403,6 @@ const UpdateResearchInfo = ({route,navigate}) => {
                                         name='scopus'
                                         value={null}
                                         onChange={null}
-                                        margin='normal'
                                         variant='outlined'
                                     ></TextField>
                                     </Grid2>
@@ -389,77 +429,40 @@ const UpdateResearchInfo = ({route,navigate}) => {
                                 <Divider orientation='horizontal' flexItem />
                                 <Typography variant='body1' padding={1} sx={{ color: "#d40821" }}>Conference:</Typography>
                                 <Grid2 container paddingLeft={1} spacing={{ xs: 0, md: 3 }}>
-                                  <Grid2 item size={{ xs: 12, md: 6 }}>
-                                  <TextField
-                                      fullWidth
-                                      label='Title'
-                                      name='publicationName'
-                                      value={null}
-                                      onChange={null}
-                                      margin='normal'
-                                      variant='outlined'
-                                  ></TextField>
-                                  </Grid2>
-                                  <Grid2 item size={{ xs: 12, md: 3 }}>
-                                  <TextField
-                                      fullWidth
-                                      label='Venue'
-                                      name='publicationFormat'
-                                      value={null}
-                                      onChange={null}
-                                      margin='normal'
-                                      variant='outlined'
-                                  ></TextField>
-                                  </Grid2>
-                                  <Grid2 item size={{ xs: 12, md: 3 }}>
-                                  <TextField 
-                                      fullWidth
-                                      label='Date'
-                                      name='data'
-                                      value={null}
-                                      onChange={null}
-                                      margin='normal'
-                                      variant='outlined' 
-                                  ></TextField>
-                                  </Grid2>
-                                  <Grid2 item size={{ xs: 12, md: 12 }}>
-                                    <Box
+                                  <Box
+                                    sx={{
+                                      display: "flex",
+                                      alignItems: "center",
+                                      border: "1px dashed #ccc",
+                                      borderRadius: 1,
+                                      p: 1,
+                                      cursor: "pointer",
+                                      justifyContent: "center",
+                                      gap: 2,
+                                      mb: 1
+                                    }}
+                                  >
+                                    <Button 
+                                      variant='text'
+                                      color='primary'
                                       sx={{
-                                        display: "flex",
-                                        alignItems: "center",
-                                        border: "1px dashed #ccc",
-                                        width: "25rem",
-                                        height: "3rem",
-                                        maxWidth: "25rem",
+                                        width: "20rem",
+                                        color: "#08397C",
+                                        fontFamily: "Montserrat, sans-serif",
+                                        fontWeight: 400,
+                                        textTransform: "none",
+                                        fontSize: { xs: "0.875rem", md: "1rem" },
+                                        alignSelf: "center",
                                         maxHeight: "3rem",
-                                        p: 3,
-                                        cursor: "pointer",
-                                        justifyContent: "center",
-                                        gap: 2,
+                                        "&:hover": {
+                                          color: "#052045",
+                                        },
                                       }}
+                                      onClick={handleOpenModal}
                                     >
-                                      <Button 
-                                        variant='text'
-                                        color='primary'
-                                        sx={{
-                                          color: "#08397C",
-                                          fontFamily: "Montserrat, sans-serif",
-                                          fontWeight: 400,
-                                          textTransform: "none",
-                                          fontSize: { xs: "0.875rem", md: "1rem" },
-                                          width: "13rem",
-                                          alignSelf: "center",
-                                          borderRadius: "100px",
-                                          maxHeight: "3rem",
-                                          "&:hover": {
-                                            color: "#052045",
-                                          },
-                                        }}
-                                      >
-                                        + Add Conference
-                                      </Button>
-                                    </Box>
-                                  </Grid2>
+                                      + Add Conference
+                                    </Button>
+                                  </Box>
                                 </Grid2>
                                 <Box
                                     sx={{
@@ -498,7 +501,143 @@ const UpdateResearchInfo = ({route,navigate}) => {
                         </Box>
                     </Grid2>
 
-                    
+                    {/* Add Conference Modal */}
+                    <Modal
+                      open={openModal}
+                      onClose={handleCloseModal}
+                    >
+                      <Box
+                        sx={{
+                          position: "absolute",
+                          top: "50%",
+                          left: "50%",
+                          transform: "translate(-50%, -50%)",
+                          width: "40rem",
+                          bgcolor: "background.paper",
+                          boxShadow: 24,
+                          p: 5,
+                          borderRadius: "8px",
+                        }}
+                      >
+                        <Typography
+                          variant='h3'
+                          color='#08397C'
+                          fontWeight='1000'
+                          mb={4}
+                          sx={{
+                            textAlign: { xs: "left", md: "bottom" },
+                          }}
+                        >
+                          Add Conference
+                        </Typography>
+                        <TextField
+                          label='Conference Title'
+                          value={conferenceTitle}
+                          fullWidth
+                          onChange={(e) => setConferenceTitle(e.target.value)}
+                          margin='normal'
+                        />
+                        <TextField
+                          select
+                          fullWidth
+                          label="Country"
+                          value={singleCountry}
+                          onChange={(e) => {
+                            setSingleCountry(e.target.value);
+                            fetchCities(e.target.value);
+                          }}
+                          margin="normal"
+                        >
+                          <MenuItem value="" disabled>
+                            Select your country
+                          </MenuItem>
+                          {countries.map((country) => (
+                            <MenuItem key={country.country} value={country.country}>
+                              {country.country}
+                            </MenuItem>
+                          ))}
+                        </TextField>
+                        <TextField
+                          select
+                          fullWidth
+                          label="City"
+                          value={singleCity}
+                          onChange={(e) => setSingleCity(e.target.value)}
+                          margin="normal"
+                          disabled={!Cities.length} // Disable if no cities are loaded
+                          helperText='Select country first to select city'
+                        >
+                          <MenuItem value="" disabled>
+                            Select your city
+                          </MenuItem>
+                          {Cities.map((city) => (
+                            <MenuItem key={city} value={city}>
+                              {city}
+                            </MenuItem>
+                          ))}
+                        </TextField>
+                        <TextField
+                          fullWidth
+                          label='Date Approved'
+                          variant='outlined'
+                          type='date'
+                          margin='normal'
+                          value={dateApproved}
+                          onChange={(e) => setDateApproved(e.target.value)}
+                          InputLabelProps={{ shrink: true }}
+                        />
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            mt: 5,
+                          }}
+                        >
+                          <Button
+                            onClick={handleCloseModal}
+                            sx={{
+                              backgroundColor: "#08397C",
+                              color: "#FFF",
+                              fontFamily: "Montserrat, sans-serif",
+                              fontWeight: 600,
+                              fontSize: { xs: "0.875rem", md: "1.275rem" },
+                              padding: { xs: "0.5rem", md: "1.5rem" },
+                              borderRadius: "100px",
+                              maxHeight: "3rem",
+                              textTransform: "none",
+                              "&:hover": {
+                                backgroundColor: "#072d61",
+                              },
+                            }}
+                          >
+                            Cancel
+                          </Button>
+                          <Button
+                            variant='contained'
+                            color='primary'
+                            onClick={handleAddConference}
+                            sx={{
+                              backgroundColor: "#CA031B",
+                              color: "#FFF",
+                              fontFamily: "Montserrat, sans-serif",
+                              fontWeight: 600,
+                              textTransform: "none",
+                              fontSize: { xs: "0.875rem", md: "1.275rem" },
+                              padding: { xs: "0.5rem 1rem", md: "1.5rem" },
+                              marginLeft: "2rem",
+                              borderRadius: "100px",
+                              maxHeight: "3rem",
+                              "&:hover": {
+                                backgroundColor: "#A30417",
+                                color: "#FFF",
+                              },
+                            }}
+                          >
+                            Add
+                          </Button>
+                        </Box>
+                      </Box>
+                    </Modal>
 
                     {/* Right-side Timeline Section*/}
                     <Grid2 sx={{ display: "flex", flexDirection: "column", height: "100%"}} size={3}>
