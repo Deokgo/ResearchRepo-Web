@@ -59,10 +59,11 @@ const StatusUpdateButton = ({
         }}
       >
         {loading ? (
-          <CircularProgress size={24} color='inherit' />
-        ) : (
-          `Update Status to: ${statusToUpdate}`
-        )}
+            <CircularProgress size={24} color='inherit' />
+          ) : (
+            statusToUpdate === "COMPLETED" ? "COMPLETED" : `Update Status to: ${statusToUpdate}`
+          )}
+
       </Button>
       {success && (
         <div style={{ color: "green", marginTop: "1rem" }}>
