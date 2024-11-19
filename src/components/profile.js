@@ -85,7 +85,7 @@ const Profile = () => {
           email: data.account.email || "",
           role: data.account.role || "",
         });
-  
+
         // Set initial data for comparison
         setInitialData({
           firstName: data.researcher.first_name || "",
@@ -107,6 +107,9 @@ const Profile = () => {
       }
     }
   };  
+
+  // Disabling combobox when the role of the user are these:
+  const shouldDisableInputs = ['System Administrator', 'Director', 'Head Executive'].includes(formValues.role);
 
   // Effect to check selected department (console log)
   useEffect(() => {
@@ -166,11 +169,7 @@ const Profile = () => {
           alert("No changes detected. Please modify your profile before saving.");
         }else{
           // Validation to ensure no empty values (adjust as per requirements)
-        const missingFields = Object.entries(payload).filter(([key, value]) => !value && key !== 'middle_name' && key !== 'suffix');
-        if (missingFields.length > 0) {
-            alert(`Missing fields: ${missingFields.map(([key]) => key).join(', ')}`);
-            return;
-        }
+        
 
         // API call
         const response = await fetch(`/accounts/update_account/${userId}`, {
@@ -583,6 +582,7 @@ const Profile = () => {
                       width: '280px', // Set a fixed width
                       minWidth: '200px', // Optional: Set a minimum width for responsiveness
                     }}
+                    disabled={shouldDisableInputs} // Conditionally disable input based on role
                   >
                     {colleges.map((college) => (
                       <MenuItem key={college.college_id} value={college.college_id}>
@@ -610,6 +610,7 @@ const Profile = () => {
                       width: '280px', // Set a fixed width
                       minWidth: '200px', // Optional: Set a minimum width for responsiveness
                     }}
+                    disabled={shouldDisableInputs || !formValues.department} // Conditionally disable input based on role and department selection
                   >
                     {programs
                       .filter((program) => {
