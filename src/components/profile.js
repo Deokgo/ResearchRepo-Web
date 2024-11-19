@@ -56,6 +56,7 @@ const Profile = () => {
     program: "",
     email: "",
     role: "",
+    institution: "",
   });
 
   const [passwordValues, setPasswordValues] = useState({
@@ -73,6 +74,7 @@ const Profile = () => {
   
         // Set user data for later use
         setUserData(data);
+        console.log("response: ", response);
   
         // Set form values
         setFormValues({
@@ -83,7 +85,9 @@ const Profile = () => {
           department: data.researcher.college_id || "",
           program: data.researcher.program_id || "",
           email: data.account.email || "",
-          role: data.account.role || "",
+          role: data.account.role_name || "",
+          institution: data.researcher.institution || "",
+
         });
 
         // Set initial data for comparison
@@ -109,7 +113,9 @@ const Profile = () => {
   };  
 
   // Disabling combobox when the role of the user are these:
-  const shouldDisableInputs = ['System Administrator', 'Director', 'Head Executive'].includes(formValues.role);
+  const shouldDisableInputs = 
+  ['System Administrator', 'Director', 'Head Executive'].includes(formValues.role) || 
+  (formValues.role === 'Researcher' && (!formValues.department));
 
   // Effect to check selected department (console log)
   useEffect(() => {
@@ -168,8 +174,6 @@ const Profile = () => {
         if (!hasChanges) {
           alert("No changes detected. Please modify your profile before saving.");
         }else{
-          // Validation to ensure no empty values (adjust as per requirements)
-        
 
         // API call
         const response = await fetch(`/accounts/update_account/${userId}`, {
@@ -258,6 +262,10 @@ const Profile = () => {
 
   const handleOpenModal = async () => {
     setIsModalOpen(true);
+    console.log('Should disable inputs:', shouldDisableInputs);
+    console.log('Role:', formValues.role);
+    console.log('Department:', formValues.department);
+    console.log('Program:', formValues.program);
     await fetchUserData(); 
   };
 
@@ -456,7 +464,7 @@ const Profile = () => {
                   },
                   {
                     label: "Role",
-                    value: userData.account.role,
+                    value: userData.account.role_name,
                   },
                   {
                     label: "Department",
@@ -465,6 +473,10 @@ const Profile = () => {
                   {
                     label: "Program",
                     value: userData.researcher.program_id || "N/A",
+                  },
+                  {
+                    label: "Institution",
+                    value: userData.researcher.institution,
                   },
                 ].map((field, index) => (
                   <Grid2 size={{ xs: 12, sm: 6 }} key={index}>

@@ -31,6 +31,17 @@ const SignUpModal = () => {
     password: "",
   });
 
+  const resetFields = () => {
+    setFormData({
+      firstName: "",
+      lastName: "",
+      institution: "",
+      email: "",
+      reason: "",
+      password: "",
+    });
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
@@ -84,6 +95,7 @@ const SignUpModal = () => {
 
       const data = await response.json();
       alert(`Signup successful! User ID: ${data.user_id}`);
+      resetFields();
       closeSignupModal(); // Close the signup modal
       openLoginModal(); // Open the login modal
     } catch (error) {
@@ -346,6 +358,7 @@ const SignUpModal = () => {
                     href='#'
                     onClick={(e) => {
                       e.preventDefault();
+                      resetFields();
                       closeSignupModal();
                       openLoginModal();
                     }}

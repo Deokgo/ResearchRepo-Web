@@ -245,7 +245,7 @@ const ManageUsers = () => {
             >
               <TextField
                 variant='outlined'
-                placeholder='Search User...'
+                placeholder='Search by User ID or Email'
                 value={searchQuery}
                 onChange={handleSearchChange}
                 sx={{ width: "30rem" }}
@@ -355,8 +355,8 @@ const ManageUsers = () => {
                     borderRadius: "8px",
                   }}
                 >
-                  <Typography variant='h5' mb={3}>
-                    Edit User Role
+                  <Typography variant='h6' mb={3}>
+                    Edit User Role and Account Status
                   </Typography>
                   <TextField
                     label='User ID'

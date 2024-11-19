@@ -25,6 +25,13 @@ const LoginModal = ({ isOpen, handleClose }) => {
     }));
   };
 
+  const resetFields = () => {
+    setFormValues({
+      email: "",
+      password: "",
+    });
+  };
+
   const modalStyle = {
     position: "absolute",
     top: "50%",
@@ -182,6 +189,7 @@ const LoginModal = ({ isOpen, handleClose }) => {
                       e.preventDefault();
                       closeLoginModal();
                       openPassresetModal();
+                      resetFields();
                     }}
                     style={{ color: "#3393EA" }}
                   >
@@ -196,6 +204,7 @@ const LoginModal = ({ isOpen, handleClose }) => {
                       e.preventDefault();
                       closeLoginModal();
                       openSignupModal();
+                      resetFields();
                     }}
                     style={{ color: "#3393EA" }}
                   >
