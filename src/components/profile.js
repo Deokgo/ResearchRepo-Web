@@ -460,11 +460,11 @@ const Profile = () => {
                   },
                   {
                     label: "Department",
-                    value: userData.researcher.college_id,
+                    value: userData.researcher.college_id || "N/A",
                   },
                   {
                     label: "Program",
-                    value: userData.researcher.program_id,
+                    value: userData.researcher.program_id || "N/A",
                   },
                 ].map((field, index) => (
                   <Grid2 size={{ xs: 12, sm: 6 }} key={index}>
