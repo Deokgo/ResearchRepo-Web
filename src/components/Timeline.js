@@ -6,36 +6,36 @@ import TimelineConnector from "@mui/lab/TimelineConnector";
 import TimelineContent from "@mui/lab/TimelineContent";
 import TimelineDot from "@mui/lab/TimelineDot";
 import { Box } from "@mui/material";
+import axios from "axios";
 
 export default function DynamicTimeline({ researchId, refresh }) {
-  const [events, setEvents] = useState([]); // Initialize as an empty array
+  const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch data from the API whenever researchId or refresh changes
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(`/track/research_status/${researchId}`);
-        const data = await response.json();
-
-        // Ensure data is an array
-        if (Array.isArray(data)) {
-          setEvents(data);  // Set the data to state
-        } else {
-          setError("Received data is not an array");
-        }
-      } catch (err) {
-        setError("Failed to fetch data");
-        console.error(err);
-      } finally {
-        setLoading(false);
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(`/track/research_status/${researchId}`);
+      if (Array.isArray(response.data)) {
+        setEvents(response.data);
+      } else {
+        setError("Received data is not an array");
       }
-    };
+    } catch (err) {
+      setError("Failed to fetch data");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    // Call fetchData whenever the `refresh` or `researchId` changes
-    fetchData();
-  }, [researchId, refresh]); // Re-run when researchId or refresh changes
+  // This useEffect will run whenever refresh changes
+  useEffect(() => {
+    if (researchId) {
+      fetchData();
+    }
+  }, [researchId, refresh]); // Added refresh to dependencies
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
@@ -43,7 +43,12 @@ export default function DynamicTimeline({ researchId, refresh }) {
   // Render the Timeline component when data is available
   return (
     <Box sx={{ width: "100%", margin: "" }}>
-      <Timeline sx={{ paddingLeft: "15%", "& .MuiTimelineItem-root:before": { display: "none" } }}>
+      <Timeline
+        sx={{
+          paddingLeft: "15%",
+          "& .MuiTimelineItem-root:before": { display: "none" },
+        }}
+      >
         {events.length === 0 ? (
           <TimelineItem>
             <TimelineContent>No events found</TimelineContent>
@@ -54,7 +59,8 @@ export default function DynamicTimeline({ researchId, refresh }) {
               <TimelineSeparator>
                 <TimelineDot
                   style={{
-                    backgroundColor: index === events.length - 1 ? "red" : "#888",
+                    backgroundColor:
+                      index === events.length - 1 ? "red" : "#888",
                   }}
                 />
                 {index < events.length - 1 && <TimelineConnector />}

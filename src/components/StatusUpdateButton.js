@@ -2,7 +2,12 @@ import React, { useState } from "react";
 import { Button, CircularProgress } from "@mui/material";
 import axios from "axios";
 
-const StatusUpdateButton = ({ apiUrl, statusToUpdate, disabled }) => {
+const StatusUpdateButton = ({
+  apiUrl,
+  statusToUpdate,
+  disabled,
+  onStatusUpdate,
+}) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
@@ -13,13 +18,16 @@ const StatusUpdateButton = ({ apiUrl, statusToUpdate, disabled }) => {
     setSuccess(false);
 
     try {
-      const response = await axios.post(apiUrl, { status: statusToUpdate });
-      if (response.status === 200) {
+      if (onStatusUpdate) {
+        await onStatusUpdate(statusToUpdate);
         setSuccess(true);
       }
     } catch (err) {
       console.error(err);
-      setError("Failed to update status. Please try again.");
+      setError(
+        err.response?.data?.message ||
+          "Failed to update status. Please try again."
+      );
     } finally {
       setLoading(false);
     }
@@ -28,8 +36,8 @@ const StatusUpdateButton = ({ apiUrl, statusToUpdate, disabled }) => {
   return (
     <div style={{ textAlign: "center", marginTop: "2rem" }}>
       <Button
-        variant="contained"
-        color="primary"
+        variant='contained'
+        color='primary'
         onClick={handleClick}
         disabled={loading || disabled} // Button is disabled based on loading state or if 'disabled' is true
         sx={{
@@ -51,7 +59,7 @@ const StatusUpdateButton = ({ apiUrl, statusToUpdate, disabled }) => {
         }}
       >
         {loading ? (
-          <CircularProgress size={24} color="inherit" />
+          <CircularProgress size={24} color='inherit' />
         ) : (
           `Update Status to: ${statusToUpdate}`
         )}
