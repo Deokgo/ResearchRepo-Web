@@ -14,21 +14,13 @@ import {
   Modal,
   MenuItem,
 } from "@mui/material";
-import {
-  Timeline,
-  TimelineItem,
-  TimelineSeparator,
-  TimelineConnector,
-  TimelineContent,
-  TimelineDot,
-} from "@mui/lab";
-import TimelineOppositeContent, {
-  timelineOppositeContentClasses,
-} from "@mui/lab/TimelineOppositeContent";
+import Stack from '@mui/material/Stack';
+import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
+import DownloadIcon from '@mui/icons-material/Download';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import { useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import homeBg from "../assets/home_bg.png";
-import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import axios from "axios";
 import FileUploader from "./FileUploader";
 import { Title } from "@mui/icons-material";
@@ -394,8 +386,7 @@ const UpdateResearchInfo = ({ route, navigate }) => {
                       </Typography>
                       <Grid2
                         container
-                        spacing={{ xs: 0, md: 3 }}
-                        sx={{ mb: "1rem" }}
+                        sx={{ mb: "3rem", mt: "1rem" }}
                       >
                         {data && data.dataset && data.dataset.length > 0 ? (
                           data.dataset.map((item, index) => (
@@ -403,109 +394,147 @@ const UpdateResearchInfo = ({ route, navigate }) => {
                               sx={{
                                 display: "flex",
                                 flexDirection: "column",
-                                width: "auto",
-                                paddingLeft: 3,
+                                borderRadius: 2,
+                                width: "100%",
                               }}
                             >
-                              <Typography
-                                variant='h3'
-                                fontWeight='700'
-                                sx={{ color: "#08397C", mb: "2rem" }}
-                                gutterBottom
-                              >
-                                {item.title}
-                              </Typography>
-                              <Typography variant='body1' sx={{ mb: "1rem" }}>
-                                <strong>College Department:</strong>{" "}
-                                {item.college_id}
-                              </Typography>
-                              <Typography variant='body1' sx={{ mb: "1rem" }}>
-                                <strong>Program:</strong> {item.program_name}
-                              </Typography>
-                              <Typography variant='body1' sx={{ mb: "1rem" }}>
-                                <strong>Authors:</strong>{" "}
-                                {Array.isArray(item.authors)
-                                  ? item.authors
-                                      .map(
-                                        (author) =>
-                                          `${author.name} (${author.email})`
-                                      )
-                                      .join("; ")
-                                  : "No authors available"}
-                              </Typography>
-                              <Typography variant='body1' sx={{ mb: "1rem" }}>
-                                <strong>Adviser:</strong>{" "}
-                                {item.adviser
-                                  ? `${item.adviser.name} (${item.adviser.email})`
-                                  : "No adviser available"}
-                              </Typography>
-                              <Typography variant='body1' sx={{ mb: "1rem" }}>
-                                <strong>Panel Members:</strong>{" "}
-                                {Array.isArray(item.panels) &&
-                                item.panels.length > 0
-                                  ? item.panels
-                                      .map(
-                                        (panel) =>
-                                          `${panel.name} (${panel.email})`
-                                      )
-                                      .join("; ")
-                                  : "No panel members available"}
-                              </Typography>
-                              <Typography variant='body1' sx={{ mb: "1rem" }}>
-                                <strong>Abstract:</strong>{" "}
-                                {item.abstract || "No abstract available"}
-                              </Typography>
-                              <Typography variant='body1' sx={{ mb: "1rem" }}>
-                                <strong>Keywords:</strong>{" "}
-                                {Array.isArray(item.keywords)
-                                  ? item.keywords.join("; ")
-                                  : "No keywords available"}
-                              </Typography>
-                              <Typography variant='body1' sx={{ mb: "1rem" }}>
-                                <strong>Journal:</strong> {item.journal}
-                              </Typography>
-                              <Typography variant='body1' sx={{ mb: "1rem" }}>
-                                <strong>Research Type:</strong>{" "}
-                                {item.research_type}
-                              </Typography>
-                              <Typography variant='body1' sx={{ mb: "1rem" }}>
-                                <strong>SDG:</strong> {item.sdg}
-                              </Typography>
-                              <Typography variant='body1' sx={{ mb: "1rem" }}>
-                                <strong>Year:</strong> {item.year}
-                              </Typography>
-                              <Typography variant='body1' sx={{ mb: "1rem" }}>
-                                <strong>Download Count:</strong>{" "}
-                                {item.download_count}
-                              </Typography>
-                              <Typography variant='body1' sx={{ mb: "1rem" }}>
-                                <strong>View Count:</strong> {item.view_count}
-                              </Typography>
-                              <Button
-                                variant='contained'
-                                color='primary'
-                                sx={{
-                                  backgroundColor: "#08397C",
-                                  color: "#FFF",
-                                  fontFamily: "Montserrat, sans-serif",
-                                  fontWeight: 400,
-                                  textTransform: "none",
-                                  fontSize: { xs: "0.875rem", md: "1rem" },
-                                  padding: { xs: "0.5rem 1rem", md: "1rem" },
-                                  marginTop: "1rem",
-                                  marginBottom: "1rem",
-                                  width: "13rem",
-                                  borderRadius: "100px",
-                                  maxHeight: "3rem",
-                                  "&:hover": {
-                                    backgroundColor: "#052045",
-                                    color: "#FFF",
-                                  },
-                                }}
-                                onClick={() => handleViewManuscript(item)}
-                              >
-                                View Manuscript
-                              </Button>
+                              <Grid2 container display='flex' flexDirection='column' justifyContent='center'>
+                                <Typography
+                                  variant='h3'
+                                  alignSelf='center'
+                                  textAlign="center"
+                                  fontWeight='700'
+                                  sx={{ color: "#08397C", width: "90%"}}
+                                  gutterBottom
+                                >
+                                  {item.title}
+                                </Typography>
+                                <Typography 
+                                  variant='h6' 
+                                  sx={{ mb: "1rem" }} 
+                                  alignSelf='center'
+                                  fontWeight='600'
+                                >
+                                  {Array.isArray(item.authors)
+                                    ? item.authors
+                                        .map((author) => `${(author.name)}`)
+                                        .join(", ")
+                                    : "No authors available"}
+                                </Typography>
+                                <Typography
+                                  variant='h7' 
+                                  sx={{ mb: "1rem", color:"#8B8B8B"}} 
+                                  alignSelf='center'
+                                  fontWeight='500'
+                                >
+                                  {item.year}
+                                </Typography>
+                              </Grid2>
+
+                              <Grid2 container display='flex' justifyContent='flex-end'>
+                                <Stack direction="row" alignContent="center" gap={1}>
+                                  <DownloadIcon color='primary'/>
+                                  <Typography variant='h7' sx={{ mr: "2rem" }}>
+                                    {item.download_count} Downloads
+                                  </Typography>
+                                </Stack>
+                                <Stack direction="row" alignContent="center" gap={1}>
+                                  <VisibilityIcon color='primary'/>
+                                  <Typography variant='h7' sx={{ mr: "1rem" }}>
+                                    {item.view_count} Views
+                                  </Typography>
+                                </Stack>
+                              </Grid2>
+                              
+                              <Divider variant="middle" sx={{ mt: "1rem", mb: "2rem"}}/>
+
+                              <Grid2 container display='flex' paddingLeft={2} paddingRight={2}>
+                                <Grid2 size={8} paddingRight={10}>
+                                  <Typography variant='h6' fontWeight='700' sx={{ mb: "1rem" }}>Keywords:</Typography>
+                                  <Typography variant='body1'>
+                                    {Array.isArray(item.keywords)
+                                      ? item.keywords.join("; ")
+                                      : "No keywords available"}
+                                  </Typography>
+                                  <Typography variant='h6' fontWeight='700' sx={{ mt: "2rem", mb: "1rem" }}>Abstract:</Typography>
+                                  <Typography variant='body1'>
+                                    {item.abstract || "No abstract available"}
+                                  </Typography>
+                                </Grid2>
+                                <Grid2 size={4} justifyContent='flex-end'>
+                                  <Box
+                                    sx={{
+                                      display: "flex",
+                                      flexDirection: "column",
+                                      position: "relative",
+                                      width: "auto",
+                                      bgcolor: "#f0f0f0",
+                                      borderRadius: 2,
+                                      padding: 3,
+                                      height: "auto",
+                                    }}
+                                  >
+                                    <Typography variant='h7' sx={{ mb: "1rem" }}>
+                                      <strong>College Department:</strong>{" "}
+                                      {item.college_id}
+                                    </Typography>
+                                    <Typography variant='h7' sx={{ mb: "1rem" }}>
+                                      <strong>Program:</strong> 
+                                      {item.program_name}
+                                    </Typography>
+                                    <Typography variant='body1' sx={{ mb: "1rem" }}>
+                                      <strong>Adviser:</strong>{" "}
+                                      {item.adviser
+                                        ? `${item.adviser.name}`
+                                        : "No adviser available"}
+                                    </Typography>
+                                    <Typography variant='body1' sx={{ mb: "1rem" }}>
+                                      <strong>Panel Members:</strong>{" "}
+                                      {Array.isArray(item.panels) &&
+                                      item.panels.length > 0
+                                        ? item.panels
+                                            .map((panel) => `${panel.name}`)
+                                            .join("; ")
+                                        : "No panel members available"}
+                                    </Typography>
+                                    <Divider variant="middle" sx={{ mt: "1rem", mb: "1rem"}}/>
+                                    <Typography variant='body1' sx={{ mb: "1rem" }}>
+                                      <strong>Journal:</strong> {item.journal}
+                                    </Typography>
+                                    <Typography variant='body1' sx={{ mb: "1rem" }}>
+                                      <strong>Research Type:</strong>{" "}
+                                      {item.research_type}
+                                    </Typography>
+                                    <Typography variant='body1' sx={{ mb: "1rem" }}>
+                                      <strong>SDG:</strong> {item.sdg}
+                                    </Typography>
+                                    <Button
+                                      variant='contained'
+                                      color='primary'
+                                      sx={{
+                                        backgroundColor: "#08397C",
+                                        color: "#FFF",
+                                        fontFamily: "Montserrat, sans-serif",
+                                        fontWeight: 400,
+                                        textTransform: "none",
+                                        fontSize: { xs: "0.875rem", md: "1rem" },
+                                        padding: { xs: "0.5rem 1rem", md: "1rem" },
+                                        marginTop: "2rem",
+                                        width: "13rem",
+                                        alignSelf: "center",
+                                        borderRadius: "100px",
+                                        maxHeight: "3rem",
+                                        "&:hover": {
+                                          backgroundColor: "#072d61",
+                                        },
+                                      }}
+                                      onClick={() => handleViewManuscript(item)}
+                                    >
+                                      View PDF
+                                    </Button>
+                                  </Box>               
+                                </Grid2>
+                              </Grid2>
                             </Box>
                           ))
                         ) : (
@@ -577,7 +606,7 @@ const UpdateResearchInfo = ({ route, navigate }) => {
                               cursor: "pointer",
                               justifyContent: "center",
                               gap: 2,
-                              mb: 1,
+                              mb: 5,
                             }}
                           >
                             <FileUploader
