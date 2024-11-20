@@ -31,6 +31,7 @@ import homeBg from "../assets/home_bg.png";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import axios from "axios";
 import FileUploader from "./FileUploader";
+import { Title } from "@mui/icons-material";
 
 const UpdateResearchInfo = ({ route, navigate }) => {
   const [users, setUsers] = useState([]);
@@ -122,8 +123,67 @@ const UpdateResearchInfo = ({ route, navigate }) => {
     setOpenModal(false);
   };
 
-  const handleAddConference = () => {
-    // Insert Add Conference Logic Here...
+  const handleAddConference = async () => {
+    try {
+      // Validate required fields
+      const requiredFields = {
+        "Conference Title": conferenceTitle,
+        Country: singleCountry,
+        City: singleCity,
+        "Conference Date": dateApproved
+      };
+
+      const missingFields = Object.entries(requiredFields)
+        .filter(([_, value]) => {
+          if (Array.isArray(value)) {
+            return value.length === 0;
+          }
+          return !value;
+        })
+        .map(([key]) => key);
+
+      if (missingFields.length > 0) {
+        alert(
+          `Please fill in all required fields: ${missingFields.join(", ")}`
+        );
+        return;
+      }
+
+      const formData = new FormData();
+
+      // Get user_id from localStorage
+      const userId = localStorage.getItem("user_id");
+      formData.append("user_id", userId);
+
+      // Add all required fields to formData
+      formData.append("conference_title", conferenceTitle);
+      formData.append("country", singleCountry);
+      formData.append("city", singleCity);
+      formData.append("conference_date", dateApproved);
+
+      // Send the conference data
+      const response = await axios.post("/conference/add_conference", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      console.log("Response:", response.data);
+      alert("Conference added successfully!");
+      handleCloseModal();
+    } catch (error) {
+      console.error("Error adding conference:", error);
+      if (error.response) {
+        console.error("Error response:", error.response.data);
+        alert(
+          `Failed to add conference: ${
+            error.response.data.error || "Please try again."
+          }`
+        );
+      } else {
+        alert("Failed to add conference. Please try again.");
+      }
+    }
   };
 
   const [file, setFile] = useState(null);
