@@ -17,15 +17,17 @@ import Footer from "./footer";
 import homeBg from "../assets/home_bg.png";
 import { Search } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-import Stack from '@mui/material/Stack';
-import Divider from '@mui/material/Divider';
+import Stack from "@mui/material/Stack";
+import Divider from "@mui/material/Divider";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
-import DownloadIcon from '@mui/icons-material/Download';
-import VisibilityIcon from '@mui/icons-material/Visibility';
+import DownloadIcon from "@mui/icons-material/Download";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 import axios from "axios";
 import { Virtuoso } from "react-virtuoso";
 import DummyKG from "../assets/dummy_kg_keyword.png";
 import Modal from "@mui/material/Modal";
+import { useModalContext } from "./modalcontext";
+import AddPaperModal from "./addpapermodal";
 
 const DepartmentCollection = () => {
   const navigate = useNavigate();
@@ -45,6 +47,8 @@ const DepartmentCollection = () => {
   const [selectedResearchItem, setSelectedResearchItem] = useState(null);
   const [response, setReponse] = useState(null);
   const itemsPerPage = 5;
+  const { isAddPaperModalOpen, openAddPaperModal, closeAddPaperModal } =
+    useModalContext();
 
   const handleNavigateKnowledgeGraph = () => {
     navigate("/knowledgegraph");
@@ -54,28 +58,34 @@ const DepartmentCollection = () => {
     try {
       const currentTime = Date.now(); // Get the current timestamp
       const lastViewedTimeKey = `lastViewedTime_${item.research_id}`;
-      const lastViewedTime = parseInt(localStorage.getItem(lastViewedTimeKey), 10);
+      const lastViewedTime = parseInt(
+        localStorage.getItem(lastViewedTimeKey),
+        10
+      );
       const userId = localStorage.getItem("user_id");
-  
+
       // Determine if increment is needed
-      const isIncrement = !lastViewedTime || currentTime - lastViewedTime > 30000;
-  
+      const isIncrement =
+        !lastViewedTime || currentTime - lastViewedTime > 30000;
+
       const response = await axios.put(
         `/paper/increment_views/${item.research_id}?is_increment=${isIncrement}`,
         {
           user_id: userId,
         }
       );
-  
+
       // Update the item and save the current timestamp
       const updatedItem = {
         ...item,
         view_count: response.data.updated_views,
         download_count: response.data.download_count,
       };
-  
+
       // setSelectedResearchItem(updatedItem);
-      navigate(`/displayresearchinfo/`,{state:{id:updatedItem.research_id}});
+      navigate(`/displayresearchinfo/`, {
+        state: { id: updatedItem.research_id },
+      });
 
       if (isIncrement) {
         localStorage.setItem(lastViewedTimeKey, currentTime); // Save the current timestamp
@@ -87,10 +97,10 @@ const DepartmentCollection = () => {
         status: error.response?.status,
         item: item,
       });
-      navigate(`/displayresearchinfo/`,{state:{id:item.research_id}}); // Fall back to the original item if an error occurs
+      navigate(`/displayresearchinfo/`, { state: { id: item.research_id } }); // Fall back to the original item if an error occurs
     }
   };
-  
+
   const handleCloseModal = () => {
     setSelectedResearchItem(null);
   };
@@ -281,12 +291,12 @@ const DepartmentCollection = () => {
             responseType: "blob",
           }
         );
-  
+
         // Create a URL for the Blob and open it in a new tab
         const blob = new Blob([response.data], { type: "application/pdf" });
         const url = window.URL.createObjectURL(blob);
         window.open(url, "_blank");
-  
+
         // Increment the download count after successfully displaying the Blob
         const userId = localStorage.getItem("user_id");
         const incrementResponse = await axios.put(
@@ -295,7 +305,7 @@ const DepartmentCollection = () => {
             user_id: userId,
           }
         );
-  
+
         // Update the download count in the researchItem object
         const updatedItem = {
           ...researchItem,
@@ -314,7 +324,7 @@ const DepartmentCollection = () => {
     } else {
       alert("No manuscript available for this research.");
     }
-  };  
+  };
 
   return (
     <>
@@ -583,112 +593,146 @@ const DepartmentCollection = () => {
                     flexDirection: "column",
                   }}
                 >
-                  <TextField
-                    variant='outlined'
-                    placeholder='Search by Title or Authors'
-                    value={searchQuery}
-                    onChange={handleSearchChange}
-                    sx={{
-                      width: "100%",
-                      mb: 2,
-                    }}
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position='start'>
-                          <Search />
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
                   <Box
                     sx={{
-                      flex: 1,
-                      backgroundColor: "#F7F9FC",
-                      borderRadius: 1,
-                      overflow: "hidden",
+                      height: "100%",
                       display: "flex",
                       flexDirection: "column",
                     }}
                   >
-                    <Box sx={{ flex: 1, overflow: "hidden" }}>
-                      {loading ? (
-                        <Typography>Loading...</Typography>
-                      ) : (
-                        <Virtuoso
-                          style={{ height: "100%" }}
-                          data={paginatedResearch}
-                          itemContent={(index, researchItem) => (
-                            <Box
-                              key={researchItem.research_id}
-                              sx={{
-                                p: 2,
-                                cursor: "pointer",
-                                minHeight: "calc((100% - 48px) / 5)",
-                                display: "flex",
-                                flexDirection: "column",
-                                justifyContent: "center",
-                                borderBottom: "1px solid rgba(0, 0, 0, 0.1)",
-                                "&:hover": {
-                                  backgroundColor: "rgba(0, 0, 0, 0.04)",
-                                },
-                              }}
-                              onClick={() =>
-                                handleResearchItemClick(researchItem)
-                              }
-                            >
-                              <Typography
-                                variant='h6'
-                                sx={{
-                                  mb: 1.5,
-                                  fontSize: "1.1rem",
-                                  fontWeight: 500,
-                                }}
-                              >
-                                {researchItem.title}
-                              </Typography>
-                              <Typography
-                                variant='body2'
-                                sx={{
-                                  mb: 1,
-                                  color: "#666",
-                                }}
-                              >
-                                {researchItem.program_name} |{" "}
-                                {researchItem.authors
-                                  .map((author) => author.name)
-                                  .join("; ")}{" "}
-                                | {researchItem.year}
-                              </Typography>
-                              <Typography
-                                variant='caption'
-                                sx={{
-                                  color: "#0A438F",
-                                  fontWeight: 500,
-                                }}
-                              >
-                                {researchItem.journal}
-                              </Typography>
-                            </Box>
-                          )}
-                        />
-                      )}
-                    </Box>
                     <Box
                       sx={{
                         display: "flex",
-                        justifyContent: "center",
-                        py: 1,
-                        backgroundColor: "#fff",
-                        borderTop: "1px solid #eee",
+                        gap: 2,
+                        mb: 2,
                       }}
                     >
-                      <Pagination
-                        count={Math.ceil(
-                          filteredResearch.length / itemsPerPage
-                        )}
-                        page={currentPage}
-                        onChange={handleChangePage}
+                      <TextField
+                        variant='outlined'
+                        placeholder='Search by Title or Authors'
+                        value={searchQuery}
+                        onChange={handleSearchChange}
+                        sx={{ flex: 2 }}
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position='start'>
+                              <Search />
+                            </InputAdornment>
+                          ),
+                        }}
                       />
+                      <Button
+                        variant='contained'
+                        color='primary'
+                        sx={{
+                          flex: 1,
+                          backgroundColor: "#08397C",
+                          color: "#FFF",
+                          fontFamily: "Montserrat, sans-serif",
+                          fontWeight: 600,
+                          textTransform: "none",
+                          fontSize: { xs: "0.875rem", md: "1.275rem" },
+                          padding: { xs: "0.5rem 1rem", md: "0.75rem" },
+                          borderRadius: "100px",
+                          "&:hover": {
+                            backgroundColor: "#072d61",
+                          },
+                        }}
+                        onClick={openAddPaperModal}
+                      >
+                        + Add New Paper
+                      </Button>
+                    </Box>
+                    <Box
+                      sx={{
+                        flex: 1,
+                        backgroundColor: "#F7F9FC",
+                        borderRadius: 1,
+                        overflow: "hidden",
+                        display: "flex",
+                        flexDirection: "column",
+                      }}
+                    >
+                      <Box sx={{ flex: 1, overflow: "hidden" }}>
+                        {loading ? (
+                          <Typography>Loading...</Typography>
+                        ) : (
+                          <Virtuoso
+                            style={{ height: "100%" }}
+                            data={paginatedResearch}
+                            itemContent={(index, researchItem) => (
+                              <Box
+                                key={researchItem.research_id}
+                                sx={{
+                                  p: 2,
+                                  cursor: "pointer",
+                                  minHeight: "calc((100% - 48px) / 5)",
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  justifyContent: "center",
+                                  borderBottom: "1px solid rgba(0, 0, 0, 0.1)",
+                                  "&:hover": {
+                                    backgroundColor: "rgba(0, 0, 0, 0.04)",
+                                  },
+                                }}
+                                onClick={() =>
+                                  handleResearchItemClick(researchItem)
+                                }
+                              >
+                                <Typography
+                                  variant='h6'
+                                  sx={{
+                                    mb: 1.5,
+                                    fontSize: "1.1rem",
+                                    fontWeight: 500,
+                                  }}
+                                >
+                                  {researchItem.title}
+                                </Typography>
+                                <Typography
+                                  variant='body2'
+                                  sx={{
+                                    mb: 1,
+                                    color: "#666",
+                                  }}
+                                >
+                                  {researchItem.program_name} |{" "}
+                                  {researchItem.authors
+                                    .map((author) => author.name)
+                                    .join("; ")}{" "}
+                                  | {researchItem.year}
+                                </Typography>
+                                <Typography
+                                  variant='caption'
+                                  sx={{
+                                    color: "#0A438F",
+                                    fontWeight: 500,
+                                  }}
+                                >
+                                  {researchItem.journal}
+                                </Typography>
+                              </Box>
+                            )}
+                          />
+                        )}
+                      </Box>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "center",
+                          py: 1,
+                          backgroundColor: "#fff",
+                          borderTop: "1px solid #eee",
+                        }}
+                      >
+                        <Pagination
+                          count={Math.ceil(
+                            filteredResearch.length / itemsPerPage
+                          )}
+                          page={currentPage}
+                          onChange={handleChangePage}
+                        />
+                      </Box>
                     </Box>
                   </Box>
                 </Box>
@@ -728,6 +772,11 @@ const DepartmentCollection = () => {
           </Box>
         </Box>
       </Box>
+      <AddPaperModal
+        isOpen={isAddPaperModalOpen}
+        handleClose={closeAddPaperModal}
+        onPaperAdded={fetchAllResearchData}
+      />
     </>
   );
 };
