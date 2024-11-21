@@ -74,7 +74,9 @@ const DepartmentCollection = () => {
         download_count: response.data.download_count,
       };
   
-      setSelectedResearchItem(updatedItem);
+      // setSelectedResearchItem(updatedItem);
+      navigate(`/displayresearchinfo/`,{state:{id:updatedItem.research_id}});
+
       if (isIncrement) {
         localStorage.setItem(lastViewedTimeKey, currentTime); // Save the current timestamp
       }
@@ -85,7 +87,7 @@ const DepartmentCollection = () => {
         status: error.response?.status,
         item: item,
       });
-      setSelectedResearchItem(item); // Fall back to the original item if an error occurs
+      navigate(`/displayresearchinfo/`,{state:{id:item.research_id}}); // Fall back to the original item if an error occurs
     }
   };
   
@@ -726,173 +728,6 @@ const DepartmentCollection = () => {
           </Box>
         </Box>
       </Box>
-
-      {/* View Research Details */}
-      <Modal open={Boolean(selectedResearchItem)} onClose={handleCloseModal}>
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: "80rem",
-            bgcolor: "background.paper",
-            boxShadow: 24,
-            borderRadius: 2,
-            py: 8,
-            pl: 5,
-            pr: 5,
-            height: "45rem",
-            overflow: "hidden",
-            overflowY: "scroll",
-          }}
-        >
-          {selectedResearchItem && (
-            <>
-              <Grid2 container display='flex' flexDirection='column' justifyContent='center'>
-                <Typography
-                  variant='h3'
-                  alignSelf='center'
-                  textAlign="center"
-                  fontWeight='700'
-                  sx={{ color: "#08397C", width: "100%"}}
-                  gutterBottom
-                >
-                  {selectedResearchItem.title}
-                </Typography>
-                <Typography 
-                  variant='h6' 
-                  sx={{ mb: "1rem" }} 
-                  alignSelf='center'
-                  fontWeight='600'
-                >
-                  {Array.isArray(selectedResearchItem.authors)
-                    ? selectedResearchItem.authors
-                        .map((author) => `${(author.name)}`)
-                        .join(", ")
-                    : "No authors available"}
-                </Typography>
-                <Typography
-                  variant='h7' 
-                  sx={{ mb: "1rem", color:"#8B8B8B"}} 
-                  alignSelf='center'
-                  fontWeight='500'
-                >
-                  {selectedResearchItem.year}
-                </Typography>
-              </Grid2>
-
-              <Grid2 container display='flex' justifyContent='flex-end'>
-                <Stack direction="row" alignContent="center" gap={1}>
-                  <DownloadIcon color='primary'/>
-                  <Typography variant='h7' sx={{ mr: "2rem" }}>
-                    {selectedResearchItem.download_count} Downloads
-                  </Typography>
-                </Stack>
-                <Stack direction="row" alignContent="center" gap={1}>
-                  <VisibilityIcon color='primary'/>
-                  <Typography variant='h7' sx={{ mr: "1rem" }}>
-                    {selectedResearchItem.view_count} Views
-                  </Typography>
-                </Stack>
-              </Grid2>
-              
-              <Divider variant="middle" sx={{ mt: "1rem", mb: "2rem"}}/>
-
-              <Grid2 container display='flex' paddingLeft={2} paddingRight={2}>
-                <Grid2 size={8} paddingRight={10}>
-                  <Typography variant='h6' fontWeight='700' sx={{ mb: "1rem" }}>Keywords:</Typography>
-                  <Typography variant='body1'>
-                    {Array.isArray(selectedResearchItem.keywords)
-                      ? selectedResearchItem.keywords.join("; ")
-                      : "No keywords available"}
-                  </Typography>
-                  <Typography variant='h6' fontWeight='700' sx={{ mt: "2rem", mb: "1rem" }}>Abstract:</Typography>
-                  <Typography variant='body1'>
-                    {selectedResearchItem.abstract || "No abstract available"}
-                  </Typography>
-                </Grid2>
-                <Grid2 size={4} justifyContent='flex-end'>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      flexDirection: "column",
-                      position: "absolute",
-                      width: "auto",
-                      bgcolor: "#f0f0f0",
-                      borderRadius: 2,
-                      marginRight: 5,
-                      padding: 3,
-                      height: "auto",
-                    }}
-                  >
-                    <Typography variant='h7' sx={{ mb: "1rem" }}>
-                      <strong>College Department:</strong>{" "}
-                      {selectedResearchItem.college_id}
-                    </Typography>
-                    <Typography variant='h7' sx={{ mb: "1rem" }}>
-                      <strong>Program:</strong> {selectedResearchItem.program_name}
-                    </Typography>
-                    <Typography variant='body1' sx={{ mb: "1rem" }}>
-                      <strong>Adviser:</strong>{" "}
-                      {selectedResearchItem.adviser
-                        ? `${selectedResearchItem.adviser.name}`
-                        : "No adviser available"}
-                    </Typography>
-                    <Typography variant='body1' sx={{ mb: "1rem" }}>
-                      <strong>Panel Members:</strong>{" "}
-                      {Array.isArray(selectedResearchItem.panels) &&
-                      selectedResearchItem.panels.length > 0
-                        ? selectedResearchItem.panels
-                            .map((panel) => `${panel.name}`)
-                            .join("; ")
-                        : "No panel members available"}
-                    </Typography>
-                    <Button
-                      variant='contained'
-                      color='primary'
-                      sx={{
-                        backgroundColor: "#08397C",
-                        color: "#FFF",
-                        fontFamily: "Montserrat, sans-serif",
-                        fontWeight: 400,
-                        textTransform: "none",
-                        fontSize: { xs: "0.875rem", md: "1rem" },
-                        padding: { xs: "0.5rem 1rem", md: "1rem" },
-                        marginTop: "2rem",
-                        width: "13rem",
-                        alignSelf: "center",
-                        borderRadius: "100px",
-                        maxHeight: "3rem",
-                        "&:hover": {
-                          backgroundColor: "#072d61",
-                        },
-                      }}
-                      onClick={() => handleViewManuscript(selectedResearchItem)}
-                    >
-                      View PDF
-                    </Button>
-                  </Box>               
-                </Grid2>
-              </Grid2>
-              {/*
-              <Typography variant='body1' sx={{ mb: "1rem" }}>
-                <strong>Journal:</strong> {selectedResearchItem.journal}
-              </Typography>
-              <Typography variant='body1' sx={{ mb: "1rem" }}>
-                <strong>Research Type:</strong>{" "}
-                {selectedResearchItem.research_type}
-              </Typography>
-              <Typography variant='body1' sx={{ mb: "1rem" }}>
-                <strong>SDG:</strong> {selectedResearchItem.sdg}
-              </Typography>
-              */}
-            </>
-          )}
-        </Box>
-      </Modal>
     </>
   );
 };
