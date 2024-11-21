@@ -43,6 +43,7 @@ const DepartmentCollection = () => {
   const [selectedPrograms, setSelectedPrograms] = useState([]);
   const [selectedFormats, setSelectedFormats] = useState([]);
   const [selectedResearchItem, setSelectedResearchItem] = useState(null);
+  const [response, setReponse] = useState(null);
   const itemsPerPage = 5;
 
   const handleNavigateKnowledgeGraph = () => {
@@ -51,20 +52,32 @@ const DepartmentCollection = () => {
 
   const handleResearchItemClick = async (item) => {
     try {
+      const currentTime = Date.now(); // Get the current timestamp
+      const lastViewedTimeKey = `lastViewedTime_${item.research_id}`;
+      const lastViewedTime = parseInt(localStorage.getItem(lastViewedTimeKey), 10);
       const userId = localStorage.getItem("user_id");
+  
+      // Determine if increment is needed
+      const isIncrement = !lastViewedTime || currentTime - lastViewedTime > 30000;
+  
       const response = await axios.put(
-        `/paper/increment_views/${item.research_id}`,
+        `/paper/increment_views/${item.research_id}?is_increment=${isIncrement}`,
         {
           user_id: userId,
         }
       );
-
+  
+      // Update the item and save the current timestamp
       const updatedItem = {
         ...item,
         view_count: response.data.updated_views,
         download_count: response.data.download_count,
       };
+  
       setSelectedResearchItem(updatedItem);
+      if (isIncrement) {
+        localStorage.setItem(lastViewedTimeKey, currentTime); // Save the current timestamp
+      }
     } catch (error) {
       console.error("Error incrementing view count:", {
         message: error.message,
@@ -72,9 +85,10 @@ const DepartmentCollection = () => {
         status: error.response?.status,
         item: item,
       });
-      setSelectedResearchItem(item);
+      setSelectedResearchItem(item); // Fall back to the original item if an error occurs
     }
   };
+  
   const handleCloseModal = () => {
     setSelectedResearchItem(null);
   };
