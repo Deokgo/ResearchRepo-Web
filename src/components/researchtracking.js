@@ -277,7 +277,7 @@ const ResearchTracking = () => {
   };
 
   const handleKey = (key) => {
-    navigate(`/updateresearchinfo/`,{state:{id:key}});
+    navigate(`/updatetrackinginfo/`,{state:{id:key}});
   };
 
   const handleChangePage = (event, newPage) => {

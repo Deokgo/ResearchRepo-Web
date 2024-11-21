@@ -212,7 +212,7 @@ const ManagePapers = () => {
   };
 
   const handleKey = (key) => {
-    navigate(`/displayresearchinfo/`, { state: { id: key } }); // change the page for viewing research output details
+    navigate(`/updateresearchinfo/`, { state: { id: key } }); // change the page for viewing research output details
   };
 
   // Handle change in selected programs filter

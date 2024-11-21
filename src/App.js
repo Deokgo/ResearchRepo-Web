@@ -7,6 +7,7 @@ import ManageUsers from "./components/manageusers";
 import ResearchThrust from "./components/researchthrust";
 import ResearchTracking from "./components/researchtracking";
 import UpdateResearchInfo from "./components/updateresearchinfo";
+import UpdateTrackingInfo from "./components/updatetrackinginfo";
 import Collection from "./components/collection";
 import ManagePapers from "./components/managepapers";
 import ManageCollege from "./components/managecollege"
@@ -44,6 +45,7 @@ function App() {
           <Route path='/researchthrust' element={<ResearchThrust />} />
           <Route path='/researchtracking' element={<ResearchTracking />} />
           <Route path='/updateresearchinfo' element={<UpdateResearchInfo />} />
+          <Route path='/updatetrackinginfo' element={<UpdateTrackingInfo />} />
           <Route path='/managepapers' element={<ManagePapers />} />
           <Route path='/managecollege' element={<ManageCollege />} />
           <Route path='/manageprogram' element={<ManageProgram />} />
