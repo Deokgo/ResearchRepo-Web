@@ -272,22 +272,6 @@ const DepartmentCollection = () => {
     const { research_id } = researchItem;
     if (research_id) {
       try {
-        const userId = localStorage.getItem("user_id");
-        // Call the API to increment the download count using axios
-        const incrementResponse = await axios.put(
-          `/paper/increment_downloads/${research_id}`,
-          {
-            user_id: userId,
-          }
-        );
-
-        // Update the download count in the researchItem object
-        const updatedItem = {
-          ...researchItem,
-          download_count: incrementResponse.data.updated_downloads,
-        };
-        setSelectedResearchItem(updatedItem);
-
         // Make the API request to get the PDF as a Blob
         const response = await axios.get(
           `/paper/view_manuscript/${research_id}`,
@@ -295,11 +279,27 @@ const DepartmentCollection = () => {
             responseType: "blob",
           }
         );
-
+  
         // Create a URL for the Blob and open it in a new tab
         const blob = new Blob([response.data], { type: "application/pdf" });
         const url = window.URL.createObjectURL(blob);
         window.open(url, "_blank");
+  
+        // Increment the download count after successfully displaying the Blob
+        const userId = localStorage.getItem("user_id");
+        const incrementResponse = await axios.put(
+          `/paper/increment_downloads/${research_id}`,
+          {
+            user_id: userId,
+          }
+        );
+  
+        // Update the download count in the researchItem object
+        const updatedItem = {
+          ...researchItem,
+          download_count: incrementResponse.data.updated_downloads,
+        };
+        setSelectedResearchItem(updatedItem);
       } catch (error) {
         console.error("Error handling manuscript:", {
           message: error.message,
@@ -312,7 +312,7 @@ const DepartmentCollection = () => {
     } else {
       alert("No manuscript available for this research.");
     }
-  };
+  };  
 
   return (
     <>
