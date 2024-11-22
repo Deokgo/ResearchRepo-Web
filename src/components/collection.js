@@ -63,43 +63,50 @@ const DepartmentCollection = () => {
         10
       );
       const userId = localStorage.getItem("user_id");
-
+  
       // Determine if increment is needed
       const isIncrement =
         !lastViewedTime || currentTime - lastViewedTime > 30000;
-
+  
+      // Update the view count in the backend
       const response = await axios.put(
         `/paper/increment_views/${item.research_id}?is_increment=${isIncrement}`,
         {
           user_id: userId,
         }
       );
-
-      // Update the item and save the current timestamp
+  
+      // Update the item with new data
       const updatedItem = {
         ...item,
         view_count: response.data.updated_views,
         download_count: response.data.download_count,
       };
-
-      // setSelectedResearchItem(updatedItem);
-      navigate(`/displayresearchinfo/`, {
+  
+      // Navigate to the research details page
+      navigate(`/displayresearchinfo/${updatedItem.research_id}`, {
         state: { id: updatedItem.research_id },
       });
-
+  
+      // Save the current timestamp to localStorage if incremented
       if (isIncrement) {
-        localStorage.setItem(lastViewedTimeKey, currentTime); // Save the current timestamp
+        localStorage.setItem(lastViewedTimeKey, currentTime);
       }
     } catch (error) {
-      console.error("Error incrementing view count:", {
+      console.error("Error handling research item click:", {
         message: error.message,
         response: error.response?.data,
         status: error.response?.status,
         item: item,
       });
-      navigate(`/displayresearchinfo/`, { state: { id: item.research_id } }); // Fall back to the original item if an error occurs
+  
+      // Fall back to the original item if an error occurs
+      navigate(`/displayresearchinfo/${item.research_id}`, {
+        state: { id: item.research_id },
+      });
     }
   };
+  
 
   const handleCloseModal = () => {
     setSelectedResearchItem(null);
