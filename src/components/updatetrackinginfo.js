@@ -17,6 +17,7 @@ import {
   InputLabel,
   Modal,
   MenuItem,
+  Pagination
 } from "@mui/material";
 import Stack from '@mui/material/Stack';
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
@@ -27,6 +28,7 @@ import { useLocation } from "react-router-dom";
 import homeBg from "../assets/home_bg.png";
 import axios from "axios";
 import FileUploader from "./FileUploader";
+import { Virtuoso } from "react-virtuoso";
 
 const UpdateTrackingInfo = ({ route, navigate }) => {
   const [users, setUsers] = useState([]);
@@ -38,13 +40,22 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [newRole, setNewRole] = useState("");
   const [loading, setLoading] = useState(true); // Track loading state
+  const [currentPage, setCurrentPage] = useState(1);
 
+  const [publicationName, setPublicationName] = useState("");
+  const [datePublished, setDatePublished] = useState("");
+  const [publicationFormat, setPublicationFormat] = useState("");
+  const [indexingStatus, setIndexingStatus] = useState("");
+
+  const [conferences, setConferences] = useState([]);
   const [conferenceTitle, setConferenceTitle] = useState("");
   const [singleCountry, setSingleCountry] = useState("");
   const [singleCity, setSingleCity] = useState("");
   const [countries, setCountries] = useState([]);
   const [Cities, setCities] = useState([]);
   const [dateApproved, setDateApproved] = useState("");
+
+  const itemsPerPage = 5;
 
   const fetchCountries = async () => {
     let country = await axios.get(
@@ -104,6 +115,21 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
     };
 
     fetchUsers();
+  }, []);
+
+  // Fetch all conference titles
+  const fetchConferenceTitles = async () => {
+    try {
+      const response = await axios.get(`/data/conferences`);
+      setConferences(response.data.conferences);
+    } catch (error) {
+      console.error("Error fetching conference titles:", error);
+    }
+  };
+
+  // Fetch all conference_titles
+  useEffect(() => {
+    fetchConferenceTitles();
   }, []);
 
   const handleOpenModal = () => {
@@ -180,6 +206,17 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
         alert("Failed to add conference. Please try again.");
       }
     }
+  };
+
+  // Get the paginated research outputs
+  const paginatedConferences = conferences.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  // Handle pagination change
+  const handleChangePage = (event, newPage) => {
+    setCurrentPage(newPage);
   };
 
   const [file, setFile] = useState(null);
@@ -408,7 +445,6 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                     >
                       <Grid2
                         container
-                        sx={{ mb: "3rem", mt: "1rem" }}
                       >
                         {data && data.dataset && data.dataset.length > 0 ? (
                           data.dataset.map((item, index) => (
@@ -420,7 +456,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                 width: "100%",
                               }}
                             >
-                              <Grid2 container display='flex' flexDirection='column'>
+                              <Grid2 container display='flex' flexDirection='column' sx={{padding: 3}}>
                               <Typography
                                   variant="h4"
                                   textAlign="left"
@@ -467,175 +503,213 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                         )}
                       </Grid2>
                       {/* Publication Part */} 
-                      <div>
-                          {isPaperEmpty ? (
-                            <Typography
-                              variant='h6'
-                              padding={1}
-                              sx={{ color: "#d40821" }}>
-                            No publications available.
+                      <Box paddingLeft={2}>
+                        <Grid2 display='flex' flexDirection='row'>
+                            <Grid2 size={6}>
+                                <Typography variant="h6" color='#d40821' fontWeight="700" sx={{ mb: "1rem" }}>
+                                    Publication:
+                                </Typography>
+                            </Grid2>
+                            <Grid2 size={6}>
+                                <Typography variant="h6" color='#d40821' fontWeight="700" sx={{ mb: "1rem" }}>
+                                    Conference:
+                                </Typography>
+                            </Grid2>
+                        </Grid2>                 
+                          
+                        {isPaperEmpty ? (
+                          <Typography
+                            variant='h6'
+                            sx={{ color: "#d40821" }}
+                          >
+                            No Publication Available
                           </Typography>
-                          ) : (
-                            <div>
-                              <Box>
-                                {pubData && pubData.dataset && pubData.dataset.length > 0 ? (
-                                  pubData.dataset.map((data, index) => (
-                                    <Box
-                                      sx={{
-                                        display: "flex",
-                                        flexDirection: "column",
-                                        borderRadius: 2,
-                                        width: "100%",
-                                      }}
-                                    >
-                                    <Typography
-                                      variant='h6'
-                                      sx={{ color: "#d40821" }}
-                                    >
-                                      Publication:
-                                    </Typography>
-                                      
-                                        <Grid2 item size={{ xs: 12, md: 3 }}>
+                        ) : (
+                          <Box>
+                            <Box>
+                              {pubData && pubData.dataset && pubData.dataset.length > 0 ? (
+                                pubData.dataset.map((data, index) => (
+                                  <Box
+                                    sx={{
+                                      display: "flex",
+                                      flexDirection: "column",
+                                      position: "relative",
+                                      width: "100%",
+                                      borderRadius: 2,
+                                      paddingLeft: 3,
+                                      height: "auto",
+                                    }}
+                                  >
+                                    <Grid2 display='flex' flexDirection='row'>
+                                      <Grid2 size={6}>
+                                        <Grid2 item sx={{ mb: "1rem", mr: "3rem"}}>
+                                          {isEditing ? (
+                                            <TextField
+                                              fullWidth
+                                              label='Publication Name'
+                                              name='publicationName'
+                                              value={""}
+                                              variant='outlined'
+                                              />
+                                            ) : (
+                                              <Typography variant="h7" sx={{ mb: "1rem" }}>
+                                                  <strong>Publication Name:</strong> {data.publication_name || "None"}
+                                              </Typography>
+                                            )}
+                                        </Grid2>
+                                        <Grid2 item sx={{ mb: "1rem", mr: "3rem"}}>
+                                          {isEditing ? (
+                                            <TextField
+                                              fullWidth
+                                              label='Date Published'
+                                              name='date_published'
+                                              value={""}
+                                              variant='outlined'
+                                              />
+                                            ) : (
+                                              <Typography variant="h7" sx={{ mb: "1rem" }}>
+                                                  <strong>Date Published:</strong> {data.date_published || "None"}
+                                              </Typography>
+                                            )}
+                                        </Grid2>
+                                        <Grid2 item sx={{ mb: "1rem", mr: "3rem" }}>
+                                          {isEditing ? (
+                                            <FormControl fullWidth variant='outlined'>
+                                              <InputLabel>Format</InputLabel>
+                                                <Select
+                                                  value={""}
+                                                  onChange={(e) => setFormat(e.target.value)}
+                                                >
+                                                  <MenuItem value='journal'>Journal</MenuItem>
+                                                  <MenuItem value='proceeding'>Proceeding</MenuItem>
+                                                </Select>
+                                            </FormControl>
+                                            
+                                            
+                                          ) : (
+                                            <Typography variant="h7" sx={{ mb: "1rem" }}>
+                                                <strong>Format:</strong> {data.journal || "None"}
+                                            </Typography>
+                                          )}
+                                          
+                                        </Grid2>
+                                        <Grid2 item sx={{ mb: "1rem", mr: "3rem" }}>
                                         {isEditing ? (
                                             <TextField
                                             fullWidth
-                                            label='Publication Name'
+                                            label='Indexing Status'
                                             name='publicationName'
                                             value={""}
                                             variant='outlined'
                                             />
                                           ) : (
-                                            <Typography>Publication Name: {data.publication_name || "None"}</Typography>
-                                          )}
-                                          
-                                        </Grid2>
-                                        <Grid2 item size={{ xs: 12, md: 3 }}>
-                                        {isEditing ? (
-                                            <TextField
-                                            fullWidth
-                                            label='Date Published'
-                                            name='date_published'
-                                            value={""}
-                                            variant='outlined'
-                                            />
-                                          ) : (
-                                            <Typography>Date Published: {data.date_published || "None"}</Typography>
-                                          )}
-                                          
-                                        </Grid2>
-                                        <Grid2 item size={{ xs: 12, md: 3 }}>
-                                        {isEditing ? (
-                                          <FormControl fullWidth variant='filled'>
-                                          <InputLabel>Format</InputLabel>
-                                          <Select
-                                            value={""}
-                                            onChange={(e) => setFormat(e.target.value)}
-                                          >
-                                            <MenuItem value='journal'>Journal</MenuItem>
-                                            <MenuItem value='proceeding'>Proceeding</MenuItem>
-                                          </Select>
-                                          </FormControl>
-                                            
-                                            
-                                          ) : (
-                                            <Typography>Format: {data.journal || "None"}</Typography>
-                                          )}
-                                          
-                                        </Grid2>
-                                        <Grid2 item size={{ xs: 12, md: 3 }}>
-                                        {isEditing ? (
-                                            <TextField
-                                            fullWidth
-                                            label='Publication Name'
-                                            name='publicationName'
-                                            value={""}
-                                            variant='outlined'
-                                            />
-                                          ) : (
-                                            <Typography>Indexing Status: {data.scopus}</Typography>
+                                            <Typography variant="h7" sx={{ mb: "1rem" }}>
+                                                <strong>Indexing Status:</strong> {data.scopus || "None"}
+                                            </Typography>
                                           )} 
                                         </Grid2>
-                                        <Typography
-                                      variant='h6'
-                                      sx={{ color: "#d40821" }}
-                                    >
-                                      Conference:
-                                    </Typography>
-                                      
-                                        <Grid2 item size={{ xs: 12, md: 3 }}>
-                                        {isEditing ? (
-                                            <TextField
-                                            fullWidth
-                                            label='Title'
-                                            name='conference_title'
-                                            value={""}
-                                            variant='outlined'
-                                            />
-                                          ) : (
-                                            <Typography>Title: {data.conference_title || "None"}</Typography>
-                                          )}
-                                          
+                                      </Grid2>
+                                      {/* Conference Part */}
+                                      <Grid2 size={6}>
+                                        <Grid2 item sx={{ mb: "1rem", mr: "3rem"  }}>
+                                          {isEditing ? (
+                                              <TextField
+                                              fullWidth
+                                              label='Title'
+                                              name='conference_title'
+                                              value={""}
+                                              variant='outlined'
+                                              />
+                                            ) : (
+                                              <Typography variant="h7" sx={{ mb: "1rem" }}>
+                                                  <strong>Title:</strong> {data.conference_title || "None"}
+                                              </Typography>
+                                            )}
+                                            
                                         </Grid2>
-                                        <Grid2 item size={{ xs: 12, md: 3 }}>
-                                        {isEditing ? (
-                                            <TextField
-                                            fullWidth
-                                            label='Date'
-                                            name='conference_date'
-                                            value={""}
-                                            variant='outlined'
-                                            />
-                                          ) : (
-                                            <Typography>Date: {data.conference_date || "None"}</Typography>
-                                          )}
-                                          
+                                        <Grid2 item sx={{ mb: "1rem", mr: "3rem"  }}>
+                                          {isEditing ? (
+                                              <TextField
+                                              fullWidth
+                                              label='Date'
+                                              name='conference_date'
+                                              value={""}
+                                              variant='outlined'
+                                              />
+                                            ) : (
+                                              <Typography variant="h7" sx={{ mb: "1rem" }}>
+                                                  <strong>Date:</strong> {data.conference_date || "None"}
+                                              </Typography>
+                                            )}
+                                            
                                         </Grid2>
-                                        <Grid2 item size={{ xs: 12, md: 3 }}>
-                                        {isEditing ? (
-                                            <TextField
-                                            select
-                                            fullWidth
-                                            label='Country'
-                                            value={singleCountry}
-                                            onChange={(e) => {
-                                              setSingleCountry(e.target.value);
-                                              fetchCities(e.target.value);
-                                            }}
-                                            margin='normal'
-                                          >
-                                            <MenuItem value='' disabled>
-                                              Select your country
-                                            </MenuItem>
-                                            {countries.map((country) => (
-                                              <MenuItem key={country.country} value={country.country}>
-                                                {country.country}
+                                        <Grid2 item sx={{ mb: "1rem", mr: "3rem"  }}>
+                                          {isEditing ? (
+                                              <TextField
+                                              select
+                                              fullWidth
+                                              label='Country'
+                                              value={singleCountry}
+                                              onChange={(e) => {
+                                                setSingleCountry(e.target.value);
+                                                fetchCities(e.target.value);
+                                              }}
+                                            >
+                                              <MenuItem value='' disabled>
+                                                Select your country
                                               </MenuItem>
-                                            ))}
-                                          </TextField>
-                                          ) : (
-                                            <Typography>Venue: {data.conference_venue || "None"}</Typography>
-                                          )}
-                                          
+                                              {countries.map((country) => (
+                                                <MenuItem key={country.country} value={country.country}>
+                                                  {country.country}
+                                                </MenuItem>
+                                              ))}
+                                            </TextField>
+                                            ) : (
+                                              <Typography variant="h7" sx={{ mb: "1rem" }}>
+                                                  <strong>Venue:</strong> {data.conference_venue || "None"}
+                                              </Typography>
+                                            )}
+                                            
                                         </Grid2>
+                                      </Grid2>
+                                    </Grid2>
+                                  </Box>                       
+                                ))
+                              ) : (
+                                <Typography variant="body1">No publications available.</Typography>
+                              )}
 
-                                    </Box>
-                                    
-                                    
-                                  ))
-                                ) : (
-                                  <Typography variant="body1">No publications available.</Typography>
-                                )}
-                                
-                              </Box>
-                            <button onClick={toggleEdit}>
-                            {isEditing ? "Cancel Editing" : "Edit"}
-                          </button></div>
-                          )}
-                          
-                        </div>                     
+                              <Button
+                                variant='contained'
+                                color='primary'
+                                sx={{
+                                  backgroundColor: "#08397C",
+                                  color: "#FFF",
+                                  fontFamily: "Montserrat, sans-serif",
+                                  fontWeight: 500,
+                                  textTransform: "none",
+                                  fontSize: { xs: "0.875rem", md: "1rem" },
+                                  padding: { xs: "0.5rem 1rem", md: "1.5rem" },
+                                  marginTop: "2rem",
+                                  width: "auto",
+                                  borderRadius: "100px",
+                                  maxHeight: "3rem",
+                                  "&:hover": {
+                                    backgroundColor: "#052045",
+                                    color: "#FFF",
+                                  },
+                                  
+                                }}
+                                onClick={toggleEdit}
+                              >
+                                {isEditing ? "Cancel Editing" : "Edit"}
+                              </Button>
+                            </Box>
+                          </Box>)}                         
+                        </Box>                     
                       <Typography
                         variant='body1'
-                        padding={1}
+                        paddingTop={5}
                         sx={{ color: "#d40821" }}
                       >
                         Publication:
@@ -716,7 +790,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                       <Grid2
                         container
                         paddingLeft={1}
-                        spacing={{ xs: 0, md: 3 }}
+                        height='100%'
                       >
                         <Box
                           sx={{
@@ -729,6 +803,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                             justifyContent: "center",
                             gap: 2,
                             mb: 1,
+                            mt: 2
                           }}
                         >
                           <Button
@@ -753,6 +828,88 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                           </Button>
                         </Box>
                       </Grid2>
+                      <Box
+                        sx={{
+                          backgroundColor: "#F7F9FC",
+                          borderRadius: 1,
+                          mt: 5,
+                          overflow: "hidden",
+                          display: "flex",
+                          flexDirection: "column",
+                          height: "auto"
+                        }}
+                      >
+                        <Box sx={{ height: "38em", overflow: "hidden" }}>
+                          {loading ? (
+                            <Typography>Loading...</Typography>
+                          ) : (
+                            <Virtuoso
+                              data={paginatedConferences}
+                              itemContent={(index, conference) => (
+                                <Box
+                                  key={conference.conference_id}
+                                  sx={{
+                                    p: 3,
+                                    cursor: "pointer",
+                                    minHeight: "calc((100% - 48px) / 5)",
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    justifyContent: "center",
+                                    borderBottom: "1px solid rgba(0, 0, 0, 0.1)",
+                                    "&:hover": {
+                                      backgroundColor: "rgba(0, 0, 0, 0.04)",
+                                    },
+                                  }}
+                                >
+                                  <Typography
+                                    variant='h6'
+                                    sx={{
+                                      fontSize: "1.1rem",
+                                      fontWeight: 500,
+                                    }}
+                                  >
+                                    {conference.conference_title}
+                                  </Typography>
+                                  <Typography
+                                    variant='body2'
+                                    sx={{
+                                      color: "#666",
+                                    }}
+                                  >
+                                    {conference.conference_date} 
+                                  </Typography>
+                                  <Typography
+                                    variant='caption'
+                                    sx={{
+                                      color: "#0A438F",
+                                      fontWeight: 500,
+                                    }}
+                                  >
+                                    {conference.conference_venue}
+                                  </Typography>
+                                </Box>
+                              )}
+                            />
+                          )}
+                        </Box>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "center",
+                            py: 1,
+                            backgroundColor: "#fff",
+                            borderTop: "1px solid #eee",
+                          }}
+                        >
+                          <Pagination
+                            count={Math.ceil(
+                              conferences.length / itemsPerPage
+                            )}
+                            page={currentPage}
+                            onChange={handleChangePage}
+                          />
+                        </Box>
+                      </Box>
                       <Box
                         sx={{
                           display: "flex",
