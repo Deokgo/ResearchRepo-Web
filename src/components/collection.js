@@ -632,15 +632,16 @@ const DepartmentCollection = () => {
                         variant='contained'
                         color='primary'
                         sx={{
-                          flex: 1,
                           backgroundColor: "#08397C",
                           color: "#FFF",
                           fontFamily: "Montserrat, sans-serif",
                           fontWeight: 600,
                           textTransform: "none",
                           fontSize: { xs: "0.875rem", md: "1.275rem" },
-                          padding: { xs: "0.5rem 1rem", md: "0.75rem" },
+                          padding: { xs: "0.5rem 1rem", md: "1.5rem" },
+                          marginLeft: "2rem",
                           borderRadius: "100px",
+                          maxHeight: "3rem",
                           "&:hover": {
                             backgroundColor: "#072d61",
                           },

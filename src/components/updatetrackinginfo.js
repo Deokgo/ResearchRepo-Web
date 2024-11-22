@@ -14,6 +14,9 @@ import {
   Divider,
   Modal,
   MenuItem,
+  FormControl,
+  InputLabel,
+  Select
 } from "@mui/material";
 import Stack from '@mui/material/Stack';
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
@@ -36,7 +39,9 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
   const [newRole, setNewRole] = useState("");
   const [loading, setLoading] = useState(true); // Track loading state
 
+  const [conferences, setConferences] = useState([]);
   const [conferenceTitle, setConferenceTitle] = useState("");
+  const [venue, setVenue] = useState("");
   const [singleCountry, setSingleCountry] = useState("");
   const [singleCity, setSingleCity] = useState("");
   const [countries, setCountries] = useState([]);
@@ -88,6 +93,40 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
     }
   }, [id]);
 
+  
+
+  // Fetch all conference titles
+  const fetchConferecenTitles = async () => {
+    try {
+      const response = await axios.get(`/data/conferences`);
+      setConferences(response.data.conferences);
+    } catch (error) {
+      console.error("Error fetching conference titles:", error);
+    }
+  };
+
+// Fetch all conference_titles
+  useEffect(() => {
+    fetchConferecenTitles();
+  }, []);
+
+  const fetchConferenceDetails = async (id) => {
+    try {
+      const response = await axios.get(`/data/conference_details/${id}`);
+
+      if (response.data.conference_details && response.data.conference_details.length > 0) {
+          const item = response.data.dataset[0];
+          console.log("Fetched conference details:", item);
+
+          setVenue(item.conference_venue);
+          setDateApproved(item.conference_date)
+      };
+
+    } catch (error) {
+      console.error("Error fetching conference titles:", error);
+    }
+  };
+
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -114,6 +153,12 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
     setDateApproved("");
     setOpenModal(false);
   };
+
+  const handleConferenceChange = (event) => {
+    const selectedConference = event.target.value;
+    setConferenceTitle(selectedConference)
+    fetchConferenceDetails(selectedConference);
+  }
 
   const handleAddConference = async () => {
     try {
@@ -379,7 +424,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                     >
                       <Grid2
                         container
-                        sx={{ mb: "3rem", mt: "1rem" }}
+                        sx={{ mt: "1rem" }}
                       >
                         {data && data.dataset && data.dataset.length > 0 ? (
                           data.dataset.map((item, index) => (
@@ -428,7 +473,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                   {item.year}
                                 </Typography>
                               </Grid2>                              
-                              <Divider variant="left" sx={{ mt: "1rem", mb: "2rem"}}/>
+                              <Divider variant="left" sx={{ mt: "1rem" }}/>
                             </Box>
                           ))
                         ) : (
@@ -518,45 +563,78 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                       >
                         Conference:
                       </Typography>
-                      <Grid2
-                        container
-                        paddingLeft={1}
-                        spacing={{ xs: 0, md: 3 }}
-                      >
-                        <Box
-                          sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            border: "1px dashed #ccc",
-                            borderRadius: 1,
-                            p: 1,
-                            cursor: "pointer",
-                            justifyContent: "center",
-                            gap: 2,
-                            mb: 1,
-                          }}
-                        >
-                          <Button
-                            variant='text'
-                            color='primary'
+                      <Grid2 container paddingLeft={1} spacing={3}>
+                        <Grid2 size={6}>
+                          <FormControl fullWidth variant='outlined' margin="normal">
+                            <InputLabel>Conference Title</InputLabel>
+                            <Select
+                              value={conferenceTitle}
+                              label='Conference Title'
+                              onChange={handleConferenceChange}
+                            >
+                              {conferences.map((conference) => (
+                                <MenuItem key={conference.conference_id} value={conference.conference_id}>
+                                  {conference.conference_title}
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          </FormControl>
+                        </Grid2>
+                        <Grid2 size={3}>
+                        <TextField
+                          label='Conference Venue'
+                          value={venue}
+                          fullWidth
+                          onChange={(e) => setVenue(e.target.value)}
+                          margin='normal'
+                        />        
+                        </Grid2>
+                        <Grid2 size={3}>
+                        <TextField
+                          label='Conference Date'
+                          value={dateApproved}
+                          fullWidth
+                          onChange={(e) => setDateApproved(e.target.value)}
+                          margin='normal'
+                        />
+                        </Grid2>
+                        <Grid2 size={12}>
+                          <Box
                             sx={{
-                              width: "20rem",
-                              color: "#08397C",
-                              fontFamily: "Montserrat, sans-serif",
-                              fontWeight: 400,
-                              textTransform: "none",
-                              fontSize: { xs: "0.875rem", md: "1rem" },
-                              alignSelf: "center",
-                              maxHeight: "3rem",
-                              "&:hover": {
-                                color: "#052045",
-                              },
+                              display: "flex",
+                              alignItems: "center",
+                              border: "1px dashed #ccc",
+                              borderRadius: 1,
+                              p: 1,
+                              cursor: "pointer",
+                              justifyContent: "center",
+                              gap: 2,
+                              mb: 1,
                             }}
-                            onClick={handleOpenModal}
-                          >
-                            + Add Conference
-                          </Button>
-                        </Box>
+                          >      
+                            <Button
+                              variant='text'
+                              color='primary'
+                              sx={{
+                                width: "20rem",
+                                color: "#08397C",
+                                fontFamily: "Montserrat, sans-serif",
+                                fontWeight: 400,
+                                textTransform: "none",
+                                fontSize: { xs: "0.875rem", md: "1rem" },
+                                alignSelf: "center",
+                                maxHeight: "3rem",
+                                "&:hover": {
+                                  color: "#052045",
+                                },
+                              }}
+                              onClick={handleOpenModal}
+                            >
+                              + Add Conference
+                            </Button>
+                          </Box>
+                        </Grid2>
+                        
                       </Grid2>
                       <Box
                         sx={{
