@@ -12,11 +12,11 @@ import {
   Typography,
   Grid2,
   Divider,
-  Modal,
-  MenuItem,
+  Select,
   FormControl,
   InputLabel,
-  Select
+  Modal,
+  MenuItem,
 } from "@mui/material";
 import Stack from '@mui/material/Stack';
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
@@ -39,9 +39,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
   const [newRole, setNewRole] = useState("");
   const [loading, setLoading] = useState(true); // Track loading state
 
-  const [conferences, setConferences] = useState([]);
   const [conferenceTitle, setConferenceTitle] = useState("");
-  const [venue, setVenue] = useState("");
   const [singleCountry, setSingleCountry] = useState("");
   const [singleCity, setSingleCity] = useState("");
   const [countries, setCountries] = useState([]);
@@ -93,40 +91,6 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
     }
   }, [id]);
 
-  
-
-  // Fetch all conference titles
-  const fetchConferecenTitles = async () => {
-    try {
-      const response = await axios.get(`/data/conferences`);
-      setConferences(response.data.conferences);
-    } catch (error) {
-      console.error("Error fetching conference titles:", error);
-    }
-  };
-
-// Fetch all conference_titles
-  useEffect(() => {
-    fetchConferecenTitles();
-  }, []);
-
-  const fetchConferenceDetails = async (id) => {
-    try {
-      const response = await axios.get(`/data/conference_details/${id}`);
-
-      if (response.data.conference_details && response.data.conference_details.length > 0) {
-          const item = response.data.dataset[0];
-          console.log("Fetched conference details:", item);
-
-          setVenue(item.conference_venue);
-          setDateApproved(item.conference_date)
-      };
-
-    } catch (error) {
-      console.error("Error fetching conference titles:", error);
-    }
-  };
-
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -145,6 +109,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
   const handleOpenModal = () => {
     setOpenModal(true);
   };
+  const [format,setFormat]=useState("")
 
   const handleCloseModal = () => {
     setConferenceTitle("");
@@ -153,12 +118,6 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
     setDateApproved("");
     setOpenModal(false);
   };
-
-  const handleConferenceChange = (event) => {
-    const selectedConference = event.target.value;
-    setConferenceTitle(selectedConference)
-    fetchConferenceDetails(selectedConference);
-  }
 
   const handleAddConference = async () => {
     try {
@@ -310,6 +269,31 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
     }
   };
 
+  const [pubData, setPubData] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+
+
+  useEffect(() => {
+    const fetchPublication = async () => {
+      try {
+        const response = await axios.get(`/track/publication/${id}`);
+        const fetched_data = response.data.dataset;
+        setPubData({ dataset: fetched_data });
+      } catch (error) {
+        console.error("Error fetching data of users:", error);
+      } finally {
+      }
+    };
+
+    fetchPublication();
+  }, []);
+
+  const toggleEdit=()=>{
+    setIsEditing(!isEditing);
+  };
+
+  const isPaperEmpty = Array.isArray(pubData) && pubData.length === 0;
+
   return (
     <>
       <Box
@@ -424,7 +408,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                     >
                       <Grid2
                         container
-                        sx={{ mt: "1rem" }}
+                        sx={{ mb: "3rem", mt: "1rem" }}
                       >
                         {data && data.dataset && data.dataset.length > 0 ? (
                           data.dataset.map((item, index) => (
@@ -473,7 +457,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                   {item.year}
                                 </Typography>
                               </Grid2>                              
-                              <Divider variant="left" sx={{ mt: "1rem" }}/>
+                              <Divider variant="left" sx={{ mt: "1rem", mb: "2rem"}}/>
                             </Box>
                           ))
                         ) : (
@@ -482,7 +466,173 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                           </div>
                         )}
                       </Grid2>
-                      {/* Publication Part */}
+                      {/* Publication Part */} 
+                      <div>
+                          {isPaperEmpty ? (
+                            <Typography
+                              variant='h6'
+                              padding={1}
+                              sx={{ color: "#d40821" }}>
+                            No publications available.
+                          </Typography>
+                          ) : (
+                            <div>
+                              <Box>
+                                {pubData && pubData.dataset && pubData.dataset.length > 0 ? (
+                                  pubData.dataset.map((data, index) => (
+                                    <Box
+                                      sx={{
+                                        display: "flex",
+                                        flexDirection: "column",
+                                        borderRadius: 2,
+                                        width: "100%",
+                                      }}
+                                    >
+                                    <Typography
+                                      variant='h6'
+                                      sx={{ color: "#d40821" }}
+                                    >
+                                      Publication:
+                                    </Typography>
+                                      
+                                        <Grid2 item size={{ xs: 12, md: 3 }}>
+                                        {isEditing ? (
+                                            <TextField
+                                            fullWidth
+                                            label='Publication Name'
+                                            name='publicationName'
+                                            value={""}
+                                            variant='outlined'
+                                            />
+                                          ) : (
+                                            <Typography>Publication Name: {data.publication_name || "None"}</Typography>
+                                          )}
+                                          
+                                        </Grid2>
+                                        <Grid2 item size={{ xs: 12, md: 3 }}>
+                                        {isEditing ? (
+                                            <TextField
+                                            fullWidth
+                                            label='Date Published'
+                                            name='date_published'
+                                            value={""}
+                                            variant='outlined'
+                                            />
+                                          ) : (
+                                            <Typography>Date Published: {data.date_published || "None"}</Typography>
+                                          )}
+                                          
+                                        </Grid2>
+                                        <Grid2 item size={{ xs: 12, md: 3 }}>
+                                        {isEditing ? (
+                                          <FormControl fullWidth variant='filled'>
+                                          <InputLabel>Format</InputLabel>
+                                          <Select
+                                            value={""}
+                                            onChange={(e) => setFormat(e.target.value)}
+                                          >
+                                            <MenuItem value='journal'>Journal</MenuItem>
+                                            <MenuItem value='proceeding'>Proceeding</MenuItem>
+                                          </Select>
+                                          </FormControl>
+                                            
+                                            
+                                          ) : (
+                                            <Typography>Format: {data.journal || "None"}</Typography>
+                                          )}
+                                          
+                                        </Grid2>
+                                        <Grid2 item size={{ xs: 12, md: 3 }}>
+                                        {isEditing ? (
+                                            <TextField
+                                            fullWidth
+                                            label='Publication Name'
+                                            name='publicationName'
+                                            value={""}
+                                            variant='outlined'
+                                            />
+                                          ) : (
+                                            <Typography>Indexing Status: {data.scopus}</Typography>
+                                          )} 
+                                        </Grid2>
+                                        <Typography
+                                      variant='h6'
+                                      sx={{ color: "#d40821" }}
+                                    >
+                                      Conference:
+                                    </Typography>
+                                      
+                                        <Grid2 item size={{ xs: 12, md: 3 }}>
+                                        {isEditing ? (
+                                            <TextField
+                                            fullWidth
+                                            label='Title'
+                                            name='conference_title'
+                                            value={""}
+                                            variant='outlined'
+                                            />
+                                          ) : (
+                                            <Typography>Title: {data.conference_title || "None"}</Typography>
+                                          )}
+                                          
+                                        </Grid2>
+                                        <Grid2 item size={{ xs: 12, md: 3 }}>
+                                        {isEditing ? (
+                                            <TextField
+                                            fullWidth
+                                            label='Date'
+                                            name='conference_date'
+                                            value={""}
+                                            variant='outlined'
+                                            />
+                                          ) : (
+                                            <Typography>Date: {data.conference_date || "None"}</Typography>
+                                          )}
+                                          
+                                        </Grid2>
+                                        <Grid2 item size={{ xs: 12, md: 3 }}>
+                                        {isEditing ? (
+                                            <TextField
+                                            select
+                                            fullWidth
+                                            label='Country'
+                                            value={singleCountry}
+                                            onChange={(e) => {
+                                              setSingleCountry(e.target.value);
+                                              fetchCities(e.target.value);
+                                            }}
+                                            margin='normal'
+                                          >
+                                            <MenuItem value='' disabled>
+                                              Select your country
+                                            </MenuItem>
+                                            {countries.map((country) => (
+                                              <MenuItem key={country.country} value={country.country}>
+                                                {country.country}
+                                              </MenuItem>
+                                            ))}
+                                          </TextField>
+                                          ) : (
+                                            <Typography>Venue: {data.conference_venue || "None"}</Typography>
+                                          )}
+                                          
+                                        </Grid2>
+
+                                    </Box>
+                                    
+                                    
+                                  ))
+                                ) : (
+                                  <Typography variant="body1">No publications available.</Typography>
+                                )}
+                                
+                              </Box>
+                            <button onClick={toggleEdit}>
+                            {isEditing ? "Cancel Editing" : "Edit"}
+                          </button></div>
+                          )}
+                          
+                        </div>                     
                       <Typography
                         variant='body1'
                         padding={1}
@@ -563,78 +713,45 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                       >
                         Conference:
                       </Typography>
-                      <Grid2 container paddingLeft={1} spacing={3}>
-                        <Grid2 size={6}>
-                          <FormControl fullWidth variant='outlined' margin="normal">
-                            <InputLabel>Conference Title</InputLabel>
-                            <Select
-                              value={conferenceTitle}
-                              label='Conference Title'
-                              onChange={handleConferenceChange}
-                            >
-                              {conferences.map((conference) => (
-                                <MenuItem key={conference.conference_id} value={conference.conference_id}>
-                                  {conference.conference_title}
-                                </MenuItem>
-                              ))}
-                            </Select>
-                          </FormControl>
-                        </Grid2>
-                        <Grid2 size={3}>
-                        <TextField
-                          label='Conference Venue'
-                          value={venue}
-                          fullWidth
-                          onChange={(e) => setVenue(e.target.value)}
-                          margin='normal'
-                        />        
-                        </Grid2>
-                        <Grid2 size={3}>
-                        <TextField
-                          label='Conference Date'
-                          value={dateApproved}
-                          fullWidth
-                          onChange={(e) => setDateApproved(e.target.value)}
-                          margin='normal'
-                        />
-                        </Grid2>
-                        <Grid2 size={12}>
-                          <Box
+                      <Grid2
+                        container
+                        paddingLeft={1}
+                        spacing={{ xs: 0, md: 3 }}
+                      >
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            border: "1px dashed #ccc",
+                            borderRadius: 1,
+                            p: 1,
+                            cursor: "pointer",
+                            justifyContent: "center",
+                            gap: 2,
+                            mb: 1,
+                          }}
+                        >
+                          <Button
+                            variant='text'
+                            color='primary'
                             sx={{
-                              display: "flex",
-                              alignItems: "center",
-                              border: "1px dashed #ccc",
-                              borderRadius: 1,
-                              p: 1,
-                              cursor: "pointer",
-                              justifyContent: "center",
-                              gap: 2,
-                              mb: 1,
+                              width: "20rem",
+                              color: "#08397C",
+                              fontFamily: "Montserrat, sans-serif",
+                              fontWeight: 400,
+                              textTransform: "none",
+                              fontSize: { xs: "0.875rem", md: "1rem" },
+                              alignSelf: "center",
+                              maxHeight: "3rem",
+                              "&:hover": {
+                                color: "#052045",
+                              },
                             }}
-                          >      
-                            <Button
-                              variant='text'
-                              color='primary'
-                              sx={{
-                                width: "20rem",
-                                color: "#08397C",
-                                fontFamily: "Montserrat, sans-serif",
-                                fontWeight: 400,
-                                textTransform: "none",
-                                fontSize: { xs: "0.875rem", md: "1rem" },
-                                alignSelf: "center",
-                                maxHeight: "3rem",
-                                "&:hover": {
-                                  color: "#052045",
-                                },
-                              }}
-                              onClick={handleOpenModal}
-                            >
-                              + Add Conference
-                            </Button>
-                          </Box>
-                        </Grid2>
-                        
+                            onClick={handleOpenModal}
+                          >
+                            + Add Conference
+                          </Button>
+                        </Box>
                       </Grid2>
                       <Box
                         sx={{
