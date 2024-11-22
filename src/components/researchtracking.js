@@ -496,15 +496,9 @@ const ResearchTracking = () => {
                         display: "flex", 
                       }}
                     >
-                      <TextField
-                        variant='outlined'
-                        placeholder='Search by Title or Code'
-                        value={filteredResearch.length}
-                        disabled
-                        sx={{ width: "5rem", input: {textAlign: "center"}}}
-                      />
+                      
                         <Typography padding={2} variant='h6' sx={{ justifyContent: "center", color: "#8B8B8B" }}>
-                          results found
+                        {filteredResearch.length} results found
                         </Typography>
                     </Box>       
                     
