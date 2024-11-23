@@ -17,9 +17,11 @@ import {
   InputLabel,
   Modal,
   MenuItem,
-  Pagination
+  Pagination,
+  InputAdornment
 } from "@mui/material";
 import Stack from '@mui/material/Stack';
+import { Search } from "@mui/icons-material";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import DownloadIcon from '@mui/icons-material/Download';
 import VisibilityIcon from '@mui/icons-material/Visibility';
@@ -38,6 +40,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
   const { id } = location.state || {}; // Default to an empty object if state is undefined
   const [data, setData] = useState(null); // Start with null to represent no data
   const [selectedUser, setSelectedUser] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
   const [newRole, setNewRole] = useState("");
   const [loading, setLoading] = useState(true); // Track loading state
   const [currentPage, setCurrentPage] = useState(1);
@@ -48,7 +51,11 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
   const [indexingStatus, setIndexingStatus] = useState("");
 
   const [conferences, setConferences] = useState([]);
+  const [filteredConferences, setFilteredConferences] = useState([]);
   const [conferenceTitle, setConferenceTitle] = useState("");
+  const [selectedTitle, setSelectedTitle] = useState("");
+  const [selectedVenue, setSelectedVenue] = useState("");
+  const [selectedDate, setSelectedDate] = useState("");
   const [singleCountry, setSingleCountry] = useState("");
   const [singleCity, setSingleCity] = useState("");
   const [countries, setCountries] = useState([]);
@@ -121,7 +128,9 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
   const fetchConferenceTitles = async () => {
     try {
       const response = await axios.get(`/data/conferences`);
-      setConferences(response.data.conferences);
+      const fetchConferences = response.data.conferences
+      setConferences(fetchConferences);
+      setFilteredConferences(fetchConferences)
     } catch (error) {
       console.error("Error fetching conference titles:", error);
     }
@@ -209,7 +218,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
   };
 
   // Get the paginated research outputs
-  const paginatedConferences = conferences.slice(
+  const paginatedConferences = filteredConferences.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
@@ -217,6 +226,34 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
   // Handle pagination change
   const handleChangePage = (event, newPage) => {
     setCurrentPage(newPage);
+  };
+
+  useEffect(() => {
+    let filtered = conferences;
+
+    // Filter by Search Query
+    if (searchQuery) {
+      filtered = filtered.filter((conference) => {
+        const titleMatch = conference.conference_title
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase());
+        const venueMatch = conference.conference_venue
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase());
+
+        return titleMatch || venueMatch;
+      });
+    }
+    setFilteredConferences(filtered);
+    setCurrentPage(1); // Reset to the first page on filter change
+  }, [
+    searchQuery,
+    conferences,
+  ]);
+
+  // Handle change in search query
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value.toLowerCase());
   };
 
   const [file, setFile] = useState(null);
@@ -456,7 +493,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                 width: "100%",
                               }}
                             >
-                              <Grid2 container display='flex' flexDirection='column' sx={{padding: 3}}>
+                              <Grid2 container display='flex' flexDirection='column' sx={{padding: 2}}>
                               <Typography
                                   variant="h4"
                                   textAlign="left"
@@ -493,7 +530,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                   {item.year}
                                 </Typography>
                               </Grid2>                              
-                              <Divider variant="left" sx={{ mt: "1rem", mb: "2rem"}}/>
+                              <Divider variant="left" sx={{ mb: "2rem"}}/>
                             </Box>
                           ))
                         ) : (
@@ -503,19 +540,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                         )}
                       </Grid2>
                       {/* Publication Part */} 
-                      <Box paddingLeft={2}>
-                        <Grid2 display='flex' flexDirection='row'>
-                            <Grid2 size={6}>
-                                <Typography variant="h6" color='#d40821' fontWeight="700" sx={{ mb: "1rem" }}>
-                                    Publication:
-                                </Typography>
-                            </Grid2>
-                            <Grid2 size={6}>
-                                <Typography variant="h6" color='#d40821' fontWeight="700" sx={{ mb: "1rem" }}>
-                                    Conference:
-                                </Typography>
-                            </Grid2>
-                        </Grid2>                 
+                      <Box paddingLeft={2}>                 
                           
                         {isPaperEmpty ? (
                           <Typography
@@ -540,6 +565,18 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                       height: "auto",
                                     }}
                                   >
+                                    <Grid2 display='flex' flexDirection='row'>
+                                      <Grid2 size={6}>
+                                          <Typography variant="h6" color='#d40821' fontWeight="700" sx={{ mb: "1rem" }}>
+                                              Publication:
+                                          </Typography>
+                                      </Grid2>
+                                      <Grid2 size={6}>
+                                          <Typography variant="h6" color='#d40821' fontWeight="700" sx={{ mb: "1rem" }}>
+                                              Conference:
+                                          </Typography>
+                                      </Grid2>
+                                    </Grid2>
                                     <Grid2 display='flex' flexDirection='row'>
                                       <Grid2 size={6}>
                                         <Grid2 item sx={{ mb: "1rem", mr: "3rem"}}>
@@ -673,37 +710,44 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                         </Grid2>
                                       </Grid2>
                                     </Grid2>
+                                    <Box
+                                      sx={{
+                                        display: "flex",
+                                        flexDirection: "column",
+                                        alignItems: "flex-start",
+                                      }}
+                                    >
+                                      <Button
+                                        variant='contained'
+                                        color='primary'
+                                        sx={{
+                                          backgroundColor: "#08397C",
+                                          color: "#FFF",
+                                          fontFamily: "Montserrat, sans-serif",
+                                          fontWeight: 500,
+                                          textTransform: "none",
+                                          fontSize: { xs: "0.875rem", md: "1rem" },
+                                          padding: { xs: "0.5rem 1rem", md: "1.5rem" },
+                                          marginTop: "3rem",
+                                          width: "auto",
+                                          borderRadius: "100px",
+                                          maxHeight: "3rem",
+                                          "&:hover": {
+                                            backgroundColor: "#052045",
+                                            color: "#FFF",
+                                          },
+                                          
+                                        }}
+                                        onClick={toggleEdit}
+                                      >
+                                        {isEditing ? "Cancel Editing" : "Edit"}
+                                      </Button>
+                                    </Box>
                                   </Box>                       
                                 ))
                               ) : (
-                                <Typography variant="body1">No publications available.</Typography>
+                                <Typography variant="body1">No Publication and Conference available.</Typography>
                               )}
-
-                              <Button
-                                variant='contained'
-                                color='primary'
-                                sx={{
-                                  backgroundColor: "#08397C",
-                                  color: "#FFF",
-                                  fontFamily: "Montserrat, sans-serif",
-                                  fontWeight: 500,
-                                  textTransform: "none",
-                                  fontSize: { xs: "0.875rem", md: "1rem" },
-                                  padding: { xs: "0.5rem 1rem", md: "1.5rem" },
-                                  marginTop: "2rem",
-                                  width: "auto",
-                                  borderRadius: "100px",
-                                  maxHeight: "3rem",
-                                  "&:hover": {
-                                    backgroundColor: "#052045",
-                                    color: "#FFF",
-                                  },
-                                  
-                                }}
-                                onClick={toggleEdit}
-                              >
-                                {isEditing ? "Cancel Editing" : "Edit"}
-                              </Button>
                             </Box>
                           </Box>)}                         
                         </Box>                     
@@ -787,52 +831,75 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                       >
                         Conference:
                       </Typography>
-                      <Grid2
-                        container
-                        paddingLeft={1}
-                        height='100%'
-                      >
-                        <Box
-                          sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            border: "1px dashed #ccc",
-                            borderRadius: 1,
-                            p: 1,
-                            cursor: "pointer",
-                            justifyContent: "center",
-                            gap: 2,
-                            mb: 1,
-                            mt: 2
-                          }}
-                        >
-                          <Button
-                            variant='text'
-                            color='primary'
-                            sx={{
-                              width: "20rem",
-                              color: "#08397C",
-                              fontFamily: "Montserrat, sans-serif",
-                              fontWeight: 400,
-                              textTransform: "none",
-                              fontSize: { xs: "0.875rem", md: "1rem" },
-                              alignSelf: "center",
-                              maxHeight: "3rem",
-                              "&:hover": {
-                                color: "#052045",
-                              },
+                      <Grid2 display='flex' flexDirection='column' padding='1rem'>
+                        <Typography variant="h7" sx={{ mb: "1rem" }}>
+                            <strong>Title:</strong> {selectedTitle || "None"}
+                        </Typography>
+                        <Typography variant="h7" sx={{ mb: "1rem" }}>
+                            <strong>Venue:</strong> {selectedVenue || "None"}
+                        </Typography>
+                        <Typography variant="h7" sx={{ mb: "1rem" }}>
+                            <strong>Date:</strong> {selectedDate || "None"}
+                        </Typography>
+                      </Grid2>
+                      <Grid2 display='flex' padding='1rem'>
+                        <Grid2 container size={8} justifyContent='flex-start'>
+                          <TextField
+                            variant='outlined'
+                            placeholder='Search by Title or Venue'
+                            value={searchQuery}
+                            onChange={handleSearchChange}
+                            sx={{ flex: 2 }}
+                            InputProps={{
+                              startAdornment: (
+                                <InputAdornment position='start'>
+                                  <Search />
+                                </InputAdornment>
+                              ),
                             }}
-                            onClick={handleOpenModal}
+                          />
+                        </Grid2>
+                        <Grid2 container size={4} justifyContent='flex-end'>
+                          <Box
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              border: "2px dashed #ccc",
+                              borderRadius: 1,
+                              p: 1,
+                              cursor: "pointer",
+                              justifyContent: "center",
+                              gap: 2,
+                            }}
                           >
-                            + Add Conference
+                            <Button
+                              variant='text'
+                              color='primary'
+                              sx={{
+                                color: "#08397C",
+                                fontFamily: "Montserrat, sans-serif",
+                                fontWeight: 600,
+                                textTransform: "none",
+                                fontSize: { xs: "0.875rem", md: "1rem" },
+                                alignSelf: "center",
+                                maxHeight: "3rem",
+                                "&:hover": {
+                                  color: "#052045",
+                                },
+                              }}
+                              onClick={handleOpenModal}
+                            >
+                              + Add Conference
                           </Button>
-                        </Box>
+                          </Box>
+                        </Grid2>
                       </Grid2>
                       <Box
                         sx={{
                           backgroundColor: "#F7F9FC",
                           borderRadius: 1,
-                          mt: 5,
+                          margin: "1rem",
+                          mt: 2,
                           overflow: "hidden",
                           display: "flex",
                           flexDirection: "column",
@@ -859,6 +926,11 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                     "&:hover": {
                                       backgroundColor: "rgba(0, 0, 0, 0.04)",
                                     },
+                                  }}
+                                  onClick={() => {
+                                    setSelectedTitle(conference.conference_title);
+                                    setSelectedVenue(conference.conference_venue);
+                                    setSelectedDate(conference.conference_date);
                                   }}
                                 >
                                   <Typography
@@ -903,7 +975,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                         >
                           <Pagination
                             count={Math.ceil(
-                              conferences.length / itemsPerPage
+                              filteredConferences.length / itemsPerPage
                             )}
                             page={currentPage}
                             onChange={handleChangePage}
@@ -939,7 +1011,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                             },
                           }}
                         >
-                          Update Info
+                          Add Details
                         </Button>
                       </Box>
                     </Box>
