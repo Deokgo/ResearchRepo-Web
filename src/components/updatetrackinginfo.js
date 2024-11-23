@@ -37,6 +37,8 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
   const navpage = useNavigate();
   const location = useLocation();
   const [openModal, setOpenModal] = useState(false);
+  const [openModalPub, setOpenModalPub] = useState(false);
+  const [openModalCon, setOpenModalCon] = useState(false);
   const { id } = location.state || {}; // Default to an empty object if state is undefined
   const [data, setData] = useState(null); // Start with null to represent no data
   const [selectedUser, setSelectedUser] = useState(null);
@@ -52,10 +54,12 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
 
   const [conferences, setConferences] = useState([]);
   const [filteredConferences, setFilteredConferences] = useState([]);
-  const [conferenceTitle, setConferenceTitle] = useState("");
+
   const [selectedTitle, setSelectedTitle] = useState("");
   const [selectedVenue, setSelectedVenue] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
+
+  const [conferenceTitle, setConferenceTitle] = useState("");
   const [singleCountry, setSingleCountry] = useState("");
   const [singleCity, setSingleCity] = useState("");
   const [countries, setCountries] = useState([]);
@@ -144,9 +148,27 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
   const handleOpenModal = () => {
     setOpenModal(true);
   };
+
+  const handleOpenModalPub = () => {
+    setOpenModalPub(true);
+  };
+
+  const handleOpenModalCon = () => {
+    setOpenModalCon(true);
+  };
+
   const [format,setFormat]=useState("")
 
   const handleCloseModal = () => {
+    setPublicationName("");
+    setPublicationFormat("");
+    setDatePublished("");
+    setIndexingStatus("");
+    setOpenModalPub(false);
+
+    setSearchQuery("");
+    setOpenModalCon(false);
+
     setConferenceTitle("");
     setSingleCountry("");
     setSingleCity("");
@@ -263,32 +285,6 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
   };
 
   const onDeleteFileHandler = () => {};
-  const handleViewManuscript = async (researchItem) => {
-    const { research_id } = researchItem;
-    if (research_id) {
-      try {
-        // Make the API request to get the PDF as a Blob kasi may proxy issue if directly window.open, so padaanin muna natin kay axios
-        const response = await axios.get(
-          `/paper/view_manuscript/${research_id}`,
-          {
-            responseType: "blob", // Get the response as a binary Blob (PDF)
-          }
-        );
-
-        // Create a URL for the Blob and open it in a new tab
-        const blob = new Blob([response.data], { type: "application/pdf" });
-        const url = window.URL.createObjectURL(blob);
-
-        // Open the PDF in a new tab
-        window.open(url, "_blank");
-      } catch (error) {
-        console.error("Error fetching the manuscript:", error);
-        alert("Failed to retrieve the manuscript. Please try again.");
-      }
-    } else {
-      alert("No manuscript available for this research.");
-    }
-  };
 
   const [status, setStatus] = useState(null);
   const [error, setError] = useState(null);
@@ -448,7 +444,8 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
           {/*Main Content */}
           <Box
             sx={{
-              padding: 5,
+              padding: 3,
+              ml: 2
             }}
           >
             {/* Left-side Form Section*/}
@@ -460,7 +457,14 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                 height: "100%",
               }}
             >
-              <Grid2 display='flex' size={9}>
+              <Grid2
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  height: "100%",
+                }}
+                size={8}
+              >
                 <Box
                   sx={{
                     border: "2px solid #0A438F",
@@ -530,7 +534,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                   {item.year}
                                 </Typography>
                               </Grid2>                              
-                              <Divider variant="left" sx={{ mb: "2rem"}}/>
+                              <Divider variant="left" sx={{ mb: "1rem"}}/>
                             </Box>
                           ))
                         ) : (
@@ -561,7 +565,6 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                       position: "relative",
                                       width: "100%",
                                       borderRadius: 2,
-                                      paddingLeft: 3,
                                       height: "auto",
                                     }}
                                   >
@@ -728,7 +731,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                           textTransform: "none",
                                           fontSize: { xs: "0.875rem", md: "1rem" },
                                           padding: { xs: "0.5rem 1rem", md: "1.5rem" },
-                                          marginTop: "3rem",
+                                          marginTop: "1rem",
                                           width: "auto",
                                           borderRadius: "100px",
                                           maxHeight: "3rem",
@@ -746,278 +749,421 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                   </Box>                       
                                 ))
                               ) : (
-                                <Typography variant="body1">No Publication and Conference available.</Typography>
+                                <Box display='flex' flexDirection='column' justifyContent='center'>
+                                  <Typography
+                                    variant='body1'
+                                    sx={{ color: "#d40821" }}
+                                  >
+                                    Publication:
+                                  </Typography>
+                                  <Grid2 display='flex' flexDirection='column' padding='1rem'>
+                                    <Typography variant="h7" sx={{ mb: "1rem" }}>
+                                        <strong>Name:</strong> {publicationName || "None"}
+                                    </Typography>
+                                    <Typography variant="h7" sx={{ mb: "1rem" }}>
+                                        <strong>Format:</strong> {publicationFormat || "None"}
+                                    </Typography>
+                                    <Typography variant="h7" sx={{ mb: "1rem" }}>
+                                        <strong>Date:</strong> {datePublished || "None"}
+                                    </Typography>
+                                    <Typography variant="h7" >
+                                        <strong>Indexing Status:</strong> {indexingStatus || "None"}
+                                    </Typography>
+                                  </Grid2>
+                                  <Grid2 container size={4} justifyContent='flex-start' margin="1rem">
+                                      <Box
+                                        sx={{
+                                          display: "flex",
+                                          alignItems: "center",
+                                          border: "2px dashed #0A438F",
+                                          borderRadius: 1,
+                                          p: 1,
+                                          cursor: "pointer",
+                                          justifyContent: "center",
+                                        }}
+                                      >
+                                        <Button
+                                          variant='text'
+                                          color='primary'
+                                          sx={{
+                                            color: "#08397C",
+                                            fontFamily: "Montserrat, sans-serif",
+                                            fontWeight: 600,
+                                            textTransform: "none",
+                                            fontSize: { xs: "0.875rem", md: "1rem" },
+                                            alignSelf: "center",
+                                            maxHeight: "3rem",
+                                            "&:hover": {
+                                              color: "#052045",
+                                            },
+                                          }}
+                                          onClick={handleOpenModalPub}
+                                        >
+                                          + Add Publication Details
+                                      </Button>
+                                    </Box>
+                                  </Grid2>
+                                  <Divider orientation='horizontal' flexItem />
+                                  <Typography
+                                    variant='body1'
+                                    paddingTop={2}
+                                    sx={{ color: "#d40821" }}
+                                  >
+                                    Conference:
+                                  </Typography>
+                                  <Grid2 display='flex' flexDirection='column' padding='1rem'>
+                                    <Typography variant="h7" sx={{ mb: "1rem" }}>
+                                        <strong>Title:</strong> {selectedTitle || "None"}
+                                    </Typography>
+                                    <Typography variant="h7" sx={{ mb: "1rem" }}>
+                                        <strong>Venue:</strong> {selectedVenue || "None"}
+                                    </Typography>
+                                    <Typography variant="h7" sx={{ mb: "1rem" }}>
+                                        <strong>Date:</strong> {selectedDate || "None"}
+                                    </Typography>
+                                  </Grid2>
+                                  <Grid2 display='flex' padding='1rem' justifyContent='flex-start' gap={3}>
+                                    <Box
+                                        sx={{
+                                          display: "flex",
+                                          alignItems: "center",
+                                          border: "2px dashed #0A438F",
+                                          borderRadius: 1,
+                                          p: 1,
+                                          cursor: "pointer",
+                                          justifyContent: "center",
+                                          gap: 2,
+                                        }}
+                                      >
+                                        <Button
+                                          variant='text'
+                                          color='primary'
+                                          sx={{
+                                            color: "#08397C",
+                                            fontFamily: "Montserrat, sans-serif",
+                                            fontWeight: 600,
+                                            textTransform: "none",
+                                            fontSize: { xs: "0.875rem", md: "1rem" },
+                                            alignSelf: "center",
+                                            maxHeight: "3rem",
+                                            "&:hover": {
+                                              color: "#052045",
+                                            },
+                                          }}
+                                          onClick={handleOpenModalCon}
+                                        >
+                                          Select Conference
+                                      </Button>
+                                    </Box>
+                                    <Box
+                                      sx={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        border: "2px dashed #0A438F",
+                                        borderRadius: 1,
+                                        p: 1,
+                                        cursor: "pointer",
+                                        justifyContent: "center",
+                                        gap: 2,
+                                      }}
+                                    >
+                                      <Button
+                                        variant='text'
+                                        color='primary'
+                                        sx={{
+                                          color: "#08397C",
+                                          fontFamily: "Montserrat, sans-serif",
+                                          fontWeight: 600,
+                                          textTransform: "none",
+                                          fontSize: { xs: "0.875rem", md: "1rem" },
+                                          alignSelf: "center",
+                                          maxHeight: "3rem",
+                                          "&:hover": {
+                                            color: "#052045",
+                                          },
+                                        }}
+                                        onClick={handleOpenModal}
+                                      >
+                                        + Add Conference
+                                      </Button>
+                                    </Box>
+                                  </Grid2>
+                                  <Box
+                                    sx={{
+                                      display: "flex",
+                                      flexDirection: "column",
+                                      alignItems: "flex-end",
+                                      marginTop: 3,
+                                    }}
+                                  >
+                                    <Button
+                                      variant='contained'
+                                      color='primary'
+                                      sx={{
+                                        backgroundColor: "#08397C",
+                                        color: "#FFF",
+                                        fontFamily: "Montserrat, sans-serif",
+                                        fontWeight: 600,
+                                        textTransform: "none",
+                                        fontSize: { xs: "0.875rem", md: "1.275rem" },
+                                        padding: { xs: "0.5rem 1rem", md: "1.5rem" },
+                                        marginTop: "1rem",
+                                        width: "auto",
+                                        borderRadius: "100px",
+                                        maxHeight: "3rem",
+                                        "&:hover": {
+                                          backgroundColor: "#052045",
+                                          color: "#FFF",
+                                        },
+                                      }}
+                                    >
+                                      Save Details
+                                    </Button>
+                                  </Box>
+                                </Box>
                               )}
                             </Box>
                           </Box>)}                         
                         </Box>                     
-                      <Typography
-                        variant='body1'
-                        paddingTop={5}
-                        sx={{ color: "#d40821" }}
-                      >
-                        Publication:
-                      </Typography>
-                      <Grid2 container padding={1} spacing={{ xs: 0, md: 3 }}>
-                        <Grid2 item size={{ xs: 12, md: 3 }}>
-                          <TextField
-                            fullWidth
-                            label='Publication Name'
-                            name='publicationName'
-                            value={null}
-                            onChange={null}
-                            variant='outlined'
-                          ></TextField>
-                        </Grid2>
-                        <Grid2 item size={{ xs: 12, md: 3 }}>
-                          <TextField
-                            fullWidth
-                            label='Publication Format'
-                            name='publicationFormat'
-                            value={null}
-                            onChange={null}
-                            variant='outlined'
-                          ></TextField>
-                        </Grid2>
-                        <Grid2 item size={{ xs: 12, md: 3 }}>
-                          <TextField
-                            fullWidth
-                            label='Published Date'
-                            name='fundingagency'
-                            value={null}
-                            onChange={null}
-                            variant='outlined'
-                          ></TextField>
-                        </Grid2>
-                        <Grid2 item size={{ xs: 12, md: 3 }}>
-                          <TextField
-                            fullWidth
-                            label='Scopus'
-                            name='scopus'
-                            value={null}
-                            onChange={null}
-                            variant='outlined'
-                          ></TextField>
-                        </Grid2>
-                        <Grid2 item size={{ xs: 12, md: 12 }}>
-                          <Typography variant='body1' sx={{ color: "#8B8B8B" }}>
-                            Upload Extended Abstract:
-                          </Typography>
-                          <Box
-                            sx={{
-                              display: "flex",
-                              alignItems: "center",
-                              border: "1px dashed #ccc",
-                              borderRadius: 1,
-                              p: 1,
-                              cursor: "pointer",
-                              justifyContent: "center",
-                              gap: 2,
-                              mb: 5,
-                            }}
-                          >
-                            <FileUploader
-                              onSelectFile={onSelectFileHandler}
-                              onDeleteFile={onDeleteFileHandler}
-                            />
-                          </Box>
-                        </Grid2>
-                      </Grid2>
-                      <Divider orientation='horizontal' flexItem />
-                      <Typography
-                        variant='body1'
-                        padding={1}
-                        sx={{ color: "#d40821" }}
-                      >
-                        Conference:
-                      </Typography>
-                      <Grid2 display='flex' flexDirection='column' padding='1rem'>
-                        <Typography variant="h7" sx={{ mb: "1rem" }}>
-                            <strong>Title:</strong> {selectedTitle || "None"}
-                        </Typography>
-                        <Typography variant="h7" sx={{ mb: "1rem" }}>
-                            <strong>Venue:</strong> {selectedVenue || "None"}
-                        </Typography>
-                        <Typography variant="h7" sx={{ mb: "1rem" }}>
-                            <strong>Date:</strong> {selectedDate || "None"}
-                        </Typography>
-                      </Grid2>
-                      <Grid2 display='flex' padding='1rem'>
-                        <Grid2 container size={8} justifyContent='flex-start'>
-                          <TextField
-                            variant='outlined'
-                            placeholder='Search by Title or Venue'
-                            value={searchQuery}
-                            onChange={handleSearchChange}
-                            sx={{ flex: 2 }}
-                            InputProps={{
-                              startAdornment: (
-                                <InputAdornment position='start'>
-                                  <Search />
-                                </InputAdornment>
-                              ),
-                            }}
-                          />
-                        </Grid2>
-                        <Grid2 container size={4} justifyContent='flex-end'>
-                          <Box
-                            sx={{
-                              display: "flex",
-                              alignItems: "center",
-                              border: "2px dashed #ccc",
-                              borderRadius: 1,
-                              p: 1,
-                              cursor: "pointer",
-                              justifyContent: "center",
-                              gap: 2,
-                            }}
-                          >
-                            <Button
-                              variant='text'
-                              color='primary'
-                              sx={{
-                                color: "#08397C",
-                                fontFamily: "Montserrat, sans-serif",
-                                fontWeight: 600,
-                                textTransform: "none",
-                                fontSize: { xs: "0.875rem", md: "1rem" },
-                                alignSelf: "center",
-                                maxHeight: "3rem",
-                                "&:hover": {
-                                  color: "#052045",
-                                },
-                              }}
-                              onClick={handleOpenModal}
-                            >
-                              + Add Conference
-                          </Button>
-                          </Box>
-                        </Grid2>
-                      </Grid2>
-                      <Box
-                        sx={{
-                          backgroundColor: "#F7F9FC",
-                          borderRadius: 1,
-                          margin: "1rem",
-                          mt: 2,
-                          overflow: "hidden",
-                          display: "flex",
-                          flexDirection: "column",
-                          height: "auto"
-                        }}
-                      >
-                        <Box sx={{ height: "38em", overflow: "hidden" }}>
-                          {loading ? (
-                            <Typography>Loading...</Typography>
-                          ) : (
-                            <Virtuoso
-                              data={paginatedConferences}
-                              itemContent={(index, conference) => (
-                                <Box
-                                  key={conference.conference_id}
-                                  sx={{
-                                    p: 3,
-                                    cursor: "pointer",
-                                    minHeight: "calc((100% - 48px) / 5)",
-                                    display: "flex",
-                                    flexDirection: "column",
-                                    justifyContent: "center",
-                                    borderBottom: "1px solid rgba(0, 0, 0, 0.1)",
-                                    "&:hover": {
-                                      backgroundColor: "rgba(0, 0, 0, 0.04)",
-                                    },
-                                  }}
-                                  onClick={() => {
-                                    setSelectedTitle(conference.conference_title);
-                                    setSelectedVenue(conference.conference_venue);
-                                    setSelectedDate(conference.conference_date);
-                                  }}
-                                >
-                                  <Typography
-                                    variant='h6'
-                                    sx={{
-                                      fontSize: "1.1rem",
-                                      fontWeight: 500,
-                                    }}
-                                  >
-                                    {conference.conference_title}
-                                  </Typography>
-                                  <Typography
-                                    variant='body2'
-                                    sx={{
-                                      color: "#666",
-                                    }}
-                                  >
-                                    {conference.conference_date} 
-                                  </Typography>
-                                  <Typography
-                                    variant='caption'
-                                    sx={{
-                                      color: "#0A438F",
-                                      fontWeight: 500,
-                                    }}
-                                  >
-                                    {conference.conference_venue}
-                                  </Typography>
-                                </Box>
-                              )}
-                            />
-                          )}
-                        </Box>
-                        <Box
-                          sx={{
-                            display: "flex",
-                            justifyContent: "center",
-                            py: 1,
-                            backgroundColor: "#fff",
-                            borderTop: "1px solid #eee",
-                          }}
-                        >
-                          <Pagination
-                            count={Math.ceil(
-                              filteredConferences.length / itemsPerPage
-                            )}
-                            page={currentPage}
-                            onChange={handleChangePage}
-                          />
-                        </Box>
-                      </Box>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          flexDirection: "column",
-                          alignItems: "flex-end",
-                          marginTop: 5,
-                        }}
-                      >
-                        <Button
-                          variant='contained'
-                          color='primary'
-                          sx={{
-                            backgroundColor: "#08397C",
-                            color: "#FFF",
-                            fontFamily: "Montserrat, sans-serif",
-                            fontWeight: 600,
-                            textTransform: "none",
-                            fontSize: { xs: "0.875rem", md: "1.275rem" },
-                            padding: { xs: "0.5rem 1rem", md: "1.5rem" },
-                            marginTop: "1rem",
-                            width: "auto",
-                            borderRadius: "100px",
-                            maxHeight: "3rem",
-                            "&:hover": {
-                              backgroundColor: "#052045",
-                              color: "#FFF",
-                            },
-                          }}
-                        >
-                          Add Details
-                        </Button>
-                      </Box>
+                      
                     </Box>
                   </form>
                 </Box>
               </Grid2>
+
+              {/* Add Publication Modal */}
+              <Modal open={openModalPub} onClose={handleCloseModal}>
+                <Box
+                  sx={{
+                    position: "absolute",
+                    top: "50%",
+                    left: "50%",
+                    transform: "translate(-50%, -50%)",
+                    width: "40rem",
+                    bgcolor: "background.paper",
+                    boxShadow: 24,
+                    p: 5,
+                    borderRadius: "8px",
+                  }}
+                >
+                  <Typography
+                    variant='h3'
+                    color='#08397C'
+                    fontWeight='1000'
+                    mb={4}
+                    sx={{
+                      textAlign: { xs: "left", md: "bottom" },
+                    }}
+                  >
+                    Add Publication
+                  </Typography>
+                  <TextField
+                    label='Publication Name'
+                    value={publicationName}
+                    fullWidth
+                    onChange={(e) => setPublicationName(e.target.value)}
+                    margin='normal'
+                  />
+                  <FormControl fullWidth variant='outlined' margin='normal'>
+                    <InputLabel>Format</InputLabel>
+                      <Select
+                        value={publicationFormat}
+                        onChange={(e) => setPublicationFormat(e.target.value)}
+                      >
+                        <MenuItem value='journal'>Journal</MenuItem>
+                        <MenuItem value='proceeding'>Proceeding</MenuItem>
+                      </Select>
+                  </FormControl>
+                  <TextField
+                    fullWidth
+                    label='Date'
+                    variant='outlined'
+                    type='date'
+                    margin='normal'
+                    value={datePublished}
+                    onChange={(e) => setDatePublished(e.target.value)}
+                    InputLabelProps={{ shrink: true }}
+                  />
+                  <TextField
+                    label='Indexing Status'
+                    value={indexingStatus}
+                    fullWidth
+                    onChange={(e) => setIndexingStatus(e.target.value)}
+                    margin='normal'
+                  />
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      mt: 5,
+                    }}
+                  >
+                    <Button
+                      onClick={handleCloseModal}
+                      sx={{
+                        backgroundColor: "#08397C",
+                        color: "#FFF",
+                        fontFamily: "Montserrat, sans-serif",
+                        fontWeight: 600,
+                        fontSize: { xs: "0.875rem", md: "1.275rem" },
+                        padding: { xs: "0.5rem", md: "1.5rem" },
+                        borderRadius: "100px",
+                        maxHeight: "3rem",
+                        textTransform: "none",
+                        "&:hover": {
+                          backgroundColor: "#072d61",
+                        },
+                      }}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      variant='contained'
+                      color='primary'
+                      onClick={(handleAddConference)}
+                      sx={{
+                        backgroundColor: "#CA031B",
+                        color: "#FFF",
+                        fontFamily: "Montserrat, sans-serif",
+                        fontWeight: 600,
+                        textTransform: "none",
+                        fontSize: { xs: "0.875rem", md: "1.275rem" },
+                        padding: { xs: "0.5rem 1rem", md: "1.5rem" },
+                        marginLeft: "2rem",
+                        borderRadius: "100px",
+                        maxHeight: "3rem",
+                        "&:hover": {
+                          backgroundColor: "#A30417",
+                          color: "#FFF",
+                        },
+                      }}
+                    >
+                      Add
+                    </Button>
+                  </Box>
+                </Box>
+              </Modal>
+              
+              {/* Select Conference Modal */}
+              <Modal open={openModalCon} onClose={handleCloseModal}>
+                <Box
+                  sx={{
+                    position: "absolute",
+                    top: "50%",
+                    left: "50%",
+                    transform: "translate(-50%, -50%)",
+                    width: "40rem",
+                    bgcolor: "background.paper",
+                    boxShadow: 24,
+                    p: 5,
+                    borderRadius: "8px",
+                  }}
+                >
+                  <TextField
+                    fullWidth
+                    variant='outlined'
+                    placeholder='Search by Title or Venue'
+                    value={searchQuery}
+                    onChange={handleSearchChange}
+                    sx={{ flex: 2 }}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position='start'>
+                          <Search />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                  <Box
+                    sx={{
+                      backgroundColor: "#F7F9FC",
+                      borderRadius: 1,
+                      mt: 2,
+                      overflow: "hidden",
+                      display: "flex",
+                      flexDirection: "column",
+                      height: "auto"
+                    }}
+                  >
+                    <Box sx={{ height: "32em", overflow: "hidden" }}>
+                      {loading ? (
+                        <Typography>Loading...</Typography>
+                      ) : (
+                        <Virtuoso
+                          data={paginatedConferences}
+                          itemContent={(index, conference) => (
+                            <Box
+                              key={conference.conference_id}
+                              sx={{
+                                p: 2,
+                                cursor: "pointer",
+                                minHeight: "calc((100% - 48px) / 5)",
+                                display: "flex",
+                                flexDirection: "column",
+                                justifyContent: "center",
+                                borderBottom: "1px solid rgba(0, 0, 0, 0.1)",
+                                "&:hover": {
+                                  backgroundColor: "rgba(0, 0, 0, 0.04)",
+                                },
+                              }}
+                              onClick={() => {
+                                setSelectedTitle(conference.conference_title);
+                                setSelectedVenue(conference.conference_venue);
+                                setSelectedDate(conference.conference_date);
+                                handleCloseModal();
+                              }}
+                            >
+                              <Typography
+                                variant='h6'
+                                sx={{
+                                  fontSize: "1.1rem",
+                                  fontWeight: 500,
+                                }}
+                              >
+                                {conference.conference_title}
+                              </Typography>
+                              <Typography
+                                variant='body2'
+                                sx={{
+                                  color: "#666",
+                                }}
+                              >
+                                {conference.conference_date} 
+                              </Typography>
+                              <Typography
+                                variant='caption'
+                                sx={{
+                                  color: "#0A438F",
+                                  fontWeight: 500,
+                                }}
+                              >
+                                {conference.conference_venue}
+                              </Typography>
+                            </Box>
+                          )}
+                        />
+                      )}
+                    </Box>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                        py: 1,
+                        backgroundColor: "#fff",
+                        borderTop: "1px solid #eee",
+                      }}
+                    >
+                      <Pagination
+                        count={Math.ceil(
+                          filteredConferences.length / itemsPerPage
+                        )}
+                        page={currentPage}
+                        onChange={handleChangePage}
+                      />
+                    </Box>
+                  </Box>
+                </Box>
+              </Modal>
 
               {/* Add Conference Modal */}
               <Modal open={openModal} onClose={handleCloseModal}>
