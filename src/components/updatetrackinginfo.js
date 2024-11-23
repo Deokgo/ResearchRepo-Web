@@ -239,6 +239,83 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
     }
   };
 
+  const handleSavePublication = async () => {
+
+    if (selectedVenue) {
+      const venue = selectedVenue.split(",").map(item => item.trim());
+      setSingleCity(venue[0]);
+      setSingleCountry(venue[1]);
+    }
+
+    try {
+      // Validate required fields
+      const requiredFields = {
+        "Publication Name": publicationName,
+        Format : publicationFormat,
+        "Date Published": datePublished,
+        "Indexing Status": indexingStatus,
+        "Conference Title": selectedTitle,
+        City: singleCity,
+        Country: singleCountry,
+        "Conference Date": selectedDate
+      };
+
+      const missingFields = Object.entries(requiredFields)
+        .filter(([_, value]) => {
+          if (Array.isArray(value)) {
+            return value.length === 0;
+          }
+          return !value;
+        })
+        .map(([key]) => key);
+
+      if (missingFields.length > 0) {
+        alert(
+          `Please fill in all required fields: ${missingFields.join(", ")}`
+        );
+        return;
+      }
+
+      const formData = new FormData();
+
+      // Get user_id from localStorage
+      const userId = localStorage.getItem("user_id");
+      formData.append("user_id", userId);
+
+      // Add all required fields to formData
+      formData.append("publication_name", publicationName);
+      formData.append("journal", publicationFormat);
+      formData.append("date_published", datePublished);
+      formData.append("scopus", indexingStatus);
+      formData.append("conference_title", selectedTitle);
+      formData.append("city", singleCity);
+      formData.append("country", singleCountry);
+      formData.append("conference_date", selectedDate);
+
+      // Send the conference data
+      const response = await axios.post(`/track/publication/${id}`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      console.log("Response:", response.data);
+      alert("Publication added successfully!");
+    } catch (error) {
+      console.error("Error adding publication:", error);
+      if (error.response) {
+        console.error("Error response:", error.response.data);
+        alert(
+          `Failed to add publication: ${
+            error.response.data.error || "Please try again."
+          }`
+        );
+      } else {
+        alert("Failed to add publication. Please try again.");
+      }
+    }
+  };
+
   // Get the paginated research outputs
   const paginatedConferences = filteredConferences.slice(
     (currentPage - 1) * itemsPerPage,
@@ -604,8 +681,11 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                               label='Date Published'
                                               name='date_published'
                                               type="date"
-                                              value={data.date_published}
+                                              value={data.date_published || ''}
                                               variant='outlined'
+                                              InputLabelProps={{
+                                                shrink: true
+                                              }}
                                               />
                                             ) : (
                                               <Typography variant="h7" sx={{ mb: "1rem" }}>
@@ -618,6 +698,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                             <FormControl fullWidth variant='outlined'>
                                               <InputLabel>Format</InputLabel>
                                                 <Select
+                                                  label='Format'
                                                   value={data.journal}
                                                   onChange={(e) => setFormat(e.target.value)}
                                                 >
@@ -625,27 +706,29 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                                   <MenuItem value='proceeding'>Proceeding</MenuItem>
                                                 </Select>
                                             </FormControl>
-                                            
-                                            
                                           ) : (
                                             <Typography variant="h7" sx={{ mb: "1rem" }}>
-                                            <strong>Format:</strong>{" "}
-                                            {data.journal 
-                                              ? data.journal.charAt(0).toUpperCase() + data.journal.slice(1).toLowerCase() 
-                                              : "None"}
-                                          </Typography>
+                                              <strong>Format:</strong>{" "}
+                                              {data.journal 
+                                                ? data.journal.charAt(0).toUpperCase() + data.journal.slice(1).toLowerCase() 
+                                                : "None"}
+                                            </Typography>
                                           )}
                                           
                                         </Grid2>
                                         <Grid2 item sx={{ mb: "1rem", mr: "3rem" }}>
                                         {isEditing ? (
-                                            <TextField
-                                            fullWidth
-                                            label='Indexing Status'
-                                            name='publicationName'
-                                            value={data.scopus}
-                                            variant='outlined'
-                                            />
+                                          <FormControl fullWidth variant='outlined' >
+                                            <InputLabel>Indexing Status</InputLabel>
+                                              <Select
+                                                label='Indexing Status'
+                                                value={data.scopus}
+                                                onChange={(e) => setIndexingStatus(e.target.value)}
+                                              >
+                                                <MenuItem value='SCOPUS'>Scopus</MenuItem>
+                                                <MenuItem value='NON-SCOPUS'>Non-Scopus</MenuItem>
+                                              </Select>
+                                          </FormControl>
                                           ) : (
                                             <Typography variant="h7" sx={{ mb: "1rem" }}>
                                                 <strong>Indexing Status:</strong> {data.scopus || "None"}
@@ -657,7 +740,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                       <Grid2 size={6}>
                                         <Grid2 item sx={{ mb: "1rem", mr: "3rem"  }}>
                                           {isEditing ? (
-                                              <TextField
+                                            <TextField
                                               fullWidth
                                               label='Title'
                                               name='conference_title'
@@ -673,7 +756,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                         </Grid2>
                                         <Grid2 item sx={{ mb: "1rem", mr: "3rem"  }}>
                                           {isEditing ? (
-                                              <TextField
+                                            <TextField
                                               fullWidth
                                               label='Date'
                                               type="date"
@@ -711,24 +794,24 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                               ))}
                                             </TextField>
                                             <TextField
-                                            select
-                                            fullWidth
-                                            label='City'
-                                            value={data.city}
-                                            onChange={(e) => setSingleCity(e.target.value)}
-                                            margin='normal'
-                                            disabled={!Cities.length} // Disable if no cities are loaded
-                                            helperText='Select country first to select city'
-                                          >
-                                            <MenuItem value='' disabled>
-                                              Select your city
-                                            </MenuItem>
-                                            {Cities.map((city) => (
-                                              <MenuItem key={city} value={city}>
-                                                {city}
+                                              select
+                                              fullWidth
+                                              label='City'
+                                              value={data.city}
+                                              onChange={(e) => setSingleCity(e.target.value)}
+                                              margin='normal'
+                                              disabled={!Cities.length} // Disable if no cities are loaded
+                                              helperText='Select country first to select city'
+                                            >
+                                              <MenuItem value='' disabled>
+                                                Select your city
                                               </MenuItem>
-                                            ))}
-                                          </TextField>
+                                              {Cities.map((city) => (
+                                                <MenuItem key={city} value={city}>
+                                                  {city}
+                                                </MenuItem>
+                                              ))}
+                                            </TextField>
                                           </Box>
                                             ) : (
                                               <Typography variant="h7" sx={{ mb: "1rem" }}>
@@ -935,6 +1018,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                           color: "#FFF",
                                         },
                                       }}
+                                      onClick={handleSavePublication}
                                     >
                                       Save Publication Details
                                     </Button>
@@ -944,7 +1028,6 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                             </Box>
                           </Box>)}                         
                         </Box>                     
-                      
                     </Box>
                   </form>
                 </Box>
@@ -1003,13 +1086,16 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                     onChange={(e) => setDatePublished(e.target.value)}
                     InputLabelProps={{ shrink: true }}
                   />
-                  <TextField
-                    label='Indexing Status'
-                    value={indexingStatus}
-                    fullWidth
-                    onChange={(e) => setIndexingStatus(e.target.value)}
-                    margin='normal'
-                  />
+                  <FormControl fullWidth variant='outlined' margin='normal'>
+                    <InputLabel>Indexing Status</InputLabel>
+                      <Select
+                        value={indexingStatus}
+                        onChange={(e) => setIndexingStatus(e.target.value)}
+                      >
+                        <MenuItem value='scopus'>Scopus</MenuItem>
+                        <MenuItem value='non-scopus'>Non-Scopus</MenuItem>
+                      </Select>
+                  </FormControl>
                   <Box
                     sx={{
                       display: "flex",
