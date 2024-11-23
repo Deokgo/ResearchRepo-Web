@@ -160,19 +160,19 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
   const [format,setFormat]=useState("")
 
   const handleCloseModal = () => {
-    setPublicationName("");
-    setPublicationFormat("");
-    setDatePublished("");
-    setIndexingStatus("");
+    setPublicationName(publicationName);
+    setPublicationFormat(publicationFormat);
+    setDatePublished(datePublished);
+    setIndexingStatus(indexingStatus);
     setOpenModalPub(false);
 
     setSearchQuery("");
     setOpenModalCon(false);
 
-    setConferenceTitle("");
-    setSingleCountry("");
-    setSingleCity("");
-    setDateApproved("");
+    setConferenceTitle(selectedTitle);
+    setSingleCountry(singleCountry);
+    setSingleCity(singleCity);
+    setDateApproved(selectedDate);
     setOpenModal(false);
   };
 
@@ -250,10 +250,6 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
     try {
       // Validate required fields
       const requiredFields = {
-        "Publication Name": publicationName,
-        Format : publicationFormat,
-        "Date Published": datePublished,
-        "Indexing Status": indexingStatus,
         "Conference Title": selectedTitle,
         City: singleCity,
         Country: singleCountry,
@@ -1206,8 +1202,16 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                 },
                               }}
                               onClick={() => {
+                                // Split the venue into parts
+                                const venueParts = conference.conference_venue?.split(",") || []; // Ensure safe splitting
+                                const city = venueParts[0]?.trim(); // First part as city (if exists)
+                                const country = venueParts[1]?.trim() || venueParts[0]?.trim(); // Second part as country, fallback to the first part
+
+                                // Set values
                                 setSelectedTitle(conference.conference_title);
-                                setSelectedVenue(conference.conference_venue);
+                                setSelectedVenue(conference.conference_venue);                                
+                                setSingleCountry(country);                                
+                                setSingleCity(venueParts.length > 1 ? city : ""); // Set city only if it exists
                                 setSelectedDate(conference.conference_date);
                                 handleCloseModal();
                               }}
