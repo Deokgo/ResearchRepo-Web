@@ -41,6 +41,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
   const { isAddPaperModalOpen, closeAddPaperModal, openAddPaperModal } =
     useModalContext();
   const [file, setFile] = useState(null);
+  const [extendedAbstract, setExtendedAbstract] = useState(null);
   const [selectedSDGs, setSelectedSDGs] = useState([]);
 
   // Fetch all colleges when the modal opens
@@ -127,6 +128,10 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
     setFile(e.target.files[0]);
   };
 
+  const onSelectFileHandlerEA = (e) => {
+    setExtendedAbstract(e.target.files[0]);
+  };
+
   const onDeleteFileHandler = () => {};
 
   const handleKeywordsChange = (event, newValue) => {
@@ -149,7 +154,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
         Keywords: keywords,
         Panels: panels,
         Authors: authors,
-        File: file,
+        "Full Manuscript": file,
       };
 
       const missingFields = Object.entries(requiredFields)
@@ -167,6 +172,11 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
         );
         return;
       }
+      
+
+      console.log("File:", file);
+      console.log("Extended Abstract:", extendedAbstract);
+
 
       const formData = new FormData();
 
@@ -185,6 +195,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
       formData.append("adviser_id", adviser?.user_id || "");
       formData.append("sdg", selectedSDGs.map((sdg) => sdg.id).join(";"));
       formData.append("file", file);
+      formData.append("extended_abstract", extendedAbstract);
 
       // Add authors without order
       authors.forEach((author) => {
@@ -245,6 +256,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
       setKeywords([]);
       setPanels([]);
       setFile(null);
+      setExtendedAbstract(null);
       setAuthors([]);
     }
   }, [isAddPaperModalOpen]);
@@ -487,7 +499,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
               onChange={(e) => setAbstract(e.target.value)}
             />
           </Grid2>
-          <Grid2 size={6}>
+          <Grid2 size={3}>
             <Typography variant='body1' sx={{ color: "#8B8B8B" }}>
               Upload Full Manuscript:
             </Typography>
@@ -496,7 +508,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
                 display: "flex",
                 alignItems: "center",
                 border: "1px dashed #ccc",
-                width: "25rem",
+                width: "20rem",
                 height: "5rem",
                 maxWidth: "25rem",
                 maxHeight: "5rem",
@@ -508,6 +520,31 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
             >
               <FileUploader
                 onSelectFile={onSelectFileHandler}
+                onDeleteFile={onDeleteFileHandler}
+              />
+            </Box>
+          </Grid2>
+          <Grid2 size={3}>
+            <Typography variant='body1' sx={{ color: "#8B8B8B" }}>
+              Upload Extended Abstract:
+            </Typography>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                border: "1px dashed #ccc",
+                width: "20rem",
+                height: "5rem",
+                maxWidth: "25rem",
+                maxHeight: "5rem",
+                p: 3,
+                cursor: "pointer",
+                justifyContent: "center",
+                gap: 2,
+              }}
+            >
+              <FileUploader
+                onSelectFile={onSelectFileHandlerEA}
                 onDeleteFile={onDeleteFileHandler}
               />
             </Box>
