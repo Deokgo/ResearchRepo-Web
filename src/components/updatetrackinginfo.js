@@ -588,7 +588,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                               fullWidth
                                               label='Publication Name'
                                               name='publicationName'
-                                              value={""}
+                                              value={data.publication_name}
                                               variant='outlined'
                                               />
                                             ) : (
@@ -603,7 +603,8 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                               fullWidth
                                               label='Date Published'
                                               name='date_published'
-                                              value={""}
+                                              type="date"
+                                              value={data.date_published}
                                               variant='outlined'
                                               />
                                             ) : (
@@ -617,7 +618,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                             <FormControl fullWidth variant='outlined'>
                                               <InputLabel>Format</InputLabel>
                                                 <Select
-                                                  value={""}
+                                                  value={data.journal}
                                                   onChange={(e) => setFormat(e.target.value)}
                                                 >
                                                   <MenuItem value='journal'>Journal</MenuItem>
@@ -628,8 +629,11 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                             
                                           ) : (
                                             <Typography variant="h7" sx={{ mb: "1rem" }}>
-                                                <strong>Format:</strong> {data.journal || "None"}
-                                            </Typography>
+                                            <strong>Format:</strong>{" "}
+                                            {data.journal 
+                                              ? data.journal.charAt(0).toUpperCase() + data.journal.slice(1).toLowerCase() 
+                                              : "None"}
+                                          </Typography>
                                           )}
                                           
                                         </Grid2>
@@ -639,7 +643,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                             fullWidth
                                             label='Indexing Status'
                                             name='publicationName'
-                                            value={""}
+                                            value={data.scopus}
                                             variant='outlined'
                                             />
                                           ) : (
@@ -657,7 +661,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                               fullWidth
                                               label='Title'
                                               name='conference_title'
-                                              value={""}
+                                              value={data.conference_title}
                                               variant='outlined'
                                               />
                                             ) : (
@@ -672,8 +676,9 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                               <TextField
                                               fullWidth
                                               label='Date'
+                                              type="date"
                                               name='conference_date'
-                                              value={""}
+                                              value={data.conference_date}
                                               variant='outlined'
                                               />
                                             ) : (
@@ -685,11 +690,12 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                         </Grid2>
                                         <Grid2 item sx={{ mb: "1rem", mr: "3rem"  }}>
                                           {isEditing ? (
+                                            <Box>
                                               <TextField
                                               select
                                               fullWidth
                                               label='Country'
-                                              value={singleCountry}
+                                              value={data.country}
                                               onChange={(e) => {
                                                 setSingleCountry(e.target.value);
                                                 fetchCities(e.target.value);
@@ -704,9 +710,29 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                                 </MenuItem>
                                               ))}
                                             </TextField>
+                                            <TextField
+                                            select
+                                            fullWidth
+                                            label='City'
+                                            value={data.city}
+                                            onChange={(e) => setSingleCity(e.target.value)}
+                                            margin='normal'
+                                            disabled={!Cities.length} // Disable if no cities are loaded
+                                            helperText='Select country first to select city'
+                                          >
+                                            <MenuItem value='' disabled>
+                                              Select your city
+                                            </MenuItem>
+                                            {Cities.map((city) => (
+                                              <MenuItem key={city} value={city}>
+                                                {city}
+                                              </MenuItem>
+                                            ))}
+                                          </TextField>
+                                          </Box>
                                             ) : (
                                               <Typography variant="h7" sx={{ mb: "1rem" }}>
-                                                  <strong>Venue:</strong> {data.conference_venue || "None"}
+                                                  <strong>Venue:</strong> {data.city+","+data.country || "None"}
                                               </Typography>
                                             )}
                                             
