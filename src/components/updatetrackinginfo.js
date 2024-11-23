@@ -394,6 +394,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
       setIsButtonDisabled(false);
     }
   }, [status]);
+
   // Handle status update and refresh timeline
   const handleStatusUpdate = async (newStatus) => {
     try {
@@ -409,6 +410,22 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
         // Fetch the next available status
         const nextStatusResponse = await axios.get(`/track/next_status/${id}`);
         setStatus(nextStatusResponse.data);
+      }
+    } catch (err) {
+      console.error("Error updating status:", err);
+      setError(err.response?.data?.message || "Failed to update status");
+    }
+  };
+
+  // Handle pull out status update
+  const handlePullOut = async (newStatus) => {
+    try {
+      // Make the status update request
+      const response = await axios.post(`/track/research_status/pullout/${id}`);
+
+      if (response.status === 200 || response.status === 201) {
+        // Toggle refresh to trigger timeline update
+        setRefreshTimeline((prev) => !prev);
       }
     } catch (err) {
       console.error("Error updating status:", err);
@@ -1427,6 +1444,31 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                     />
                   )
                 )}
+                <Button
+                  variant='contained'
+                  color='primary'
+                  onClick={handlePullOut}
+                  sx={{
+                    backgroundColor: "#08397C",
+                    color: "#FFF",
+                    fontFamily: "Montserrat, sans-serif",
+                    fontWeight: 600,
+                    textTransform: "none",
+                    fontSize: { xs: "0.875rem", md: "1.275rem" },
+                    padding: { xs: "0.5rem 1rem", md: "1rem" },
+                    width: '75%',
+                    alignSelf: 'center',
+                    marginTop: "2rem",
+                    borderRadius: "100px",
+                    maxHeight: "3rem",
+                    "&:hover": {
+                      backgroundColor: "#072d61",
+                      color: "#FFF",
+                    },
+                  }}
+                >
+                  PULL OUT PAPER
+                </Button>
               </Grid2>
             </Grid2>
           </Box>
