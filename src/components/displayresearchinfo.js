@@ -61,6 +61,7 @@ const DisplayResearchInfo = ({ route, navigate }) => {
   const [colleges, setColleges] = useState([]);
   const [programs, setPrograms] = useState([]);
   const [file, setFile] = useState(null);
+  const [extendedAbstract, setExtendedAbstract] = useState(null);
 
   useEffect(() => {
     if (id) {
@@ -133,22 +134,28 @@ const DisplayResearchInfo = ({ route, navigate }) => {
     if (research_id) {
       try {
         // Fetch the PDF as a Blob
-        const response = await axios.get(`/paper/view_extended_abstract/${research_id}`, {
-          responseType: "blob",
-        });
-  
+        const response = await axios.get(
+          `/paper/view_extended_abstract/${research_id}`,
+          {
+            responseType: "blob",
+          }
+        );
+
         const blob = new Blob([response.data], { type: "application/pdf" });
         const url = window.URL.createObjectURL(blob);
         window.open(url, "_blank");
-  
+
         // Increment the download count
         const userId = localStorage.getItem("user_id");
-        const incrementResponse = await axios.put(`/paper/increment_downloads/${research_id}`, {
-          user_id: userId,
-        });
-  
+        const incrementResponse = await axios.put(
+          `/paper/increment_downloads/${research_id}`,
+          {
+            user_id: userId,
+          }
+        );
+
         const updatedDownloadCount = incrementResponse.data.updated_downloads;
-  
+
         // Update the specific item in the data state
         setData((prevData) => ({
           ...prevData,
@@ -158,7 +165,6 @@ const DisplayResearchInfo = ({ route, navigate }) => {
               : item
           ),
         }));
-  
       } catch (error) {
         console.error("Error fetching the manuscript:", error);
         alert("Failed to retrieve the extended abstract. Please try again.");
@@ -166,7 +172,7 @@ const DisplayResearchInfo = ({ route, navigate }) => {
     } else {
       alert("No extended abstract available for this research.");
     }
-  };  
+  };
 
   const [status, setStatus] = useState(null);
   const [error, setError] = useState(null);
@@ -282,6 +288,67 @@ const DisplayResearchInfo = ({ route, navigate }) => {
 
   const handleSaveChanges = async () => {
     try {
+      // Check if any changes were made by comparing editableData with original data
+      const originalData = data.dataset.find(
+        (item) => item.research_id === editableData.research_id
+      );
+
+      // Format dates for comparison
+      const originalDate = originalData.date_approved
+        ? new Date(originalData.date_approved).toISOString().split("T")[0]
+        : "";
+      const editableDate = editableData.date_approved || "";
+
+      // Compare relevant fields
+      const hasChanges =
+        originalData.title !== editableData.title ||
+        originalData.college_id !== editableData.college_id ||
+        originalData.program_id !== editableData.program_id ||
+        originalData.abstract !== editableData.abstract ||
+        originalData.research_type !== editableData.research_type ||
+        originalDate !== editableDate || // Compare formatted dates
+        originalData.adviser?.user_id !== editableData.adviser?.user_id ||
+        JSON.stringify(originalData.keywords.sort()) !==
+          JSON.stringify(keywords.sort()) ||
+        originalData.sdg !== selectedSDGs.map((sdg) => sdg.id).join(";") ||
+        JSON.stringify(originalData.authors.map((a) => a.user_id).sort()) !==
+          JSON.stringify(editableData.authors.map((a) => a.user_id).sort()) ||
+        JSON.stringify(originalData.panels.map((p) => p.user_id).sort()) !==
+          JSON.stringify(editableData.panels.map((p) => p.user_id).sort()) ||
+        file !== null || // Check if new file was uploaded
+        extendedAbstract !== null; // Check if new extended abstract was uploaded
+
+      console.log("Changes detected:", {
+        title: originalData.title !== editableData.title,
+        college: originalData.college_id !== editableData.college_id,
+        program: originalData.program_id !== editableData.program_id,
+        abstract: originalData.abstract !== editableData.abstract,
+        type: originalData.research_type !== editableData.research_type,
+        date: originalDate !== editableDate,
+        adviser:
+          originalData.adviser?.user_id !== editableData.adviser?.user_id,
+        keywords:
+          JSON.stringify(originalData.keywords.sort()) !==
+          JSON.stringify(keywords.sort()),
+        sdg: originalData.sdg !== selectedSDGs.map((sdg) => sdg.id).join(";"),
+        authors:
+          JSON.stringify(originalData.authors.map((a) => a.user_id).sort()) !==
+          JSON.stringify(editableData.authors.map((a) => a.user_id).sort()),
+        panels:
+          JSON.stringify(originalData.panels.map((p) => p.user_id).sort()) !==
+          JSON.stringify(editableData.panels.map((p) => p.user_id).sort()),
+        newFile: file !== null,
+        newEA: extendedAbstract !== null,
+      });
+
+      if (!hasChanges) {
+        alert("No changes were made to save.");
+        setIsEditMode(false);
+        setEditableData(null);
+        return;
+      }
+
+      // Proceed with existing save logic if changes were detected
       const formData = new FormData();
       const userId = localStorage.getItem("user_id");
 
@@ -301,6 +368,9 @@ const DisplayResearchInfo = ({ route, navigate }) => {
       // Handle file upload
       if (file) {
         formData.append("file", file);
+      }
+      if (extendedAbstract) {
+        formData.append("extended_abstract", extendedAbstract);
       }
 
       // Add authors
@@ -409,6 +479,15 @@ const DisplayResearchInfo = ({ route, navigate }) => {
     const selectedFile = e.target.files[0];
     if (selectedFile && selectedFile.type === "application/pdf") {
       setFile(selectedFile);
+    } else {
+      alert("Please select a PDF file");
+    }
+  };
+
+  const onSelectFileHandlerEA = (e) => {
+    const selectedFile = e.target.files[0];
+    if (selectedFile && selectedFile.type === "application/pdf") {
+      setExtendedAbstract(selectedFile);
     } else {
       alert("Please select a PDF file");
     }
@@ -1027,7 +1106,7 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                               }
                             />
                           </Grid2>
-                          <Grid2 size={4}>
+                          <Grid2 size={3}>
                             <Typography
                               variant='body1'
                               sx={{ color: "#8B8B8B", mb: 1 }}
@@ -1052,15 +1131,9 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                                 onDeleteFile={onDeleteFileHandler}
                               />
                             </Box>
-                          </Grid2>
-                          <Grid2
-                            size={2}
-                            display='flex'
-                            justifyContent='center'
-                          >
                             <Button
                               variant='contained'
-                              onClick={handleViewManuscript}
+                              onClick={() => handleViewManuscript(editableData)}
                               sx={{
                                 backgroundColor: "#08397C",
                                 color: "#FFF",
@@ -1069,8 +1142,8 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                                 textTransform: "none",
                                 fontSize: { xs: "0.875rem", md: "1rem" },
                                 padding: { xs: "0.5rem 1rem", md: "1rem" },
-                                marginTop: "2.5rem",
-                                width: "13rem",
+                                marginTop: "1rem",
+                                width: "100%",
                                 borderRadius: "100px",
                                 maxHeight: "3rem",
                                 "&:hover": {
@@ -1079,6 +1152,54 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                               }}
                             >
                               View Manuscript
+                            </Button>
+                          </Grid2>
+                          <Grid2 size={3}>
+                            <Typography
+                              variant='body1'
+                              sx={{ color: "#8B8B8B", mb: 1 }}
+                            >
+                              Extended Abstract:
+                            </Typography>
+                            <Box
+                              sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                width: "100%",
+                                flex: 1,
+                                minHeight: "5rem",
+                                p: 3,
+                                cursor: "pointer",
+                                justifyContent: "center",
+                                gap: 2,
+                              }}
+                            >
+                              <FileUploader
+                                onSelectFile={onSelectFileHandlerEA}
+                                onDeleteFile={onDeleteFileHandler}
+                              />
+                            </Box>
+                            <Button
+                              variant='contained'
+                              onClick={() => handleViewEA(editableData)}
+                              sx={{
+                                backgroundColor: "#08397C",
+                                color: "#FFF",
+                                fontFamily: "Montserrat, sans-serif",
+                                fontWeight: 400,
+                                textTransform: "none",
+                                fontSize: { xs: "0.875rem", md: "1rem" },
+                                padding: { xs: "0.5rem 1rem", md: "1rem" },
+                                marginTop: "1rem",
+                                width: "100%",
+                                borderRadius: "100px",
+                                maxHeight: "3rem",
+                                "&:hover": {
+                                  backgroundColor: "#052045",
+                                },
+                              }}
+                            >
+                              View Extended Abstract
                             </Button>
                           </Grid2>
                           <Grid2 size={12}>
