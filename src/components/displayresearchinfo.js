@@ -128,6 +128,46 @@ const DisplayResearchInfo = ({ route, navigate }) => {
     }
   };
 
+  const handleViewEA = async (researchItem) => {
+    const { research_id } = researchItem;
+    if (research_id) {
+      try {
+        // Fetch the PDF as a Blob
+        const response = await axios.get(`/paper/view_extended_abstract/${research_id}`, {
+          responseType: "blob",
+        });
+  
+        const blob = new Blob([response.data], { type: "application/pdf" });
+        const url = window.URL.createObjectURL(blob);
+        window.open(url, "_blank");
+  
+        // Increment the download count
+        const userId = localStorage.getItem("user_id");
+        const incrementResponse = await axios.put(`/paper/increment_downloads/${research_id}`, {
+          user_id: userId,
+        });
+  
+        const updatedDownloadCount = incrementResponse.data.updated_downloads;
+  
+        // Update the specific item in the data state
+        setData((prevData) => ({
+          ...prevData,
+          dataset: prevData.dataset.map((item) =>
+            item.research_id === research_id
+              ? { ...item, download_count: updatedDownloadCount }
+              : item
+          ),
+        }));
+  
+      } catch (error) {
+        console.error("Error fetching the manuscript:", error);
+        alert("Failed to retrieve the extended abstract. Please try again.");
+      }
+    } else {
+      alert("No extended abstract available for this research.");
+    }
+  };  
+
   const [status, setStatus] = useState(null);
   const [error, setError] = useState(null);
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
@@ -671,7 +711,31 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                                 }}
                                 onClick={() => handleViewManuscript(item)}
                               >
-                                View PDF
+                                View Full Manuscript
+                              </Button>
+                              <Button
+                                variant='contained'
+                                color='primary'
+                                sx={{
+                                  backgroundColor: "#08397C",
+                                  color: "#FFF",
+                                  fontFamily: "Montserrat, sans-serif",
+                                  fontWeight: 400,
+                                  textTransform: "none",
+                                  fontSize: { xs: "0.875rem", md: "1rem" },
+                                  padding: { xs: "0.5rem 1rem", md: "1rem" },
+                                  marginTop: "2rem",
+                                  width: "13rem",
+                                  alignSelf: "center",
+                                  borderRadius: "100px",
+                                  maxHeight: "3rem",
+                                  "&:hover": {
+                                    backgroundColor: "#072d61",
+                                  },
+                                }}
+                                onClick={() => handleViewEA(item)}
+                              >
+                                View Extended Abstract
                               </Button>
                             </Box>
                           </Grid2>
