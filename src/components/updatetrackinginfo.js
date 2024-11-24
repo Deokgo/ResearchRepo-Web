@@ -349,7 +349,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
     }
   };
 
-  const handleEditButton = () => {
+  const handleEditPublication = () => {
     // Add update logic here...
   }
   // Get the paginated research outputs
