@@ -349,8 +349,84 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
     }
   };
 
-  const handleEditPublication = () => {
-    // Add update logic here...
+  const handleEditPublication = async () => {
+    
+    if (selectedVenue) {
+      const venue = selectedVenue.split(",").map(item => item.trim());
+      setSingleCity(venue.length > 1 ? venue[0] : "");
+      setSingleCountry(venue[1]);
+    }
+
+    try {
+      // Validate required fields
+      const requiredFields = {
+        "Publication Name": publicationName,
+        "Publication Format" : publicationFormat,
+        "Date Published": datePublished,
+        "Indexing Status": indexingStatus,
+        "Conference Title": selectedTitle,
+        "Conference Venue": selectedVenue,
+        "Conference Date": selectedDate
+      };
+
+      const missingFields = Object.entries(requiredFields)
+        .filter(([_, value]) => {
+          if (Array.isArray(value)) {
+            return value.length === 0;
+          }
+          return !value;
+        })
+        .map(([key]) => key);
+
+      if (missingFields.length > 0) {
+        alert(
+          `Please fill in all required fields: ${missingFields.join(", ")}`
+        );
+        return;
+      }
+
+      const formData = new FormData();
+
+      // Get user_id from localStorage
+      const userId = localStorage.getItem("user_id");
+      formData.append("user_id", userId);
+
+      // Add all required fields to formData
+      formData.append("publication_name", publicationName);
+      formData.append("journal", publicationFormat);
+      formData.append("date_published", datePublished);
+      formData.append("scopus", indexingStatus);
+      formData.append("conference_title", selectedTitle);
+      formData.append("city", singleCity);
+      formData.append("country", singleCountry);
+      formData.append("conference_date", selectedDate);
+
+      // Send the conference data
+      const response = await axios.put(`/track/publication/${id}`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      console.log("Response:", response.data);
+      alert("Publication updated successfully!");
+      handleFormCleanup();
+
+      window.location.reload();
+      
+    } catch (error) {
+      console.error("Error updating publication:", error);
+      if (error.response) {
+        console.error("Error response:", error.response.data);
+        alert(
+          `Failed to update publication: ${
+            error.response.data.error || "Please try again."
+          }`
+        );
+      } else {
+        alert("Failed to update publication. Please try again.");
+      }
+    }
   }
   // Get the paginated research outputs
   const paginatedConferences = filteredConferences.slice(
@@ -471,14 +547,42 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
 
   const [pubData, setPubData] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
-
+  const [initialData, setInitialData] = useState(null);
+  const [initialValues, setInitialValues] = useState(null);
 
   useEffect(() => {
     const fetchPublication = async () => {
       try {
         const response = await axios.get(`/track/publication/${id}`);
-        const fetched_data = response.data.dataset;
-        setPubData({ dataset: fetched_data });
+        
+        if (response.data.dataset && response.data.dataset.length > 0) {
+          const fetched_data = response.data.dataset;
+          console.log("Fetched publication data:", fetched_data);
+
+          const initialData = {
+            publication_name : fetched_data.publication_name || "",
+            journal : fetched_data.journal || "",
+            date_published : fetched_data.date_published 
+              ? new Date(fetched_data.date_published).toLocaleDateString('en-CA')
+              : "",
+            scopus : fetched_data.scopus || "",
+            conference_title : fetched_data.conference_title || "",
+            conference_venue : `${fetched_data.city}, ${fetched_data.country}` || "",
+            conference_date : fetched_data.conference_date || "",
+          };
+          setInitialValues(initialData);
+
+          // Set current values
+          setPublicationName(initialData.publication_name);
+          setPublicationFormat(initialData.journal);
+          setDatePublished(initialData.date_published);
+          setIndexingStatus(initialData.scopus);
+          setSelectedTitle(initialData.conference_title);
+          setSelectedVenue(initialData.conference_venue);
+          setSelectedDate(initialData.conference_date);
+
+          setPubData({ dataset: fetched_data });
+        }
       } catch (error) {
         console.error("Error fetching data of users:", error);
       } finally {
@@ -486,7 +590,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
     };
 
     fetchPublication();
-  }, []);
+  }, [id]);
 
   const toggleEdit = () =>{
     if (isEditing){
@@ -725,7 +829,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                               fullWidth
                                               label='Publication Name'
                                               name='publicationName'
-                                              value={publicationName || data.publication_name || "None"}
+                                              value={publicationName || "None"}
                                               variant='outlined'
                                               onChange={(e) => setPublicationName(e.target.value)}
                                               />
