@@ -20,16 +20,12 @@ import {
   Pagination,
   InputAdornment
 } from "@mui/material";
-import Stack from '@mui/material/Stack';
 import { Search } from "@mui/icons-material";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
-import DownloadIcon from '@mui/icons-material/Download';
-import VisibilityIcon from '@mui/icons-material/Visibility';
 import { useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import homeBg from "../assets/home_bg.png";
 import axios from "axios";
-import FileUploader from "./FileUploader";
 import { Virtuoso } from "react-virtuoso";
 
 const UpdateTrackingInfo = ({ route, navigate }) => {
@@ -349,14 +345,24 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
     }
   };
 
-  const handleEditPublication = async () => {
-    
-    if (selectedVenue) {
-      const venue = selectedVenue.split(",").map(item => item.trim());
-      setSingleCity(venue.length > 1 ? venue[0] : "");
-      setSingleCountry(venue[1]);
-    }
+  const handleSaveDetails = () => {
+    // Check if there are any changes by comparing the current state with initial data
+    const hasChanges =
+      publicationName != initialData?.publication_name ||
+      publicationFormat != initialData?.journal ||
+      datePublished != initialData?.date_published ||
+      selectedTitle != initialData?.conference_title ||
+      selectedDate != initialData?.conference_date ||
+      selectedVenue != initialData?. conference_venue;
 
+    if (!hasChanges) {
+      alert("No changes are made");
+    } else {
+      handleEditPublication();
+    }
+  };
+
+  const handleEditPublication = async () => {
     try {
       // Validate required fields
       const requiredFields = {
@@ -562,9 +568,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
           const initialData = {
             publication_name : fetched_data[0].publication_name || "",
             journal : fetched_data[0].journal || "",
-            date_published : fetched_data[0].date_published 
-              ? new Date(fetched_data[0].date_published).toLocaleDateString('en-CA')
-              : "",
+            date_published : fetched_data[0].date_published,
             scopus : fetched_data[0].scopus || "",
             conference_title : fetched_data[0].conference_title || "",
             conference_venue : `${fetched_data[0].city}, ${fetched_data[0].country}` || "",
@@ -595,12 +599,14 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
 
   const toggleEdit = () =>{
     if (isEditing){
-      setPublicationName("");
-      setPublicationFormat("");
-      setDatePublished("");
-      setIndexingStatus("");
+      setPublicationName(initialValues.publication_name)
+      setPublicationFormat(initialValues.journal);
+      setDatePublished(initialValues.date_published);
+      setIndexingStatus(initialValues.scopus);
+      setSelectedTitle(initialValues.conference_title);
+      setSelectedDate(initialValues.conference_date);
+      setSelectedVenue(initialValues.conference_venue);
     }
-    
     setIsEditing(!isEditing);
   };
 
@@ -836,7 +842,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                               />
                                             ) : (
                                               <Typography variant="h7" sx={{ mb: "1rem" }}>
-                                                  <strong>Publication Name:</strong> {data.publication_name || "None"}
+                                                  <strong>Publication Name:</strong> {publicationName || "None"}
                                               </Typography>
                                             )}
                                         </Grid2>
@@ -847,7 +853,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                               label='Date Published'
                                               name='date_published'
                                               type="date"
-                                              value={datePublished || new Date(data.date_published).toLocaleDateString('en-CA') || ''}
+                                              value={new Date(datePublished).toLocaleDateString('en-CA') || ''}
                                               variant='outlined'
                                               InputLabelProps={{
                                                 shrink: true
@@ -856,7 +862,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                               />
                                             ) : (
                                               <Typography variant="h7" sx={{ mb: "1rem" }}>
-                                                  <strong>Date Published:</strong> {data.date_published || "None"}
+                                                  <strong>Date Published:</strong> {datePublished || "None"}
                                               </Typography>
                                             )}
                                         </Grid2>
@@ -866,7 +872,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                               <InputLabel>Format</InputLabel>
                                                 <Select
                                                   label='Format'
-                                                  value={publicationFormat || data.journal || ''}
+                                                  value={publicationFormat || ''}
                                                   onChange={(e) => setPublicationFormat(e.target.value)}
                                                 >
                                                   <MenuItem value='journal'>Journal</MenuItem>
@@ -876,8 +882,8 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                           ) : (
                                             <Typography variant="h7" sx={{ mb: "1rem" }}>
                                               <strong>Format:</strong>{" "}
-                                              {data.journal 
-                                                ? data.journal.charAt(0).toUpperCase() + data.journal.slice(1).toLowerCase() 
+                                              {publicationFormat 
+                                                ? publicationFormat.charAt(0).toUpperCase() + publicationFormat.slice(1).toLowerCase() 
                                                 : "None"}
                                             </Typography>
                                           )}
@@ -889,7 +895,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                             <InputLabel>Indexing Status</InputLabel>
                                               <Select
                                                 label='Indexing Status'
-                                                value={indexingStatus || data.scopus || ''}
+                                                value={indexingStatus || ''}
                                                 onChange={(e) => setIndexingStatus(e.target.value)}
                                               >
                                                 <MenuItem value='SCOPUS'>Scopus</MenuItem>
@@ -898,7 +904,10 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                           </FormControl>
                                           ) : (
                                             <Typography variant="h7" sx={{ mb: "1rem" }}>
-                                                <strong>Indexing Status:</strong> {data.scopus || "None"}
+                                              <strong>Indexing Status:</strong>{" "}
+                                              {indexingStatus 
+                                                ? indexingStatus.charAt(0).toUpperCase() + indexingStatus.slice(1).toLowerCase() 
+                                                : "None"}
                                             </Typography>
                                           )} 
                                         </Grid2>
@@ -910,13 +919,13 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                           {isEditing ? (
                                             <Box display='flex' flexDirection='column'>
                                               <Typography variant="h7" sx={{ mb: "1rem" }}>
-                                                <strong>Title:</strong> {selectedTitle || data.conference_title || "None"}
+                                                <strong>Title:</strong> {selectedTitle || "None"}
                                               </Typography>
                                               <Typography variant="h7" sx={{ mb: "1rem" }}>
-                                                <strong>Date:</strong> {selectedDate || data.conference_date || "None"}
+                                                <strong>Date:</strong> {selectedDate || "None"}
                                               </Typography>
                                               <Typography variant="h7" sx={{ mb: "1rem" }}>
-                                                <strong>Venue:</strong> {selectedVenue || `${data.city}, ${data.country}` || "None"}
+                                                <strong>Venue:</strong> {selectedVenue || "None"}
                                               </Typography>
 
                                               <Box
@@ -1021,13 +1030,13 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                             ) : (
                                               <Box display='flex' flexDirection='column'>
                                                 <Typography variant="h7" sx={{ mb: "1rem" }}>
-                                                  <strong>Title:</strong> {data.conference_title || "None"}
+                                                  <strong>Title:</strong> {selectedTitle || "None"}
                                               </Typography>
                                               <Typography variant="h7" sx={{ mb: "1rem" }}>
-                                                  <strong>Date:</strong> {data.conference_date || "None"}
+                                                  <strong>Date:</strong> {selectedDate || "None"}
                                               </Typography>
                                               <Typography variant="h7" sx={{ mb: "1rem" }}>
-                                                  <strong>Venue:</strong> {`${data.city}, ${data.country}` || "None"}
+                                                  <strong>Venue:</strong> {selectedVenue || "None"}
                                               </Typography>
                                               </Box>
                                             )}
@@ -1070,7 +1079,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                         <Button
                                           variant='contained'
                                           color='primary'
-                                          onClick={handleEditPublication}
+                                          onClick={handleSaveDetails}
                                           sx={{
                                             backgroundColor: "#CA031B",
                                             color: "#FFF",
