@@ -401,6 +401,7 @@ const DisplayResearchInfo = ({ route, navigate }) => {
       setIsEditMode(false);
       setEditableData(null);
       setFile(null); // Reset file state after successful upload
+      setExtendedAbstract(null); // Add this line
 
       // Refresh the data
       const refreshResponse = await axios.get(
