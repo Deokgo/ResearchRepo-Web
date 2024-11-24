@@ -560,16 +560,17 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
           console.log("Fetched publication data:", fetched_data);
 
           const initialData = {
-            publication_name : fetched_data.publication_name || "",
-            journal : fetched_data.journal || "",
-            date_published : fetched_data.date_published 
-              ? new Date(fetched_data.date_published).toLocaleDateString('en-CA')
+            publication_name : fetched_data[0].publication_name || "",
+            journal : fetched_data[0].journal || "",
+            date_published : fetched_data[0].date_published 
+              ? new Date(fetched_data[0].date_published).toLocaleDateString('en-CA')
               : "",
-            scopus : fetched_data.scopus || "",
-            conference_title : fetched_data.conference_title || "",
-            conference_venue : `${fetched_data.city}, ${fetched_data.country}` || "",
-            conference_date : fetched_data.conference_date || "",
+            scopus : fetched_data[0].scopus || "",
+            conference_title : fetched_data[0].conference_title || "",
+            conference_venue : `${fetched_data[0].city}, ${fetched_data[0].country}` || "",
+            conference_date : fetched_data[0].conference_date || "",
           };
+          console.log(initialData);
           setInitialValues(initialData);
 
           // Set current values
@@ -1264,11 +1265,11 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                               )}
                             </Box>
                           </Box>)}                         
-                        </Box>                     
-                    </Box>
-                  </form>
-                </Box>
-              </Grid2>
+                    </Box>                     
+                  </Box>
+                </form>
+              </Box>
+            </Grid2>
 
               {/* Add Publication Modal */}
               <Modal open={openModalPub}>
