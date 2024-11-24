@@ -160,21 +160,40 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
   const [format,setFormat]=useState("")
 
   const handleCloseModal = () => {
-    setPublicationName(publicationName);
-    setPublicationFormat(publicationFormat);
-    setDatePublished(datePublished);
-    setIndexingStatus(indexingStatus);
     setOpenModalPub(false);
 
     setSearchQuery("");
     setOpenModalCon(false);
 
-    setConferenceTitle(selectedTitle);
-    setSingleCountry(singleCountry);
-    setSingleCity(singleCity);
-    setDateApproved(selectedDate);
     setOpenModal(false);
   };
+  
+  const handleFormCleanup = () => {
+    setPublicationName("");
+    setPublicationFormat("");
+    setDatePublished("");
+    setIndexingStatus("");
+
+    setConferenceTitle("");
+    setSingleCountry("");
+    setSingleCity("");
+    setDateApproved("");
+
+    setSelectedTitle("");
+    setSelectedVenue("");
+    setSelectedDate("");
+  }
+  const handleConferenceSelection = () => {
+    // Split the venue into parts
+    const venueParts = selectedVenue?.split(",") || []; // Ensure safe splitting
+    const city = venueParts[0]?.trim(); // First part as city (if exists)
+    const country = venueParts[1]?.trim() || venueParts[0]?.trim(); // Second part as country, fallback to the first part
+    
+    setSingleCountry(country);                                
+    setSingleCity(venueParts.length > 1 ? city : ""); // Set city only if it exists
+
+    handleCloseModal();
+  }
 
   const handleAddConference = async () => {
     try {
@@ -224,6 +243,11 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
       console.log("Response:", response.data);
       alert("Conference added successfully!");
       handleCloseModal();
+
+      setSelectedTitle(conferenceTitle);
+      setSelectedVenue(`${singleCity}, ${singleCountry}`)
+      setSelectedDate(dateApproved)
+      
     } catch (error) {
       console.error("Error adding conference:", error);
       if (error.response) {
@@ -243,16 +267,19 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
 
     if (selectedVenue) {
       const venue = selectedVenue.split(",").map(item => item.trim());
-      setSingleCity(venue[0]);
+      setSingleCity(venue.length > 1 ? venue[0] : "");
       setSingleCountry(venue[1]);
     }
 
     try {
       // Validate required fields
       const requiredFields = {
+        "Publication Name": publicationName,
+        "Publication Format" : publicationFormat,
+        "Date Published": datePublished,
+        "Indexing Status": indexingStatus,
         "Conference Title": selectedTitle,
-        City: singleCity,
-        Country: singleCountry,
+        "Conference Venue": selectedVenue,
         "Conference Date": selectedDate
       };
 
@@ -297,6 +324,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
 
       console.log("Response:", response.data);
       alert("Publication added successfully!");
+      handleFormCleanup();
     } catch (error) {
       console.error("Error adding publication:", error);
       if (error.response) {
@@ -828,7 +856,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                           </Box>
                                             ) : (
                                               <Typography variant="h7" sx={{ mb: "1rem" }}>
-                                                  <strong>Venue:</strong> {data.city+","+data.country || "None"}
+                                                  <strong>Venue:</strong> {`${data.city}, ${data.country}` || "None"}
                                               </Typography>
                                             )}
                                             
@@ -1047,7 +1075,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
               </Grid2>
 
               {/* Add Publication Modal */}
-              <Modal open={openModalPub} onClose={handleCloseModal}>
+              <Modal open={openModalPub}>
                 <Box
                   sx={{
                     position: "absolute",
@@ -1105,8 +1133,8 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                         value={indexingStatus}
                         onChange={(e) => setIndexingStatus(e.target.value)}
                       >
-                        <MenuItem value='scopus'>Scopus</MenuItem>
-                        <MenuItem value='non-scopus'>Non-Scopus</MenuItem>
+                        <MenuItem value='SCOPUS'>Scopus</MenuItem>
+                        <MenuItem value='NON-SCOPUS'>Non-Scopus</MenuItem>
                       </Select>
                   </FormControl>
                   <Box
@@ -1117,7 +1145,12 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                     }}
                   >
                     <Button
-                      onClick={() => setOpenModalPub(false)}
+                      onClick={() => {
+                        setPublicationName("");
+                        setPublicationFormat("");
+                        setDatePublished("");
+                        setIndexingStatus("");
+                        setOpenModalPub(false);}}
                       sx={{
                         backgroundColor: "#08397C",
                         color: "#FFF",
@@ -1133,14 +1166,37 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                         },
                       }}
                     >
-                      Back
+                      Cancel
+                    </Button>
+                    <Button
+                      variant='contained'
+                      color='primary'
+                      onClick={handleCloseModal}
+                      sx={{
+                        backgroundColor: "#CA031B",
+                        color: "#FFF",
+                        fontFamily: "Montserrat, sans-serif",
+                        fontWeight: 600,
+                        textTransform: "none",
+                        fontSize: { xs: "0.875rem", md: "1.275rem" },
+                        padding: { xs: "0.5rem 1rem", md: "1.5rem" },
+                        marginLeft: "2rem",
+                        borderRadius: "100px",
+                        maxHeight: "3rem",
+                        "&:hover": {
+                          backgroundColor: "#A30417",
+                          color: "#FFF",
+                        },
+                      }}
+                    >
+                      Add
                     </Button>
                   </Box>
                 </Box>
               </Modal>
               
               {/* Select Conference Modal */}
-              <Modal open={openModalCon} onClose={handleCloseModal}>
+              <Modal open={openModalCon}>
                 <Box
                   sx={{
                     position: "absolute",
@@ -1202,18 +1258,11 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                 },
                               }}
                               onClick={() => {
-                                // Split the venue into parts
-                                const venueParts = conference.conference_venue?.split(",") || []; // Ensure safe splitting
-                                const city = venueParts[0]?.trim(); // First part as city (if exists)
-                                const country = venueParts[1]?.trim() || venueParts[0]?.trim(); // Second part as country, fallback to the first part
-
                                 // Set values
                                 setSelectedTitle(conference.conference_title);
-                                setSelectedVenue(conference.conference_venue);                                
-                                setSingleCountry(country);                                
-                                setSingleCity(venueParts.length > 1 ? city : ""); // Set city only if it exists
+                                setSelectedVenue(conference.conference_venue);
                                 setSelectedDate(conference.conference_date);
-                                handleCloseModal();
+                                handleConferenceSelection();
                               }}
                             >
                               <Typography
@@ -1265,6 +1314,25 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                       />
                     </Box>
                   </Box>
+                  <Button
+                    onClick={handleCloseModal}
+                    sx={{
+                      backgroundColor: "#08397C",
+                      color: "#FFF",
+                      fontFamily: "Montserrat, sans-serif",
+                      fontWeight: 600,
+                      fontSize: { xs: "0.875rem", md: "1.275rem" },
+                      padding: { xs: "0.5rem", md: "1.5rem" },
+                      borderRadius: "100px",
+                      maxHeight: "3rem",
+                      textTransform: "none",
+                      "&:hover": {
+                        backgroundColor: "#072d61",
+                      },
+                    }}
+                  >
+                    Cancel
+                  </Button>
                 </Box>
               </Modal>
 
@@ -1452,6 +1520,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                   variant='contained'
                   color='primary'
                   onClick={handlePullOut}
+                  disabled={isButtonDisabled}
                   sx={{
                     backgroundColor: "#08397C",
                     color: "#FFF",
@@ -1462,7 +1531,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                     padding: { xs: "0.5rem 1rem", md: "1rem" },
                     width: '75%',
                     alignSelf: 'center',
-                    marginTop: "2rem",
+                    marginTop: "1rem",
                     borderRadius: "100px",
                     maxHeight: "3rem",
                     "&:hover": {
