@@ -29,7 +29,7 @@ import Modal from "@mui/material/Modal";
 import { useModalContext } from "./modalcontext";
 import AddPaperModal from "./addpapermodal";
 
-const DepartmentCollection = () => {
+const Collection = () => {
   const navigate = useNavigate();
   const [userDepartment, setUserDepartment] = useState(null);
   const [research, setResearch] = useState([]);
@@ -63,11 +63,11 @@ const DepartmentCollection = () => {
         10
       );
       const userId = localStorage.getItem("user_id");
-  
+
       // Determine if increment is needed
       const isIncrement =
         !lastViewedTime || currentTime - lastViewedTime > 30000;
-  
+
       // Update the view count in the backend
       const response = await axios.put(
         `/paper/increment_views/${item.research_id}?is_increment=${isIncrement}`,
@@ -75,19 +75,19 @@ const DepartmentCollection = () => {
           user_id: userId,
         }
       );
-  
+
       // Update the item with new data
       const updatedItem = {
         ...item,
         view_count: response.data.updated_views,
         download_count: response.data.download_count,
       };
-  
+
       // Navigate to the research details page
       navigate(`/displayresearchinfo/${updatedItem.research_id}`, {
         state: { id: updatedItem.research_id },
       });
-  
+
       // Save the current timestamp to localStorage if incremented
       if (isIncrement) {
         localStorage.setItem(lastViewedTimeKey, currentTime);
@@ -99,14 +99,13 @@ const DepartmentCollection = () => {
         status: error.response?.status,
         item: item,
       });
-  
+
       // Fall back to the original item if an error occurs
       navigate(`/displayresearchinfo/${item.research_id}`, {
         state: { id: item.research_id },
       });
     }
   };
-  
 
   const handleCloseModal = () => {
     setSelectedResearchItem(null);
@@ -789,4 +788,4 @@ const DepartmentCollection = () => {
   );
 };
 
-export default DepartmentCollection;
+export default Collection;

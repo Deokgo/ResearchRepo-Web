@@ -2,7 +2,7 @@
 
 import MenuIcon from "@mui/icons-material/Menu";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import {
   AppBar,
   Box,
@@ -25,11 +25,10 @@ const Navbar = () => {
   const [anchorElUser, setAnchorElUser] = useState(null);
 
   const [anchorElDash, setAnchorElDash] = useState(null);
-  const [anchorElRepo, setAnchorElRepo] = useState(null);
   const [anchorElSyma, setAnchorElSyma] = useState(null);
 
   const [open, setOpen] = React.useState(false);
-  const anchorRef = React.useRef<HTMLButtonElement>(null);
+  const anchorRef = React.useRef < HTMLButtonElement > null;
   const navigate = useNavigate();
   const isLoggedIn = !!localStorage.getItem("token");
 
@@ -39,12 +38,16 @@ const Navbar = () => {
 
   const isMobile = useMediaQuery("(max-width:600px)");
 
-  {/*****************Event Handlers******************/}
+  {
+    /*****************Event Handlers******************/
+  }
 
-  {/*Logged Out*/}
+  {
+    /*Logged Out*/
+  }
   const handleResearchThrust = () => {
-      navigate("/researchthrust")
-    }
+    navigate("/researchthrust");
+  };
 
   const handleLogin = () => {
     setIsLoginModalOpen(true);
@@ -70,8 +73,9 @@ const Navbar = () => {
     setIsPassresetModalOpen(false);
   };
 
-
-  {/*Logged In*/}
+  {
+    /*Logged In*/
+  }
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
   };
@@ -84,24 +88,16 @@ const Navbar = () => {
     setAnchorElUser(event.currentTarget);
   };
 
- const handleCloseUserMenu = () => {
+  const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
 
   const handleOpenDashMenu = (event) => {
-    setAnchorElDash (event.currentTarget);
+    setAnchorElDash(event.currentTarget);
   };
 
   const handleCloseDashMenu = () => {
     setAnchorElDash(null);
-  };
-
-  const handleOpenRepoMenu = (event) => {
-      setAnchorElRepo (event.currentTarget);
-    };
-  
-  const handleCloseRepoMenu = () => {
-    setAnchorElRepo(null);
   };
 
   const handleOpenSymaMenu = (event) => {
@@ -111,7 +107,6 @@ const Navbar = () => {
   const handleCloseSymaMenu = () => {
     setAnchorElSyma(null);
   };
-
 
   const handleProfile = () => {
     navigate("/profile");
@@ -179,8 +174,8 @@ const Navbar = () => {
     color: "#001C43",
     fontFamily: "Montserrat, sans-serif",
     fontWeight: 600,
-    marginRight: "1rem"
-  }
+    marginRight: "1rem",
+  };
 
   return (
     <AppBar
@@ -214,7 +209,7 @@ const Navbar = () => {
                 width: "100%",
                 height: "100%",
                 objectFit: "contain",
-                padding: 10
+                padding: 10,
               }}
             />
           </IconButton>
@@ -258,15 +253,14 @@ const Navbar = () => {
                 color: "#001C43",
                 fontSize: { xs: "1.2rem", md: "1.25rem" },
                 textAlign: { xs: "center", md: "inherit" },
-                lineHeight: { xs: "0.5"},
-                paddingBottom: "0.75rem"
+                lineHeight: { xs: "0.5" },
+                paddingBottom: "0.75rem",
               }}
             >
               Research Repository
             </Typography>
           </Box>
         </Box>
-
 
         {/*Navigation Buttons*/}
         <Box sx={{ display: { xs: "none", md: "flex" }, gap: 3 }}>
@@ -286,11 +280,7 @@ const Navbar = () => {
               >
                 Research Thrusts
               </Button>
-              <Button
-                key={"Log in"}
-                onClick={handleLogin}
-                sx={buttonSettings}
-              >
+              <Button key={"Log in"} onClick={handleLogin} sx={buttonSettings}>
                 Log in
               </Button>
             </Box>
@@ -299,18 +289,21 @@ const Navbar = () => {
               <Button
                 key='Dashboard'
                 onClick={handleOpenDashMenu}
-                endIcon={<KeyboardArrowDownIcon style={{ color: 'red', fontSize: 30 }}/>}
+                endIcon={
+                  <KeyboardArrowDownIcon
+                    style={{ color: "red", fontSize: 30 }}
+                  />
+                }
                 sx={buttonSettings}
               >
                 Dashboard
               </Button>
               <Button
-                key='Repository'
-                onClick={handleOpenRepoMenu}
-                endIcon={<KeyboardArrowDownIcon style={{ color: 'red', fontSize: 30 }}/>}
+                key='Collections'
+                onClick={handleCollection}
                 sx={buttonSettings}
               >
-                Repository
+                Collections
               </Button>
               <Button
                 key='ResearchTracking'
@@ -329,7 +322,11 @@ const Navbar = () => {
               <Button
                 key='SystemManagement'
                 onClick={handleOpenSymaMenu}
-                endIcon={<KeyboardArrowDownIcon style={{ color: 'red', fontSize: 30 }}/>}
+                endIcon={
+                  <KeyboardArrowDownIcon
+                    style={{ color: "red", fontSize: 30 }}
+                  />
+                }
                 sx={buttonSettings}
               >
                 System Management
@@ -341,7 +338,7 @@ const Navbar = () => {
               >
                 <AccountCircleIcon sx={{ fontSize: "3.5rem" }} />
               </IconButton>
-            </Box>   
+            </Box>
           )}
         </Box>
         <Box sx={{ display: { xs: "flex", md: "none" } }}>
@@ -416,17 +413,17 @@ const Navbar = () => {
           sx={{ "& .MuiPaper-root": { backgroundColor: "#CA031B" } }}
         >
           <MenuItem onClick={handleProfile}>
-            <Typography color="common.white" >Profile</Typography>
+            <Typography color='common.white'>Profile</Typography>
           </MenuItem>
           <MenuItem onClick={null}>
-            <Typography color="common.white" >Contact Us</Typography>
+            <Typography color='common.white'>Contact Us</Typography>
           </MenuItem>
           <MenuItem onClick={null}>
-            <Typography color="common.white" >Help</Typography>
+            <Typography color='common.white'>Help</Typography>
           </MenuItem>
           <Divider />
           <MenuItem onClick={handleLogout}>
-            <Typography color="common.white" >Log out</Typography>
+            <Typography color='common.white'>Log out</Typography>
           </MenuItem>
         </Menu>
 
@@ -447,37 +444,13 @@ const Navbar = () => {
           sx={{ "& .MuiPaper-root": { backgroundColor: "#CA031B" } }}
         >
           <MenuItem onClick={handleReports}>
-            <Typography color="common.white" >Reports</Typography>
+            <Typography color='common.white'>Reports</Typography>
           </MenuItem>
           <MenuItem onClick={handleMainDash}>
-            <Typography color="common.white" >Analytics</Typography>
+            <Typography color='common.white'>Analytics</Typography>
           </MenuItem>
           <MenuItem onClick={handleKnowledgeGraph}>
-            <Typography color="common.white" >Knowledge Graph</Typography>
-          </MenuItem>
-        </Menu>
-
-        {/*Repository Menu*/}
-        <Menu
-          anchorEl={anchorElRepo}
-          anchorOrigin={{
-            vertical: "top",
-            horizontal: "right",
-          }}
-          keepMounted
-          transformOrigin={{
-            vertical: "top",
-            horizontal: "right",
-          }}
-          open={Boolean(anchorElRepo)}
-          onClose={handleCloseRepoMenu}
-          sx={{ "& .MuiPaper-root": { backgroundColor: "#CA031B" } }}
-        >
-          <MenuItem onClick={handleCollection}>
-            <Typography color="common.white" >Collections</Typography>
-          </MenuItem>
-          <MenuItem onClick={handleManagePapers}>
-            <Typography color="common.white" >Manage Papers</Typography>
+            <Typography color='common.white'>Knowledge Graph</Typography>
           </MenuItem>
         </Menu>
 
@@ -498,22 +471,22 @@ const Navbar = () => {
           sx={{ "& .MuiPaper-root": { backgroundColor: "#CA031B" } }}
         >
           <MenuItem onClick={handleManageUsers}>
-            <Typography color="common.white" >Manage Users</Typography>
+            <Typography color='common.white'>Manage Users</Typography>
           </MenuItem>
           <MenuItem onClick={handleManageCollege}>
-            <Typography color="common.white" >Manage College</Typography>
+            <Typography color='common.white'>Manage College</Typography>
           </MenuItem>
           <MenuItem onClick={handleManageProgram}>
-            <Typography color="common.white" >Manage Program</Typography>
+            <Typography color='common.white'>Manage Program</Typography>
           </MenuItem>
         </Menu>
       </Toolbar>
       <LoginModal
-          isOpen={isModalLoginOpen}
-          handleClose={handleCloseLoginModal}
-          handleOpenSignup={handleOpenSignupModal}
-          handleOpenPassreset={handleOpenPassresetModal}
-        />
+        isOpen={isModalLoginOpen}
+        handleClose={handleCloseLoginModal}
+        handleOpenSignup={handleOpenSignupModal}
+        handleOpenPassreset={handleOpenPassresetModal}
+      />
     </AppBar>
   );
 };
