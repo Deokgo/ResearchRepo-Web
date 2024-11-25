@@ -40,7 +40,8 @@ const Collection = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const [dateRange, setDateRange] = useState([2010, 2024]);
+  const [dateRange, setDateRange] = useState([2010, 2025]); // Default min and max year
+  const [sliderValue, setSliderValue] = useState([2010, 2025]); // Initial slider value
   const [selectedColleges, setSelectedColleges] = useState([]);
   const [selectedPrograms, setSelectedPrograms] = useState([]);
   const [selectedFormats, setSelectedFormats] = useState([]);
@@ -195,7 +196,7 @@ const Collection = () => {
 
     // Filter by Date Range
     filtered = filtered.filter(
-      (item) => item.year >= dateRange[0] && item.year <= dateRange[1]
+      (item) => item.year >= sliderValue[0] && item.year <= sliderValue[1]
     );
     if (selectedColleges.length > 0) {
       filtered = filtered.filter((item) =>
@@ -236,7 +237,7 @@ const Collection = () => {
     setFilteredResearch(filtered);
     setCurrentPage(1); // Reset to the first page on filter change
   }, [
-    dateRange,
+    sliderValue,
     selectedColleges,
     selectedPrograms,
     selectedFormats,
@@ -249,9 +250,27 @@ const Collection = () => {
     setSearchQuery(e.target.value.toLowerCase());
   };
 
+  // Function to fetch the year range dynamically
+  useEffect(() => {
+    async function fetchDateRange() {
+      try {
+        const response = await axios.get("/dataset/fetch_date_range"); // API endpoint
+        const { min_year, max_year } = response.data.date_range;
+
+        // Update the date range and initialize the slider values
+        setDateRange([min_year, max_year]);
+        setSliderValue([min_year, max_year]);
+      } catch (error) {
+        console.error("Failed to fetch date range:", error);
+      }
+    }
+
+    fetchDateRange();
+  }, []);
+
   // Handle change in date range filter
   const handleDateRangeChange = (event, newValue) => {
-    setDateRange(newValue);
+    setSliderValue(newValue);
   };
   const handleCollegeChange = (event) => {
     const { value, checked } = event.target;
@@ -470,11 +489,11 @@ const Collection = () => {
                       }}
                     >
                       <Slider
-                        value={dateRange}
+                        value={sliderValue}
                         onChange={handleDateRangeChange}
                         valueLabelDisplay='on'
-                        min={2010}
-                        max={2024}
+                        min={dateRange[0]}
+                        max={dateRange[1]}
                         sx={{
                           width: "90%",
                           "& .MuiSlider-valueLabel": {

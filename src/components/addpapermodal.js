@@ -132,7 +132,13 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
     setExtendedAbstract(e.target.files[0]);
   };
 
-  const onDeleteFileHandler = () => {};
+  const onDeleteFileHandler = () => {
+    setFile(null);
+  };
+
+  const onDeleteFileHandlerEA = () => {
+    setExtendedAbstract(null);
+  };
 
   const handleKeywordsChange = (event, newValue) => {
     setKeywords(newValue);
@@ -508,7 +514,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
                 display: "flex",
                 alignItems: "center",
                 border: "1px dashed #ccc",
-                width: "20rem",
+                width: "17rem",
                 height: "5rem",
                 maxWidth: "25rem",
                 maxHeight: "5rem",
@@ -533,7 +539,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
                 display: "flex",
                 alignItems: "center",
                 border: "1px dashed #ccc",
-                width: "20rem",
+                width: "17rem",
                 height: "5rem",
                 maxWidth: "25rem",
                 maxHeight: "5rem",
@@ -545,7 +551,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
             >
               <FileUploader
                 onSelectFile={onSelectFileHandlerEA}
-                onDeleteFile={onDeleteFileHandler}
+                onDeleteFile={onDeleteFileHandlerEA}
               />
             </Box>
           </Grid2>

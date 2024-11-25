@@ -23,6 +23,7 @@ import { Search, Update } from "@mui/icons-material";
 import { Virtuoso } from "react-virtuoso";
 import axios from "axios";
 
+
 const ResearchTracking = () => {
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
@@ -44,7 +45,8 @@ const ResearchTracking = () => {
   const [programs, setPrograms] = useState([]);
   const [filteredResearch, setFilteredResearch] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [dateRange, setDateRange] = useState([2010, 2024]);
+  const [dateRange, setDateRange] = useState([2010, 2025]); // Default min and max year
+  const [sliderValue, setSliderValue] = useState([2010, 2025]); // Initial slider value
   const [selectedPrograms, setSelectedPrograms] = useState([]);
   const itemsPerPage = 5;
   const [selectedStatus, setSelectedStatus] = useState([]);
@@ -197,7 +199,7 @@ const ResearchTracking = () => {
 
     // Filter by Date Range
     filtered = filtered.filter(
-      (item) => item.year >= dateRange[0] && item.year <= dateRange[1]
+      (item) => item.year >= sliderValue[0] && item.year <= sliderValue[1]
     );
 
     // Filter by College
@@ -245,7 +247,7 @@ const ResearchTracking = () => {
 
     setBadgeValues(updatedBadgeValues);
   }, [
-    dateRange,
+    sliderValue,
     selectedColleges,
     selectedPrograms,
     selectedStatus,
@@ -267,8 +269,25 @@ const ResearchTracking = () => {
     );
   };
 
+  useEffect(() => {
+    async function fetchDateRange() {
+      try {
+        const response = await axios.get("/dataset/fetch_date_range"); // API endpoint
+        const { min_year, max_year } = response.data.date_range;
+
+        // Update the date range and initialize the slider values
+        setDateRange([min_year, max_year]);
+        setSliderValue([min_year, max_year]);
+      } catch (error) {
+        console.error("Failed to fetch date range:", error);
+      }
+    }
+
+    fetchDateRange();
+  }, []);
+
   const handleDateRangeChange = (event, newValue) => {
-    setDateRange(newValue);
+    setSliderValue(newValue);
   };
 
   const handleSearchChange = (e) => {
@@ -395,11 +414,11 @@ const ResearchTracking = () => {
                     Year Range:
                   </Typography>
                   <Slider
-                    value={dateRange}
+                    value={sliderValue}
                     onChange={handleDateRangeChange}
                     valueLabelDisplay='on'
-                    min={2010}
-                    max={2024}
+                    min={dateRange[0]}
+                    max={dateRange[1]}
                     sx={{ my: 3, width: "80%", alignSelf: "center" }}
                   />
                   <Typography variant='body1' sx={{ mb: 1, color: "#08397C" }}>
