@@ -216,6 +216,16 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
         })
         .map(([key]) => key);
 
+      // Check if the conference date is valid and in the future
+      const today = new Date();
+      const approvedDate = new Date(dateApproved);
+      if (dateApproved && approvedDate <= today) {
+        alert(
+          "Conference Date must be in the future"
+        );
+        return;
+      }
+
       if (missingFields.length > 0) {
         alert(
           `Please fill in all required fields: ${missingFields.join(", ")}`
@@ -278,7 +288,6 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
       const requiredFields = {
         "Publication Name": publicationName,
         "Publication Format" : publicationFormat,
-        "Date Published": datePublished,
         "Indexing Status": indexingStatus,
         "Conference Title": selectedTitle,
         "Conference Venue": selectedVenue,
@@ -293,6 +302,18 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
           return !value;
         })
         .map(([key]) => key);
+
+        const approvedDate = new Date(datePublished);
+        const today = new Date();
+
+        // Normalize both dates to midnight
+        approvedDate.setHours(0, 0, 0, 0);
+        today.setHours(0, 0, 0, 0);
+
+        if (datePublished !== null && datePublished !== "" && approvedDate < today) {
+          alert("Date Published must be today or in the future");
+          return;
+        }
 
       if (missingFields.length > 0) {
         alert(
@@ -348,15 +369,18 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
   const handleSaveDetails = () => {
     // Check if there are any changes by comparing the current state with initial data
     const hasChanges =
-      publicationName != initialData?.publication_name ||
-      publicationFormat != initialData?.journal ||
-      datePublished != initialData?.date_published ||
-      selectedTitle != initialData?.conference_title ||
-      selectedDate != initialData?.conference_date ||
-      selectedVenue != initialData?. conference_venue;
+      publicationName != initialValues?.publication_name ||
+      publicationFormat != initialValues?.journal ||
+      datePublished != initialValues?.date_published ||
+      indexingStatus != initialValues?.scopus ||
+      selectedTitle != initialValues?.conference_title ||
+      selectedDate != initialValues?.conference_date ||
+      selectedVenue != initialValues?. conference_venue;
+
+    console.log("Initial Data:", initialValues);
 
     if (!hasChanges) {
-      alert("No changes are made");
+      alert("No changes are made. Please modify publication data before saving.");
     } else {
       handleEditPublication();
     }
@@ -368,7 +392,6 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
       const requiredFields = {
         "Publication Name": publicationName,
         "Publication Format" : publicationFormat,
-        "Date Published": datePublished,
         "Indexing Status": indexingStatus,
         "Conference Title": selectedTitle,
         "Conference Venue": selectedVenue,
@@ -383,6 +406,18 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
           return !value;
         })
         .map(([key]) => key);
+
+        const approvedDate = new Date(datePublished);
+        const today = new Date();
+
+        // Normalize both dates to midnight
+        approvedDate.setHours(0, 0, 0, 0);
+        today.setHours(0, 0, 0, 0);
+
+        if (datePublished !== null && datePublished !== "" && approvedDate < today) {
+          alert("Date Published must be today or in the future");
+          return;
+        }
 
       if (missingFields.length > 0) {
         alert(
@@ -553,7 +588,6 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
 
   const [pubData, setPubData] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [initialData, setInitialData] = useState(null);
   const [initialValues, setInitialValues] = useState(null);
 
   useEffect(() => {
@@ -574,8 +608,9 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
             conference_venue : `${fetched_data[0].city}, ${fetched_data[0].country}` || "",
             conference_date : fetched_data[0].conference_date || "",
           };
-          console.log(initialData);
+          
           setInitialValues(initialData);
+          console.log(initialData);
 
           // Set current values
           setPublicationName(initialData.publication_name);
@@ -823,9 +858,11 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                           </Typography>
                                       </Grid2>
                                       <Grid2 size={6}>
+                                        {publicationFormat !== 'journal' && (
                                           <Typography variant="h6" color='#d40821' fontWeight="700" sx={{ mb: "1rem" }}>
                                               Conference:
                                           </Typography>
+                                        )}
                                       </Grid2>
                                     </Grid2>
                                     <Grid2 display='flex' flexDirection='row'>
@@ -913,135 +950,135 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                         </Grid2>
                                       </Grid2>
 
-                                      {/* Conference Part */}
-                                      <Grid2 size={6}>
-                                        <Grid2 item sx={{ mb: "1rem", mr: "2rem"  }}>
-                                          {isEditing ? (
-                                            <Box display='flex' flexDirection='column'>
-                                              <Typography variant="h7" sx={{ mb: "1rem" }}>
-                                                <strong>Title:</strong> {selectedTitle || "None"}
-                                              </Typography>
-                                              <Typography variant="h7" sx={{ mb: "1rem" }}>
-                                                <strong>Date:</strong> {selectedDate || "None"}
-                                              </Typography>
-                                              <Typography variant="h7" sx={{ mb: "1rem" }}>
-                                                <strong>Venue:</strong> {selectedVenue || "None"}
-                                              </Typography>
-
-                                              <Box
-                                                sx={{
-                                                  display: "flex",
-                                                  alignItems: "center",
-                                                  border: "2px dashed #0A438F",
-                                                  borderRadius: 1,
-                                                  m: 1,
-                                                  cursor: "pointer",
-                                                  justifyContent: "center",
-                                                  gap: 2,
-                                                }}
-                                              >
-                                                <Button
-                                                  variant='text'
-                                                  color='primary'
+                                      {publicationFormat !== 'journal' && (
+                                        <Grid2 size={6}>
+                                          <Grid2 item sx={{ mb: '1rem', mr: '2rem' }}>
+                                            {isEditing ? (
+                                              <Box display="flex" flexDirection="column">
+                                                <Typography variant="h7" sx={{ mb: '1rem' }}>
+                                                  <strong>Title:</strong> {selectedTitle || 'None'}
+                                                </Typography>
+                                                <Typography variant="h7" sx={{ mb: '1rem' }}>
+                                                  <strong>Date:</strong> {selectedDate || 'None'}
+                                                </Typography>
+                                                <Typography variant="h7" sx={{ mb: '1rem' }}>
+                                                  <strong>Venue:</strong> {selectedVenue || 'None'}
+                                                </Typography>
+                                                <Box
                                                   sx={{
-                                                    color: "#08397C",
-                                                    fontFamily: "Montserrat, sans-serif",
-                                                    fontWeight: 600,
-                                                    textTransform: "none",
-                                                    fontSize: { xs: "0.875rem", md: "1rem" },
-                                                    alignSelf: "center",
-                                                    maxHeight: "2rem",
-                                                    "&:hover": {
-                                                      color: "#052045",
-                                                    },
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    border: '2px dashed #0A438F',
+                                                    borderRadius: 1,
+                                                    m: 1,
+                                                    cursor: 'pointer',
+                                                    justifyContent: 'center',
+                                                    gap: 2,
                                                   }}
-                                                  onClick={handleOpenModalCon}
                                                 >
-                                                  Change Conference
-                                                </Button>
-                                              </Box>
-                                              <Box
-                                                sx={{
-                                                  display: "flex",
-                                                  alignItems: "center",
-                                                  border: "2px dashed #0A438F",
-                                                  borderRadius: 1,
-                                                  m: 1,
-                                                  cursor: "pointer",
-                                                  justifyContent: "center",
-                                                  gap: 2,
-                                                }}
-                                              >
-                                                <Button
-                                                  variant='text'
-                                                  color='primary'
+                                                  <Button
+                                                    variant="text"
+                                                    color="primary"
+                                                    sx={{
+                                                      color: '#08397C',
+                                                      fontFamily: 'Montserrat, sans-serif',
+                                                      fontWeight: 600,
+                                                      textTransform: 'none',
+                                                      fontSize: { xs: '0.875rem', md: '1rem' },
+                                                      alignSelf: 'center',
+                                                      maxHeight: '2rem',
+                                                      '&:hover': {
+                                                        color: '#052045',
+                                                      },
+                                                    }}
+                                                    onClick={handleOpenModalCon}
+                                                  >
+                                                    Change Conference
+                                                  </Button>
+                                                </Box>
+                                                <Box
                                                   sx={{
-                                                    width: '100%',
-                                                    color: "#08397C",
-                                                    fontFamily: "Montserrat, sans-serif",
-                                                    fontWeight: 600,
-                                                    textTransform: "none",
-                                                    fontSize: { xs: "0.875rem", md: "1rem" },
-                                                    alignSelf: "center",
-                                                    maxHeight: "2rem",
-                                                    "&:hover": {
-                                                      color: "#052045",
-                                                    },
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    border: '2px dashed #0A438F',
+                                                    borderRadius: 1,
+                                                    m: 1,
+                                                    cursor: 'pointer',
+                                                    justifyContent: 'center',
+                                                    gap: 2,
                                                   }}
-                                                  onClick={handleOpenModal}
                                                 >
-                                                  + Add Conference
-                                                </Button>
-                                              </Box>
-                                              <Box
-                                                sx={{
-                                                  display: "flex",
-                                                  alignItems: "center",
-                                                  border: "2px dashed #CA031B",
-                                                  borderRadius: 1,
-                                                  m: 1,
-                                                  cursor: "pointer",
-                                                  justifyContent: "center",
-                                                  gap: 2,
-                                                }}
-                                              >
-                                                <Button
-                                                  variant='text'
-                                                  color='primary'
+                                                  <Button
+                                                    variant="text"
+                                                    color="primary"
+                                                    sx={{
+                                                      width: '100%',
+                                                      color: '#08397C',
+                                                      fontFamily: 'Montserrat, sans-serif',
+                                                      fontWeight: 600,
+                                                      textTransform: 'none',
+                                                      fontSize: { xs: '0.875rem', md: '1rem' },
+                                                      alignSelf: 'center',
+                                                      maxHeight: '2rem',
+                                                      '&:hover': {
+                                                        color: '#052045',
+                                                      },
+                                                    }}
+                                                    onClick={handleOpenModal}
+                                                  >
+                                                    + Add Conference
+                                                  </Button>
+                                                </Box>
+                                                <Box
                                                   sx={{
-                                                    width: '100%',
-                                                    color: "#CA031B",
-                                                    fontFamily: "Montserrat, sans-serif",
-                                                    fontWeight: 600,
-                                                    textTransform: "none",
-                                                    fontSize: { xs: "0.875rem", md: "1rem" },
-                                                    alignSelf: "center",
-                                                    maxHeight: "2rem",
-                                                    "&:hover": {
-                                                      color: "#A30417",
-                                                    },
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    border: '2px dashed #CA031B',
+                                                    borderRadius: 1,
+                                                    m: 1,
+                                                    cursor: 'pointer',
+                                                    justifyContent: 'center',
+                                                    gap: 2,
                                                   }}
-                                                  onClick={handleResetCon}
                                                 >
-                                                  Reset
-                                                </Button>
+                                                  <Button
+                                                    variant="text"
+                                                    color="primary"
+                                                    sx={{
+                                                      width: '100%',
+                                                      color: '#CA031B',
+                                                      fontFamily: 'Montserrat, sans-serif',
+                                                      fontWeight: 600,
+                                                      textTransform: 'none',
+                                                      fontSize: { xs: '0.875rem', md: '1rem' },
+                                                      alignSelf: 'center',
+                                                      maxHeight: '2rem',
+                                                      '&:hover': {
+                                                        color: '#A30417',
+                                                      },
+                                                    }}
+                                                    onClick={handleResetCon}
+                                                  >
+                                                    Reset
+                                                  </Button>
+                                                </Box>
                                               </Box>
-                                            </Box>
                                             ) : (
-                                              <Box display='flex' flexDirection='column'>
-                                                <Typography variant="h7" sx={{ mb: "1rem" }}>
-                                                  <strong>Title:</strong> {selectedTitle || "None"}
-                                              </Typography>
-                                              <Typography variant="h7" sx={{ mb: "1rem" }}>
-                                                  <strong>Date:</strong> {selectedDate || "None"}
-                                              </Typography>
-                                              <Typography variant="h7" sx={{ mb: "1rem" }}>
-                                                  <strong>Venue:</strong> {selectedVenue || "None"}
-                                              </Typography>
+                                              <Box display="flex" flexDirection="column">
+                                                <Typography variant="h7" sx={{ mb: '1rem' }}>
+                                                  <strong>Title:</strong> {selectedTitle || 'None'}
+                                                </Typography>
+                                                <Typography variant="h7" sx={{ mb: '1rem' }}>
+                                                  <strong>Date:</strong> {selectedDate || 'None'}
+                                                </Typography>
+                                                <Typography variant="h7" sx={{ mb: '1rem' }}>
+                                                  <strong>Venue:</strong> {selectedVenue || 'None'}
+                                                </Typography>
                                               </Box>
                                             )}
+                                          </Grid2>
                                         </Grid2>
-                                      </Grid2>
+                                      )}
                                     </Grid2>
                                     <Box
                                       sx={{
@@ -1157,119 +1194,123 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                     </Box>
                                   </Grid2>
                                   <Divider orientation='horizontal' flexItem  sx={{mt: "1rem", mb: "1rem"}}/>
-                                  <Typography variant="h6" color='#d40821' fontWeight="700">
-                                      Conference:
-                                  </Typography>
-                                  <Grid2 display='flex' flexDirection='column' padding='1rem'>
-                                    <Typography variant="h7" sx={{ mb: "1rem" }}>
-                                        <strong>Title:</strong> {selectedTitle || "None"}
-                                    </Typography>
-                                    <Typography variant="h7" sx={{ mb: "1rem" }}>
-                                        <strong>Venue:</strong> {selectedVenue || "None"}
-                                    </Typography>
-                                    <Typography variant="h7" sx={{ mb: "1rem" }}>
-                                        <strong>Date:</strong> {selectedDate || "None"}
-                                    </Typography>
-                                  </Grid2>
-                                  <Grid2 display='flex' paddingLeft='1rem' justifyContent='flex-start' gap={3}>
-                                    <Box
+                                  {publicationFormat !== "journal" && ( // Render only if the selected type is not "Journal"
+                                    <>
+                                      <Typography variant="h6" color='#d40821' fontWeight="700">
+                                        Conference:
+                                      </Typography>
+                                      <Grid2 display='flex' flexDirection='column' padding='1rem'>
+                                        <Typography variant="h7" sx={{ mb: "1rem" }}>
+                                          <strong>Title:</strong> {selectedTitle || "None"}
+                                        </Typography>
+                                        <Typography variant="h7" sx={{ mb: "1rem" }}>
+                                          <strong>Venue:</strong> {selectedVenue || "None"}
+                                        </Typography>
+                                        <Typography variant="h7" sx={{ mb: "1rem" }}>
+                                          <strong>Date:</strong> {selectedDate || "None"}
+                                        </Typography>
+                                      </Grid2>
+                                      <Grid2 display='flex' paddingLeft='1rem' justifyContent='flex-start' gap={3}>
+                                        <Box
+                                          sx={{
+                                            display: "flex",
+                                            alignItems: "center",
+                                            border: "2px dashed #0A438F",
+                                            borderRadius: 1,
+                                            p: 1,
+                                            cursor: "pointer",
+                                            justifyContent: "center",
+                                            gap: 2,
+                                          }}
+                                        >
+                                          <Button
+                                            variant='text'
+                                            color='primary'
+                                            sx={{
+                                              color: "#08397C",
+                                              fontFamily: "Montserrat, sans-serif",
+                                              fontWeight: 600,
+                                              textTransform: "none",
+                                              fontSize: { xs: "0.875rem", md: "1rem" },
+                                              alignSelf: "center",
+                                              maxHeight: "3rem",
+                                              "&:hover": {
+                                                color: "#052045",
+                                              },
+                                            }}
+                                            onClick={handleOpenModalCon}
+                                          >
+                                            Select Conference
+                                          </Button>
+                                        </Box>
+                                        <Box
+                                          sx={{
+                                            display: "flex",
+                                            alignItems: "center",
+                                            border: "2px dashed #0A438F",
+                                            borderRadius: 1,
+                                            p: 1,
+                                            cursor: "pointer",
+                                            justifyContent: "center",
+                                            gap: 2,
+                                          }}
+                                        >
+                                          <Button
+                                            variant='text'
+                                            color='primary'
+                                            sx={{
+                                              color: "#08397C",
+                                              fontFamily: "Montserrat, sans-serif",
+                                              fontWeight: 600,
+                                              textTransform: "none",
+                                              fontSize: { xs: "0.875rem", md: "1rem" },
+                                              alignSelf: "center",
+                                              maxHeight: "3rem",
+                                              "&:hover": {
+                                                color: "#052045",
+                                              },
+                                            }}
+                                            onClick={handleOpenModal}
+                                          >
+                                            + Add Conference
+                                          </Button>
+                                        </Box>
+                                      </Grid2>
+                                      <Box
                                         sx={{
                                           display: "flex",
-                                          alignItems: "center",
-                                          border: "2px dashed #0A438F",
-                                          borderRadius: 1,
-                                          p: 1,
-                                          cursor: "pointer",
-                                          justifyContent: "center",
-                                          gap: 2,
+                                          flexDirection: "column",
+                                          alignItems: "flex-end",
+                                          marginTop: 3,
                                         }}
                                       >
-                                        <Button
-                                          variant='text'
-                                          color='primary'
-                                          sx={{
-                                            color: "#08397C",
-                                            fontFamily: "Montserrat, sans-serif",
-                                            fontWeight: 600,
-                                            textTransform: "none",
-                                            fontSize: { xs: "0.875rem", md: "1rem" },
-                                            alignSelf: "center",
-                                            maxHeight: "3rem",
-                                            "&:hover": {
-                                              color: "#052045",
-                                            },
-                                          }}
-                                          onClick={handleOpenModalCon}
-                                        >
-                                          Select Conference
-                                      </Button>
-                                    </Box>
-                                    <Box
-                                      sx={{
-                                        display: "flex",
-                                        alignItems: "center",
-                                        border: "2px dashed #0A438F",
-                                        borderRadius: 1,
-                                        p: 1,
-                                        cursor: "pointer",
-                                        justifyContent: "center",
-                                        gap: 2,
-                                      }}
-                                    >
-                                      <Button
-                                        variant='text'
-                                        color='primary'
-                                        sx={{
-                                          color: "#08397C",
-                                          fontFamily: "Montserrat, sans-serif",
-                                          fontWeight: 600,
-                                          textTransform: "none",
-                                          fontSize: { xs: "0.875rem", md: "1rem" },
-                                          alignSelf: "center",
-                                          maxHeight: "3rem",
-                                          "&:hover": {
-                                            color: "#052045",
-                                          },
-                                        }}
-                                        onClick={handleOpenModal}
-                                      >
-                                        + Add Conference
-                                      </Button>
-                                    </Box>
-                                  </Grid2>
-                                  <Box
+                                      </Box>
+                                    </>
+                                  )}
+                                  <Button
+                                    variant='contained'
+                                    color='primary'
                                     sx={{
-                                      display: "flex",
-                                      flexDirection: "column",
-                                      alignItems: "flex-end",
-                                      marginTop: 3,
-                                    }}
-                                  >
-                                    <Button
-                                      variant='contained'
-                                      color='primary'
-                                      sx={{
-                                        backgroundColor: "#08397C",
+                                      backgroundColor: "#08397C",
+                                      color: "#FFF",
+                                      fontFamily: "Montserrat, sans-serif",
+                                      fontWeight: 600,
+                                      textTransform: "none",
+                                      fontSize: { xs: "0.875rem", md: "1.275rem" },
+                                      padding: { xs: "0.5rem 1rem", md: "1.5rem" },
+                                      marginTop: "1rem",
+                                      width: "auto",
+                                      borderRadius: "100px",
+                                      maxHeight: "3rem",
+                                      "&:hover": {
+                                        backgroundColor: "#052045",
                                         color: "#FFF",
-                                        fontFamily: "Montserrat, sans-serif",
-                                        fontWeight: 600,
-                                        textTransform: "none",
-                                        fontSize: { xs: "0.875rem", md: "1.275rem" },
-                                        padding: { xs: "0.5rem 1rem", md: "1.5rem" },
-                                        marginTop: "1rem",
-                                        width: "auto",
-                                        borderRadius: "100px",
-                                        maxHeight: "3rem",
-                                        "&:hover": {
-                                          backgroundColor: "#052045",
-                                          color: "#FFF",
-                                        },
-                                      }}
-                                      onClick={handleSavePublication}
-                                    >
-                                      Save Publication Details
-                                    </Button>
-                                  </Box>
+                                      },
+                                    }}
+                                    onClick={handleSavePublication}
+                                  >
+                                    Save Publication Details
+                                  </Button>
                                 </Box>
                               )}
                             </Box>
@@ -1618,7 +1659,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                   </TextField>
                   <TextField
                     fullWidth
-                    label='Date Approved'
+                    label='Conference Date'
                     variant='outlined'
                     type='date'
                     margin='normal'

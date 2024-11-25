@@ -276,7 +276,7 @@ const UpdateResearchInfo = () => {
       file.join(";") !== initialData?.full_manuscript;
 
     if (!hasChanges) {
-      alert("No changes are made");
+      alert("No changes are made. Please modify research output data before saving.");
     } else {
       updateResearchDetails();
     }
