@@ -319,14 +319,28 @@ useEffect(() => {
 
     try {
       // Validate required fields
-      const requiredFields = {
-        "Publication Name": publicationName,
-        "Publication Format" : publicationFormat,
-        "Indexing Status": indexingStatus,
-        "Conference Title": selectedTitle,
-        "Conference Venue": selectedVenue,
-        "Conference Date": selectedDate
-      };
+      // Determine required fields based on publicationFormat
+      let requiredFields;
+
+      if (publicationFormat === "journal") {
+        requiredFields = {
+          "Publication Name": publicationName,
+          "Publication Format": publicationFormat,
+          "Indexing Status": indexingStatus,
+        };
+      } else if (publicationFormat === "proceeding") {
+        requiredFields = {
+          "Publication Name": publicationName,
+          "Publication Format": publicationFormat,
+          "Indexing Status": indexingStatus,
+          "Conference Title": selectedTitle,
+          "Conference Venue": selectedVenue,
+          "Conference Date": selectedDate,
+        };
+      } else {
+        alert("Invalid indexing status. Please select either 'journal' or 'proceeding'.");
+        return;
+      }
 
       const missingFields = Object.entries(requiredFields)
         .filter(([_, value]) => {
@@ -344,10 +358,7 @@ useEffect(() => {
         approvedDate.setHours(0, 0, 0, 0);
         today.setHours(0, 0, 0, 0);
 
-        if (datePublished !== null && datePublished !== "" && approvedDate < today) {
-          alert("Date Published must be today or in the future");
-          return;
-        }
+        
 
       if (missingFields.length > 0) {
         alert(
@@ -423,14 +434,28 @@ useEffect(() => {
   const handleEditPublication = async () => {
     try {
       // Validate required fields
-      const requiredFields = {
-        "Publication Name": publicationName,
-        "Publication Format" : publicationFormat,
-        "Indexing Status": indexingStatus,
-        "Conference Title": selectedTitle,
-        "Conference Venue": selectedVenue,
-        "Conference Date": selectedDate
-      };
+      // Determine required fields based on publicationFormat
+      let requiredFields;
+
+      if (publicationFormat === "journal") {
+        requiredFields = {
+          "Publication Name": publicationName,
+          "Publication Format": publicationFormat,
+          "Indexing Status": indexingStatus,
+        };
+      } else if (publicationFormat === "proceeding") {
+        requiredFields = {
+          "Publication Name": publicationName,
+          "Publication Format": publicationFormat,
+          "Indexing Status": indexingStatus,
+          "Conference Title": selectedTitle,
+          "Conference Venue": selectedVenue,
+          "Conference Date": selectedDate,
+        };
+      } else {
+        alert("Invalid indexing status. Please select either 'journal' or 'proceeding'.");
+        return;
+      }
 
       const missingFields = Object.entries(requiredFields)
         .filter(([_, value]) => {
@@ -448,10 +473,7 @@ useEffect(() => {
         approvedDate.setHours(0, 0, 0, 0);
         today.setHours(0, 0, 0, 0);
 
-        if (datePublished !== null && datePublished !== "" && approvedDate < today) {
-          alert("Date Published must be today or in the future");
-          return;
-        }
+        
 
       if (missingFields.length > 0) {
         alert(
