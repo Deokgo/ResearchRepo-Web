@@ -19,6 +19,7 @@ import homeBg from "../assets/home_bg.png";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const modalStyle = {
   position: "absolute",
@@ -33,20 +34,17 @@ const modalStyle = {
 };
 
 const Profile = () => {
+  const { user } = useAuth();
   const [userData, setUserData] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCollege, setSelectedCollege] = useState("");
   const [selectedProgram, setSelectedProgram] = useState("");
-  const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false);
+  const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] =
+    useState(false);
   const [colleges, setColleges] = useState([]);
   const [programs, setPrograms] = useState([]);
   const [initialData, setInitialData] = useState(null);
   const navigate = useNavigate();
-  // Retrieve user_id from cookie/localStorage
-  const getUserId = () => {
-    const userId = localStorage.getItem("user_id");
-    return userId;
-  };
   const [formValues, setFormValues] = useState({
     firstName: "",
     middleName: "",
@@ -66,16 +64,15 @@ const Profile = () => {
   });
 
   const fetchUserData = async () => {
-    const userId = getUserId();
-    if (userId) {
+    if (user?.user_id) {
       try {
-        const response = await axios.get(`/accounts/users/${userId}`);
+        const response = await axios.get(`/accounts/users/${user.user_id}`);
         const data = response.data;
-  
+
         // Set user data for later use
         setUserData(data);
         console.log("response: ", response);
-  
+
         // Set form values
         setFormValues({
           firstName: data.researcher.first_name || "",
@@ -87,7 +84,6 @@ const Profile = () => {
           email: data.account.email || "",
           role: data.account.role_name || "",
           institution: data.researcher.institution || "",
-
         });
 
         // Set initial data for comparison
@@ -99,9 +95,9 @@ const Profile = () => {
           department: data.researcher.college_id || "",
           program: data.researcher.program_id || "",
         });
-        
+
         console.log("Initial data set:", initialData); // Check if this is correct
-  
+
         // Fetch programs for the initially set department if present
         if (data.researcher.college_id) {
           fetchProgramsByCollege(data.researcher.college_id);
@@ -110,25 +106,29 @@ const Profile = () => {
         console.error("Error fetching user data:", error);
       }
     }
-  };  
+  };
 
   // Disabling combobox when the role of the user are these:
-  const shouldDisableInputs = 
-  ['System Administrator', 'Director', 'Head Executive'].includes(formValues.role) || 
-  (formValues.role === 'Researcher' && (!formValues.department));
+  const shouldDisableInputs =
+    ["System Administrator", "Director", "Head Executive"].includes(
+      formValues.role
+    ) ||
+    (formValues.role === "Researcher" && !formValues.department);
 
   // Effect to check selected department (console log)
   useEffect(() => {
     if (formValues.department) {
-      console.log('Selected College on load:', formValues.department);
+      console.log("Selected College on load:", formValues.department);
     }
   }, [formValues.department]);
 
   // Fetch user data on component mount
   useEffect(() => {
-    fetchUserData();
-  }, []);
-  
+    if (user?.user_id) {
+      fetchUserData();
+    }
+  }, [user]);
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormValues({ ...formValues, [name]: value });
@@ -141,98 +141,112 @@ const Profile = () => {
 
   const handleSaveUserChanges = async () => {
     try {
-        const userId = getUserId();
-        
-        // Extract relevant data from formValues
-        const {
-            firstName,
-            middleName,
-            lastName,
-            suffix,
-            department: college_id,
-            program: program_id,
-        } = formValues;
+      if (!user?.user_id) {
+        alert("User ID not found");
+        return;
+      }
 
-        // Construct the payload
-        const payload = {
-            first_name: firstName,
-            middle_name: middleName,
-            last_name: lastName,
-            suffix,
-            college_id,
-            program_id,
-        };
+      // Extract relevant data from formValues
+      const {
+        firstName,
+        middleName,
+        lastName,
+        suffix,
+        department: college_id,
+        program: program_id,
+      } = formValues;
 
-        const hasChanges =
-          firstName !== initialData?.firstName ||
-          middleName !== initialData?.middleName ||
-          lastName !== initialData?.lastName ||
-          suffix !== initialData?.suffix ||
-          college_id !== initialData?.department ||
-          program_id !== initialData?.program;
+      // Construct the payload
+      const payload = {
+        first_name: firstName,
+        middle_name: middleName,
+        last_name: lastName,
+        suffix,
+        college_id,
+        program_id,
+      };
 
-        if (!hasChanges) {
-          alert("No changes detected. Please modify your profile before saving.");
-        }else{
+      const hasChanges =
+        firstName !== initialData?.firstName ||
+        middleName !== initialData?.middleName ||
+        lastName !== initialData?.lastName ||
+        suffix !== initialData?.suffix ||
+        college_id !== initialData?.department ||
+        program_id !== initialData?.program;
 
+      if (!hasChanges) {
+        alert("No changes detected. Please modify your profile before saving.");
+      } else {
         // API call
-        const response = await fetch(`/accounts/update_account/${userId}`, {
-            method: 'PUT',
+        const response = await fetch(
+          `/accounts/update_account/${user.user_id}`,
+          {
+            method: "PUT",
             headers: {
-                'Content-Type': 'application/json',
+              "Content-Type": "application/json",
             },
             body: JSON.stringify(payload),
-        });
+          }
+        );
 
         // Handle response
         if (response.ok) {
-            const data = await response.json();
-            alert('Profile updated successfully.');
-            console.log('Updated data:', data);
-            fetchUserData();
-            handleCloseModal();
+          const data = await response.json();
+          alert("Profile updated successfully.");
+          console.log("Updated data:", data);
+          fetchUserData();
+          handleCloseModal();
         } else {
-            const errorData = await response.json();
-            alert(`Failed to update profile: ${errorData.message || 'Unknown error'}`);
-            
-            if (errorData.missing_fields) {
-                console.log('Missing fields:', errorData.missing_fields);
-            }
+          const errorData = await response.json();
+          alert(
+            `Failed to update profile: ${errorData.message || "Unknown error"}`
+          );
+
+          if (errorData.missing_fields) {
+            console.log("Missing fields:", errorData.missing_fields);
           }
-        }        
+        }
+      }
     } catch (error) {
-        console.error('Error updating profile:', error);
-        alert('An error occurred while updating the profile.');
+      console.error("Error updating profile:", error);
+      alert("An error occurred while updating the profile.");
     }
   };
 
   const handleSaveNewPassword = async () => {
     const { currentPassword, newPassword, confirmPassword } = passwordValues;
-    const userId = getUserId();
-  
+
+    if (!user?.user_id) {
+      alert("User ID not found");
+      return;
+    }
+
     // Validate input fields
     if (!currentPassword || !newPassword || !confirmPassword) {
       alert("All fields are required.");
       return;
     }
-  
+
     if (newPassword !== confirmPassword) {
       alert("Passwords do not match.");
       return;
     }
-  
+
     try {
       // Send request to the server
-      const response = await axios.put(`/accounts/update_password/${userId}`, {
-        currentPassword,
-        newPassword,
-        confirmPassword,
-      });
-  
+      const response = await axios.put(
+        `/accounts/update_password/${user.user_id}`,
+        {
+          currentPassword,
+          newPassword,
+          confirmPassword,
+        }
+      );
+
       // Handle server response
       if (response.status === 200) {
         alert("Password successfully updated.");
-        
+
         // Reset fields and close modal
         setPasswordValues({
           currentPassword: "",
@@ -246,15 +260,17 @@ const Profile = () => {
       }
     } catch (error) {
       console.error("Error updating password:", error);
-  
+
       // Handle server errors or network issues
       if (error.response && error.response.data.message) {
         alert(error.response.data.message);
       } else {
-        alert("An error occurred while updating the password. Please try again later.");
+        alert(
+          "An error occurred while updating the password. Please try again later."
+        );
       }
     }
-  };  
+  };
 
   const handleNavigateHome = () => {
     navigate("/main");
@@ -262,11 +278,11 @@ const Profile = () => {
 
   const handleOpenModal = async () => {
     setIsModalOpen(true);
-    console.log('Should disable inputs:', shouldDisableInputs);
-    console.log('Role:', formValues.role);
-    console.log('Department:', formValues.department);
-    console.log('Program:', formValues.program);
-    await fetchUserData(); 
+    console.log("Should disable inputs:", shouldDisableInputs);
+    console.log("Role:", formValues.role);
+    console.log("Department:", formValues.department);
+    console.log("Program:", formValues.program);
+    await fetchUserData();
   };
 
   const handleCloseModal = () => {
@@ -338,8 +354,8 @@ const Profile = () => {
         }}
       >
         <Navbar />
-        <Box 
-        sx={{
+        <Box
+          sx={{
             flexGrow: 1,
             display: "flex",
             flexDirection: "column",
@@ -347,7 +363,6 @@ const Profile = () => {
             marginTop: { xs: "3.5rem", sm: "4rem", md: "6rem" },
           }}
         >
-
           {/* Header Section */}
           <Box
             sx={{
@@ -378,11 +393,11 @@ const Profile = () => {
             />
             <Box sx={{ display: "flex", ml: "5rem", zIndex: 3 }}>
               <IconButton
-                  onClick={() => navigate(-1)}
-                  sx={{
-                    color: "#fff",
-                  }}
-                >
+                onClick={() => navigate(-1)}
+                sx={{
+                  color: "#fff",
+                }}
+              >
                 <ArrowBackIosIcon />
               </IconButton>
               <Typography
@@ -422,7 +437,7 @@ const Profile = () => {
               }}
             >
               <Button
-                variant="outlined"
+                variant='outlined'
                 startIcon={<EditIcon />}
                 onClick={handleOpenModal}
                 sx={{ fontWeight: 600 }}
@@ -430,7 +445,7 @@ const Profile = () => {
                 Edit Profile
               </Button>
               <Button
-                variant="outlined"
+                variant='outlined'
                 startIcon={<EditIcon />}
                 onClick={handleOpenChangePasswordModal}
                 sx={{ fontWeight: 600 }}
@@ -578,26 +593,29 @@ const Profile = () => {
                 <Grid2 size={{ xs: 12, sm: 6 }}>
                   <InputLabel>Department</InputLabel>
                   <Select
-                    value={formValues.department || ''} // Use an empty string as fallback
+                    value={formValues.department || ""} // Use an empty string as fallback
                     onChange={(e) => {
                       const selectedDepartment = e.target.value;
-                      console.log('Selected Department:', selectedDepartment); // Debug
+                      console.log("Selected Department:", selectedDepartment); // Debug
                       handleCollegeChange(e); // Update department value
                       setFormValues((prevValues) => ({
                         ...prevValues,
                         department: selectedDepartment, // Update form state
-                        program: '', // Reset program when department changes
+                        program: "", // Reset program when department changes
                       }));
                     }}
                     label='Department'
                     sx={{
-                      width: '280px', // Set a fixed width
-                      minWidth: '200px', // Optional: Set a minimum width for responsiveness
+                      width: "280px", // Set a fixed width
+                      minWidth: "200px", // Optional: Set a minimum width for responsiveness
                     }}
                     disabled={shouldDisableInputs} // Conditionally disable input based on role
                   >
                     {colleges.map((college) => (
-                      <MenuItem key={college.college_id} value={college.college_id}>
+                      <MenuItem
+                        key={college.college_id}
+                        value={college.college_id}
+                      >
                         {college.college_name}
                       </MenuItem>
                     ))}
@@ -607,10 +625,10 @@ const Profile = () => {
                 <Grid2 size={{ xs: 12, sm: 6 }}>
                   <InputLabel>Program</InputLabel>
                   <Select
-                    value={formValues.program || ''} // Use an empty string as fallback
+                    value={formValues.program || ""} // Use an empty string as fallback
                     onChange={(e) => {
                       const selectedProgram = e.target.value;
-                      console.log('Selected Program:', selectedProgram); // Debug
+                      console.log("Selected Program:", selectedProgram); // Debug
                       setSelectedProgram(selectedProgram); // Update selected program
                       setFormValues((prevValues) => ({
                         ...prevValues,
@@ -619,19 +637,23 @@ const Profile = () => {
                     }}
                     label='Program'
                     sx={{
-                      width: '280px', // Set a fixed width
-                      minWidth: '200px', // Optional: Set a minimum width for responsiveness
+                      width: "280px", // Set a fixed width
+                      minWidth: "200px", // Optional: Set a minimum width for responsiveness
                     }}
                     disabled={shouldDisableInputs || !formValues.department} // Conditionally disable input based on role and department selection
                   >
                     {programs
                       .filter((program) => {
-                        const isMatch = program.college_id === formValues.department;
-                        console.log('Filtering Programs:', program, isMatch); // Debug
+                        const isMatch =
+                          program.college_id === formValues.department;
+                        console.log("Filtering Programs:", program, isMatch); // Debug
                         return isMatch;
                       })
                       .map((program) => (
-                        <MenuItem key={program.program_id} value={program.program_id}>
+                        <MenuItem
+                          key={program.program_id}
+                          value={program.program_id}
+                        >
                           {program.program_name}
                         </MenuItem>
                       ))}
@@ -674,7 +696,7 @@ const Profile = () => {
           >
             <Box sx={modalStyle}>
               <Typography
-                variant="h4"
+                variant='h4'
                 sx={{ mb: 4, fontWeight: 800, color: "#08397C" }}
               >
                 Change Password
@@ -682,32 +704,32 @@ const Profile = () => {
               <Grid2 container spacing={2}>
                 <Grid2 size={{ xs: 12 }}>
                   <TextField
-                    label="Current Password"
+                    label='Current Password'
                     fullWidth
-                    name="currentPassword"
+                    name='currentPassword'
                     value={passwordValues.currentPassword}
                     onChange={handlePasswordInputChange}
-                    type="password"
+                    type='password'
                   />
                 </Grid2>
                 <Grid2 size={{ xs: 12 }}>
                   <TextField
-                    label="New Password"
+                    label='New Password'
                     fullWidth
-                    name="newPassword"
+                    name='newPassword'
                     value={passwordValues.newPassword}
                     onChange={handlePasswordInputChange}
-                    type="password"
+                    type='password'
                   />
                 </Grid2>
                 <Grid2 size={{ xs: 12 }}>
                   <TextField
-                    label="Confirm Password"
+                    label='Confirm Password'
                     fullWidth
-                    name="confirmPassword"
+                    name='confirmPassword'
                     value={passwordValues.confirmPassword}
                     onChange={handlePasswordInputChange}
-                    type="password"
+                    type='password'
                   />
                 </Grid2>
               </Grid2>
@@ -719,14 +741,14 @@ const Profile = () => {
                 }}
               >
                 <Button
-                  variant="outlined"
+                  variant='outlined'
                   onClick={handleCloseChangePasswordModal}
                   sx={{ fontWeight: 600 }}
                 >
                   Back
                 </Button>
                 <Button
-                  variant="contained"
+                  variant='contained'
                   sx={{
                     backgroundColor: "#CA031B",
                     color: "#FFF",

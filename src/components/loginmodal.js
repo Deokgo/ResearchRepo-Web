@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Box, Button, TextField, Typography, Modal } from "@mui/material";
 import { useModalContext } from "./modalcontext";
+import { useAuth } from "../context/AuthContext";
+import axios from "axios";
 
 const LoginModal = ({ isOpen, handleClose }) => {
   const navigate = useNavigate();
@@ -11,6 +13,7 @@ const LoginModal = ({ isOpen, handleClose }) => {
     openSignupModal,
     openPassresetModal,
   } = useModalContext();
+  const { login } = useAuth();
 
   const [formValues, setFormValues] = useState({
     email: "",
@@ -45,39 +48,28 @@ const LoginModal = ({ isOpen, handleClose }) => {
   };
 
   // Handle form submission
-  // Handle form submission
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("/auth/login", {
-        method: "POST",
+      const response = await axios.post("/auth/login", formValues);
+      const { token } = response.data;
+
+      // Get user details after login
+      const userResponse = await axios.get("/auth/me", {
         headers: {
-          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(formValues),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(
-          errorData.message || `HTTP error! status: ${response.status}`
-        );
-      }
-
-      const data = await response.json();
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("role", data.role);
-      localStorage.setItem("user_id", data.user_id);
-      localStorage.setItem("college", data.college);
-      localStorage.setItem("program", data.program);
+      // Call login to set the token and user data
+      await login(token);
 
       alert(`Login Successfully`);
       handleClose();
 
-      // Redirect based on role_id
-      const role_id = data.role;
-
-      switch (role_id) {
+      // Navigate based on user role
+      const userRole = userResponse.data.role;
+      switch (userRole) {
         case "01":
           navigate("/manage-users");
           break;
@@ -89,17 +81,16 @@ const LoginModal = ({ isOpen, handleClose }) => {
           navigate("/maindash");
           break;
         case "05":
-          navigate("/managepapers");
-          break;
         case "06":
           navigate("/collection");
           break;
         default:
           alert("Unknown role, unable to navigate");
+          navigate("/");
           break;
       }
     } catch (error) {
-      alert(`Login failed: ${error.message}`);
+      alert(`Login failed: ${error.response?.data?.message || error.message}`);
     }
   };
 

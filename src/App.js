@@ -10,12 +10,13 @@ import UpdateResearchInfo from "./components/updateresearchinfo";
 import UpdateTrackingInfo from "./components/updatetrackinginfo";
 import Collection from "./components/collection";
 import ManagePapers from "./components/managepapers";
-import ManageCollege from "./components/managecollege"
-import ManageProgram from "./components/manageprogram"
-import { CssBaseline } from "@mui/material"; // To remove default margin
+import ManageCollege from "./components/managecollege";
+import ManageProgram from "./components/manageprogram";
+import { CssBaseline } from "@mui/material";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import KnowledgeGraph from "./components/knowledgegraph";
 import { ModalProvider } from "./components/modalcontext";
+import { AuthProvider } from "./context/AuthContext";
 import MainDash from "./components/maindash";
 import PubDash from "./components/pubdash";
 import DisplayResearchInfo from "./components/displayresearchinfo";
@@ -25,51 +26,133 @@ function App() {
   const isLoggedIn = !!localStorage.getItem("token");
 
   return (
-    <ModalProvider>
-      <Router>
-        <CssBaseline />
-        <Routes>
-          {/**Add more condition here which depends on the user role (e.g. if sysadmin the view is manage papers)*/}
-          {!isLoggedIn ? (
+    <Router>
+      <AuthProvider>
+        <ModalProvider>
+          <CssBaseline />
+          <Routes>
+            {/* Public routes */}
             <Route path='/' element={<Home />} />
-          ) : (
-            <Route path='/' element={<ManagePapers />} />
-          )}
-          <Route path='/collection' element={<Collection />} />
-          <Route path='/home' element={<Home />} />
-          <Route path='/readmore' element={<ReadMore />} />
+            <Route path='/home' element={<Home />} />
+            <Route path='/readmore' element={<ReadMore />} />
 
-          <Route path='/knowledgegraph' element={<KnowledgeGraph />} />
-          <Route path='/maindash' element={<MainDash />} />
-          <Route path='/publication' element={<PubDash />} />
-          <Route path='/researchthrust' element={<ResearchThrust />} />
-          <Route path='/researchtracking' element={<ResearchTracking />} />
-          <Route path='/updateresearchinfo' element={<UpdateResearchInfo />} />
-          <Route path='/updatetrackinginfo' element={<UpdateTrackingInfo />} />
-          <Route path='/managepapers' element={<ManagePapers />} />
-          <Route path='/managecollege' element={<ManageCollege />} />
-          <Route path='/manageprogram' element={<ManageProgram />} />
-          <Route path='/displayresearchinfo/:research_id' element={<DisplayResearchInfo />} />
-
-          <Route
-            path='/profile'
-            element={
-              <PrivateRoute>
-                <Profile />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path='/manage-users'
-            element={
-              <PrivateRoute>
-                <ManageUsers />
-              </PrivateRoute>
-            }
-          />
-        </Routes>
-      </Router>
-    </ModalProvider>
+            {/* Protected routes */}
+            <Route
+              path='/knowledgegraph'
+              element={
+                <PrivateRoute>
+                  <KnowledgeGraph />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path='/collection'
+              element={
+                <PrivateRoute>
+                  <Collection />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path='/maindash'
+              element={
+                <PrivateRoute>
+                  <MainDash />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path='/publication'
+              element={
+                <PrivateRoute>
+                  <PubDash />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path='/researchthrust'
+              element={
+                <PrivateRoute>
+                  <ResearchThrust />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path='/researchtracking'
+              element={
+                <PrivateRoute>
+                  <ResearchTracking />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path='/updateresearchinfo'
+              element={
+                <PrivateRoute>
+                  <UpdateResearchInfo />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path='/updatetrackinginfo'
+              element={
+                <PrivateRoute>
+                  <UpdateTrackingInfo />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path='/managepapers'
+              element={
+                <PrivateRoute>
+                  <ManagePapers />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path='/managecollege'
+              element={
+                <PrivateRoute>
+                  <ManageCollege />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path='/manageprogram'
+              element={
+                <PrivateRoute>
+                  <ManageProgram />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path='/displayresearchinfo/:research_id'
+              element={
+                <PrivateRoute>
+                  <DisplayResearchInfo />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path='/profile'
+              element={
+                <PrivateRoute>
+                  <Profile />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path='/manage-users'
+              element={
+                <PrivateRoute>
+                  <ManageUsers />
+                </PrivateRoute>
+              }
+            />
+          </Routes>
+        </ModalProvider>
+      </AuthProvider>
+    </Router>
   );
 }
 

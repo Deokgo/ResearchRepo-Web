@@ -19,8 +19,12 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import navLogo from "../assets/MMCL_Logo_Nav.png";
 import LoginModal from "./loginmodal";
+import { useAuth } from "../context/AuthContext";
 
 const Navbar = () => {
+  const { user, logout } = useAuth();
+  const isLoggedIn = !!user;
+
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
 
@@ -30,7 +34,6 @@ const Navbar = () => {
   const [open, setOpen] = React.useState(false);
   const anchorRef = React.useRef < HTMLButtonElement > null;
   const navigate = useNavigate();
-  const isLoggedIn = !!localStorage.getItem("token");
 
   const [isModalLoginOpen, setIsLoginModalOpen] = useState(false);
   const [isModalSignupOpen, setIsSignupModalOpen] = useState(false);
@@ -153,11 +156,11 @@ const Navbar = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    logout();
     navigate("/home");
   };
 
-  const mobileMenuItems = isLoggedIn
+  const mobileMenuItems = user
     ? [
         { label: "Home", onClick: handleNavigateHome },
         { label: "Research Thrusts", onClick: handleResearchThrust },

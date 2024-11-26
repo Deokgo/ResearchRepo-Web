@@ -142,7 +142,7 @@ const Home = () => {
   };
 
   const handleReadMore = () => {
-    navigate("/readmore")
+    navigate("/readmore");
   };
 
   return (
@@ -214,7 +214,7 @@ const Home = () => {
               >
                 <Slider
                   {...settings}
-                  style={{ width: isMobile ? "60%" : "95%"}}
+                  style={{ width: isMobile ? "60%" : "95%" }}
                 >
                   {departments.map((department) => (
                     <Box key={department.id} sx={{ px: 3 }}>
@@ -228,7 +228,7 @@ const Home = () => {
                           display: "flex",
                           flexDirection: "column",
                           alignItems: "center",
-                          justifyContent:"end",
+                          justifyContent: "end",
                           backgroundImage: `url(${department.image})`,
                           backgroundSize: "cover",
                         }}
@@ -307,32 +307,33 @@ const Home = () => {
                 flexDirection: "column",
                 justifyContent: "center",
                 alignItems: "center",
-                alignSelf: "center"
+                alignSelf: "center",
               }}
             >
               <img
-                    src={DummyKG}
-                    alt='Dummy Knowledge Graph'
-                    style={{
-                        width: "100%",
-                        height: "auto",
-                        objectFit: "contain",
-                        paddingTop: "5rem"
-                    }}
-                />
-                <Typography
-                  variant='body1'
-                  sx={{
-                    fontFamily: "Montserrat, sans-serif",
-                    fontWeight: 300,
-                    fontSize: { xs: "1rem", md: "1.15rem" },
-                    color: "#F0F0F0",
-                    maxWidth: { xs: "100%", md: "80%" },
-                    paddingTop: "5rem",
-                    paddingLeft: "5rem"
-                  }}
-                >
-                  A platform for researches by the Mapúa MCL researchers
+                src={DummyKG}
+                alt='Dummy Knowledge Graph'
+                style={{
+                  width: "100%",
+                  height: "auto",
+                  objectFit: "contain",
+                  paddingTop: "5rem",
+                }}
+              />
+              <Typography
+                variant='body1'
+                sx={{
+                  fontFamily: "Montserrat, sans-serif",
+                  fontWeight: 300,
+                  fontSize: { xs: "1rem", md: "1.15rem" },
+                  color: "#F0F0F0",
+                  maxWidth: { xs: "100%", md: "80%" },
+                  paddingTop: "5rem",
+                  paddingLeft: "5rem",
+                }}
+              >
+                A research platform for researchers, built by Mapúa MCL
+                researchers
               </Typography>
             </Box>
           </Box>
