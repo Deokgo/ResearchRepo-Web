@@ -25,29 +25,19 @@ export const AuthProvider = ({ children }) => {
           },
         });
       } catch (error) {
-        logout();
+        // Only logout if refresh token also fails
+        try {
+          await refreshToken();
+        } catch (refreshError) {
+          logout();
+        }
       }
     };
 
-    // Check session every 30 seconds
-    const intervalId = setInterval(validateSession, 30000);
+    validateSession(); // Run immediately
+    const intervalId = setInterval(validateSession, 60000); // Check every minute
 
-    // Cleanup on unmount
     return () => clearInterval(intervalId);
-  }, [navigate]);
-
-  useEffect(() => {
-    const interceptor = axios.interceptors.response.use(
-      (response) => response,
-      (error) => {
-        if (error.response?.status === 401) {
-          logout();
-        }
-        return Promise.reject(error);
-      }
-    );
-
-    return () => axios.interceptors.response.eject(interceptor);
   }, [navigate]);
 
   const fetchUserDetails = async () => {
@@ -86,6 +76,49 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     navigate("/");
   };
+
+  const refreshToken = async () => {
+    try {
+      const response = await axios.post("/auth/refresh");
+      const { token } = response.data;
+      if (token) {
+        localStorage.setItem("token", token);
+        return token;
+      }
+      throw new Error("No token received");
+    } catch (error) {
+      localStorage.removeItem("token");
+      setUser(null);
+      throw error;
+    }
+  };
+
+  // Keep one main interceptor for handling token refresh
+  useEffect(() => {
+    const interceptor = axios.interceptors.response.use(
+      (response) => response,
+      async (error) => {
+        const originalRequest = error.config;
+
+        if (error.response?.status === 401 && !originalRequest._retry) {
+          originalRequest._retry = true;
+
+          try {
+            const newToken = await refreshToken();
+            originalRequest.headers["Authorization"] = `Bearer ${newToken}`;
+            return axios(originalRequest);
+          } catch (refreshError) {
+            logout();
+            return Promise.reject(refreshError);
+          }
+        }
+
+        return Promise.reject(error);
+      }
+    );
+
+    return () => axios.interceptors.response.eject(interceptor);
+  }, [navigate]);
 
   useEffect(() => {
     fetchUserDetails();
