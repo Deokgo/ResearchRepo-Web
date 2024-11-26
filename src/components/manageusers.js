@@ -356,7 +356,7 @@ const ManageUsers = () => {
                   }}
                 >
                   <Typography variant='h6' mb={3}>
-                    Edit User Role and Account Status
+                    Edit User Account
                   </Typography>
                   <TextField
                     label='User ID'
@@ -378,12 +378,22 @@ const ManageUsers = () => {
                       value={newRole} // This should hold role_id
                       onChange={(e) => setNewRole(e.target.value)} // Update newRole with role_id
                       label="Role"
+                      disabled={
+                        selectedUser?.institution !== "Mapúa Malayan Colleges Laguna" || 
+                        ['01', '02', '03'].includes(selectedUser?.role_id) // Disable for specific role IDs
+                      }
                     >
-                      {roles.map((role) => (
-                        <MenuItem key={role.role_id} value={role.role_id}> {/* Value is role_id */}
-                          {role.role_name}  {/* Display role_name */}
-                        </MenuItem>
-                      ))}
+                      {roles
+                        .filter(
+                          (role) =>
+                            !['01', '02', '03'].includes(role.role_id) || // Keep other roles
+                            ['01', '02', '03'].includes(newRole) // Always include if the selected role is restricted
+                        )
+                        .map((role) => (
+                          <MenuItem key={role.role_id} value={role.role_id}> {/* Value is role_id */}
+                            {role.role_name} {/* Display role_name */}
+                          </MenuItem>
+                        ))}
                     </Select>
                   </FormControl>
                   <FormControl component='fieldset' margin='normal'>
