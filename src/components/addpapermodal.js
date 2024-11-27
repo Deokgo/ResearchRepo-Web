@@ -65,7 +65,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
   const fetchProgramsByCollege = async (collegeId) => {
     if (collegeId) {
       try {
-        const response = await axios.get(`/deptprogs/programs`, {
+        const response = await axios.get(`/deptprogs/programs/${collegeId}`, {
           params: { department: collegeId },
         });
         setPrograms(response.data.programs);

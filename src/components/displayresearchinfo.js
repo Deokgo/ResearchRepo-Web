@@ -269,7 +269,7 @@ const DisplayResearchInfo = ({ route, navigate }) => {
     // Fetch programs for the selected college
     if (item.college_id) {
       axios
-        .get(`/deptprogs/programs`, {
+        .get(`/deptprogs/programs/${item.college_id}`, {
           params: { department: item.college_id },
         })
         .then((response) => {
@@ -428,7 +428,7 @@ const DisplayResearchInfo = ({ route, navigate }) => {
     setEditableData((prev) => ({ ...prev, college_id: selectedCollegeId }));
 
     try {
-      const response = await axios.get(`/deptprogs/programs`, {
+      const response = await axios.get(`/deptprogs/programs/${selectedCollegeId}`, {
         params: { department: selectedCollegeId },
       });
       setPrograms(response.data.programs);
