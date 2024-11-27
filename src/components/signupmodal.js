@@ -160,7 +160,7 @@ const SignUpModal = () => {
                 <Grid2 item size={{ xs: 12, md: 4 }}>
                   <TextField
                     fullWidth
-                    label='Middle Name'
+                    label='Middle Initial'
                     name='middleName'
                     value={formData.middleName}
                     onChange={handleChange}
