@@ -52,29 +52,6 @@ const ReadMore = () => {
     role: "",
   });
 
-  const fetchUserData = async () => {
-    const userId = getUserId();
-    if (userId) {
-      try {
-        const response = await axios.get(`/accounts/users/${userId}`);
-        const data = response.data;
-        setUserData(data);
-        setFormValues({
-          firstName: data.researcher.first_name || "",
-          middleName: data.researcher.middle_name || "",
-          lastName: data.researcher.last_name || "",
-          suffix: data.researcher.suffix || "",
-          department: data.researcher.college_id || "",
-          program: data.researcher.program_id || "",
-          email: data.account.email || "",
-          role: data.account.role || "",
-        });
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-      }
-    }
-  };
-
   const departments = [
     {
       id: 1,
@@ -114,11 +91,6 @@ const ReadMore = () => {
     const query = e.target.value.toLowerCase();
     setSearchQuery(query);
   };
-
-  // Fetch user data on component mount
-  useEffect(() => {
-    fetchUserData();
-  }, []);
 
   const handleOpenModal = () => {
     setIsModalOpen(true);
@@ -196,84 +168,94 @@ const ReadMore = () => {
           <Box
             sx={{
               flexGrow: 1,
-              mt: 12
+              mt: 12,
             }}
           >
             <Grid2 container sx={{ paddingLeft: 25, height: "100%" }}>
-              <Grid2 display="flex" flexDirection="column" justifyContent="flex-end" size={6}>
+              <Grid2
+                display='flex'
+                flexDirection='column'
+                justifyContent='flex-end'
+                size={6}
+              >
                 <Typography
-                    variant='h3'
+                  variant='h3'
+                  sx={{
+                    fontFamily: "Montserrat, sans-serif",
+                    fontWeight: 600,
+                    fontSize: { xs: "2.5rem", md: "4.375rem" },
+                    color: "#001C43",
+                    lineHeight: 1.25,
+                    maxWidth: "80%",
+                  }}
+                >
+                  A centralized hub for all your
+                  <Box
                     sx={{
+                      backgroundColor: "#DF031D",
+                      width: "33rem",
+                    }}
+                  >
+                    <Typography
+                      align='center'
+                      sx={{
                         fontFamily: "Montserrat, sans-serif",
                         fontWeight: 600,
-                        fontSize: { xs: "2.5rem", md: "4.375rem" },
-                        color: "#001C43",
+                        fontSize: { xs: "2.5rem", md: "4rem" },
+                        color: "#FFF",
                         lineHeight: 1.25,
-                        maxWidth: "80%",
-                    }}
-                >
-                    A centralized hub for all your
-                        <Box
-                            sx={{
-                                backgroundColor: "#DF031D",
-                                width: "33rem"
-                            }}
-                        >
-                            <Typography
-                                align="center"
-                                sx={{
-                                    fontFamily: "Montserrat, sans-serif",
-                                    fontWeight:600,
-                                    fontSize: { xs: "2.5rem", md: "4rem" },
-                                    color: "#FFF",
-                                    lineHeight: 1.25,
-                                }}
-                            >
-                                research needs
-                            </Typography> 
-                        </Box>
-                </Typography>        
+                      }}
+                    >
+                      research needs
+                    </Typography>
+                  </Box>
+                </Typography>
                 <Typography
-                    variant='body1'
-                    sx={{
+                  variant='body1'
+                  sx={{
                     fontFamily: "Montserrat, sans-serif",
                     fontWeight: 500,
                     fontSize: { xs: "1rem", md: "1.5rem" },
                     color: "#001C43",
                     width: "80%",
-                    mt: 4
-                    }}
+                    mt: 4,
+                  }}
                 >
-                    A platform for researches by the Mapúa MCL researchers
-                </Typography>      
-                 
+                  A platform for researches by the Mapúa MCL researchers
+                </Typography>
               </Grid2>
-              <Grid2 display="flex" flexDirection="column" align="center" size={6}>
+              <Grid2
+                display='flex'
+                flexDirection='column'
+                align='center'
+                size={6}
+              >
                 <img
-                    src={navLogo}
-                    alt='Logo'
-                    style={{
-                        width: "80%",
-                        height: "80%",
-                        objectFit: "contain",
-                    }}
+                  src={navLogo}
+                  alt='Logo'
+                  style={{
+                    width: "80%",
+                    height: "80%",
+                    objectFit: "contain",
+                  }}
                 />
                 <Typography
-                    variant='body1'
-                    sx={{
+                  variant='body1'
+                  sx={{
                     fontFamily: "Montserrat, sans-serif",
                     fontWeight: 300,
                     fontSize: { xs: "1rem", md: "1.25rem" },
                     color: "#001C43",
                     width: "80%",
-                    mt: 6
-                    }}
+                    mt: 6,
+                  }}
                 >
-                    Our research repository offers seamless platform to gather, store, analyze, and share valuable data and insights.
-                </Typography> 
+                  Our research repository offers seamless platform to gather,
+                  store, analyze, and share valuable data and insights.
+                </Typography>
               </Grid2>
             </Grid2>
-           </Box>
+          </Box>
         </Box>
       </Box>
     </>

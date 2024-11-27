@@ -35,6 +35,7 @@ function App() {
             <Route path='/' element={<Home />} />
             <Route path='/home' element={<Home />} />
             <Route path='/readmore' element={<ReadMore />} />
+            <Route path='/researchthrust' element={<ResearchThrust />} />
 
             {/* Protected routes */}
             <Route
@@ -69,14 +70,7 @@ function App() {
                 </PrivateRoute>
               }
             />
-            <Route
-              path='/researchthrust'
-              element={
-                <PrivateRoute>
-                  <ResearchThrust />
-                </PrivateRoute>
-              }
-            />
+
             <Route
               path='/researchtracking'
               element={

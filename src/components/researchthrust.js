@@ -51,29 +51,6 @@ const ResearchThrust = () => {
     role: "",
   });
 
-  const fetchUserData = async () => {
-    const userId = getUserId();
-    if (userId) {
-      try {
-        const response = await axios.get(`/accounts/users/${userId}`);
-        const data = response.data;
-        setUserData(data);
-        setFormValues({
-          firstName: data.researcher.first_name || "",
-          middleName: data.researcher.middle_name || "",
-          lastName: data.researcher.last_name || "",
-          suffix: data.researcher.suffix || "",
-          department: data.researcher.college_id || "",
-          program: data.researcher.program_id || "",
-          email: data.account.email || "",
-          role: data.account.role || "",
-        });
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-      }
-    }
-  };
-
   const departments = [
     {
       id: 1,
@@ -114,11 +91,6 @@ const ResearchThrust = () => {
     setSearchQuery(query);
   };
 
-  // Fetch user data on component mount
-  useEffect(() => {
-    fetchUserData();
-  }, []);
-  
   const handleOpenModal = () => {
     setIsModalOpen(true);
   };
@@ -203,7 +175,7 @@ const ResearchThrust = () => {
               sx={{
                 display: "flex",
                 flexDirection: "column",
-                paddingLeft: "12rem"
+                paddingLeft: "12rem",
               }}
             >
               {/* Search Bar */}
@@ -212,7 +184,7 @@ const ResearchThrust = () => {
                 placeholder='Search...'
                 value={searchQuery}
                 onChange={handleSearchChange}
-                sx={{ width: "30rem", paddingLeft: 5}}
+                sx={{ width: "30rem", paddingLeft: 5 }}
               />
               <Box
                 sx={{

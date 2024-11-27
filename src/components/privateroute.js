@@ -1,14 +1,15 @@
 import React from "react";
 import { Navigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const PrivateRoute = ({ children }) => {
-  const token = localStorage.getItem("token");
+  const { user, loading } = useAuth();
 
-  if (!token) {
-    return <Navigate to='/login' />;
+  if (loading) {
+    return <div>Loading...</div>; // Or your loading component
   }
 
-  return children;
+  return user ? children : <Navigate to='/' />;
 };
 
 export default PrivateRoute;

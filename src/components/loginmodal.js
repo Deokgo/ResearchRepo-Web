@@ -54,12 +54,14 @@ const LoginModal = ({ isOpen, handleClose }) => {
       const response = await axios.post("/auth/login", formValues);
       const { token } = response.data;
 
+      // Set the token in localStorage
+      localStorage.setItem("token", token);
+
+      // Set default authorization header for all future requests
+      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
       // Get user details after login
-      const userResponse = await axios.get("/auth/me", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const userResponse = await axios.get("/auth/me");
 
       // Call login to set the token and user data
       await login(token);
