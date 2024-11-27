@@ -19,6 +19,7 @@ import { useNavigate } from "react-router-dom";
 import homeBg from "../assets/home_bg.png";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import { Circle, Search } from "@mui/icons-material";
+import EditIcon from '@mui/icons-material/Edit';
 import CircleIcon from '@mui/icons-material/Circle';
 import { Virtuoso } from "react-virtuoso";
 import axios from "axios";
@@ -36,6 +37,10 @@ const ManageCollege = () => {
   const [collegeAbbrv, setCollegeAbbrv] = useState("");
   const [collegeName, setCollegeName] = useState("");
   const [colorAttrb, setColorAttrb] = useState("#000000");
+
+  const [initialData, setInitialData] = useState(null);
+  const [newName, setNewName] = useState("");
+  const [newColor, setNewColor] = useState("");
 
   useEffect(() => {
     const fetchColleges = async () => {
@@ -62,16 +67,19 @@ const ManageCollege = () => {
     setFilteredCollege(
       colleges.filter(
         (college) =>
-          college.name.toLowerCase().includes(query) ||
+          college.college_name.toLowerCase().includes(query) ||
           college.college_id.toLowerCase().includes(query)
       )
     );
   };
 
-  const handleOpenModal = (college) => {
-    setSelectedCollege(college);
-    setOpenModal(true);
-  };
+  const handlePostModal = () => {
+    setCollegeAbbrv("");
+    setCollegeName("");
+    setColorAttrb("#000000");
+    setNewName("");
+    setNewColor("");
+  }
 
   const handleOpenAddModal = () => {
     setAddModal(true);
@@ -81,6 +89,8 @@ const ManageCollege = () => {
     setAddModal(false)
     setOpenModal(false);
     setSelectedCollege(null);
+
+    handlePostModal();
   };
 
   const handleAddCollege = async () => {
@@ -149,13 +159,71 @@ const ManageCollege = () => {
       }
     }
   }
-  const handleSaveChanges = () => {
-    console.log(
-      "Saving changes for:",
-      selectedCollege.college_id
-    );
-    setOpenModal(false);
+
+  const handleOpenModal = (college) => {
+    setSelectedCollege(college)
+    // Set the initial data
+    setInitialData({
+      college_name: college.college_name,
+      color_code: college.color_code
+    })
+    setNewName(college.college_name);
+    setNewColor(college.color_code);
+
+    setOpenModal(true);
   };
+
+  const handleUpdateCollege = () => {
+    const hasChanges =
+      newName !== initialData?.college_name ||
+      newColor !== initialData?.color_code;
+
+    if (!hasChanges) {
+      alert(
+        "No changes detected. Please modify user's details before saving."
+      );
+    } else {
+      updateCollege();
+    }
+  };
+  const updateCollege = async () => {
+    try {
+
+      const formData = new FormData();
+
+      // Add all required fields to formData
+      formData.append("college_name", newName);
+      formData.append("color_code", newColor);
+
+      // Send the college data
+      const response = await axios.put(`/data/colleges/${selectedCollege.college_id}`, 
+        {college_name: newName,
+        color_code: newColor}, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      console.log("Response:", response.data);
+      alert("College updated successfully!");
+
+      // Update users state to reflect changes without re-fetching
+      const updatedCollege = colleges.map((college) =>
+        college.college_id === selectedCollege.college_id
+          ? { ...college, college_name: newName, color_code: newColor }
+          : college
+      );
+  
+      // Update the state to trigger a re-render
+      setColleges(updatedCollege);
+      setFilteredCollege(updatedCollege);
+  
+    } catch (error) {
+      console.error("Error updating college:", error);
+    } finally {
+      handleCloseModal();
+    }
+  }
 
   return (
     <>
@@ -240,7 +308,7 @@ const ManageCollege = () => {
                 width: "80%", // Center search bar and button
                 display: "flex",
                 paddingTop: 3,
-                paddingBottom: 5,
+                paddingBottom: 3,
                 justifyContent: "space-between",
                 alignItems: "center",
               }}
@@ -305,8 +373,8 @@ const ManageCollege = () => {
                       >
                         <Box sx={{ flex: 1 }}>College ID</Box>
                         <Box sx={{ flex: 2 }}>Name</Box>
-                        <Box sx={{ flex: 1 }}>Color Attribute</Box>
-                        <Box sx={{ flex: 1 }}>Action</Box>
+                        <Box sx={{ flex: 1 }}>Color Code</Box>
+                        <Box sx={{ flex: 1 }}>Modify</Box>
                       </Box>
                     ),
                   }}
@@ -327,13 +395,11 @@ const ManageCollege = () => {
                             <CircleIcon style={{ color: college.color_code }}/>
                         </Box>
                         <Box sx={{ flex: 1 }}>
-                          <Button
-                            variant='text'
-                            color='primary'
+                          <IconButton
                             onClick={() => handleOpenModal(college)}
                           >
-                            Edit
-                          </Button>
+                            <EditIcon color='primary'/>
+                          </IconButton>
                         </Box>
                       </Box>
                     );
@@ -342,7 +408,7 @@ const ManageCollege = () => {
               )}
             </Box>
 
-            {/* Add Conference Modal */}
+            {/* Add College Modal */}
             <Modal open={addModal} onClose={handleCloseModal}>
                 <Box
                   sx={{
@@ -457,65 +523,121 @@ const ManageCollege = () => {
                 </Box>
               </Modal>
 
+            {/* Update College Modal */}
             {selectedCollege && (
-              <Modal
-                open={openModal}
-                onClose={handleCloseModal}
-              >
+              <Modal open={openModal} onClose={handleCloseModal}>
                 <Box
                   sx={{
                     position: "absolute",
                     top: "50%",
                     left: "50%",
                     transform: "translate(-50%, -50%)",
-                    width: 400,
+                    width: "40rem",
                     bgcolor: "background.paper",
                     boxShadow: 24,
-                    p: 4,
+                    p: 5,
                     borderRadius: "8px",
                   }}
                 >
-                  <Typography variant='h5' mb={3}>
+                  <Typography
+                    variant='h3'
+                    color='#08397C'
+                    fontWeight='1000'
+                    mb={4}
+                    sx={{
+                      textAlign: { xs: "left", md: "bottom" },
+                    }}
+                  >
                     Edit College
                   </Typography>
                   <TextField
-                    label='College ID'
+                    label='Abbreviation'
                     value={selectedCollege.college_id}
-                    disabled
                     fullWidth
+                    disabled
                     margin='normal'
                   />
                   <TextField
                     label='Name'
-                    value={selectedCollege.college_name}
+                    value={newName}
                     fullWidth
+                    onChange={(e) => setNewName(e.target.value)}
                     margin='normal'
                   />
+                  <Grid2 display='flex'>
+                    <Grid2 width='50%' size={6}>
+                      <TextField
+                        type='color'
+                        fullWidth
+                        label='Color Attribute'
+                        value={newColor}
+                        onChange={(e) => setNewColor(e.target.value)}
+                        margin='normal'
+                      />
+                    </Grid2>
+                    <Grid2 paddingTop='2rem' size={6}>
+                      <Typography
+                        variant='h6'
+                        sx={{ display:'flex', width: '50%' }}
+                        color='#08397C'
+                        ml={4}
+                      >
+                        {newColor}
+                      </Typography>
+                    </Grid2>
+                  </Grid2>      
                   <Box
                     sx={{
                       display: "flex",
                       justifyContent: "space-between",
-                      mt: 3,
+                      mt: 5,
                     }}
                   >
                     <Button
-                      variant='outlined'
                       onClick={handleCloseModal}
-                      sx={{ fontWeight: 600 }}
+                      sx={{
+                        backgroundColor: "#08397C",
+                        color: "#FFF",
+                        fontFamily: "Montserrat, sans-serif",
+                        fontWeight: 600,
+                        fontSize: { xs: "0.875rem", md: "1.275rem" },
+                        padding: { xs: "0.5rem", md: "1.5rem" },
+                        borderRadius: "100px",
+                        maxHeight: "3rem",
+                        textTransform: "none",
+                        "&:hover": {
+                          backgroundColor: "#072d61",
+                        },
+                      }}
                     >
-                      Back
+                      Cancel
                     </Button>
                     <Button
                       variant='contained'
                       color='primary'
-                      onClick={handleSaveChanges}
-                      sx={{ fontWeight: 600 }}
+                      onClick={handleUpdateCollege}
+                      sx={{
+                        backgroundColor: "#CA031B",
+                        color: "#FFF",
+                        fontFamily: "Montserrat, sans-serif",
+                        fontWeight: 600,
+                        textTransform: "none",
+                        fontSize: { xs: "0.875rem", md: "1.275rem" },
+                        padding: { xs: "0.5rem 1rem", md: "1.5rem" },
+                        marginLeft: "2rem",
+                        borderRadius: "100px",
+                        maxHeight: "3rem",
+                        "&:hover": {
+                          backgroundColor: "#A30417",
+                          color: "#FFF",
+                        },
+                      }}
                     >
-                      Save Changes
+                      Update
                     </Button>
                   </Box>
                 </Box>
-              </Modal>
+              </Modal>       
             )}
           </Box>
         </Box>
