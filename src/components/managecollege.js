@@ -12,15 +12,15 @@ import {
   Select,
   TextField,
   Typography,
-  Grid2
+  Grid2,
+  InputProps
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import homeBg from "../assets/home_bg.png";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
-import { MuiColorInput } from 'mui-color-input'
-import { Search } from "@mui/icons-material";
+import { Circle, Search } from "@mui/icons-material";
+import CircleIcon from '@mui/icons-material/Circle';
 import { Virtuoso } from "react-virtuoso";
-import collegeAttributeData from '../data/colorAttribute.json'
 import axios from "axios";
 
 const ManageCollege = () => {
@@ -37,9 +37,6 @@ const ManageCollege = () => {
   const [collegeName, setCollegeName] = useState("");
   const [colorAttrb, setColorAttrb] = useState("#000000");
 
-  // State to manage the college colors
-  const [color, setColor] = useState(collegeAttributeData.colorAttribute);
-
   useEffect(() => {
     const fetchColleges = async () => {
         try {
@@ -47,6 +44,8 @@ const ManageCollege = () => {
         const fetchColleges = response.data.colleges;
         setColleges(fetchColleges);
         setFilteredCollege(fetchColleges);
+
+        console.log(colleges)
         } catch (error) {
         console.error("Error fetching colleges:", error); 
         } finally {
@@ -117,8 +116,11 @@ const ManageCollege = () => {
       // Add all required fields to formData
       formData.append("college_id", collegeAbbrv);
       formData.append("college_name", collegeName);
-      //formData.append("college_color", colorAttrb);
 
+      if (colorAttrb !== '#000000'){
+        formData.append("college_color", colorAttrb);
+      }
+      
       // Send the conference data
       const response = await axios.post("/data/colleges", formData, {
         headers: {
@@ -321,7 +323,9 @@ const ManageCollege = () => {
                       >
                         <Box sx={{ flex: 1 }}>{college.college_id}</Box>
                         <Box sx={{ flex: 2 }}>{college.college_name}</Box>
-                        <Box sx={{ flex: 1 }}>{null}</Box>
+                        <Box sx={{ flex: 1 }}>
+                            <CircleIcon style={{ color: college.color_code }}/>
+                        </Box>
                         <Box sx={{ flex: 1 }}>
                           <Button
                             variant='text'
