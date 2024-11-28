@@ -21,6 +21,7 @@ import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import { Circle, Search } from "@mui/icons-material";
 import EditIcon from '@mui/icons-material/Edit';
 import CircleIcon from '@mui/icons-material/Circle';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { Virtuoso } from "react-virtuoso";
 import axios from "axios";
 
@@ -32,6 +33,7 @@ const ManageCollege = () => {
   const navigate = useNavigate();
   const [openModal, setOpenModal] = useState(false);
   const [addModal, setAddModal] = useState(false);
+  const [deleteModal, setDeleteModal] = useState(false);
   const [selectedCollege, setSelectedCollege] = useState(null);
 
   const [collegeAbbrv, setCollegeAbbrv] = useState("");
@@ -88,6 +90,7 @@ const ManageCollege = () => {
   const handleCloseModal = () => {
     setAddModal(false)
     setOpenModal(false);
+    setDeleteModal(false);
     setSelectedCollege(null);
 
     handlePostModal();
@@ -188,13 +191,6 @@ const ManageCollege = () => {
   };
   const updateCollege = async () => {
     try {
-
-      const formData = new FormData();
-
-      // Add all required fields to formData
-      formData.append("college_name", newName);
-      formData.append("color_code", newColor);
-
       // Send the college data
       const response = await axios.put(`/data/colleges/${selectedCollege.college_id}`, 
         {college_name: newName,
@@ -224,6 +220,34 @@ const ManageCollege = () => {
       handleCloseModal();
     }
   }
+
+  const handleDeleteCollege = (college) => {
+    setSelectedCollege(college)
+
+    setDeleteModal(true);
+  };
+
+  const deleteCollege = async () => {
+    try {
+      // Send the college data
+      const response = await axios.delete(`/data/colleges/${selectedCollege.college_id}`, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      console.log("Response:", response.data);
+      alert("College deleted successfully!");
+  
+      handleCloseModal();
+      window.location.reload();
+  
+    } catch (error) {
+      console.error("Error deleting college:", error);
+    } finally {
+      handleCloseModal();
+    }
+  };
 
   return (
     <>
@@ -373,8 +397,9 @@ const ManageCollege = () => {
                       >
                         <Box sx={{ flex: 1 }}>College ID</Box>
                         <Box sx={{ flex: 2 }}>Name</Box>
-                        <Box sx={{ flex: 1 }}>Color Code</Box>
+                        <Box sx={{ flex: 2 }}>Color Code</Box>
                         <Box sx={{ flex: 1 }}>Modify</Box>
+                        <Box sx={{ flex: 1 }}>Delete</Box>
                       </Box>
                     ),
                   }}
@@ -391,7 +416,7 @@ const ManageCollege = () => {
                       >
                         <Box sx={{ flex: 1 }}>{college.college_id}</Box>
                         <Box sx={{ flex: 2 }}>{college.college_name}</Box>
-                        <Box sx={{ flex: 1 }}>
+                        <Box sx={{ flex: 2 }}>
                             <CircleIcon style={{ color: college.color_code }}/>
                         </Box>
                         <Box sx={{ flex: 1 }}>
@@ -399,6 +424,13 @@ const ManageCollege = () => {
                             onClick={() => handleOpenModal(college)}
                           >
                             <EditIcon color='primary'/>
+                          </IconButton>
+                        </Box>
+                        <Box sx={{ flex: 1 }}>
+                          <IconButton
+                            onClick={() => handleDeleteCollege(college)}
+                          >
+                            <DeleteIcon color='primary'/>
                           </IconButton>
                         </Box>
                       </Box>
@@ -634,6 +666,113 @@ const ManageCollege = () => {
                       }}
                     >
                       Update
+                    </Button>
+                  </Box>
+                </Box>
+              </Modal>       
+            )}
+
+            {/* Delete College Modal */}
+            {selectedCollege && (
+              <Modal open={deleteModal} onClose={handleCloseModal}>
+                <Box
+                  sx={{
+                    position: "absolute",
+                    top: "50%",
+                    left: "50%",
+                    transform: "translate(-50%, -50%)",
+                    width: "40rem",
+                    bgcolor: "background.paper",
+                    boxShadow: 24,
+                    p: 5,
+                    borderRadius: "8px",
+                  }}
+                >
+                  <Typography
+                    variant='h3'
+                    color='#08397C'
+                    fontWeight='1000'
+                    mb={4}
+                    sx={{
+                      textAlign: { xs: "left", md: "bottom" },
+                    }}
+                  >
+                    Delete College
+                  </Typography>
+                  <Box display="flex" flexDirection="column">
+                    <Typography variant="h7" sx={{ mb: '1rem' }}>
+                      <strong>College ID:</strong> {selectedCollege.college_id || 'None'}
+                    </Typography>
+                    <Typography variant="h7" sx={{ mb: '1rem' }}>
+                      <strong>College Name:</strong> {selectedCollege.college_name || 'None'}
+                    </Typography>
+                    <Typography variant="h7" sx={{ mb: '1rem' }}>
+                      <strong>Color Code:</strong> 
+                      <Grid2 display='flex' flexDirection='row' paddingTop='1rem'>
+                        <Grid2 size={6}>
+                          <CircleIcon style={{ color: selectedCollege.color_code, paddingTop: '0.35rem' }}/>
+                        </Grid2>
+                        <Grid2 size={6}>
+                          <Typography
+                            variant='h6'
+                            sx={{ display:'flex', width: '50%' }}
+                            color='#08397C'
+                            ml={4}
+                          >
+                            {selectedCollege.color_code || '#000000'}
+                          </Typography>
+                        </Grid2>
+                      </Grid2>
+                    </Typography>
+                  </Box>    
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      mt: 5,
+                    }}
+                  >
+                    <Button
+                      onClick={handleCloseModal}
+                      sx={{
+                        backgroundColor: "#08397C",
+                        color: "#FFF",
+                        fontFamily: "Montserrat, sans-serif",
+                        fontWeight: 600,
+                        fontSize: { xs: "0.875rem", md: "1.275rem" },
+                        padding: { xs: "0.5rem", md: "1.5rem" },
+                        borderRadius: "100px",
+                        maxHeight: "3rem",
+                        textTransform: "none",
+                        "&:hover": {
+                          backgroundColor: "#072d61",
+                        },
+                      }}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      variant='contained'
+                      color='primary'
+                      onClick={deleteCollege}
+                      sx={{
+                        backgroundColor: "#CA031B",
+                        color: "#FFF",
+                        fontFamily: "Montserrat, sans-serif",
+                        fontWeight: 600,
+                        textTransform: "none",
+                        fontSize: { xs: "0.875rem", md: "1.275rem" },
+                        padding: { xs: "0.5rem 1rem", md: "1.5rem" },
+                        marginLeft: "2rem",
+                        borderRadius: "100px",
+                        maxHeight: "3rem",
+                        "&:hover": {
+                          backgroundColor: "#A30417",
+                          color: "#FFF",
+                        },
+                      }}
+                    >
+                      Delete
                     </Button>
                   </Box>
                 </Box>
