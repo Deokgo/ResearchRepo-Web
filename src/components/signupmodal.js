@@ -1,5 +1,6 @@
 // signupmodal.js
 import React, { useState } from "react";
+import OtpModal from "./otpmodal";
 import { useModalContext } from "./modalcontext"; // Import the ModalContext
 import {
   Box,
@@ -74,9 +75,31 @@ const SignUpModal = () => {
   const toggleConfirmPasswordVisibility = () => {
     setShowConfirmPassword((prev) => !prev);
   };
+  
+  const [isModalOpen, setIsModalOpen] = useState(false); // Controls OTP modal visibility
+  const [isVerified, setIsVerified] = useState(false);   // Tracks if OTP is verified
+  const [signupTriggered, setSignupTriggered] = useState(false); 
+
+
+  const handleVerification = (verified) => {
+    setIsVerified(verified);
+
+    // If signup was previously triggered, retry signup after verification
+    if (verified && signupTriggered) {
+      handleSignup();
+    }
+  };
+
 
   const handleSignup = async (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault(); // Prevent form submission if triggered manually
+
+    if (!isVerified) {
+      setSignupTriggered(true); // Mark that signup was attempted before verification
+      setIsModalOpen(true); // Open the OTP modal for verification
+      return;
+    }
+
     try {
       const response = await fetch("/auth/signup", {
         method: "POST",
@@ -96,10 +119,12 @@ const SignUpModal = () => {
       const data = await response.json();
       alert(`Signup successful! User ID: ${data.user_id}`);
       resetFields();
-      closeSignupModal(); // Close the signup modal
-      openLoginModal(); // Open the login modal
+      closeSignupModal(); // Ensure the modal is closed
+      openLoginModal(); // Transition to login
     } catch (error) {
       alert(`Signup failed: ${error.message}`);
+    } finally {
+      setSignupTriggered(false); // Reset signup trigger
     }
   };
 
@@ -367,6 +392,12 @@ const SignUpModal = () => {
                     Login
                   </a>
                 </Typography>
+                <OtpModal
+                  open={isModalOpen}
+                  email={formData.email}
+                  onVerify={handleVerification}
+                  onClose={() => setIsModalOpen(false)}
+                />
               </Box>
             </Box>
           </form>
