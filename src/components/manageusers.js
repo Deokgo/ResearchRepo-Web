@@ -22,6 +22,8 @@ import {
   TableCell,
   TableHead,
   TableRow,
+  TableContainer,
+  Tooltip,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import homeBg from "../assets/home_bg.png";
@@ -30,6 +32,9 @@ import { Search } from "@mui/icons-material";
 import { Virtuoso } from "react-virtuoso";
 import axios from "axios";
 import FileUploadIcon from "@mui/icons-material/FileUpload";
+import DeleteIcon from "@mui/icons-material/Delete";
+import AddIcon from "@mui/icons-material/Add";
+import ErrorIcon from "@mui/icons-material/Error";
 
 const ManageUsers = () => {
   const [users, setUsers] = useState([]);
@@ -46,6 +51,36 @@ const ManageUsers = () => {
   const [openAddModal, setOpenAddModal] = useState(false);
   const [selectedUserType, setSelectedUserType] = useState("");
   const [newUsers, setNewUsers] = useState([]);
+  const [colleges, setColleges] = useState([]);
+  const [programs, setPrograms] = useState([]);
+  const [parsedUsers, setParsedUsers] = useState([]);
+  const [programsByCollege, setProgramsByCollege] = useState({});
+  const [selectedRole, setSelectedRole] = useState("");
+  const [selectedCollege, setSelectedCollege] = useState("");
+  const [selectedProgram, setSelectedProgram] = useState("");
+  const [hasFile, setHasFile] = useState(false);
+  const [manualEntry, setManualEntry] = useState({
+    email: "",
+    firstName: "",
+    middleInitial: "",
+    surname: "",
+    suffix: "",
+  });
+  const [duplicateEmails, setDuplicateEmails] = useState([]);
+
+  const fetchUsers = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get("/accounts/users");
+      setUsers(response.data.researchers);
+      setFilteredUsers(response.data.researchers);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      alert("Error fetching users");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     const fetchRoles = async () => {
@@ -57,21 +92,16 @@ const ManageUsers = () => {
       }
     };
 
-    const fetchUsers = async () => {
+    const fetchColleges = async () => {
       try {
-        const response = await axios.get("/accounts/users");
-        const fetchedUsers = response.data.researchers;
-        setUsers(fetchedUsers);
-        setFilteredUsers(fetchedUsers);
+        const response = await axios.get("/deptprogs/college_depts");
+        setColleges(response.data.colleges);
       } catch (error) {
-        console.error("Error fetching data of users:", error);
-      } finally {
-        setLoading(false);
+        console.error("Error fetching colleges:", error);
       }
     };
 
-    fetchRoles(); // Call fetchRoles here
-    fetchUsers();
+    Promise.all([fetchRoles(), fetchUsers(), fetchColleges()]);
   }, []);
 
   const handleSearchChange = (e) => {
@@ -172,17 +202,339 @@ const ManageUsers = () => {
 
   const handleCloseAddModal = () => {
     setOpenAddModal(false);
-    setSelectedUserType("");
-    setNewUsers([]);
+    setSelectedRole("");
+    setSelectedCollege("");
+    setSelectedProgram("");
+    setParsedUsers([]);
+    setHasFile(false);
+    setDuplicateEmails([]);
+    setManualEntry({
+      email: "",
+      firstName: "",
+      middleInitial: "",
+      surname: "",
+      suffix: "",
+    });
+
+    // Reset file input
+    const fileInput = document.querySelector('input[type="file"]');
+    if (fileInput) {
+      fileInput.value = "";
+    }
+  };
+
+  const checkDuplicateEmail = async (email) => {
+    try {
+      // Check for duplicates in current table
+      const tableCount = parsedUsers.filter(
+        (user) => user.email === email
+      ).length;
+      if (tableCount > 1) return true;
+
+      // Check database for existing email
+      const response = await axios.get(`/accounts/check_email?email=${email}`);
+      return response.data.exists;
+    } catch (error) {
+      console.error("Error checking email:", error);
+      return false;
+    }
   };
 
   const handleFileUpload = (event) => {
     const file = event.target.files[0];
     if (file) {
-      // TODO: Implement CSV parsing logic
-      // For now, just console log the file
-      console.log("File selected:", file);
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const text = e.target.result;
+        const rows = text.split("\n");
+        const headers = rows[0]
+          .toLowerCase()
+          .split(",")
+          .map((h) => h.trim());
+
+        // Get current table state
+        const currentTableEmails = new Map(
+          parsedUsers.map((user) => [
+            user.email,
+            !duplicateEmails.includes(user.email),
+          ])
+        );
+
+        const newDuplicates = [];
+        const newUsers = [];
+        const processedEmails = new Set();
+
+        // Process each row
+        for (const row of rows.slice(1)) {
+          const values = row.split(",").map((v) => v.trim());
+          const email = values[headers.indexOf("email")]?.trim();
+
+          if (!email) continue;
+
+          // Skip if already processed in this import
+          if (processedEmails.has(email)) {
+            if (!newDuplicates.includes(email)) {
+              newDuplicates.push(email);
+            }
+            continue;
+          }
+
+          // Check if email exists in current table
+          if (currentTableEmails.has(email)) {
+            // If it's a valid entry (not marked as duplicate), skip without marking as duplicate
+            if (currentTableEmails.get(email)) {
+              continue;
+            }
+          }
+
+          // Check database for existing email
+          const isDuplicate = await checkDuplicateEmail(email);
+          if (isDuplicate) {
+            if (!newDuplicates.includes(email)) {
+              newDuplicates.push(email);
+            }
+            continue;
+          }
+
+          // Add new user if email is unique
+          processedEmails.add(email);
+          newUsers.push({
+            id: Date.now() + newUsers.length,
+            email: email,
+            firstName: values[headers.indexOf("first_name")]?.trim(),
+            middleInitial: values[headers.indexOf("middle_initial")]?.trim(),
+            surname: values[headers.indexOf("surname")]?.trim(),
+            suffix: values[headers.indexOf("suffix")]?.trim() || "",
+          });
+        }
+
+        // Update states
+        setParsedUsers((prevUsers) => [...prevUsers, ...newUsers]);
+        setDuplicateEmails((prev) => [...new Set([...prev, ...newDuplicates])]);
+
+        if (newDuplicates.length > 0) {
+          alert(
+            `Warning: The following emails are duplicates or already exist and will be ignored:\n${newDuplicates.join(
+              "\n"
+            )}`
+          );
+        }
+      };
+      reader.readAsText(file);
     }
+
+    // Reset file input
+    event.target.value = "";
+  };
+
+  const handleRoleChange = (userId, newRole) => {
+    setParsedUsers((users) =>
+      users.map((user) =>
+        user.id === userId ? { ...user, roleId: newRole } : user
+      )
+    );
+  };
+
+  const handleCollegeChange = async (newCollege) => {
+    setSelectedCollege(newCollege);
+    setSelectedProgram(""); // Reset program when college changes
+
+    try {
+      const response = await axios.get(`/deptprogs/programs/${newCollege}`);
+      setPrograms(response.data.programs);
+    } catch (error) {
+      console.error("Error fetching programs:", error);
+    }
+  };
+
+  const handleProgramChange = (userId, newProgram) => {
+    setParsedUsers((users) =>
+      users.map((user) =>
+        user.id === userId ? { ...user, programId: newProgram } : user
+      )
+    );
+  };
+
+  const fetchProgramsForCollege = async (collegeId) => {
+    try {
+      const response = await axios.get(`/deptprogs/programs/${collegeId}`);
+      setProgramsByCollege((prev) => ({
+        ...prev,
+        [collegeId]: response.data.programs,
+      }));
+    } catch (error) {
+      console.error("Error fetching programs:", error);
+    }
+  };
+
+  // Add this function to handle form submission
+  const handleAddUsers = async () => {
+    try {
+      // Validate selections
+      if (!selectedRole || !selectedCollege || !selectedProgram) {
+        alert("Please select role, college, and program");
+        return;
+      }
+
+      // Check if we have any users to add
+      if (parsedUsers.length === 0) {
+        alert("Please add at least one user");
+        return;
+      }
+
+      // Create FormData object
+      const formData = new FormData();
+
+      // Get the original CSV file if it exists
+      const fileInput = document.querySelector('input[type="file"]');
+      if (fileInput?.files[0]) {
+        formData.append("file", fileInput.files[0]);
+      }
+
+      // Add the parsed users data with common selections
+      const enrichedUsers = parsedUsers
+        .filter((user) => !duplicateEmails.includes(user.email))
+        .map((user) => ({
+          email: user.email.trim(),
+          firstName: user.firstName.trim(),
+          middleInitial: user.middleInitial ? user.middleInitial.trim() : "",
+          surname: user.surname.trim(),
+          suffix: user.suffix ? user.suffix.trim() : "",
+          roleId: selectedRole,
+          collegeId: selectedCollege,
+          programId: selectedProgram,
+        }));
+
+      if (enrichedUsers.length === 0) {
+        alert("No valid users to add. All emails are duplicates.");
+        return;
+      }
+
+      formData.append("users", JSON.stringify(enrichedUsers));
+
+      // Make the API call
+      const response = await axios.post("/accounts/bulk", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      // Handle success and download credentials file
+      if (response.data) {
+        const blob = new Blob([response.data], { type: "text/csv" });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `accounts_${new Date().toISOString()}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+
+        alert("Users added successfully! Downloading credentials file...");
+        handleCloseAddModal();
+        fetchUsers();
+      }
+    } catch (error) {
+      console.error("Error adding users:", error);
+      alert(error.response?.data?.error || "Error adding users");
+    }
+  };
+
+  const handleAddRow = async () => {
+    // Check required fields
+    if (!manualEntry.email || !manualEntry.firstName || !manualEntry.surname) {
+      alert("Email, First Name, and Surname are required");
+      return;
+    }
+
+    // Check if email exists in current table
+    const emailExistsInTable = parsedUsers.some(
+      (user) => user.email === manualEntry.email
+    );
+    if (emailExistsInTable) {
+      alert(`Email ${manualEntry.email} already exists in the current entries`);
+      return;
+    }
+
+    // Check if email exists in database
+    const isDuplicate = await checkDuplicateEmail(manualEntry.email);
+    if (isDuplicate) {
+      alert(`Email ${manualEntry.email} already exists in the database`);
+      return;
+    }
+
+    // If email is unique, add the new row
+    setParsedUsers([...parsedUsers, { ...manualEntry, id: Date.now() }]);
+
+    // Reset manual entry form
+    setManualEntry({
+      email: "",
+      firstName: "",
+      middleInitial: "",
+      surname: "",
+      suffix: "",
+    });
+  };
+
+  const handleDeleteRow = async (id) => {
+    // Remove the row
+    const updatedUsers = parsedUsers.filter((user) => user.id !== id);
+    setParsedUsers(updatedUsers);
+
+    // Recalculate duplicates
+    const newDuplicates = [];
+    for (const user of updatedUsers) {
+      // Check for duplicates in current table
+      const tableCount = updatedUsers.filter(
+        (u) => u.email === user.email
+      ).length;
+      const isDuplicate =
+        tableCount > 1 || (await checkDuplicateEmail(user.email));
+      if (isDuplicate && !newDuplicates.includes(user.email)) {
+        newDuplicates.push(user.email);
+      }
+    }
+    setDuplicateEmails(newDuplicates);
+  };
+
+  // Add this function to check if there are any valid (non-duplicate) users
+  const hasValidUsers = () => {
+    const validUsers = parsedUsers.filter(
+      (user) => !duplicateEmails.includes(user.email)
+    );
+    return validUsers.length > 0;
+  };
+
+  // Update the DuplicateWarning component to show appropriate message
+  const DuplicateWarning = ({ duplicateEmails }) => {
+    if (duplicateEmails.length === 0) return null;
+
+    const allDuplicates = duplicateEmails.length === parsedUsers.length;
+
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: 1,
+          color: "error.main",
+          mt: 2,
+        }}
+      >
+        <ErrorIcon fontSize='small' />
+        <Typography variant='body2'>
+          {allDuplicates
+            ? "All emails already exist in the database. No new users will be added."
+            : `${duplicateEmails.length} duplicate email${
+                duplicateEmails.length === 1 ? "" : "s"
+              } found among the users to be added. 
+              ${
+                duplicateEmails.length === 1 ? "This will" : "These will"
+              } be ignored during import: ${duplicateEmails.join(", ")}`}
+        </Typography>
+      </Box>
+    );
   };
 
   return (
@@ -303,14 +655,16 @@ const ManageUsers = () => {
                   maxHeight: "3rem",
                 }}
               >
-                Add New User
+                Add Users
               </Button>
             </Box>
 
             {/* Virtuoso Table */}
             <Box sx={{ width: "80%" }}>
               {loading ? (
-                <Typography>Loading users...</Typography>
+                <Box sx={{ display: "flex", justifyContent: "center" }}>
+                  <Typography>Loading users...</Typography>
+                </Box>
               ) : (
                 <Virtuoso
                   style={{ height: "500px" }}
@@ -422,8 +776,6 @@ const ManageUsers = () => {
                         )
                         .map((role) => (
                           <MenuItem key={role.role_id} value={role.role_id}>
-                            {" "}
-                            {/* Value is role_id */}
                             {role.role_name} {/* Display role_name */}
                           </MenuItem>
                         ))}
@@ -487,31 +839,65 @@ const ManageUsers = () => {
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
-            width: "80%",
-            maxWidth: 1000,
+            width: "90%",
+            maxWidth: 1200,
             bgcolor: "background.paper",
             boxShadow: 24,
             p: 4,
             borderRadius: "8px",
-            maxHeight: "80vh",
+            maxHeight: "85vh",
             overflow: "auto",
           }}
         >
           <Typography variant='h6' mb={3}>
-            Add Multiple Users
+            Add Users
           </Typography>
 
-          <Box sx={{ display: "flex", justifyContent: "space-between", mb: 3 }}>
-            <FormControl sx={{ width: "300px" }}>
-              <InputLabel>User Type</InputLabel>
+          {/* Common Dropdowns */}
+          <Box sx={{ display: "flex", gap: 2, mb: 3 }}>
+            <FormControl sx={{ minWidth: 200 }}>
+              <InputLabel>Role</InputLabel>
               <Select
-                value={selectedUserType}
-                onChange={(e) => setSelectedUserType(e.target.value)}
-                label='User Type'
+                value={selectedRole}
+                onChange={(e) => setSelectedRole(e.target.value)}
+                label='Role'
               >
-                <MenuItem value='researchers'>Researchers</MenuItem>
-                <MenuItem value='students'>Students</MenuItem>
-                <MenuItem value='faculty'>Faculty</MenuItem>
+                {roles.map((role) => (
+                  <MenuItem key={role.role_id} value={role.role_id}>
+                    {role.role_name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+
+            <FormControl sx={{ minWidth: 200 }}>
+              <InputLabel>College</InputLabel>
+              <Select
+                value={selectedCollege}
+                onChange={(e) => handleCollegeChange(e.target.value)}
+                label='College'
+              >
+                {colleges.map((college) => (
+                  <MenuItem key={college.college_id} value={college.college_id}>
+                    {college.college_name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+
+            <FormControl sx={{ minWidth: 200 }}>
+              <InputLabel>Program</InputLabel>
+              <Select
+                value={selectedProgram}
+                onChange={(e) => setSelectedProgram(e.target.value)}
+                label='Program'
+                disabled={!selectedCollege}
+              >
+                {programs.map((program) => (
+                  <MenuItem key={program.program_id} value={program.program_id}>
+                    {program.program_name}
+                  </MenuItem>
+                ))}
               </Select>
             </FormControl>
 
@@ -519,61 +905,205 @@ const ManageUsers = () => {
               variant='contained'
               component='label'
               startIcon={<FileUploadIcon />}
-              sx={{ height: "56px" }}
+              sx={{ mb: 3 }}
             >
               Import from CSV
               <input
                 type='file'
-                hidden
                 accept='.csv'
+                hidden
                 onChange={handleFileUpload}
               />
             </Button>
           </Box>
 
-          <Box sx={{ width: "100%", overflow: "auto" }}>
+          {/* Users Table */}
+          <TableContainer sx={{ mb: 3 }}>
             <Table>
               <TableHead>
-                <TableRow>
-                  <TableCell>Email</TableCell>
-                  <TableCell>Surname</TableCell>
-                  <TableCell>First Name</TableCell>
-                  <TableCell>Middle Initial</TableCell>
-                  <TableCell>Suffix</TableCell>
+                <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
+                  <TableCell>
+                    <Typography variant='subtitle2' sx={{ fontWeight: 700 }}>
+                      Email
+                    </Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant='subtitle2' sx={{ fontWeight: 700 }}>
+                      First Name
+                    </Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant='subtitle2' sx={{ fontWeight: 700 }}>
+                      Middle Initial
+                    </Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant='subtitle2' sx={{ fontWeight: 700 }}>
+                      Surname
+                    </Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant='subtitle2' sx={{ fontWeight: 700 }}>
+                      Suffix
+                    </Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant='subtitle2' sx={{ fontWeight: 700 }}>
+                      Actions
+                    </Typography>
+                  </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {newUsers.map((user, index) => (
-                  <TableRow key={index}>
-                    <TableCell>{user.email}</TableCell>
-                    <TableCell>{user.surname}</TableCell>
+                {/* Existing Users */}
+                {parsedUsers.map((user) => (
+                  <TableRow
+                    key={user.id}
+                    sx={{
+                      backgroundColor: duplicateEmails.includes(user.email)
+                        ? "#ffebee"
+                        : "inherit",
+                      "&:hover": {
+                        backgroundColor: duplicateEmails.includes(user.email)
+                          ? "#ffcdd2"
+                          : "inherit",
+                      },
+                    }}
+                  >
+                    <TableCell>
+                      <Box
+                        sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                      >
+                        {user.email}
+                        {duplicateEmails.includes(user.email) && (
+                          <Tooltip title='Duplicate email'>
+                            <ErrorIcon color='error' fontSize='small' />
+                          </Tooltip>
+                        )}
+                      </Box>
+                    </TableCell>
                     <TableCell>{user.firstName}</TableCell>
                     <TableCell>{user.middleInitial}</TableCell>
+                    <TableCell>{user.surname}</TableCell>
                     <TableCell>{user.suffix}</TableCell>
+                    <TableCell>
+                      <IconButton
+                        onClick={() => handleDeleteRow(user.id)}
+                        color='error'
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </TableCell>
                   </TableRow>
                 ))}
+                {/* Manual Entry Row */}
+                <TableRow>
+                  <TableCell>
+                    <TextField
+                      size='small'
+                      value={manualEntry.email}
+                      onChange={(e) =>
+                        setManualEntry({
+                          ...manualEntry,
+                          email: e.target.value,
+                        })
+                      }
+                      placeholder='Email'
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <TextField
+                      size='small'
+                      value={manualEntry.firstName}
+                      onChange={(e) =>
+                        setManualEntry({
+                          ...manualEntry,
+                          firstName: e.target.value,
+                        })
+                      }
+                      placeholder='First Name'
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <TextField
+                      size='small'
+                      value={manualEntry.middleInitial}
+                      onChange={(e) =>
+                        setManualEntry({
+                          ...manualEntry,
+                          middleInitial: e.target.value,
+                        })
+                      }
+                      placeholder='MI'
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <TextField
+                      size='small'
+                      value={manualEntry.surname}
+                      onChange={(e) =>
+                        setManualEntry({
+                          ...manualEntry,
+                          surname: e.target.value,
+                        })
+                      }
+                      placeholder='Surname'
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <TextField
+                      size='small'
+                      value={manualEntry.suffix}
+                      onChange={(e) =>
+                        setManualEntry({
+                          ...manualEntry,
+                          suffix: e.target.value,
+                        })
+                      }
+                      placeholder='Suffix'
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <IconButton onClick={handleAddRow} color='primary'>
+                      <AddIcon />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
               </TableBody>
             </Table>
-          </Box>
+          </TableContainer>
 
+          {/* Footer area with warning and buttons */}
           <Box
-            sx={{ display: "flex", justifyContent: "flex-end", mt: 3, gap: 2 }}
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "flex-start",
+              mt: 3,
+            }}
           >
-            <Button
-              variant='outlined'
-              onClick={handleCloseAddModal}
-              sx={{ fontWeight: 600 }}
-            >
-              Cancel
-            </Button>
-            <Button
-              variant='contained'
-              color='primary'
-              sx={{ fontWeight: 600 }}
-              disabled={newUsers.length === 0}
-            >
-              Add Users
-            </Button>
+            {/* Warning message on the left */}
+            <Box sx={{ flex: 1 }}>
+              <DuplicateWarning duplicateEmails={duplicateEmails} />
+            </Box>
+
+            {/* Action buttons on the right */}
+            <Box sx={{ display: "flex", gap: 2 }}>
+              <Button onClick={handleCloseAddModal}>Cancel</Button>
+              <Button
+                variant='contained'
+                onClick={handleAddUsers}
+                disabled={
+                  !hasValidUsers() || // Disable if no valid users
+                  !selectedRole ||
+                  !selectedCollege ||
+                  !selectedProgram ||
+                  parsedUsers.length === 0
+                }
+              >
+                Add Users
+              </Button>
+            </Box>
           </Box>
         </Box>
       </Modal>
