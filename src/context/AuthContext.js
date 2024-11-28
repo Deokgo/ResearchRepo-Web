@@ -35,8 +35,15 @@ export const AuthProvider = ({ children }) => {
   };
 
   const login = async (token) => {
-    localStorage.setItem("token", token);
-    await fetchUserDetails();
+    try {
+      localStorage.setItem("token", token);
+      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      await fetchUserDetails();
+    } catch (error) {
+      console.error("Error during login:", error);
+      localStorage.removeItem("token");
+      throw error;
+    }
   };
 
   const logout = () => {

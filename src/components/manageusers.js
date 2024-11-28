@@ -17,6 +17,11 @@ import {
   Radio,
   RadioGroup,
   FormLabel,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import homeBg from "../assets/home_bg.png";
@@ -24,6 +29,7 @@ import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import { Search } from "@mui/icons-material";
 import { Virtuoso } from "react-virtuoso";
 import axios from "axios";
+import FileUploadIcon from "@mui/icons-material/FileUpload";
 
 const ManageUsers = () => {
   const [users, setUsers] = useState([]);
@@ -34,9 +40,12 @@ const ManageUsers = () => {
   const [openModal, setOpenModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [newRole, setNewRole] = useState("");
-  const [roles, setRoles] = useState([]); 
+  const [roles, setRoles] = useState([]);
   const [accountStatus, setAccountStatus] = useState("");
   const [initialData, setInitialData] = useState(null);
+  const [openAddModal, setOpenAddModal] = useState(false);
+  const [selectedUserType, setSelectedUserType] = useState("");
+  const [newUsers, setNewUsers] = useState([]);
 
   useEffect(() => {
     const fetchRoles = async () => {
@@ -47,7 +56,7 @@ const ManageUsers = () => {
         console.error("Error fetching roles:", error);
       }
     };
-  
+
     const fetchUsers = async () => {
       try {
         const response = await axios.get("/accounts/users");
@@ -60,7 +69,7 @@ const ManageUsers = () => {
         setLoading(false);
       }
     };
-  
+
     fetchRoles(); // Call fetchRoles here
     fetchUsers();
   }, []);
@@ -81,12 +90,14 @@ const ManageUsers = () => {
 
     // Set the initial data for comparison in handleSaveChanges
     setInitialData({
-      role_name: user.role_name, 
+      role_name: user.role_name,
       accountStatus: user.acc_status,
     });
-  
+
     // Find and set the role_id for the selected user
-    const matchingRole = roles.find((role_id) => role_id.role_name === user.role_name);
+    const matchingRole = roles.find(
+      (role_id) => role_id.role_name === user.role_name
+    );
     if (matchingRole) {
       setNewRole(matchingRole.role_id); // Set the newRole state with the role_id
     } else {
@@ -95,7 +106,7 @@ const ManageUsers = () => {
 
     console.log("Selected User:", user);
     console.log("Matching Role (if found):", matchingRole);
-  
+
     setAccountStatus(user.acc_status); // Set account status for the selected user
     setOpenModal(true);
   };
@@ -105,9 +116,9 @@ const ManageUsers = () => {
     setSelectedUser(null);
   };
 
-   // Function to get role by role_id
+  // Function to get role by role_id
   const getRoleById = (roleId) => {
-    return roles.find(role => role.role_id === roleId);
+    return roles.find((role) => role.role_id === roleId);
   };
 
   const handleSaveChanges = async () => {
@@ -123,8 +134,7 @@ const ManageUsers = () => {
     } else {
       updateChanges();
     }
-    
-  };   
+  };
 
   const updateChanges = async () => {
     try {
@@ -132,10 +142,10 @@ const ManageUsers = () => {
         role_id: newRole, // Corrected key to 'role_id'
         acc_status: accountStatus,
       });
-      
-      const selectedRole = roles.find(role => role.role_id === newRole);
-      const roleName = selectedRole ? selectedRole.role_name : "N/A";  // Default to "N/A" if not found
-      console.log("Selected Role Name: ", roleName);  
+
+      const selectedRole = roles.find((role) => role.role_id === newRole);
+      const roleName = selectedRole ? selectedRole.role_name : "N/A"; // Default to "N/A" if not found
+      console.log("Selected Role Name: ", roleName);
 
       // Update users state to reflect changes without re-fetching
       const updatedUsers = users.map((user) =>
@@ -143,16 +153,35 @@ const ManageUsers = () => {
           ? { ...user, role_name: roleName, acc_status: accountStatus }
           : user
       );
-  
+
       // Update the state to trigger a re-render
       setUsers(updatedUsers);
       setFilteredUsers(updatedUsers);
-  
+
       console.log("New Role ID: ", newRole); // Optional for debugging
     } catch (error) {
       console.error("Error saving changes:", error);
     } finally {
       setOpenModal(false);
+    }
+  };
+
+  const handleOpenAddModal = () => {
+    setOpenAddModal(true);
+  };
+
+  const handleCloseAddModal = () => {
+    setOpenAddModal(false);
+    setSelectedUserType("");
+    setNewUsers([]);
+  };
+
+  const handleFileUpload = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      // TODO: Implement CSV parsing logic
+      // For now, just console log the file
+      console.log("File selected:", file);
     }
   };
 
@@ -260,6 +289,7 @@ const ManageUsers = () => {
               <Button
                 variant='contained'
                 color='primary'
+                onClick={handleOpenAddModal}
                 sx={{
                   backgroundColor: "#F40824",
                   color: "#FFF",
@@ -270,7 +300,7 @@ const ManageUsers = () => {
                   padding: { xs: "0.5rem 1rem", md: "1.5rem" },
                   marginLeft: "2rem",
                   borderRadius: "100px",
-                  maxHeight: "3rem"
+                  maxHeight: "3rem",
                 }}
               >
                 Add New User
@@ -372,48 +402,51 @@ const ManageUsers = () => {
                     fullWidth
                     margin='normal'
                   />
-                  <FormControl fullWidth margin="normal">
+                  <FormControl fullWidth margin='normal'>
                     <InputLabel>Role</InputLabel>
                     <Select
                       value={newRole} // This should hold role_id
                       onChange={(e) => setNewRole(e.target.value)} // Update newRole with role_id
-                      label="Role"
+                      label='Role'
                       disabled={
-                        selectedUser?.institution !== "Mapúa Malayan Colleges Laguna" || 
-                        ['01', '02', '03'].includes(selectedUser?.role_id) // Disable for specific role IDs
+                        selectedUser?.institution !==
+                          "Mapúa Malayan Colleges Laguna" ||
+                        ["01", "02", "03"].includes(selectedUser?.role_id) // Disable for specific role IDs
                       }
                     >
                       {roles
                         .filter(
                           (role) =>
-                            !['01', '02', '03'].includes(role.role_id) || // Keep other roles
-                            ['01', '02', '03'].includes(newRole) // Always include if the selected role is restricted
+                            !["01", "02", "03"].includes(role.role_id) || // Keep other roles
+                            ["01", "02", "03"].includes(newRole) // Always include if the selected role is restricted
                         )
                         .map((role) => (
-                          <MenuItem key={role.role_id} value={role.role_id}> {/* Value is role_id */}
+                          <MenuItem key={role.role_id} value={role.role_id}>
+                            {" "}
+                            {/* Value is role_id */}
                             {role.role_name} {/* Display role_name */}
                           </MenuItem>
                         ))}
                     </Select>
                   </FormControl>
                   <FormControl component='fieldset' margin='normal'>
-                  <FormLabel component='legend'>Account Status</FormLabel>
-                  <RadioGroup
-                    value={accountStatus}  // Use state variable here
-                    onChange={(e) => setAccountStatus(e.target.value)}
-                  >
-                    <FormControlLabel
-                      value='ACTIVATED'
-                      control={<Radio />}
-                      label='Activated'
-                    />
-                    <FormControlLabel
-                      value='DEACTIVATED'
-                      control={<Radio />}
-                      label='Deactivated'
-                    />
-                  </RadioGroup>
-                </FormControl>
+                    <FormLabel component='legend'>Account Status</FormLabel>
+                    <RadioGroup
+                      value={accountStatus} // Use state variable here
+                      onChange={(e) => setAccountStatus(e.target.value)}
+                    >
+                      <FormControlLabel
+                        value='ACTIVATED'
+                        control={<Radio />}
+                        label='Activated'
+                      />
+                      <FormControlLabel
+                        value='DEACTIVATED'
+                        control={<Radio />}
+                        label='Deactivated'
+                      />
+                    </RadioGroup>
+                  </FormControl>
                   <Box
                     sx={{
                       display: "flex",
@@ -443,6 +476,107 @@ const ManageUsers = () => {
           </Box>
         </Box>
       </Box>
+      <Modal
+        open={openAddModal}
+        onClose={handleCloseAddModal}
+        aria-labelledby='add-users-modal'
+      >
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: "80%",
+            maxWidth: 1000,
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            p: 4,
+            borderRadius: "8px",
+            maxHeight: "80vh",
+            overflow: "auto",
+          }}
+        >
+          <Typography variant='h6' mb={3}>
+            Add Multiple Users
+          </Typography>
+
+          <Box sx={{ display: "flex", justifyContent: "space-between", mb: 3 }}>
+            <FormControl sx={{ width: "300px" }}>
+              <InputLabel>User Type</InputLabel>
+              <Select
+                value={selectedUserType}
+                onChange={(e) => setSelectedUserType(e.target.value)}
+                label='User Type'
+              >
+                <MenuItem value='researchers'>Researchers</MenuItem>
+                <MenuItem value='students'>Students</MenuItem>
+                <MenuItem value='faculty'>Faculty</MenuItem>
+              </Select>
+            </FormControl>
+
+            <Button
+              variant='contained'
+              component='label'
+              startIcon={<FileUploadIcon />}
+              sx={{ height: "56px" }}
+            >
+              Import from CSV
+              <input
+                type='file'
+                hidden
+                accept='.csv'
+                onChange={handleFileUpload}
+              />
+            </Button>
+          </Box>
+
+          <Box sx={{ width: "100%", overflow: "auto" }}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Email</TableCell>
+                  <TableCell>Surname</TableCell>
+                  <TableCell>First Name</TableCell>
+                  <TableCell>Middle Initial</TableCell>
+                  <TableCell>Suffix</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {newUsers.map((user, index) => (
+                  <TableRow key={index}>
+                    <TableCell>{user.email}</TableCell>
+                    <TableCell>{user.surname}</TableCell>
+                    <TableCell>{user.firstName}</TableCell>
+                    <TableCell>{user.middleInitial}</TableCell>
+                    <TableCell>{user.suffix}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </Box>
+
+          <Box
+            sx={{ display: "flex", justifyContent: "flex-end", mt: 3, gap: 2 }}
+          >
+            <Button
+              variant='outlined'
+              onClick={handleCloseAddModal}
+              sx={{ fontWeight: 600 }}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant='contained'
+              color='primary'
+              sx={{ fontWeight: 600 }}
+              disabled={newUsers.length === 0}
+            >
+              Add Users
+            </Button>
+          </Box>
+        </Box>
+      </Modal>
     </>
   );
 };
