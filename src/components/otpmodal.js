@@ -15,6 +15,8 @@ const OtpModal = ({ email, formData, onVerify, open, onClose }) => {
   const [isVerified, setIsVerified] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
+  const [resendClicked, setResendClicked] = useState(false);
   const intervalRef = useRef(null);
 
   // API endpoint URLs
@@ -31,15 +33,7 @@ const OtpModal = ({ email, formData, onVerify, open, onClose }) => {
         console.log("Generated OTP (for demo purposes):", response.data.otp);
 
         // Start timer
-        intervalRef.current = setInterval(() => {
-          setTimer((prevTimer) => {
-            if (prevTimer <= 1) {
-              clearInterval(intervalRef.current);
-              return 0;
-            }
-            return prevTimer - 1;
-          });
-        }, 1000);
+        startTimer();
       } catch (error) {
         setErrorMessage("Failed to generate OTP. Please try again.");
       }
@@ -52,6 +46,22 @@ const OtpModal = ({ email, formData, onVerify, open, onClose }) => {
     };
   }, [email, open]);
 
+  const startTimer = () => {
+    setTimer(300); // Reset timer to 5 minutes
+    clearInterval(intervalRef.current); // Clear any existing interval
+    setResendClicked(false); // Reset resendClicked state
+
+    intervalRef.current = setInterval(() => {
+      setTimer((prevTimer) => {
+        if (prevTimer <= 1) {
+          clearInterval(intervalRef.current);
+          return 0;
+        }
+        return prevTimer - 1;
+      });
+    }, 1000);
+  };
+
   const handleOtpChange = (e) => {
     setOtp(e.target.value);
   };
@@ -61,11 +71,9 @@ const OtpModal = ({ email, formData, onVerify, open, onClose }) => {
 
     setLoading(true);
     try {
-      // First verify the OTP
       const verifyResponse = await axios.post(OTP_VERIFY_API, { email, otp });
 
       if (verifyResponse.status === 200) {
-        // OTP verified successfully, now create the account
         const signupResponse = await axios.post("/auth/signup", {
           firstName: formData.firstName,
           lastName: formData.lastName,
@@ -98,6 +106,22 @@ const OtpModal = ({ email, formData, onVerify, open, onClose }) => {
     }
   };
 
+  const resendOtp = async () => {
+    if (resendLoading) return;
+
+    setResendLoading(true);
+    setResendClicked(true); // Hide the Verify button
+    try {
+      await axios.post(OTP_GENERATE_API, { email });
+      setErrorMessage("");
+      startTimer();
+    } catch (error) {
+      setErrorMessage("Failed to resend OTP. Please try again.");
+    } finally {
+      setResendLoading(false);
+    }
+  };
+
   const formatTime = (seconds) => {
     const minutes = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -106,89 +130,109 @@ const OtpModal = ({ email, formData, onVerify, open, onClose }) => {
 
   return (
     <Modal open={open} onClose={onClose}>
-      <Box
-        sx={{
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          width: 400,
-          bgcolor: "background.paper",
-          boxShadow: 24,
-          p: 4,
-          borderRadius: 2,
-        }}
-      >
-        <Typography variant='h6' component='h2' gutterBottom>
-          Verify OTP
-        </Typography>
-        <Typography>Email: {email}</Typography>
-        <Typography>Time Left: {formatTime(timer)}</Typography>
+  <Box
+    sx={{
+      position: "absolute",
+      top: "50%",
+      left: "50%",
+      transform: "translate(-50%, -50%)",
+      width: 400,
+      bgcolor: "background.paper",
+      boxShadow: 24,
+      p: 4,
+      borderRadius: 2,
+      textAlign: "center", // Center all text inside this Box
+    }}
+  >
+    <Typography variant="h6" component="h2" gutterBottom>
+      Verify your Email Address
+    </Typography>
+    <Typography>
+      Please enter the 6-digit verification code that was sent to {email}
+    </Typography>
+    <TextField
+      label="Enter OTP"
+      variant="outlined"
+      fullWidth
+      value={otp}
+      onChange={handleOtpChange}
+      inputProps={{ maxLength: 6 }}
+      margin="normal"
+      placeholder="Enter 6-digit OTP"
+      sx={{ textAlign: "center" }} // Align input placeholder and label
+    />
+    <Typography>
+      Resend verification code in {formatTime(timer)}
+    </Typography>
 
-        <TextField
-          label='Enter OTP'
-          variant='outlined'
-          fullWidth
-          value={otp}
-          onChange={handleOtpChange}
-          inputProps={{ maxLength: 6 }}
-          margin='normal'
-          placeholder='Enter 6-digit OTP'
-        />
+    {isVerified && (
+      <Typography color="success.main" sx={{ mt: 1 }}>
+        OTP Verified Successfully!
+      </Typography>
+    )}
 
-        {isVerified && (
-          <Typography color='success.main' sx={{ mt: 1 }}>
-            OTP Verified Successfully!
-          </Typography>
-        )}
+    {errorMessage && (
+      <Typography color="error" sx={{ mt: 1 }}>
+        {errorMessage}
+      </Typography>
+    )}
 
-        {errorMessage && (
-          <Typography color='error' sx={{ mt: 1 }}>
-            {errorMessage}
-          </Typography>
-        )}
+    {timer === 0 && !isVerified && (
+      <Typography color="error" sx={{ mt: 1 }}>
+        OTP Expired. Please request a new one.
+      </Typography>
+    )}
 
-        {timer === 0 && !isVerified && (
-          <Typography color='error' sx={{ mt: 1 }}>
-            OTP Expired. Please request a new one.
-          </Typography>
-        )}
-
-        <Box sx={{ mt: 2, position: "relative" }}>
-          <Button
-            onClick={verifyOtp}
-            variant='contained'
-            color='primary'
-            fullWidth
-            disabled={loading || timer === 0}
-          >
-            {loading ? "Verifying..." : "Verify OTP"}
-          </Button>
-          {loading && (
-            <CircularProgress
-              size={24}
-              sx={{
-                position: "absolute",
-                top: "50%",
-                left: "50%",
-                marginTop: "-12px",
-                marginLeft: "-12px",
-              }}
-            />
-          )}
-        </Box>
-
+    {!resendClicked && (
+      <Box sx={{ mt: 2, position: "relative", textAlign: "center" }}>
         <Button
-          onClick={onClose}
-          variant='text'
-          color='secondary'
+          onClick={verifyOtp}
+          variant="contained"
+          color="primary"
           fullWidth
-          sx={{ mt: 1 }}
+          disabled={loading || timer === 0}
         >
-          Close
+          {loading ? "Verifying..." : "Verify OTP"}
         </Button>
+        {loading && (
+          <CircularProgress
+            size={24}
+            sx={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              marginTop: "-12px",
+              marginLeft: "-12px",
+            }}
+          />
+        )}
       </Box>
-    </Modal>
+    )}
+
+    {timer === 0 && (
+      <Button
+        onClick={resendOtp}
+        variant="text"
+        color="primary"
+        fullWidth
+        disabled={resendLoading}
+        sx={{ mt: 2 }}
+      >
+        {resendLoading ? "Resending..." : "Resend OTP"}
+      </Button>
+    )}
+
+    <Button
+      onClick={onClose}
+      variant="text"
+      color="secondary"
+      fullWidth
+      sx={{ mt: 1 }}
+    >
+      Close
+    </Button>
+  </Box>
+</Modal>
   );
 };
 
