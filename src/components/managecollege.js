@@ -189,6 +189,7 @@ const ManageCollege = () => {
       updateCollege();
     }
   };
+
   const updateCollege = async () => {
     try {
       // Send the college data
@@ -213,11 +214,21 @@ const ManageCollege = () => {
       // Update the state to trigger a re-render
       setColleges(updatedCollege);
       setFilteredCollege(updatedCollege);
-  
+
+      handleCloseModal();
+    
     } catch (error) {
       console.error("Error updating college:", error);
-    } finally {
-      handleCloseModal();
+      if (error.response) {
+        console.error("Error response:", error.response.data);
+        alert(
+          `Failed to update college: ${
+            error.response.data.error || "Please try again."
+          }`
+        );
+      } else {
+        alert("Failed to update college. Please try again.");
+      }
     }
   }
 
@@ -241,11 +252,19 @@ const ManageCollege = () => {
   
       handleCloseModal();
       window.location.reload();
-  
+      
     } catch (error) {
       console.error("Error deleting college:", error);
-    } finally {
-      handleCloseModal();
+      if (error.response) {
+        console.error("Error response:", error.response.data);
+        alert(
+          `Failed to delete college: ${
+            error.response.data.error || "Please try again."
+          }`
+        );
+      } else {
+        alert("Failed to delete college. Please try again.");
+      }
     }
   };
 
@@ -416,7 +435,7 @@ const ManageCollege = () => {
                       >
                         <Box sx={{ flex: 1 }}>{college.college_id}</Box>
                         <Box sx={{ flex: 2 }}>{college.college_name}</Box>
-                        <Box sx={{ flex: 2 }}>
+                        <Box sx={{ flex: 2, ml: "3rem" }}>
                             <CircleIcon style={{ color: college.color_code }}/>
                         </Box>
                         <Box sx={{ flex: 1 }}>
@@ -442,118 +461,118 @@ const ManageCollege = () => {
 
             {/* Add College Modal */}
             <Modal open={addModal} onClose={handleCloseModal}>
-                <Box
+              <Box
+                sx={{
+                  position: "absolute",
+                  top: "50%",
+                  left: "50%",
+                  transform: "translate(-50%, -50%)",
+                  width: "40rem",
+                  bgcolor: "background.paper",
+                  boxShadow: 24,
+                  p: 5,
+                  borderRadius: "8px",
+                }}
+              >
+                <Typography
+                  variant='h3'
+                  color='#08397C'
+                  fontWeight='1000'
+                  mb={4}
                   sx={{
-                    position: "absolute",
-                    top: "50%",
-                    left: "50%",
-                    transform: "translate(-50%, -50%)",
-                    width: "40rem",
-                    bgcolor: "background.paper",
-                    boxShadow: 24,
-                    p: 5,
-                    borderRadius: "8px",
+                    textAlign: { xs: "left", md: "bottom" },
                   }}
                 >
-                  <Typography
-                    variant='h3'
-                    color='#08397C'
-                    fontWeight='1000'
-                    mb={4}
+                  Add College
+                </Typography>
+                <TextField
+                  label='Abbreviation'
+                  value={collegeAbbrv}
+                  fullWidth
+                  onChange={(e) => setCollegeAbbrv(e.target.value)}
+                  margin='normal'
+                />
+                <TextField
+                  label='Name'
+                  value={collegeName}
+                  fullWidth
+                  onChange={(e) => setCollegeName(e.target.value)}
+                  margin='normal'
+                />
+                <Grid2 display='flex'>
+                  <Grid2 width='50%' size={6}>
+                    <TextField
+                      type='color'
+                      fullWidth
+                      label='Color Attribute'
+                      value={colorAttrb}
+                      onChange={(e) => setColorAttrb(e.target.value)}
+                      margin='normal'
+                    />
+                  </Grid2>
+                  <Grid2 paddingTop='2rem' size={6}>
+                    <Typography
+                      variant='h6'
+                      sx={{ display:'flex', width: '50%' }}
+                      color='#08397C'
+                      ml={4}
+                    >
+                      {colorAttrb}
+                    </Typography>
+                  </Grid2>
+                </Grid2>      
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    mt: 5,
+                  }}
+                >
+                  <Button
+                    onClick={handleCloseModal}
                     sx={{
-                      textAlign: { xs: "left", md: "bottom" },
+                      backgroundColor: "#08397C",
+                      color: "#FFF",
+                      fontFamily: "Montserrat, sans-serif",
+                      fontWeight: 600,
+                      fontSize: { xs: "0.875rem", md: "1.275rem" },
+                      padding: { xs: "0.5rem", md: "1.5rem" },
+                      borderRadius: "100px",
+                      maxHeight: "3rem",
+                      textTransform: "none",
+                      "&:hover": {
+                        backgroundColor: "#072d61",
+                      },
                     }}
                   >
-                    Add College
-                  </Typography>
-                  <TextField
-                    label='Abbreviation'
-                    value={collegeAbbrv}
-                    fullWidth
-                    onChange={(e) => setCollegeAbbrv(e.target.value)}
-                    margin='normal'
-                  />
-                  <TextField
-                    label='Name'
-                    value={collegeName}
-                    fullWidth
-                    onChange={(e) => setCollegeName(e.target.value)}
-                    margin='normal'
-                  />
-                  <Grid2 display='flex'>
-                    <Grid2 width='50%' size={6}>
-                      <TextField
-                        type='color'
-                        fullWidth
-                        label='Color Attribute'
-                        value={colorAttrb}
-                        onChange={(e) => setColorAttrb(e.target.value)}
-                        margin='normal'
-                      />
-                    </Grid2>
-                    <Grid2 paddingTop='2rem' size={6}>
-                      <Typography
-                        variant='h6'
-                        sx={{ display:'flex', width: '50%' }}
-                        color='#08397C'
-                        ml={4}
-                      >
-                        {colorAttrb}
-                      </Typography>
-                    </Grid2>
-                  </Grid2>      
-                  <Box
+                    Cancel
+                  </Button>
+                  <Button
+                    variant='contained'
+                    color='primary'
+                    onClick={handleAddCollege}
                     sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      mt: 5,
+                      backgroundColor: "#CA031B",
+                      color: "#FFF",
+                      fontFamily: "Montserrat, sans-serif",
+                      fontWeight: 600,
+                      textTransform: "none",
+                      fontSize: { xs: "0.875rem", md: "1.275rem" },
+                      padding: { xs: "0.5rem 1rem", md: "1.5rem" },
+                      marginLeft: "2rem",
+                      borderRadius: "100px",
+                      maxHeight: "3rem",
+                      "&:hover": {
+                        backgroundColor: "#A30417",
+                        color: "#FFF",
+                      },
                     }}
                   >
-                    <Button
-                      onClick={handleCloseModal}
-                      sx={{
-                        backgroundColor: "#08397C",
-                        color: "#FFF",
-                        fontFamily: "Montserrat, sans-serif",
-                        fontWeight: 600,
-                        fontSize: { xs: "0.875rem", md: "1.275rem" },
-                        padding: { xs: "0.5rem", md: "1.5rem" },
-                        borderRadius: "100px",
-                        maxHeight: "3rem",
-                        textTransform: "none",
-                        "&:hover": {
-                          backgroundColor: "#072d61",
-                        },
-                      }}
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      variant='contained'
-                      color='primary'
-                      onClick={handleAddCollege}
-                      sx={{
-                        backgroundColor: "#CA031B",
-                        color: "#FFF",
-                        fontFamily: "Montserrat, sans-serif",
-                        fontWeight: 600,
-                        textTransform: "none",
-                        fontSize: { xs: "0.875rem", md: "1.275rem" },
-                        padding: { xs: "0.5rem 1rem", md: "1.5rem" },
-                        marginLeft: "2rem",
-                        borderRadius: "100px",
-                        maxHeight: "3rem",
-                        "&:hover": {
-                          backgroundColor: "#A30417",
-                          color: "#FFF",
-                        },
-                      }}
-                    >
-                      Add
-                    </Button>
-                  </Box>
+                    Add
+                  </Button>
                 </Box>
-              </Modal>
+              </Box>
+            </Modal>
 
             {/* Update College Modal */}
             {selectedCollege && (
