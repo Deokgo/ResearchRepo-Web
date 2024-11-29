@@ -5,14 +5,14 @@ import { useModalContext } from "./modalcontext";
 import { useAuth } from "../context/AuthContext";
 import axios from "axios";
 
-const LoginModal = ({ isOpen, handleClose }) => {
-  const navigate = useNavigate();
+const LoginModal = () => {
   const {
     isLoginModalOpen,
     closeLoginModal,
     openSignupModal,
     openPassresetModal,
   } = useModalContext();
+  const navigate = useNavigate();
   const { login } = useAuth();
 
   const [formValues, setFormValues] = useState({
@@ -62,7 +62,7 @@ const LoginModal = ({ isOpen, handleClose }) => {
       const userResponse = await axios.get("/auth/me");
       const userRole = userResponse.data.role;
 
-      handleClose();
+      handleModalClose();
 
       alert(`Login Successfully`);
 
@@ -91,10 +91,15 @@ const LoginModal = ({ isOpen, handleClose }) => {
     }
   };
 
+  const handleModalClose = () => {
+    resetFields();
+    closeLoginModal();
+  };
+
   return (
     <>
       {/*Log In Modal*/}
-      <Modal open={isOpen} onClose={handleClose}>
+      <Modal open={isLoginModalOpen} onClose={handleModalClose}>
         <Box sx={modalStyle}>
           <Typography
             variant='h6'

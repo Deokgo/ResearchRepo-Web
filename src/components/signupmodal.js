@@ -18,11 +18,13 @@ import {
   Visibility,
   VisibilityOff,
 } from "@mui/icons-material";
+import axios from "axios";
 const SignUpModal = () => {
   const { isSignupModalOpen, closeSignupModal, openLoginModal } =
     useModalContext(); // Use context
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [passwordErrors, setPasswordErrors] = useState([]);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -30,6 +32,9 @@ const SignUpModal = () => {
     email: "",
     reason: "",
     password: "",
+    confirmPassword: "",
+    middleName: "",
+    suffix: "",
   });
 
   const resetFields = () => {
@@ -40,6 +45,9 @@ const SignUpModal = () => {
       email: "",
       reason: "",
       password: "",
+      confirmPassword: "",
+      middleName: "",
+      suffix: "",
     });
   };
 
@@ -75,62 +83,145 @@ const SignUpModal = () => {
   const toggleConfirmPasswordVisibility = () => {
     setShowConfirmPassword((prev) => !prev);
   };
-  
+
   const [isModalOpen, setIsModalOpen] = useState(false); // Controls OTP modal visibility
-  const [isVerified, setIsVerified] = useState(false);   // Tracks if OTP is verified
-  const [signupTriggered, setSignupTriggered] = useState(false); 
+  const [isVerified, setIsVerified] = useState(false); // Tracks if OTP is verified
+  const [signupTriggered, setSignupTriggered] = useState(false);
 
-
-  const handleVerification = (verified) => {
+  const handleVerification = async (verified, signupData) => {
     setIsVerified(verified);
 
-    // If signup was previously triggered, retry signup after verification
-    if (verified && signupTriggered) {
-      handleSignup();
+    if (verified && signupData) {
+      // Handle successful signup (e.g., store token, redirect, show success message)
+      if (signupData.token) {
+        // Store the token if needed
+        localStorage.setItem("token", signupData.token);
+      }
+
+      // Close modals and show success message
+      handleModalClose();
+      alert("Account created successfully!");
+
+      // Optionally redirect or open login modal
+      openLoginModal();
     }
   };
 
+  const validatePassword = (password) => {
+    const errors = [];
+
+    // Always check length first
+    if (password.length < 8) {
+      errors.push("Must be at least 8 characters long");
+      return errors; // Return early if length requirement isn't met
+    }
+
+    // Only check other requirements if length is 8 or more
+    if (!/[A-Z]/.test(password)) {
+      errors.push("Must contain an uppercase letter");
+    }
+    if (!/[a-z]/.test(password)) {
+      errors.push("Must contain a lowercase letter");
+    }
+    if (!/[0-9]/.test(password)) {
+      errors.push("Must contain a number");
+    }
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+      errors.push("Must contain a special character");
+    }
+
+    return errors;
+  };
+  const [reasonError, setReasonError] = useState("");
+
+  const validateEmail = (email) => {
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return emailRegex.test(email);
+  };
+
+  const [institutionError, setInstitutionError] = useState("");
 
   const handleSignup = async (e) => {
-    if (e) e.preventDefault(); // Prevent form submission if triggered manually
+    if (e) e.preventDefault();
 
-    if (!isVerified) {
-      setSignupTriggered(true); // Mark that signup was attempted before verification
-      setIsModalOpen(true); // Open the OTP modal for verification
+    // Reset errors
+    setPasswordErrors([]);
+    setReasonError("");
+    setInstitutionError("");
+
+    // Validate institution
+    if (!formData.institution || !formData.institution.trim()) {
+      setInstitutionError("Institution is required");
+      return;
+    }
+
+    // Validate reason
+    if (!formData.reason || !formData.reason.trim()) {
+      setReasonError("Reason is required");
+      return;
+    }
+
+    // Validate email format first
+    if (!validateEmail(formData.email)) {
+      alert("Invalid email format.");
       return;
     }
 
     try {
-      const response = await fetch("/auth/signup", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
+      // Check if email exists first using accounts API
+      const emailCheckResponse = await axios.get(
+        `/accounts/check_email?email=${formData.email}`
+      );
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(
-          errorData.message || `HTTP error! status: ${response.status}`
-        );
+      if (emailCheckResponse.data.exists) {
+        alert("This email is already registered.");
+        return;
       }
 
-      const data = await response.json();
-      alert(`Signup successful! User ID: ${data.user_id}`);
-      resetFields();
-      closeSignupModal(); // Ensure the modal is closed
-      openLoginModal(); // Transition to login
+      // Validate password
+      const passwordValidationErrors = validatePassword(formData.password);
+      if (passwordValidationErrors.length > 0) {
+        setPasswordErrors(passwordValidationErrors);
+        return;
+      }
+
+      // Verify passwords match
+      if (
+        formData.password.length >= 8 &&
+        formData.confirmPassword.length >= 8 &&
+        formData.password !== formData.confirmPassword
+      ) {
+        setPasswordErrors(["Passwords do not match"]);
+        return;
+      }
+
+      // If email is unique and all validations pass, open OTP modal
+      setSignupTriggered(true);
+      setIsModalOpen(true);
     } catch (error) {
-      alert(`Signup failed: ${error.message}`);
-    } finally {
-      setSignupTriggered(false); // Reset signup trigger
+      if (error.response) {
+        alert(
+          error.response.data.error || "An error occurred. Please try again."
+        );
+      } else {
+        alert("Network error. Please try again.");
+      }
     }
+  };
+
+  // Create a handler for modal close
+  const handleModalClose = () => {
+    resetFields(); // Clear all fields
+    setPasswordErrors([]); // Clear password errors
+    setReasonError(""); // Clear reason error
+    setIsVerified(false); // Reset verification status
+    setSignupTriggered(false); // Reset signup trigger
+    closeSignupModal(); // Close the modal
   };
 
   return (
     <>
-      <Modal open={isSignupModalOpen} onClose={closeSignupModal}>
+      <Modal open={isSignupModalOpen} onClose={handleModalClose}>
         <Box sx={modalStyle}>
           <Typography
             variant='h6'
@@ -262,7 +353,7 @@ const SignUpModal = () => {
                   ></TextField>
                 </Grid2>
               </Grid2>
-              
+
               <TextField
                 fullWidth
                 label='Institution'
@@ -281,7 +372,10 @@ const SignUpModal = () => {
                     </InputAdornment>
                   ),
                 }}
-              ></TextField>
+                required
+                error={Boolean(institutionError)}
+                helperText={institutionError}
+              />
               <TextField
                 fullWidth
                 label='Reason'
@@ -293,7 +387,9 @@ const SignUpModal = () => {
                 multiline
                 maxRows={1}
                 variant='outlined'
-                helperText={`${formData.reason.length}/${100}`}
+                required
+                error={Boolean(reasonError)}
+                helperText={reasonError || `${formData.reason.length}/${100}`}
                 inputProps={{
                   maxLength: 100,
                 }}
@@ -316,9 +412,25 @@ const SignUpModal = () => {
                     name='password'
                     type={showPassword ? "text" : "password"}
                     value={formData.password}
-                    onChange={handleChange}
+                    onChange={(e) => {
+                      handleChange(e);
+                      // Update password errors in real-time
+                      setPasswordErrors(validatePassword(e.target.value));
+                    }}
                     margin='normal'
                     variant='outlined'
+                    error={
+                      passwordErrors.length > 0 && formData.password.length >= 8
+                    }
+                    helperText={
+                      !formData.password
+                        ? "Enter your password"
+                        : formData.password.length < 8
+                        ? "Password must contain: 8+ characters, uppercase, lowercase, number, and special character"
+                        : passwordErrors.length > 0
+                        ? passwordErrors.join(", ")
+                        : "Password meets all requirements"
+                    }
                     InputProps={{
                       endAdornment: (
                         <InputAdornment position='end'>
@@ -328,7 +440,7 @@ const SignUpModal = () => {
                         </InputAdornment>
                       ),
                     }}
-                  ></TextField>
+                  />
                 </Grid2>
                 <Grid2 size={{ xs: 12, md: 6 }}>
                   <TextField
@@ -340,6 +452,18 @@ const SignUpModal = () => {
                     onChange={handleChange}
                     margin='normal'
                     variant='outlined'
+                    error={
+                      formData.password.length >= 8 &&
+                      formData.confirmPassword.length >= 8 &&
+                      formData.password !== formData.confirmPassword
+                    }
+                    helperText={
+                      formData.password.length >= 8 &&
+                      formData.confirmPassword.length >= 8 &&
+                      formData.password !== formData.confirmPassword
+                        ? "Passwords do not match"
+                        : ""
+                    }
                     InputProps={{
                       endAdornment: (
                         <InputAdornment position='end'>
@@ -353,7 +477,7 @@ const SignUpModal = () => {
                         </InputAdornment>
                       ),
                     }}
-                  ></TextField>
+                  />
                 </Grid2>
               </Grid2>
               <Box
@@ -395,6 +519,7 @@ const SignUpModal = () => {
                 <OtpModal
                   open={isModalOpen}
                   email={formData.email}
+                  formData={formData}
                   onVerify={handleVerification}
                   onClose={() => setIsModalOpen(false)}
                 />

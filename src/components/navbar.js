@@ -20,6 +20,7 @@ import { useNavigate } from "react-router-dom";
 import navLogo from "../assets/MMCL_Logo_Nav.png";
 import LoginModal from "./loginmodal";
 import { useAuth } from "../context/AuthContext";
+import { useModalContext } from "./modalcontext";
 
 const Navbar = () => {
   const { user, logout } = useAuth();
@@ -41,6 +42,8 @@ const Navbar = () => {
 
   const isMobile = useMediaQuery("(max-width:600px)");
 
+  const { openLoginModal } = useModalContext();
+
   {
     /*****************Event Handlers******************/
   }
@@ -53,7 +56,7 @@ const Navbar = () => {
   };
 
   const handleLogin = () => {
-    setIsLoginModalOpen(true);
+    openLoginModal();
   };
 
   const handleCloseLoginModal = () => {

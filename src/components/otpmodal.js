@@ -9,7 +9,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 
-const OtpModal = ({ email, onVerify, open, onClose }) => {
+const OtpModal = ({ email, formData, onVerify, open, onClose }) => {
   const [otp, setOtp] = useState("");
   const [timer, setTimer] = useState(300); // 5 minutes = 300 seconds
   const [isVerified, setIsVerified] = useState(false);
@@ -58,23 +58,38 @@ const OtpModal = ({ email, onVerify, open, onClose }) => {
 
   const verifyOtp = async () => {
     if (loading || timer === 0) return;
-  
+
     setLoading(true);
     try {
-      const response = await axios.post(OTP_VERIFY_API, { email, otp });
-  
-      if (response.status === 200 && response.data.message) {
-        // OTP verified successfully
-        setIsVerified(true);
-        onVerify(true); // Notify parent component of success
-        setErrorMessage("");
-      } else {
-        // In case the server returns 400 but no clear error
-        setErrorMessage("Invalid OTP. Please try again.");
+      // First verify the OTP
+      const verifyResponse = await axios.post(OTP_VERIFY_API, { email, otp });
+
+      if (verifyResponse.status === 200) {
+        // OTP verified successfully, now create the account
+        const signupResponse = await axios.post("/auth/signup", {
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          institution: formData.institution,
+          reason: formData.reason,
+          password: formData.password,
+          confirmPassword: formData.confirmPassword,
+          middleName: formData.middleName,
+          suffix: formData.suffix,
+        });
+
+        if (signupResponse.status === 201) {
+          setIsVerified(true);
+          onVerify(true, signupResponse.data); // Pass the signup response data
+          setErrorMessage("");
+          onClose(); // Close the OTP modal after successful signup
+        }
       }
     } catch (error) {
-      if (error.response && error.response.data && error.response.data.error) {
+      if (error.response?.data?.error) {
         setErrorMessage(error.response.data.error);
+      } else if (error.response?.data?.message) {
+        setErrorMessage(error.response.data.message);
       } else {
         setErrorMessage("Verification failed. Please try again.");
       }
@@ -82,7 +97,6 @@ const OtpModal = ({ email, onVerify, open, onClose }) => {
       setLoading(false);
     }
   };
-  
 
   const formatTime = (seconds) => {
     const minutes = Math.floor(seconds / 60);
@@ -105,37 +119,37 @@ const OtpModal = ({ email, onVerify, open, onClose }) => {
           borderRadius: 2,
         }}
       >
-        <Typography variant="h6" component="h2" gutterBottom>
+        <Typography variant='h6' component='h2' gutterBottom>
           Verify OTP
         </Typography>
         <Typography>Email: {email}</Typography>
         <Typography>Time Left: {formatTime(timer)}</Typography>
 
         <TextField
-          label="Enter OTP"
-          variant="outlined"
+          label='Enter OTP'
+          variant='outlined'
           fullWidth
           value={otp}
           onChange={handleOtpChange}
           inputProps={{ maxLength: 6 }}
-          margin="normal"
-          placeholder="Enter 6-digit OTP"
+          margin='normal'
+          placeholder='Enter 6-digit OTP'
         />
 
         {isVerified && (
-          <Typography color="success.main" sx={{ mt: 1 }}>
+          <Typography color='success.main' sx={{ mt: 1 }}>
             OTP Verified Successfully!
           </Typography>
         )}
 
         {errorMessage && (
-          <Typography color="error" sx={{ mt: 1 }}>
+          <Typography color='error' sx={{ mt: 1 }}>
             {errorMessage}
           </Typography>
         )}
 
         {timer === 0 && !isVerified && (
-          <Typography color="error" sx={{ mt: 1 }}>
+          <Typography color='error' sx={{ mt: 1 }}>
             OTP Expired. Please request a new one.
           </Typography>
         )}
@@ -143,8 +157,8 @@ const OtpModal = ({ email, onVerify, open, onClose }) => {
         <Box sx={{ mt: 2, position: "relative" }}>
           <Button
             onClick={verifyOtp}
-            variant="contained"
-            color="primary"
+            variant='contained'
+            color='primary'
             fullWidth
             disabled={loading || timer === 0}
           >
@@ -166,8 +180,8 @@ const OtpModal = ({ email, onVerify, open, onClose }) => {
 
         <Button
           onClick={onClose}
-          variant="text"
-          color="secondary"
+          variant='text'
+          color='secondary'
           fullWidth
           sx={{ mt: 1 }}
         >
