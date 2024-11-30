@@ -25,15 +25,15 @@ import {
   Typography,
   useMediaQuery,
 } from "@mui/material";
+import { useModalContext } from "./modalcontext";
 
 const Home = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
   const isMobile = useMediaQuery("(max-width:600px)");
-  const [isModalLoginOpen, setIsLoginModalOpen] = useState(false);
-  const [isModalSignupOpen, setIsSignupModalOpen] = useState(false);
-  const [isModalPassresetOpen, setIsPassresetModalOpen] = useState(false);
+  const { openLoginModal, openSignupModal, openPassresetModal } =
+    useModalContext();
 
   const departments = [
     {
@@ -116,29 +116,6 @@ const Home = () => {
   };
   const toggleConfirmPasswordVisibility = () => {
     setShowConfirmPassword((prev) => !prev);
-  };
-  const handleOpenLoginModal = () => {
-    setIsLoginModalOpen(true);
-  };
-
-  const handleCloseLoginModal = () => {
-    setIsLoginModalOpen(false);
-  };
-
-  const handleOpenSignupModal = () => {
-    setIsSignupModalOpen(true);
-  };
-
-  const handleCloseSignupModal = () => {
-    setIsSignupModalOpen(false);
-  };
-
-  const handleOpenPassresetModal = () => {
-    setIsPassresetModalOpen(true);
-  };
-
-  const handleClosePassresetModal = () => {
-    setIsPassresetModalOpen(false);
   };
 
   const handleReadMore = () => {
@@ -280,7 +257,7 @@ const Home = () => {
                 <Button
                   variant='contained'
                   key={"Get Started"}
-                  onClick={() => handleOpenLoginModal(true)}
+                  onClick={openLoginModal}
                   sx={{
                     backgroundColor: "#CA031B",
                     color: "#FFF",
@@ -340,20 +317,20 @@ const Home = () => {
         </Box>
 
         <LoginModal
-          isOpen={isModalLoginOpen}
-          handleClose={handleCloseLoginModal}
-          handleOpenSignup={handleOpenSignupModal}
-          handleOpenPassreset={handleOpenPassresetModal}
+          isOpen={openLoginModal.isOpen}
+          handleClose={openLoginModal.handleClose}
+          handleOpenSignup={openSignupModal}
+          handleOpenPassreset={openPassresetModal}
         />
         <SignupModal
-          isOpen={isModalSignupOpen}
-          handleClose={handleCloseSignupModal}
-          handleOpenLogin={handleOpenLoginModal} // Pass function to open LoginModal after signup
+          isOpen={openSignupModal.isOpen}
+          handleClose={openSignupModal.handleClose}
+          handleOpenLogin={openLoginModal} // Pass function to open LoginModal after signup
         />
         <PasswordResetModal
-          isOpen={isModalPassresetOpen}
-          handleClose={handleClosePassresetModal}
-          handleOpenLogin={handleOpenLoginModal}
+          isOpen={openPassresetModal.isOpen}
+          handleClose={openPassresetModal.handleClose}
+          handleOpenLogin={openLoginModal}
         />
       </Box>
     </>
