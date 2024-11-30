@@ -89,21 +89,28 @@ const SignUpModal = () => {
   const [signupTriggered, setSignupTriggered] = useState(false);
 
   const handleVerification = async (verified, signupData) => {
-    setIsVerified(verified);
-
     if (verified && signupData) {
-      // Handle successful signup (e.g., store token, redirect, show success message)
-      if (signupData.token) {
-        // Store the token if needed
-        localStorage.setItem("token", signupData.token);
+      try {
+        // Close both modals
+        setIsModalOpen(false); // Close OTP modal
+        closeSignupModal(); // Close signup modal
+
+        // Reset all states
+        resetFields();
+        setPasswordErrors([]);
+        setReasonError("");
+        setIsVerified(false);
+        setSignupTriggered(false);
+
+        // Show success message and open login modal
+        alert("Account created successfully! Please login to continue.");
+        openLoginModal();
+      } catch (error) {
+        console.error("Error during verification handling:", error);
+        alert(
+          "There was an error completing your registration. Please try again."
+        );
       }
-
-      // Close modals and show success message
-      handleModalClose();
-      alert("Account created successfully!");
-
-      // Optionally redirect or open login modal
-      openLoginModal();
     }
   };
 
@@ -149,26 +156,25 @@ const SignUpModal = () => {
     setReasonError("");
     setInstitutionError("");
 
-    // Validate institution
+    // Validate institution and reason
     if (!formData.institution || !formData.institution.trim()) {
       setInstitutionError("Institution is required");
       return;
     }
 
-    // Validate reason
     if (!formData.reason || !formData.reason.trim()) {
       setReasonError("Reason is required");
       return;
     }
 
-    // Validate email format first
+    // Validate email format
     if (!validateEmail(formData.email)) {
       alert("Invalid email format.");
       return;
     }
 
     try {
-      // Check if email exists first using accounts API
+      // Check if email exists
       const emailCheckResponse = await axios.get(
         `/accounts/check_email?email=${formData.email}`
       );
@@ -186,18 +192,21 @@ const SignUpModal = () => {
       }
 
       // Verify passwords match
-      if (
-        formData.password.length >= 8 &&
-        formData.confirmPassword.length >= 8 &&
-        formData.password !== formData.confirmPassword
-      ) {
+      if (formData.password !== formData.confirmPassword) {
         setPasswordErrors(["Passwords do not match"]);
         return;
       }
 
-      // If email is unique and all validations pass, open OTP modal
-      setSignupTriggered(true);
-      setIsModalOpen(true);
+      // Send OTP
+      const otpResponse = await axios.post("/auth/send_otp", {
+        email: formData.email,
+        isPasswordReset: false,
+      });
+
+      if (otpResponse.status === 200) {
+        setSignupTriggered(true);
+        setIsModalOpen(true);
+      }
     } catch (error) {
       if (error.response) {
         alert(
@@ -216,7 +225,8 @@ const SignUpModal = () => {
     setReasonError(""); // Clear reason error
     setIsVerified(false); // Reset verification status
     setSignupTriggered(false); // Reset signup trigger
-    closeSignupModal(); // Close the modal
+    setIsModalOpen(false); // Close OTP modal
+    closeSignupModal(); // Close signup modal
   };
 
   return (
@@ -522,6 +532,7 @@ const SignUpModal = () => {
                   formData={formData}
                   onVerify={handleVerification}
                   onClose={() => setIsModalOpen(false)}
+                  isPasswordReset={false}
                 />
               </Box>
             </Box>

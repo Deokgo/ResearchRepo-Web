@@ -36,13 +36,17 @@ const Navbar = () => {
   const anchorRef = React.useRef < HTMLButtonElement > null;
   const navigate = useNavigate();
 
-  const [isModalLoginOpen, setIsLoginModalOpen] = useState(false);
-  const [isModalSignupOpen, setIsSignupModalOpen] = useState(false);
-  const [isModalPassresetOpen, setIsPassresetModalOpen] = useState(false);
+  const {
+    isLoginModalOpen,
+    openLoginModal,
+    closeLoginModal,
+    openSignupModal,
+    closeSignupModal,
+    openPassresetModal,
+    closePassresetModal,
+  } = useModalContext();
 
   const isMobile = useMediaQuery("(max-width:600px)");
-
-  const { openLoginModal } = useModalContext();
 
   {
     /*****************Event Handlers******************/
@@ -60,23 +64,23 @@ const Navbar = () => {
   };
 
   const handleCloseLoginModal = () => {
-    setIsLoginModalOpen(false);
+    closeLoginModal();
   };
 
   const handleOpenSignupModal = () => {
-    setIsSignupModalOpen(true);
+    openSignupModal();
   };
 
   const handleCloseSignupModal = () => {
-    setIsSignupModalOpen(false);
+    closeSignupModal();
   };
 
   const handleOpenPassresetModal = () => {
-    setIsPassresetModalOpen(true);
+    openPassresetModal();
   };
 
   const handleClosePassresetModal = () => {
-    setIsPassresetModalOpen(false);
+    closePassresetModal();
   };
 
   {
@@ -487,12 +491,7 @@ const Navbar = () => {
           </MenuItem>
         </Menu>
       </Toolbar>
-      <LoginModal
-        isOpen={isModalLoginOpen}
-        handleClose={handleCloseLoginModal}
-        handleOpenSignup={handleOpenSignupModal}
-        handleOpenPassreset={handleOpenPassresetModal}
-      />
+      <LoginModal />
     </AppBar>
   );
 };

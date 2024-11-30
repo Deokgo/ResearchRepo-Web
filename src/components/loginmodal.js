@@ -96,6 +96,11 @@ const LoginModal = () => {
     closeLoginModal();
   };
 
+  const handleForgotPassword = () => {
+    closeLoginModal();
+    openPassresetModal();
+  };
+
   return (
     <>
       {/*Log In Modal*/}
@@ -174,21 +179,13 @@ const LoginModal = () => {
                   Log in
                 </Button>
 
-                <Typography sx={{ marginTop: "20px" }}>
-                  {" "}
-                  <a
-                    href='#'
-                    onClick={(e) => {
-                      e.preventDefault();
-                      closeLoginModal();
-                      openPassresetModal();
-                      resetFields();
-                    }}
-                    style={{ color: "#3393EA" }}
-                  >
-                    Forgot Password
-                  </a>
-                </Typography>
+                <Button
+                  onClick={handleForgotPassword}
+                  color='primary'
+                  sx={{ textTransform: "none" }}
+                >
+                  Forgot Password?
+                </Button>
                 <Typography sx={{ marginTop: "20px" }}>
                   Don’t have an account?{" "}
                   <a

@@ -1,23 +1,33 @@
 import React, { useState } from "react";
-import { Box, Button, TextField, Typography, Modal } from "@mui/material";
+import axios from "axios";
+import {
+  Modal,
+  Box,
+  Typography,
+  TextField,
+  Button,
+  IconButton,
+  InputAdornment,
+} from "@mui/material";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
+import OtpModal from "./otpmodal";
 import { useModalContext } from "./modalcontext";
-import { Link } from "react-router-dom";
 
 const PasswordResetModal = () => {
-  const { isPassresetModalOpen, closePassresetModal, openLoginModal } =
-    useModalContext();
-
+  const { isPassresetModalOpen, closePassresetModal } = useModalContext();
+  const [email, setEmail] = useState("");
+  const [showOtpModal, setShowOtpModal] = useState(false);
+  const [isOtpVerified, setIsOtpVerified] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [passwordErrors, setPasswordErrors] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const [formValues, setFormValues] = useState({
     email: "",
+    newPassword: "",
+    confirmPassword: "",
   });
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormValues((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
 
   const modalStyle = {
     position: "absolute",
@@ -31,82 +41,123 @@ const PasswordResetModal = () => {
     borderRadius: "10px",
   };
 
-  // Handle form submission
-  const handleReset = async (e) => {
+  const handleEmailSubmit = async (e) => {
     e.preventDefault();
-    
+    setLoading(true);
+    setError("");
+
+    try {
+      // First check if email exists
+      const checkResponse = await axios.get(
+        `/accounts/check_email?email=${formValues.email}`
+      );
+
+      if (!checkResponse.data.exists) {
+        setError("Email not found in our records.");
+        return;
+      }
+
+      // If email exists, send OTP
+      await axios.post("/auth/send_otp", {
+        email: formValues.email,
+        isPasswordReset: true,
+      });
+      setShowOtpModal(true);
+    } catch (error) {
+      setError(
+        error.response?.data?.error ||
+          error.response?.data?.message ||
+          "Error sending OTP. Please try again."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleOtpVerified = (verified) => {
+    setIsOtpVerified(verified);
+    setShowOtpModal(false);
+  };
+
+  const handlePasswordSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+
+    // Add password validation
+    if (formValues.newPassword !== formValues.confirmPassword) {
+      setError("Passwords do not match");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const response = await axios.post("/auth/reset_password", {
+        email: formValues.email,
+        newPassword: formValues.newPassword,
+      });
+
+      if (response.status === 200) {
+        alert("Password reset successful!");
+        closePassresetModal();
+      }
+    } catch (error) {
+      setError(
+        error.response?.data?.message ||
+          error.response?.data?.error ||
+          "Error resetting password. Please try again."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleChange = (e) => {
+    setFormValues({
+      ...formValues,
+      [e.target.name]: e.target.value,
+    });
+    setError("");
   };
 
   return (
     <>
-      {/*Password Reset Modal*/}
       <Modal open={isPassresetModalOpen} onClose={closePassresetModal}>
         <Box sx={modalStyle}>
-          <Typography
-            variant='h6'
-            color='#0A438F'
-            fontWeight='500'
-            sx={{
-              textAlign: { xs: "center", md: "bottom" },
-            }}
-          >
+          <Typography variant='h6' color='#0A438F' fontWeight='500'>
             Mapúa MCL Research Repository
           </Typography>
-          <Typography
-            variant='h3'
-            color='#F40824'
-            fontWeight='700'
-            padding={3}
-            sx={{
-              textAlign: { xs: "center", md: "bottom" },
-            }}
-          >
+          <Typography variant='h3' color='#F40824' fontWeight='700' padding={3}>
             Password Reset
           </Typography>
-          <form onSubmit={handleReset}>
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                marginLeft: "4rem",
-                marginRight: "4rem",
-              }}
-            >
-              <TextField
-                label='Email'
-                fullWidth
-                name='email'
-                type='email'
-                value={formValues.email}
-                onChange={handleChange}
-                margin='normal'
-                variant='outlined'
-              />
+
+          {!isOtpVerified ? (
+            <form onSubmit={handleEmailSubmit}>
               <Box
                 sx={{
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "center",
-                  marginTop: "20px",
+                  mx: "4rem",
                 }}
               >
-                <Typography sx={{ marginTop: "20px" }}>
-                  Did not receive the OTP?{" "}
-                    <a
-                        href='#'
-                        onClick={(e) => {
-                        e.preventDefault();
-                        }}
-                        style={{ color: "#3393EA" }}
-                    >
-                    Resend OTP
-                    </a>
-                </Typography>
+                <TextField
+                  label='Email'
+                  fullWidth
+                  name='email'
+                  type='email'
+                  value={formValues.email}
+                  onChange={handleChange}
+                  margin='normal'
+                  variant='outlined'
+                  error={Boolean(error)}
+                  helperText={error}
+                />
                 <Button
                   type='submit'
                   fullWidth
                   variant='contained'
+                  disabled={loading}
                   sx={{
                     maxWidth: "200px",
                     marginTop: "20px",
@@ -114,13 +165,97 @@ const PasswordResetModal = () => {
                     backgroundColor: "#EC1F28",
                   }}
                 >
-                  Send OTP
+                  {loading ? "Sending OTP..." : "Send OTP"}
                 </Button>
               </Box>
-            </Box>
-          </form>
+            </form>
+          ) : (
+            <form onSubmit={handlePasswordSubmit}>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  mx: "4rem",
+                }}
+              >
+                <TextField
+                  label='New Password'
+                  fullWidth
+                  name='newPassword'
+                  type={showPassword ? "text" : "password"}
+                  value={formValues.newPassword}
+                  onChange={handleChange}
+                  margin='normal'
+                  variant='outlined'
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position='end'>
+                        <IconButton
+                          onClick={() => setShowPassword(!showPassword)}
+                        >
+                          {showPassword ? <VisibilityOff /> : <Visibility />}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+                <TextField
+                  label='Confirm Password'
+                  fullWidth
+                  name='confirmPassword'
+                  type={showConfirmPassword ? "text" : "password"}
+                  value={formValues.confirmPassword}
+                  onChange={handleChange}
+                  margin='normal'
+                  variant='outlined'
+                  error={Boolean(error)}
+                  helperText={error}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position='end'>
+                        <IconButton
+                          onClick={() =>
+                            setShowConfirmPassword(!showConfirmPassword)
+                          }
+                        >
+                          {showConfirmPassword ? (
+                            <VisibilityOff />
+                          ) : (
+                            <Visibility />
+                          )}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+                <Button
+                  type='submit'
+                  fullWidth
+                  variant='contained'
+                  disabled={loading}
+                  sx={{
+                    maxWidth: "200px",
+                    marginTop: "20px",
+                    padding: "15px",
+                    backgroundColor: "#EC1F28",
+                  }}
+                >
+                  {loading ? "Updating..." : "Update Password"}
+                </Button>
+              </Box>
+            </form>
+          )}
         </Box>
       </Modal>
+
+      <OtpModal
+        open={showOtpModal}
+        onClose={() => setShowOtpModal(false)}
+        email={formValues.email}
+        onVerify={handleOtpVerified}
+        isPasswordReset={true}
+      />
     </>
   );
 };
