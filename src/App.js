@@ -20,6 +20,7 @@ import { AuthProvider } from "./context/AuthContext";
 import MainDash from "./components/maindash";
 import PubDash from "./components/pubdash";
 import DisplayResearchInfo from "./components/displayresearchinfo";
+import DisplayAuditLog from "./components/auditlog";
 
 function App() {
   const [data, setData] = useState([{}]);
@@ -140,6 +141,14 @@ function App() {
               element={
                 <PrivateRoute>
                   <ManageUsers />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path='/auditlog'
+              element={
+                <PrivateRoute>
+                  <DisplayAuditLog />
                 </PrivateRoute>
               }
             />

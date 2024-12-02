@@ -138,6 +138,10 @@ const Navbar = () => {
     navigate("/manageprogram");
   };
 
+  const handleViewAuditLog = () => {
+    navigate("/auditlog");
+  };
+
   const handleKnowledgeGraph = () => {
     navigate("/knowledgegraph");
   };
@@ -488,6 +492,9 @@ const Navbar = () => {
           </MenuItem>
           <MenuItem onClick={handleManageProgram}>
             <Typography color='common.white'>Manage Program</Typography>
+          </MenuItem>
+          <MenuItem onClick={handleViewAuditLog}>
+            <Typography color='common.white'>View Audit Logs</Typography>
           </MenuItem>
         </Menu>
       </Toolbar>
