@@ -166,9 +166,31 @@ const Navbar = () => {
     navigate("/home");
   };
 
-  const handleLogout = () => {
-    logout();
-    navigate("/home");
+  const handleLogout = async () => {
+    try {
+      // Call the logout API
+      const response = await fetch("/auth/logout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`, // Use appropriate token storage
+        },
+      });
+  
+      if (response.ok) {
+        // Clear the token from storage
+        localStorage.removeItem("token");
+        // Navigate to home
+        navigate("/home");
+      } else {
+        const errorData = await response.json();
+        console.error("Logout failed:", errorData.message);
+        // Optionally, show an error message to the user
+      }
+    } catch (error) {
+      console.error("An error occurred during logout:", error);
+      // Optionally, show an error message to the user
+    }
   };
 
   const mobileMenuItems = user

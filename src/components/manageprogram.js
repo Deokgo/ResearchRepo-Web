@@ -301,7 +301,7 @@ const ManageProgram = () => {
         console.error("Error response:", error.response.data);
         alert(
           `Failed to delete college: ${
-            error.response.data.error || "Please try again."
+            "This program is currently used by the institution."
           }`
         );
       } else {

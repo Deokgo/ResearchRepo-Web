@@ -259,7 +259,7 @@ const ManageCollege = () => {
         console.error("Error response:", error.response.data);
         alert(
           `Failed to delete college: ${
-            error.response.data.error || "Please try again."
+            "This college department is currently used by the institution."
           }`
         );
       } else {
