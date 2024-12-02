@@ -59,33 +59,43 @@ const ResearchThrust = () => {
     {
       id: 1,
       name: "Mapúa Institute of Technology at Laguna",
-      description: "Leading the future of engineering and technology.",
+      description: "Mapúa Institute of Technology at Laguna (MITL) is committed to advancing research that addresses global challenges through sustainable development, technological innovation, and societal impact, in alignment with the United Nations \
+      Sustainable Development Goals (SDGs). Its research agenda emphasizes interdisciplinary collaboration to create breakthrough solutions that enhance quality of life, drive economic growth, and protect the environment. Focus areas include green architecture,\
+       renewable energy, intelligent systems, and advanced manufacturing processes, integrating sustainability and cutting-edge technologies to solve real-world problems. By fostering innovation and equipping students with transformative research opportunities, \
+       MITL prepares them to become leaders who shape smarter, safer, and more sustainable communities.",
       image: placeholderImage, // Placeholder for image path
     },
     {
       id: 2,
       name: "College of Computer and Information Science",
-      description: "Innovating through computer science and IT.",
+      description: "The College of Computer and Information Science (CCIS) is dedicated to advancing research in computing technologies that support innovation, security, and the development of solutions for complex global problems. With a focus on \
+      interdisciplinary collaboration, CCIS research integrates computer science, data analytics, and information technology to provide actionable solutions that benefit industries and society. The college's research initiatives aim to push the boundaries \
+      of digital technologies while emphasizing sustainability, cybersecurity, and intelligent systems for the future.",
       image: placeholderImage, // Placeholder for image path
     },
     {
       id: 3,
       name: "College of Arts and Science",
-      description: "Fostering creativity and scientific knowledge.",
+      description: "The College of Arts and Science (CAS) fosters interdisciplinary research aimed at addressing contemporary challenges in communication, multimedia arts, and human interaction. With a strong focus on the social, cultural, and technological \
+      aspects of communication, CAS engages in innovative projects that bridge the gap between theory and practice. Research initiatives are designed to enhance understanding of how media, technology, and communication influence society, and how these fields can be \
+      harnessed for positive societal transformation. The research agenda aligns with the broader goals of enhancing education, fostering creativity, and contributing to global sustainable development.",
       image: placeholderImage, // Placeholder for image path
     },
     {
       id: 4,
       name: "E.T. Yuchengco College of Business",
       description:
-        "Amplifying student voices; nurturing student leaders — for success in today's business world.",
+        "The E.T. Yuchengco College of Business is committed to fostering cutting-edge research that empowers future business leaders to navigate complex global markets. The research agenda of the college emphasizes innovation, sustainability, and the application of business \
+        intelligence in real-world contexts. The research initiatives are designed to drive advancements in various business sectors, promote ethical practices, and contribute to the sustainable growth of industries.",
       image: placeholderImage,
     }, // Placeholder for image path
     {
       id: 5,
       name: "College of Health Sciences",
       description:
-        "Amplifying student voices; nurturing student leaders — for success in today's business world.",
+        "The College of Health Sciences at MITL is dedicated to advancing research in health sciences that focuses on improving public health, healthcare practices, and quality of life. The research agenda of the college are designed to address pressing health challenges, \
+        promote innovations in medical technologies, and contribute to the sustainability of healthcare systems. By collaborating with local and international health organizations, the college aims to produce research that not only impacts clinical practice but also enhances\
+         the overall well-being of communities. The focus on sustainability and social impact drives research in disease prevention, health education, and healthcare equity.",
       image: placeholderImage,
     }, // Placeholder for image path
   ];
