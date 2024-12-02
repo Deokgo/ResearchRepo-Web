@@ -64,6 +64,57 @@ const ResearchThrust = () => {
        renewable energy, intelligent systems, and advanced manufacturing processes, integrating sustainability and cutting-edge technologies to solve real-world problems. By fostering innovation and equipping students with transformative research opportunities, \
        MITL prepares them to become leaders who shape smarter, safer, and more sustainable communities.",
       image: placeholderImage, // Placeholder for image path
+      programs: [
+        {
+          name: "Bachelor of Science in Architecture",
+          focusAreas: [
+            { title: "Sustainable Architecture & Urban Design", sdgs: [11, 13], description: "Eco-friendly buildings, energy-efficient urban spaces, and green architecture solutions." },
+            { title: "Smart Cities and Digital Architecture", sdgs: [9, 11], description: "IoT and automation for intelligent urban environments." },
+            { title: "Cultural and Environmental Heritage Preservation", sdgs: [11], description: "Preserving historical architecture while adopting modern, sustainable building practices." },
+          ],
+        },
+        {
+          name: "Bachelor of Science in Architecture",
+          focusAreas: [
+            { title: "Sustainable Architecture & Urban Design", sdgs: [11, 13], description: "Eco-friendly buildings, energy-efficient urban spaces, and green architecture solutions." },
+            { title: "Smart Cities and Digital Architecture", sdgs: [9, 11], description: "IoT and automation for intelligent urban environments." },
+            { title: "Cultural and Environmental Heritage Preservation", sdgs: [11], description: "Preserving historical architecture while adopting modern, sustainable building practices." },
+          ],
+        },
+        {
+          name: "Bachelor of Science in Architecture",
+          focusAreas: [
+            { title: "Sustainable Architecture & Urban Design", sdgs: [11, 13], description: "Eco-friendly buildings, energy-efficient urban spaces, and green architecture solutions." },
+            { title: "Smart Cities and Digital Architecture", sdgs: [9, 11], description: "IoT and automation for intelligent urban environments." },
+            { title: "Cultural and Environmental Heritage Preservation", sdgs: [11], description: "Preserving historical architecture while adopting modern, sustainable building practices." },
+          ],
+        },
+        {
+          name: "Bachelor of Science in Chemical Engineering",
+          focusAreas: [
+            { title: "Renewable Energy & Environmental Technologies", sdgs: [11, 13], description: "Eco-friendly buildings, energy-efficient urban spaces, and green architecture solutions." },
+            { title: "Green Chemical Engineering", sdgs: [9, 11], description: "IoT and automation for intelligent urban environments." },
+            { title: "Industrial Waste Treatment", sdgs: [12,6], description: "Preserving historical architecture while adopting modern, sustainable building practices." },
+          ],
+        },
+        {
+          name: "Bachelor of Science in Architecture",
+          focusAreas: [
+            { title: "Sustainable Architecture & Urban Design", sdgs: [11, 13], description: "Eco-friendly buildings, energy-efficient urban spaces, and green architecture solutions." },
+            { title: "Smart Cities and Digital Architecture", sdgs: [9, 11], description: "IoT and automation for intelligent urban environments." },
+            { title: "Cultural and Environmental Heritage Preservation", sdgs: [11], description: "Preserving historical architecture while adopting modern, sustainable building practices." },
+          ],
+        },
+        {
+          name: "Bachelor of Science in Architecture",
+          focusAreas: [
+            { title: "Sustainable Architecture & Urban Design", sdgs: [11, 13], description: "Eco-friendly buildings, energy-efficient urban spaces, and green architecture solutions." },
+            { title: "Smart Cities and Digital Architecture", sdgs: [9, 11], description: "IoT and automation for intelligent urban environments." },
+            { title: "Cultural and Environmental Heritage Preservation", sdgs: [11], description: "Preserving historical architecture while adopting modern, sustainable building practices." },
+          ],
+        },
+        // Repeat for other programs...
+      ],
     },
     {
       id: 2,
@@ -72,6 +123,57 @@ const ResearchThrust = () => {
       interdisciplinary collaboration, CCIS research integrates computer science, data analytics, and information technology to provide actionable solutions that benefit industries and society. The college's research initiatives aim to push the boundaries \
       of digital technologies while emphasizing sustainability, cybersecurity, and intelligent systems for the future.",
       image: placeholderImage, // Placeholder for image path
+      programs: [
+        {
+          name: "Bachelor of Science in Architecture",
+          focusAreas: [
+            { title: "Sustainable Architecture & Urban Design", sdgs: [11, 13], description: "Eco-friendly buildings, energy-efficient urban spaces, and green architecture solutions." },
+            { title: "Smart Cities and Digital Architecture", sdgs: [9, 11], description: "IoT and automation for intelligent urban environments." },
+            { title: "Cultural and Environmental Heritage Preservation", sdgs: [11], description: "Preserving historical architecture while adopting modern, sustainable building practices." },
+          ],
+        },
+        {
+          name: "Bachelor of Science in Architecture",
+          focusAreas: [
+            { title: "Sustainable Architecture & Urban Design", sdgs: [11, 13], description: "Eco-friendly buildings, energy-efficient urban spaces, and green architecture solutions." },
+            { title: "Smart Cities and Digital Architecture", sdgs: [9, 11], description: "IoT and automation for intelligent urban environments." },
+            { title: "Cultural and Environmental Heritage Preservation", sdgs: [11], description: "Preserving historical architecture while adopting modern, sustainable building practices." },
+          ],
+        },
+        {
+          name: "Bachelor of Science in Architecture",
+          focusAreas: [
+            { title: "Sustainable Architecture & Urban Design", sdgs: [11, 13], description: "Eco-friendly buildings, energy-efficient urban spaces, and green architecture solutions." },
+            { title: "Smart Cities and Digital Architecture", sdgs: [9, 11], description: "IoT and automation for intelligent urban environments." },
+            { title: "Cultural and Environmental Heritage Preservation", sdgs: [11], description: "Preserving historical architecture while adopting modern, sustainable building practices." },
+          ],
+        },
+        {
+          name: "Bachelor of Science in Chemical Engineering",
+          focusAreas: [
+            { title: "Renewable Energy & Environmental Technologies", sdgs: [11, 13], description: "Eco-friendly buildings, energy-efficient urban spaces, and green architecture solutions." },
+            { title: "Green Chemical Engineering", sdgs: [9, 11], description: "IoT and automation for intelligent urban environments." },
+            { title: "Industrial Waste Treatment", sdgs: [12,6], description: "Preserving historical architecture while adopting modern, sustainable building practices." },
+          ],
+        },
+        {
+          name: "Bachelor of Science in Architecture",
+          focusAreas: [
+            { title: "Sustainable Architecture & Urban Design", sdgs: [11, 13], description: "Eco-friendly buildings, energy-efficient urban spaces, and green architecture solutions." },
+            { title: "Smart Cities and Digital Architecture", sdgs: [9, 11], description: "IoT and automation for intelligent urban environments." },
+            { title: "Cultural and Environmental Heritage Preservation", sdgs: [11], description: "Preserving historical architecture while adopting modern, sustainable building practices." },
+          ],
+        },
+        {
+          name: "Bachelor of Science in Architecture",
+          focusAreas: [
+            { title: "Sustainable Architecture & Urban Design", sdgs: [11, 13], description: "Eco-friendly buildings, energy-efficient urban spaces, and green architecture solutions." },
+            { title: "Smart Cities and Digital Architecture", sdgs: [9, 11], description: "IoT and automation for intelligent urban environments." },
+            { title: "Cultural and Environmental Heritage Preservation", sdgs: [11], description: "Preserving historical architecture while adopting modern, sustainable building practices." },
+          ],
+        },
+        // Repeat for other programs...
+      ],
     },
     {
       id: 3,
@@ -80,6 +182,57 @@ const ResearchThrust = () => {
       aspects of communication, CAS engages in innovative projects that bridge the gap between theory and practice. Research initiatives are designed to enhance understanding of how media, technology, and communication influence society, and how these fields can be \
       harnessed for positive societal transformation. The research agenda aligns with the broader goals of enhancing education, fostering creativity, and contributing to global sustainable development.",
       image: placeholderImage, // Placeholder for image path
+      programs: [
+        {
+          name: "Bachelor of Science in Architecture",
+          focusAreas: [
+            { title: "Sustainable Architecture & Urban Design", sdgs: [11, 13], description: "Eco-friendly buildings, energy-efficient urban spaces, and green architecture solutions." },
+            { title: "Smart Cities and Digital Architecture", sdgs: [9, 11], description: "IoT and automation for intelligent urban environments." },
+            { title: "Cultural and Environmental Heritage Preservation", sdgs: [11], description: "Preserving historical architecture while adopting modern, sustainable building practices." },
+          ],
+        },
+        {
+          name: "Bachelor of Science in Architecture",
+          focusAreas: [
+            { title: "Sustainable Architecture & Urban Design", sdgs: [11, 13], description: "Eco-friendly buildings, energy-efficient urban spaces, and green architecture solutions." },
+            { title: "Smart Cities and Digital Architecture", sdgs: [9, 11], description: "IoT and automation for intelligent urban environments." },
+            { title: "Cultural and Environmental Heritage Preservation", sdgs: [11], description: "Preserving historical architecture while adopting modern, sustainable building practices." },
+          ],
+        },
+        {
+          name: "Bachelor of Science in Architecture",
+          focusAreas: [
+            { title: "Sustainable Architecture & Urban Design", sdgs: [11, 13], description: "Eco-friendly buildings, energy-efficient urban spaces, and green architecture solutions." },
+            { title: "Smart Cities and Digital Architecture", sdgs: [9, 11], description: "IoT and automation for intelligent urban environments." },
+            { title: "Cultural and Environmental Heritage Preservation", sdgs: [11], description: "Preserving historical architecture while adopting modern, sustainable building practices." },
+          ],
+        },
+        {
+          name: "Bachelor of Science in Chemical Engineering",
+          focusAreas: [
+            { title: "Renewable Energy & Environmental Technologies", sdgs: [11, 13], description: "Eco-friendly buildings, energy-efficient urban spaces, and green architecture solutions." },
+            { title: "Green Chemical Engineering", sdgs: [9, 11], description: "IoT and automation for intelligent urban environments." },
+            { title: "Industrial Waste Treatment", sdgs: [12,6], description: "Preserving historical architecture while adopting modern, sustainable building practices." },
+          ],
+        },
+        {
+          name: "Bachelor of Science in Architecture",
+          focusAreas: [
+            { title: "Sustainable Architecture & Urban Design", sdgs: [11, 13], description: "Eco-friendly buildings, energy-efficient urban spaces, and green architecture solutions." },
+            { title: "Smart Cities and Digital Architecture", sdgs: [9, 11], description: "IoT and automation for intelligent urban environments." },
+            { title: "Cultural and Environmental Heritage Preservation", sdgs: [11], description: "Preserving historical architecture while adopting modern, sustainable building practices." },
+          ],
+        },
+        {
+          name: "Bachelor of Science in Architecture",
+          focusAreas: [
+            { title: "Sustainable Architecture & Urban Design", sdgs: [11, 13], description: "Eco-friendly buildings, energy-efficient urban spaces, and green architecture solutions." },
+            { title: "Smart Cities and Digital Architecture", sdgs: [9, 11], description: "IoT and automation for intelligent urban environments." },
+            { title: "Cultural and Environmental Heritage Preservation", sdgs: [11], description: "Preserving historical architecture while adopting modern, sustainable building practices." },
+          ],
+        },
+        // Repeat for other programs...
+      ],
     },
     {
       id: 4,
@@ -88,7 +241,58 @@ const ResearchThrust = () => {
         "The E.T. Yuchengco College of Business is committed to fostering cutting-edge research that empowers future business leaders to navigate complex global markets. The research agenda of the college emphasizes innovation, sustainability, and the application of business \
         intelligence in real-world contexts. The research initiatives are designed to drive advancements in various business sectors, promote ethical practices, and contribute to the sustainable growth of industries.",
       image: placeholderImage,
-    }, // Placeholder for image path
+      programs: [
+        {
+          name: "Bachelor of Science in Architecture",
+          focusAreas: [
+            { title: "Sustainable Architecture & Urban Design", sdgs: [11, 13], description: "Eco-friendly buildings, energy-efficient urban spaces, and green architecture solutions." },
+            { title: "Smart Cities and Digital Architecture", sdgs: [9, 11], description: "IoT and automation for intelligent urban environments." },
+            { title: "Cultural and Environmental Heritage Preservation", sdgs: [11], description: "Preserving historical architecture while adopting modern, sustainable building practices." },
+          ],
+        },
+        {
+          name: "Bachelor of Science in Architecture",
+          focusAreas: [
+            { title: "Sustainable Architecture & Urban Design", sdgs: [11, 13], description: "Eco-friendly buildings, energy-efficient urban spaces, and green architecture solutions." },
+            { title: "Smart Cities and Digital Architecture", sdgs: [9, 11], description: "IoT and automation for intelligent urban environments." },
+            { title: "Cultural and Environmental Heritage Preservation", sdgs: [11], description: "Preserving historical architecture while adopting modern, sustainable building practices." },
+          ],
+        },
+        {
+          name: "Bachelor of Science in Architecture",
+          focusAreas: [
+            { title: "Sustainable Architecture & Urban Design", sdgs: [11, 13], description: "Eco-friendly buildings, energy-efficient urban spaces, and green architecture solutions." },
+            { title: "Smart Cities and Digital Architecture", sdgs: [9, 11], description: "IoT and automation for intelligent urban environments." },
+            { title: "Cultural and Environmental Heritage Preservation", sdgs: [11], description: "Preserving historical architecture while adopting modern, sustainable building practices." },
+          ],
+        },
+        {
+          name: "Bachelor of Science in Chemical Engineering",
+          focusAreas: [
+            { title: "Renewable Energy & Environmental Technologies", sdgs: [11, 13], description: "Eco-friendly buildings, energy-efficient urban spaces, and green architecture solutions." },
+            { title: "Green Chemical Engineering", sdgs: [9, 11], description: "IoT and automation for intelligent urban environments." },
+            { title: "Industrial Waste Treatment", sdgs: [12,6], description: "Preserving historical architecture while adopting modern, sustainable building practices." },
+          ],
+        },
+        {
+          name: "Bachelor of Science in Architecture",
+          focusAreas: [
+            { title: "Sustainable Architecture & Urban Design", sdgs: [11, 13], description: "Eco-friendly buildings, energy-efficient urban spaces, and green architecture solutions." },
+            { title: "Smart Cities and Digital Architecture", sdgs: [9, 11], description: "IoT and automation for intelligent urban environments." },
+            { title: "Cultural and Environmental Heritage Preservation", sdgs: [11], description: "Preserving historical architecture while adopting modern, sustainable building practices." },
+          ],
+        },
+        {
+          name: "Bachelor of Science in Architecture",
+          focusAreas: [
+            { title: "Sustainable Architecture & Urban Design", sdgs: [11, 13], description: "Eco-friendly buildings, energy-efficient urban spaces, and green architecture solutions." },
+            { title: "Smart Cities and Digital Architecture", sdgs: [9, 11], description: "IoT and automation for intelligent urban environments." },
+            { title: "Cultural and Environmental Heritage Preservation", sdgs: [11], description: "Preserving historical architecture while adopting modern, sustainable building practices." },
+          ],
+        },
+        // Repeat for other programs...
+      ],
+    }, 
     {
       id: 5,
       name: "College of Health Sciences",
@@ -97,7 +301,58 @@ const ResearchThrust = () => {
         promote innovations in medical technologies, and contribute to the sustainability of healthcare systems. By collaborating with local and international health organizations, the college aims to produce research that not only impacts clinical practice but also enhances\
          the overall well-being of communities. The focus on sustainability and social impact drives research in disease prevention, health education, and healthcare equity.",
       image: placeholderImage,
-    }, // Placeholder for image path
+      programs: [
+        {
+          name: "Bachelor of Science in Architecture",
+          focusAreas: [
+            { title: "Sustainable Architecture & Urban Design", sdgs: [11, 13], description: "Eco-friendly buildings, energy-efficient urban spaces, and green architecture solutions." },
+            { title: "Smart Cities and Digital Architecture", sdgs: [9, 11], description: "IoT and automation for intelligent urban environments." },
+            { title: "Cultural and Environmental Heritage Preservation", sdgs: [11], description: "Preserving historical architecture while adopting modern, sustainable building practices." },
+          ],
+        },
+        {
+          name: "Bachelor of Science in Architecture",
+          focusAreas: [
+            { title: "Sustainable Architecture & Urban Design", sdgs: [11, 13], description: "Eco-friendly buildings, energy-efficient urban spaces, and green architecture solutions." },
+            { title: "Smart Cities and Digital Architecture", sdgs: [9, 11], description: "IoT and automation for intelligent urban environments." },
+            { title: "Cultural and Environmental Heritage Preservation", sdgs: [11], description: "Preserving historical architecture while adopting modern, sustainable building practices." },
+          ],
+        },
+        {
+          name: "Bachelor of Science in Architecture",
+          focusAreas: [
+            { title: "Sustainable Architecture & Urban Design", sdgs: [11, 13], description: "Eco-friendly buildings, energy-efficient urban spaces, and green architecture solutions." },
+            { title: "Smart Cities and Digital Architecture", sdgs: [9, 11], description: "IoT and automation for intelligent urban environments." },
+            { title: "Cultural and Environmental Heritage Preservation", sdgs: [11], description: "Preserving historical architecture while adopting modern, sustainable building practices." },
+          ],
+        },
+        {
+          name: "Bachelor of Science in Chemical Engineering",
+          focusAreas: [
+            { title: "Renewable Energy & Environmental Technologies", sdgs: [11, 13], description: "Eco-friendly buildings, energy-efficient urban spaces, and green architecture solutions." },
+            { title: "Green Chemical Engineering", sdgs: [9, 11], description: "IoT and automation for intelligent urban environments." },
+            { title: "Industrial Waste Treatment", sdgs: [12,6], description: "Preserving historical architecture while adopting modern, sustainable building practices." },
+          ],
+        },
+        {
+          name: "Bachelor of Science in Architecture",
+          focusAreas: [
+            { title: "Sustainable Architecture & Urban Design", sdgs: [11, 13], description: "Eco-friendly buildings, energy-efficient urban spaces, and green architecture solutions." },
+            { title: "Smart Cities and Digital Architecture", sdgs: [9, 11], description: "IoT and automation for intelligent urban environments." },
+            { title: "Cultural and Environmental Heritage Preservation", sdgs: [11], description: "Preserving historical architecture while adopting modern, sustainable building practices." },
+          ],
+        },
+        {
+          name: "Bachelor of Science in Architecture",
+          focusAreas: [
+            { title: "Sustainable Architecture & Urban Design", sdgs: [11, 13], description: "Eco-friendly buildings, energy-efficient urban spaces, and green architecture solutions." },
+            { title: "Smart Cities and Digital Architecture", sdgs: [9, 11], description: "IoT and automation for intelligent urban environments." },
+            { title: "Cultural and Environmental Heritage Preservation", sdgs: [11], description: "Preserving historical architecture while adopting modern, sustainable building practices." },
+          ],
+        },
+        // Repeat for other programs...
+      ],
+    }, 
   ];
 
   const handleSearchChange = (e) => {
@@ -208,39 +463,54 @@ const ResearchThrust = () => {
                 {departments.map((department) => (
                   <Box key={department.id} sx={{ m: 2 }}>
                     <Accordion
-                     expanded={expandedPanel === department.id}
-                     onChange={handleAccordionChange(department.id)}
+                      expanded={expandedPanel === department.id}
+                      onChange={handleAccordionChange(department.id)}
                     >
-                      <AccordionSummary expandIcon={<ExpandMoreIcon/>}>
+                      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                         <Typography
-                          variant='h5'
+                          variant="h5"
                           sx={{
                             padding: 2,
                             fontWeight: 700,
                             fontFamily: "Montserrat, sans-serif",
                             color: "#08397C",
-                            minHeight: "3rem",
-                            lineHeight: 1.2,
-                            WebkitBoxOrient: "vertical",
                           }}
                         >
                           {department.name}
                         </Typography>
                       </AccordionSummary>
                       <AccordionDetails>
-                        <Typography
-                          variant='h7'
-                          sx={{
-                            paddingLeft: 2,
-                            fontWeight: 500,
-                            fontFamily: "Montserrat, sans-serif",
-                            minHeight: "3rem",
-                            lineHeight: 1.2,
-                            WebkitBoxOrient: "vertical",
-                          }}
-                        >
-                          {department.description}
-                        </Typography>
+                        <Typography sx={{ padding: 2 }}>{department.description}</Typography>
+                        <Divider sx={{ marginY: 2 }} />
+                        {department.programs.map((program, index) => (
+                          <Accordion key={index}>
+                            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                              <Typography
+                                variant="h6"
+                                sx={{
+                                  fontWeight: 600,
+                                  fontFamily: "Montserrat, sans-serif",
+                                  color: "#08397C",
+                                }}
+                              >
+                                {program.name}
+                              </Typography>
+                            </AccordionSummary>
+                            <AccordionDetails>
+                              {program.focusAreas.map((focus, idx) => (
+                                <Box key={idx} sx={{ marginBottom: 2 }}>
+                                  <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+                                    {focus.title}
+                                  </Typography>
+                                  <Typography variant="body2" sx={{ paddingLeft: 2 }}>
+                                    {focus.description} <br />
+                                    <b>SDGs:</b> {focus.sdgs.join(", ")}
+                                  </Typography>
+                                </Box>
+                              ))}
+                            </AccordionDetails>
+                          </Accordion>
+                        ))}
                       </AccordionDetails>
                     </Accordion>
                   </Box>
