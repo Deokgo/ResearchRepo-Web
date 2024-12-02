@@ -525,7 +525,6 @@ import {
                                     <Box sx={{ flex: 2 }}>User Email</Box>
                                     <Box sx={{ flex: 1 }}>Role</Box>
                                     <Box sx={{ flex: 1 }}>Action</Box>
-                                    <Box sx={{ flex: 1 }}>Resource</Box>
                                     <Box sx={{ flex: 1 }}>Record Reference</Box>
                                     <Box sx={{ flex: 1 }}>Date/Time</Box>
                                     <Box sx={{ flex: 1 }}>Details</Box>
@@ -547,7 +546,6 @@ import {
                                     <Box sx={{ flex: 2 }}>{log.email}</Box>
                                     <Box sx={{ flex: 1 }}>{log.role_name}</Box>
                                     <Box sx={{ flex: 1 }}>{log.operation}</Box>
-                                    <Box sx={{ flex: 1 }}>{log.table_name}</Box>
                                     <Box sx={{ flex: 1 }}>{log.record_id}</Box>
                                     <Box sx={{ flex: 1 }}>
                                     {new Date(log.changed_datetime).toLocaleString()}
