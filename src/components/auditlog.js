@@ -504,7 +504,7 @@ import {
                             <Typography>Loading...</Typography>
                         ) : (
                             <Virtuoso
-                            style={{ height: "500px" }}
+                            style={{ height: "550px" }}
                             totalCount={paginatedLogs.length}
                             components={{
                                 Header: () => (
@@ -521,11 +521,11 @@ import {
                                     zIndex: 1000,
                                     }}
                                 >
-                                    <Box sx={{ flex: 1 }}>Log ID</Box>
+                                    <Box sx={{ flex: 2 }}>Log ID</Box>
                                     <Box sx={{ flex: 2 }}>User Email</Box>
                                     <Box sx={{ flex: 1 }}>Role</Box>
                                     <Box sx={{ flex: 1 }}>Action</Box>
-                                    <Box sx={{ flex: 1 }}>Record Reference</Box>
+                                    <Box sx={{ flex: 1 }}>Reference</Box>
                                     <Box sx={{ flex: 1 }}>Date/Time</Box>
                                     <Box sx={{ flex: 1 }}>Details</Box>
                                 </Box>
@@ -542,7 +542,7 @@ import {
                                     borderBottom: "1px solid #ccc",
                                     }}
                                 >
-                                    <Box sx={{ flex: 1 }}>{log.audit_log}</Box>
+                                    <Box sx={{ flex: 2 }}>{log.audit_log}</Box>
                                     <Box sx={{ flex: 2 }}>{log.email}</Box>
                                     <Box sx={{ flex: 1 }}>{log.role_name}</Box>
                                     <Box sx={{ flex: 1 }}>{log.operation}</Box>

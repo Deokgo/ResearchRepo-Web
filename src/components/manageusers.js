@@ -35,6 +35,7 @@ import FileUploadIcon from "@mui/icons-material/FileUpload";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import ErrorIcon from "@mui/icons-material/Error";
+import EditIcon from '@mui/icons-material/Edit';
 
 const ManageUsers = () => {
   const [users, setUsers] = useState([]);
@@ -618,8 +619,8 @@ const ManageUsers = () => {
               sx={{
                 width: "80%", // Center search bar and button
                 display: "flex",
-                paddingTop: 2,
-                paddingBottom: 2,
+                paddingTop: 3,
+                paddingBottom: 3,
                 justifyContent: "space-between",
                 alignItems: "center",
               }}
@@ -686,8 +687,8 @@ const ManageUsers = () => {
                       >
                         <Box sx={{ flex: 1 }}>User ID</Box>
                         <Box sx={{ flex: 2 }}>Email</Box>
-                        <Box sx={{ flex: 1 }}>Role</Box>
-                        <Box sx={{ flex: 1 }}>Action</Box>
+                        <Box sx={{ flex: 2 }}>Role</Box>
+                        <Box sx={{ flex: 1 }}>Modify</Box>
                       </Box>
                     ),
                   }}
@@ -704,15 +705,13 @@ const ManageUsers = () => {
                       >
                         <Box sx={{ flex: 1 }}>{user.researcher_id}</Box>
                         <Box sx={{ flex: 2 }}>{user.email}</Box>
-                        <Box sx={{ flex: 1 }}>{user.role_name || "N/A"}</Box>
+                        <Box sx={{ flex: 2 }}>{user.role_name || "N/A"}</Box>
                         <Box sx={{ flex: 1 }}>
-                          <Button
-                            variant='text'
-                            color='primary'
+                          <IconButton
                             onClick={() => handleOpenModal(user)}
                           >
-                            Edit
-                          </Button>
+                            <EditIcon color='primary'/>
+                          </IconButton>
                         </Box>
                       </Box>
                     );
@@ -724,7 +723,6 @@ const ManageUsers = () => {
               <Modal
                 open={openModal}
                 onClose={handleCloseModal}
-                aria-labelledby='edit-user-role-modal'
               >
                 <Box
                   sx={{
@@ -732,15 +730,23 @@ const ManageUsers = () => {
                     top: "50%",
                     left: "50%",
                     transform: "translate(-50%, -50%)",
-                    width: 400,
+                    width: "30rem",
                     bgcolor: "background.paper",
                     boxShadow: 24,
-                    p: 4,
+                    p: 5,
                     borderRadius: "8px",
                   }}
                 >
-                  <Typography variant='h6' mb={3}>
-                    Edit User Account
+                  <Typography
+                    variant='h3'
+                    color='#08397C'
+                    fontWeight='1000'
+                    mb={4}
+                    sx={{
+                      textAlign: { xs: "left", md: "bottom" },
+                    }}
+                  >
+                    Edit User
                   </Typography>
                   <TextField
                     label='User ID'
@@ -782,7 +788,7 @@ const ManageUsers = () => {
                     </Select>
                   </FormControl>
                   <FormControl component='fieldset' margin='normal'>
-                    <FormLabel component='legend'>Account Status</FormLabel>
+                    <FormLabel component='legend' variant="h6" fontWeight="700" sx={{ mb: "0.5rem", color:'#d40821' }}>Account Status</FormLabel>
                     <RadioGroup
                       value={accountStatus} // Use state variable here
                       onChange={(e) => setAccountStatus(e.target.value)}
@@ -803,23 +809,50 @@ const ManageUsers = () => {
                     sx={{
                       display: "flex",
                       justifyContent: "space-between",
-                      mt: 3,
+                      mt: 5,
                     }}
                   >
                     <Button
-                      variant='outlined'
                       onClick={handleCloseModal}
-                      sx={{ fontWeight: 600 }}
+                      sx={{
+                        backgroundColor: "#08397C",
+                        color: "#FFF",
+                        fontFamily: "Montserrat, sans-serif",
+                        fontWeight: 600,
+                        fontSize: { xs: "0.875rem", md: "1.275rem" },
+                        padding: { xs: "0.5rem", md: "1.5rem" },
+                        borderRadius: "100px",
+                        maxHeight: "3rem",
+                        textTransform: "none",
+                        "&:hover": {
+                          backgroundColor: "#072d61",
+                        },
+                      }}
                     >
-                      Back
+                      Cancel
                     </Button>
                     <Button
                       variant='contained'
                       color='primary'
                       onClick={handleSaveChanges}
-                      sx={{ fontWeight: 600 }}
+                      sx={{
+                        backgroundColor: "#CA031B",
+                        color: "#FFF",
+                        fontFamily: "Montserrat, sans-serif",
+                        fontWeight: 600,
+                        textTransform: "none",
+                        fontSize: { xs: "0.875rem", md: "1.275rem" },
+                        padding: { xs: "0.5rem 1rem", md: "1.5rem" },
+                        marginLeft: "2rem",
+                        borderRadius: "100px",
+                        maxHeight: "3rem",
+                        "&:hover": {
+                          backgroundColor: "#A30417",
+                          color: "#FFF",
+                        },
+                      }}
                     >
-                      Save Changes
+                      Save
                     </Button>
                   </Box>
                 </Box>
@@ -828,6 +861,8 @@ const ManageUsers = () => {
           </Box>
         </Box>
       </Box>
+
+      {/* Add User Modal */}
       <Modal
         open={openAddModal}
         onClose={handleCloseAddModal}
@@ -839,17 +874,22 @@ const ManageUsers = () => {
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
-            width: "90%",
-            maxWidth: 1200,
+            width: "auto",
             bgcolor: "background.paper",
             boxShadow: 24,
-            p: 4,
+            p: 5,
             borderRadius: "8px",
-            maxHeight: "85vh",
-            overflow: "auto",
           }}
         >
-          <Typography variant='h6' mb={3}>
+          <Typography
+            variant='h3'
+            color='#08397C'
+            fontWeight='1000'
+            mb={4}
+            sx={{
+              textAlign: { xs: "left", md: "bottom" },
+            }}
+          >
             Add Users
           </Typography>
 
@@ -901,24 +941,50 @@ const ManageUsers = () => {
               </Select>
             </FormControl>
 
-            <Button
-              variant='contained'
-              component='label'
-              startIcon={<FileUploadIcon />}
-              sx={{ mb: 3 }}
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                border: '2px dashed #0A438F',
+                borderRadius: 1,
+                m: 1,
+                cursor: 'pointer',
+                justifyContent: 'center',
+                gap: 2,
+              }}
             >
-              Import from CSV
+              <Button
+                variant='text'
+                color="primary"
+                component='label'
+                startIcon={<FileUploadIcon />}
+                sx={{
+                  padding: '1rem',
+                  color: '#08397C',
+                  fontFamily: 'Montserrat, sans-serif',
+                  fontWeight: 600,
+                  textTransform: 'none',
+                  fontSize: { xs: '0.875rem', md: '1rem' },
+                  alignSelf: 'center',
+                  maxHeight: '2rem',
+                  '&:hover': {
+                    color: '#052045',
+                  },
+                }}
+              >
+                Import from CSV
               <input
                 type='file'
                 accept='.csv'
                 hidden
                 onChange={handleFileUpload}
               />
-            </Button>
+              </Button>
+            </Box>
           </Box>
 
           {/* Users Table */}
-          <TableContainer sx={{ mb: 3 }}>
+          <TableContainer sx={{ mb: 3, width: '80rem'}}>
             <Table>
               <TableHead>
                 <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
@@ -949,7 +1015,7 @@ const ManageUsers = () => {
                   </TableCell>
                   <TableCell>
                     <Typography variant='subtitle2' sx={{ fontWeight: 700 }}>
-                      Actions
+                      Action
                     </Typography>
                   </TableCell>
                 </TableRow>
@@ -1088,11 +1154,49 @@ const ManageUsers = () => {
             </Box>
 
             {/* Action buttons on the right */}
-            <Box sx={{ display: "flex", gap: 2 }}>
-              <Button onClick={handleCloseAddModal}>Cancel</Button>
+            <Box
+              sx={{
+                display: "flex", gap: 2
+              }}
+            >
+              <Button
+                onClick={handleCloseAddModal}
+                sx={{
+                  backgroundColor: "#08397C",
+                  color: "#FFF",
+                  fontFamily: "Montserrat, sans-serif",
+                  fontWeight: 600,
+                  fontSize: { xs: "0.875rem", md: "1.275rem" },
+                  padding: { xs: "0.5rem", md: "1.5rem" },
+                  borderRadius: "100px",
+                  maxHeight: "3rem",
+                  textTransform: "none",
+                  "&:hover": {
+                    backgroundColor: "#072d61",
+                  },
+                }}
+              >
+                Cancel
+              </Button>
               <Button
                 variant='contained'
+                color='primary'
                 onClick={handleAddUsers}
+                sx={{
+                  backgroundColor: "#CA031B",
+                  color: "#FFF",
+                  fontFamily: "Montserrat, sans-serif",
+                  fontWeight: 600,
+                  textTransform: "none",
+                  fontSize: { xs: "0.875rem", md: "1.275rem" },
+                  padding: { xs: "0.5rem 1rem", md: "1.5rem" },
+                  borderRadius: "100px",
+                  maxHeight: "3rem",
+                  "&:hover": {
+                    backgroundColor: "#A30417",
+                    color: "#FFF",
+                  },
+                }}
                 disabled={
                   !hasValidUsers() || // Disable if no valid users
                   !selectedRole ||

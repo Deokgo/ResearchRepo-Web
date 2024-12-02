@@ -11,10 +11,14 @@ import {
   IconButton,
   TextField,
   Modal,
+  Accordion,
+  AccordionDetails,
+  AccordionSummary
 } from "@mui/material";
 import placeholderImage from "../assets/placeholder_image.png";
 import homeBg from "../assets/home_bg.png";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
@@ -91,12 +95,12 @@ const ResearchThrust = () => {
     setSearchQuery(query);
   };
 
-  const handleOpenModal = () => {
-    setIsModalOpen(true);
-  };
+  // State to track which accordion is currently expanded
+  const [expandedPanel, setExpandedPanel] = useState(false);
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
+  // Handler for accordion expansion
+  const handleAccordionChange = (panel) => (event, isExpanded) => {
+    setExpandedPanel(isExpanded ? panel : false);
   };
 
   return (
@@ -162,74 +166,73 @@ const ResearchThrust = () => {
               </Typography>
             </Box>
           </Box>
+          
           {/* Content Section */}
           <Box
             sx={{
               display: "flex",
-              flexDirection: "column",
-              padding: 4,
-              width: "100%",
+              padding: 5,
+              justifyContent: 'space-around',
             }}
           >
             <Box
               sx={{
                 display: "flex",
                 flexDirection: "column",
-                paddingLeft: "12rem",
               }}
             >
               {/* Search Bar */}
               <TextField
                 variant='outlined'
-                placeholder='Search...'
+                placeholder='Search fields...'
                 value={searchQuery}
                 onChange={handleSearchChange}
-                sx={{ width: "30rem", paddingLeft: 5 }}
               />
               <Box
                 sx={{
+                  paddingTop: '2rem',
                   display: "flex",
-                  flexWrap: "wrap",
-                  width: "90%",
+                  flexDirection: 'column',
                 }}
               >
                 {departments.map((department) => (
-                  <Box key={department.id} sx={{ px: 3 }}>
-                    <Paper
-                      elevation={3}
-                      sx={{
-                        padding: 2,
-                        textAlign: "center",
-                        display: "flex",
-                        width: "20rem",
-                        margin: 2,
-                        flexDirection: "column",
-                        alignItems: "center",
-                      }}
+                  <Box key={department.id} sx={{ m: 2 }}>
+                    <Accordion
+                     expanded={expandedPanel === department.id}
+                     onChange={handleAccordionChange(department.id)}
                     >
-                      <img
-                        src={department.image}
-                        style={{
-                          width: "10rem",
-                          height: "8rem",
-                          padding: "1em",
-                        }}
-                        alt={department.name}
-                      />
-                      <Typography
-                        variant='h7'
-                        sx={{
-                          fontWeight: 600,
-                          fontFamily: "Montserrat, sans-serif",
-                          color: "#08397C",
-                          minHeight: "3rem",
-                          lineHeight: 1.2,
-                          WebkitBoxOrient: "vertical",
-                        }}
-                      >
-                        {department.name}
-                      </Typography>
-                    </Paper>
+                      <AccordionSummary expandIcon={<ExpandMoreIcon/>}>
+                        <Typography
+                          variant='h5'
+                          sx={{
+                            padding: 2,
+                            fontWeight: 700,
+                            fontFamily: "Montserrat, sans-serif",
+                            color: "#08397C",
+                            minHeight: "3rem",
+                            lineHeight: 1.2,
+                            WebkitBoxOrient: "vertical",
+                          }}
+                        >
+                          {department.name}
+                        </Typography>
+                      </AccordionSummary>
+                      <AccordionDetails>
+                        <Typography
+                          variant='h7'
+                          sx={{
+                            paddingLeft: 2,
+                            fontWeight: 500,
+                            fontFamily: "Montserrat, sans-serif",
+                            minHeight: "3rem",
+                            lineHeight: 1.2,
+                            WebkitBoxOrient: "vertical",
+                          }}
+                        >
+                          {department.description}
+                        </Typography>
+                      </AccordionDetails>
+                    </Accordion>
                   </Box>
                 ))}
               </Box>
