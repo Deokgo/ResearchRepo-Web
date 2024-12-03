@@ -173,23 +173,25 @@ const Navbar = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`, // Use appropriate token storage
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
-  
+
       if (response.ok) {
         // Clear the token from storage
         localStorage.removeItem("token");
+        // Update auth context state
+        logout();
+        // Close any open menus
+        handleCloseUserMenu();
         // Navigate to home
-        navigate("/home");
+        navigate("/home", { replace: true });
       } else {
         const errorData = await response.json();
         console.error("Logout failed:", errorData.message);
-        // Optionally, show an error message to the user
       }
     } catch (error) {
       console.error("An error occurred during logout:", error);
-      // Optionally, show an error message to the user
     }
   };
 

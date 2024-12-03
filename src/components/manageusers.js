@@ -35,7 +35,7 @@ import FileUploadIcon from "@mui/icons-material/FileUpload";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import ErrorIcon from "@mui/icons-material/Error";
-import EditIcon from '@mui/icons-material/Edit';
+import EditIcon from "@mui/icons-material/Edit";
 
 const ManageUsers = () => {
   const [users, setUsers] = useState([]);
@@ -707,10 +707,8 @@ const ManageUsers = () => {
                         <Box sx={{ flex: 2 }}>{user.email}</Box>
                         <Box sx={{ flex: 2 }}>{user.role_name || "N/A"}</Box>
                         <Box sx={{ flex: 1 }}>
-                          <IconButton
-                            onClick={() => handleOpenModal(user)}
-                          >
-                            <EditIcon color='primary'/>
+                          <IconButton onClick={() => handleOpenModal(user)}>
+                            <EditIcon color='primary' />
                           </IconButton>
                         </Box>
                       </Box>
@@ -720,10 +718,7 @@ const ManageUsers = () => {
               )}
             </Box>
             {selectedUser && (
-              <Modal
-                open={openModal}
-                onClose={handleCloseModal}
-              >
+              <Modal open={openModal} onClose={handleCloseModal}>
                 <Box
                   sx={{
                     position: "absolute",
@@ -788,7 +783,14 @@ const ManageUsers = () => {
                     </Select>
                   </FormControl>
                   <FormControl component='fieldset' margin='normal'>
-                    <FormLabel component='legend' variant="h6" fontWeight="700" sx={{ mb: "0.5rem", color:'#d40821' }}>Account Status</FormLabel>
+                    <FormLabel
+                      component='legend'
+                      variant='h6'
+                      fontWeight='700'
+                      sx={{ mb: "0.5rem", color: "#d40821" }}
+                    >
+                      Account Status
+                    </FormLabel>
                     <RadioGroup
                       value={accountStatus} // Use state variable here
                       onChange={(e) => setAccountStatus(e.target.value)}
@@ -943,49 +945,58 @@ const ManageUsers = () => {
 
             <Box
               sx={{
-                display: 'flex',
-                alignItems: 'center',
-                border: '2px dashed #0A438F',
+                display: "flex",
+                alignItems: "center",
+                border: "2px dashed #0A438F",
                 borderRadius: 1,
                 m: 1,
-                cursor: 'pointer',
-                justifyContent: 'center',
+                cursor: "pointer",
+                justifyContent: "center",
                 gap: 2,
               }}
             >
               <Button
                 variant='text'
-                color="primary"
+                color='primary'
                 component='label'
                 startIcon={<FileUploadIcon />}
                 sx={{
-                  padding: '1rem',
-                  color: '#08397C',
-                  fontFamily: 'Montserrat, sans-serif',
+                  padding: "1rem",
+                  color: "#08397C",
+                  fontFamily: "Montserrat, sans-serif",
                   fontWeight: 600,
-                  textTransform: 'none',
-                  fontSize: { xs: '0.875rem', md: '1rem' },
-                  alignSelf: 'center',
-                  maxHeight: '2rem',
-                  '&:hover': {
-                    color: '#052045',
+                  textTransform: "none",
+                  fontSize: { xs: "0.875rem", md: "1rem" },
+                  alignSelf: "center",
+                  maxHeight: "2rem",
+                  "&:hover": {
+                    color: "#052045",
                   },
                 }}
               >
                 Import from CSV
-              <input
-                type='file'
-                accept='.csv'
-                hidden
-                onChange={handleFileUpload}
-              />
+                <input
+                  type='file'
+                  accept='.csv'
+                  hidden
+                  onChange={handleFileUpload}
+                />
               </Button>
             </Box>
           </Box>
 
           {/* Users Table */}
-          <TableContainer sx={{ mb: 3, width: '80rem'}}>
-            <Table>
+          <TableContainer
+            sx={{
+              mb: 3,
+              width: "80rem",
+              maxHeight: "400px", // Add fixed height
+              overflow: "auto", // Make scrollable
+            }}
+          >
+            <Table stickyHeader>
+              {" "}
+              {/* Make header sticky */}
               <TableHead>
                 <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
                   <TableCell>
@@ -1156,7 +1167,8 @@ const ManageUsers = () => {
             {/* Action buttons on the right */}
             <Box
               sx={{
-                display: "flex", gap: 2
+                display: "flex",
+                gap: 2,
               }}
             >
               <Button
