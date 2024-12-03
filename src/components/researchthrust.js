@@ -18,42 +18,30 @@ import {
 import placeholderImage from "../assets/placeholder_image.png";
 import homeBg from "../assets/home_bg.png";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
+import InfoIcon from '@mui/icons-material/Info';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-
-const modalStyle = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: 600,
-  bgcolor: "background.paper",
-  boxShadow: 24,
-  p: 4,
-  borderRadius: "10px",
-};
+import { useAuth } from "../context/AuthContext";
+import { useModalContext } from "./modalcontext";
 
 const ResearchThrust = () => {
   const [userData, setUserData] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { user, logout } = useAuth();
+  const isLoggedIn = !!user;
   const navigate = useNavigate();
   // Retrieve user_id from cookie/localStorage
-  const getUserId = () => {
-    const userId = localStorage.getItem("user_id");
-    return userId;
+
+  const {
+    openLoginModal,
+    closeLoginModal,
+  } = useModalContext();
+
+  const handleLogin = () => {
+    openLoginModal();
   };
-  const [formValues, setFormValues] = useState({
-    firstName: "",
-    middleName: "",
-    lastName: "",
-    suffix: "",
-    department: "",
-    program: "",
-    email: "",
-    role: "",
-  });
 
   const departments = [
     {
@@ -355,17 +343,18 @@ const ResearchThrust = () => {
     }, 
   ];
 
-  const handleSearchChange = (e) => {
-    const query = e.target.value.toLowerCase();
-    setSearchQuery(query);
-  };
-
   // State to track which accordion is currently expanded
   const [expandedPanel, setExpandedPanel] = useState(false);
+  const [expandedPanelProgram, setExpandedPanelProgram] = useState(false);
 
   // Handler for accordion expansion
   const handleAccordionChange = (panel) => (event, isExpanded) => {
     setExpandedPanel(isExpanded ? panel : false);
+  };
+
+  // Handler for accordion expansion
+  const handleAccordionChangeProgram = (panel) => (event, isExpanded) => {
+    setExpandedPanelProgram(isExpanded ? panel : false);
   };
 
   return (
@@ -446,16 +435,8 @@ const ResearchThrust = () => {
                 flexDirection: "column",
               }}
             >
-              {/* Search Bar */}
-              <TextField
-                variant='outlined'
-                placeholder='Search fields...'
-                value={searchQuery}
-                onChange={handleSearchChange}
-              />
               <Box
                 sx={{
-                  paddingTop: '2rem',
                   display: "flex",
                   flexDirection: 'column',
                 }}
@@ -480,37 +461,62 @@ const ResearchThrust = () => {
                         </Typography>
                       </AccordionSummary>
                       <AccordionDetails>
-                        <Typography sx={{ padding: 2 }}>{department.description}</Typography>
-                        <Divider sx={{ marginY: 2 }} />
-                        {department.programs.map((program, index) => (
-                          <Accordion key={index}>
-                            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                              <Typography
-                                variant="h6"
-                                sx={{
-                                  fontWeight: 600,
-                                  fontFamily: "Montserrat, sans-serif",
-                                  color: "#08397C",
-                                }}
-                              >
-                                {program.name}
-                              </Typography>
-                            </AccordionSummary>
-                            <AccordionDetails>
-                              {program.focusAreas.map((focus, idx) => (
-                                <Box key={idx} sx={{ marginBottom: 2 }}>
-                                  <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
-                                    {focus.title}
-                                  </Typography>
-                                  <Typography variant="body2" sx={{ paddingLeft: 2 }}>
-                                    {focus.description} <br />
-                                    <b>SDGs:</b> {focus.sdgs.join(", ")}
-                                  </Typography>
+                        <Typography sx={{ paddingLeft: 2 }}>{department.description}</Typography>
+                          {!isLoggedIn ? (
+                            <Button
+                              onClick={handleLogin}
+                              variant='text'
+                              sx={{
+                                mt: 5,
+                                color: "#CA031B",
+                                fontFamily: "Montserrat, sans-serif",
+                                fontWeight: 600,
+                                fontSize: { xs: "0.875rem", md: "1rem" },
+                                paddingLeft: '1rem'
+                              }}
+                            >
+                              Learn More <InfoIcon/>
+                            </Button>
+                          ) : (
+                            <Box>
+                              <Divider sx={{ marginY: 2 }} />
+                              {department.programs.map((program, index) => (
+                                <Box sx={{m: 2}}>
+                                  <Accordion 
+                                    key={index}
+                                    expanded={expandedPanelProgram === program.name}
+                                    onChange={handleAccordionChangeProgram(program.name)}
+                                  >
+                                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                                      <Typography
+                                        variant="h6"
+                                        sx={{
+                                          fontWeight: 600,
+                                          fontFamily: "Montserrat, sans-serif",
+                                          color: "#08397C",
+                                        }}
+                                      >
+                                        {program.name}
+                                      </Typography>
+                                    </AccordionSummary>
+                                    <AccordionDetails>
+                                      {program.focusAreas.map((focus, idx) => (
+                                        <Box key={idx} sx={{ marginBottom: 2 }}>
+                                          <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+                                            {focus.title}
+                                          </Typography>
+                                          <Typography variant="body2" sx={{ paddingLeft: 2 }}>
+                                            {focus.description} <br />
+                                            <b>SDGs:</b> {focus.sdgs.join(", ")}
+                                          </Typography>
+                                        </Box>
+                                      ))}
+                                    </AccordionDetails>
+                                  </Accordion>
                                 </Box>
                               ))}
-                            </AccordionDetails>
-                          </Accordion>
-                        ))}
+                            </Box>
+                          )}
                       </AccordionDetails>
                     </Accordion>
                   </Box>
