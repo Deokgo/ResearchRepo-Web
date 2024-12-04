@@ -524,11 +524,12 @@ const ResearchTracking = () => {
                   </Box>
                   
 
-                  {/* Virtuoso Table */}
                   <Box sx={{ padding: 2, backgroundColor: "#F7F9FC" }}>
-                    {loading ? (
-                      <Typography>Loading...</Typography>
-                    ) : (
+                  {loading ? (
+                    <Typography>Loading...</Typography>
+                  ) : (
+                    <>
+                      {/* Virtuoso Table */}
                       <Virtuoso
                         style={{ height: "400px" }}
                         data={paginatedResearch}
@@ -542,24 +543,25 @@ const ResearchTracking = () => {
                             }}
                             onClick={() => handleKey(paper.research_id)}
                           >
-                            <Typography variant='h6'>{paper.title}</Typography>
-                            <Typography variant='body2' color='textSecondary'>
-                              Status: {paper.status} | Last Updated:{" "}
-                              {paper.timestamp}
+                            <Typography variant="h6">{paper.title}</Typography>
+                            <Typography variant="body2" color="textSecondary">
+                              Status: {paper.status} | Last Updated: {paper.timestamp}
                             </Typography>
                           </Box>
                         )}
                       />
-                    )}
-                  </Box>
-
-                  {/* Pagination */}
-                  <Pagination
-                    count={Math.ceil(filteredResearch.length / rowsPerPage)}
-                    page={page}
-                    onChange={handleChangePage}
-                    sx={{ mt: 2 }}
-                  />
+                      
+                      {/* Centered Pagination */}
+                      <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
+                        <Pagination
+                          count={Math.ceil(filteredResearch.length / rowsPerPage)}
+                          page={page}
+                          onChange={handleChangePage}
+                        />
+                      </Box>
+                    </>
+                  )}
+                </Box>
                 </Box>
               </Grid2>
             </Grid2>
