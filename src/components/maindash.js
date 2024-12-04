@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "./navbar";
 import Footer from "./footer";
+import axios from "axios";
 import {
   Box,
   IconButton,
@@ -28,9 +29,19 @@ const MainDash = () => {
     }
   };
 
+  const getUserCollege = async () => {
+    try {
+        const response = await axios.get(`/data/college`);
+        console.log('Full Response:', response.data.college_id);
+    } catch (error) {
+        console.error('Error fetching college:', error);
+    }
+  };
+
   useEffect(() => {
     window.addEventListener('resize', updateIframeSize);
     updateIframeSize(); // Call initially to set the size
+    getUserCollege();
 
     return () => {
       window.removeEventListener('resize', updateIframeSize);
