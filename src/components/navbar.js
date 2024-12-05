@@ -14,6 +14,7 @@ import {
   Toolbar,
   Typography,
   useMediaQuery,
+  useTheme
 } from "@mui/material";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -24,6 +25,7 @@ import { useModalContext } from "./modalcontext";
 
 const Navbar = () => {
   const { user, logout } = useAuth();
+  const theme = useTheme();
   const isLoggedIn = !!user;
 
   const [anchorElNav, setAnchorElNav] = useState(null);
@@ -208,36 +210,63 @@ const Navbar = () => {
       ];
 
   const buttonSettings = {
-    my: 2,
     color: "#001C43",
     fontFamily: "Montserrat, sans-serif",
     fontWeight: 600,
-    marginRight: "1rem",
+    fontSize: { 
+      xs: "0.25rem",   // Smaller on extra small screens
+      sm: "0.25rem",  // Slightly larger on small screens
+      md: "0.60rem",      // Standard size on medium screens
+      lg: "0.75rem"   // Slightly larger on large screens
+    },
+    marginRight: { 
+      xs: "0.75rem", 
+      sm: "0.50rem", 
+      md: "0.25rem" 
+    },
+    padding: { 
+      xs: "0rem 0.25rem", 
+      sm: "0.25rem 0.5rem", 
+      md: "0.25rem 0.5rem" 
+    }
   };
-
   return (
     <AppBar
       position='fixed'
       sx={{
         backgroundColor: "#FFF",
-        height: { xs: "3.5rem", sm: "4rem", md: "6rem" },
+        height: { 
+          xs: 'calc(3.5rem + env(safe-area-inset-top))', 
+          sm: 'calc(4rem + env(safe-area-inset-top))', 
+          md: 'calc(6rem + env(safe-area-inset-top))' 
+        },
+        // Ensure navbar doesn't overlap content
+        zIndex: theme.zIndex.appBar,
       }}
     >
       <Toolbar
         sx={{
-          height: "100%",
+          height: '100%',
           display: "flex",
+          flexWrap: "nowrap",
           justifyContent: "space-between",
           alignItems: "center",
+          px: { xs: 1, sm: 2, md: 1 }, // Responsive padding
         }}
       >
-        <Box sx={{ display: "flex", alignItems: "center", mb: "0rem" }}>
+        <Box 
+          sx={{
+            display: "flex", 
+            alignItems: "center", 
+            flexGrow: { xs: 1, md: 0 } 
+          }}
+        >
           <IconButton
             onClick={null}
             sx={{
               p: 0,
-              width: { xs: "2.5rem", md: "5rem" },
-              height: { xs: "2.5rem", md: "5rem" },
+              width: { xs: '2rem', sm: '3rem', md: '4rem', lg: '5rem' },
+              height: { xs: '2rem', sm: '3rem', md: '4rem', lg: '5rem' },
             }}
           >
             <img
@@ -247,7 +276,7 @@ const Navbar = () => {
                 width: "100%",
                 height: "100%",
                 objectFit: "contain",
-                padding: 10,
+                padding: '0.5rem',
               }}
             />
           </IconButton>
@@ -255,10 +284,10 @@ const Navbar = () => {
             orientation='vertical'
             flexItem
             sx={{
-              mx: 2,
+              mx: { xs: 1, md: 2 },
               borderColor: "#CA031B",
               height: { xs: "1.5rem", md: "2rem" },
-              borderWidth: "2px",
+              borderWidth: { xs: '0.5px', sm: '1px', md: '2px' }, // Responsive padding,
               alignSelf: "center",
             }}
           />
@@ -277,8 +306,7 @@ const Navbar = () => {
                 fontFamily: "Montserrat, sans-serif",
                 fontWeight: 600,
                 color: "#CA031B",
-                fontSize: { xs: "1.2rem", md: "1.25rem" },
-                textAlign: { xs: "center", md: "inherit" },
+                fontSize: { xs: "0.25rem", sm: "0.5rem", md: "0.75rem", lg: "1rem" },
               }}
             >
               Institutional
@@ -289,10 +317,8 @@ const Navbar = () => {
                 fontFamily: "Montserrat, sans-serif",
                 fontWeight: 600,
                 color: "#001C43",
-                fontSize: { xs: "1.2rem", md: "1.25rem" },
-                textAlign: { xs: "center", md: "inherit" },
-                lineHeight: { xs: "0.5" },
-                paddingBottom: "0.75rem",
+                fontSize: { xs: "0.25rem", sm: "0.5rem", md: "0.75rem", lg: "1rem" },
+                lineHeight: { xs: "1", md: "1.2" },
               }}
             >
               Research Repository
@@ -303,7 +329,12 @@ const Navbar = () => {
         {/*Navigation Buttons*/}
         <Box sx={{ display: { xs: "none", md: "flex" }, gap: 3 }}>
           {!isLoggedIn ? (
-            <Box sx={{ display: { xs: "none", md: "flex" }, gap: 3 }}>
+            <Box 
+              sx={{ 
+              display: { xs: "none", md: "flex" }, 
+              alignItems: "center", 
+              gap: { md: 1, lg: 2 } 
+            }}>
               <Button
                 key='Home'
                 onClick={handleNavigateHome}
@@ -370,15 +401,18 @@ const Navbar = () => {
                 System Management
               </Button>
               <IconButton
-                size='large'
                 onClick={handleOpenUserMenu}
-                sx={{ color: "#CA031B" }}
+                sx={{ 
+                  color: "#CA031B", 
+                  fontSize: { xs: "2rem", md: "2rem", lg: "3rem" } 
+                }}
               >
-                <AccountCircleIcon sx={{ fontSize: "3.5rem" }} />
+                <AccountCircleIcon fontSize= 'inherit'  />
               </IconButton>
             </Box>
           )}
         </Box>
+
         <Box sx={{ display: { xs: "flex", md: "none" } }}>
           <IconButton
             size='large'

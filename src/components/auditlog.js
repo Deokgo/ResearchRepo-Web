@@ -238,14 +238,19 @@ const DisplayAuditLog = () => {
           <Box
             sx={{
               position: "relative",
-              height: { xs: "5rem", md: "6rem" },
+              width: "100%",
+              height: {
+                xs: "clamp(2rem, 3vh, 3rem)",
+                sm: "clamp(3rem, 8vh, 4rem)",
+                md: "clamp(3rem, 14vh, 4rem)",
+                lg: "clamp(4rem, 20vh, 5rem)"
+              },
               backgroundColor: "#0A438F",
               backgroundSize: "cover",
               backgroundPosition: "center",
               display: "flex",
               alignItems: "center",
-              padding: 2,
-              zIndex: 1,
+              zIndex: 1
             }}
           >
             <Box
@@ -266,6 +271,11 @@ const DisplayAuditLog = () => {
                 onClick={() => navigate(-1)}
                 sx={{
                   color: "#fff",
+                  transform: {
+                    xs: "scale(0.8)",
+                    sm: "scale(1)",
+                    md: "scale(1.2)"
+                  }
                 }}
               >
                 <ArrowBackIosIcon />
@@ -275,11 +285,15 @@ const DisplayAuditLog = () => {
                 sx={{
                   fontFamily: "Montserrat, sans-serif",
                   fontWeight: 800,
-                  fontSize: { xs: "1.5rem", sm: "2rem", md: "2.575rem" },
+                  fontSize: {
+                    xs: "clamp(1rem, 2vw, 1rem)",
+                    sm: "clamp(1.5rem, 3.5vw, 1.5rem)",
+                    md: "clamp(2rem, 4vw, 2.25rem)",
+                  },
                   color: "#FFF",
                   lineHeight: 1.25,
                   alignSelf: "center",
-                  zIndex: 2,
+                  zIndex: 2
                 }}
               >
                 Audit Logs
@@ -291,7 +305,7 @@ const DisplayAuditLog = () => {
           <Box
             sx={{
               flex: 1,
-              padding: 5,
+              padding: 3,
               overflow: "hidden",
               height: "calc(100% - 48px)",
             }}
@@ -308,25 +322,25 @@ const DisplayAuditLog = () => {
               <Grid2 size={3}>
                 <Box
                   sx={{
-                    border: "2px solid #0A438F",
+                    border: "1px solid #0A438F",
                     height: "100%",
                     borderRadius: 3,
                     padding: 3,
-                    overflow: "hidden",
+                    overflowY: "hidden",
                     display: "flex",
                     flexDirection: "column",
                   }}
                 >
                   <Typography
                     variant='h6'
-                    sx={{ mb: 3, fontWeight: "bold", color: "#F40824" }}
+                    sx={{ mb: 2, fontWeight: "bold", color: "#F40824" }}
                   >
                     Filters
                   </Typography>
                   <Box sx={{ mb: 2 }}>
                     <Typography
                       variant='body1'
-                      sx={{ mb: 1, color: "#08397C" }}
+                      sx={{ mb: 1, color: "#08397C", fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" }, }}
                     >
                       Date Range:
                     </Typography>
@@ -347,7 +361,7 @@ const DisplayAuditLog = () => {
                               : null,
                           }));
                         }}
-                        InputLabelProps={{ shrink: true }}
+                        InputLabelProps={{ shrink: true}}
                         fullWidth
                         size='small'
                       />
@@ -373,102 +387,107 @@ const DisplayAuditLog = () => {
                       />
                     </Box>
                   </Box>
-                  <Box sx={{ mb: 2 }}>
-                    <Typography
-                      variant='body1'
-                      sx={{ mb: 1, color: "#08397C" }}
-                    >
-                      Operations:
-                    </Typography>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        flexDirection: "column",
-                        flex: 1,
-                        minHeight: "35%",
-                        overflowY: "auto",
-                        "&::-webkit-scrollbar": {
-                          width: "8px",
-                        },
-                        "&::-webkit-scrollbar-track": {
-                          background: "#f1f1f1",
-                          borderRadius: "4px",
-                        },
-                        "&::-webkit-scrollbar-thumb": {
-                          background: "#08397C",
-                          borderRadius: "4px",
-                        },
-                      }}
-                    >
-                      {operations.length > 0 ? (
-                        operations.map((operation, index) => (
-                          <FormControlLabel
-                            key={index}
-                            control={
-                              <Checkbox
-                                checked={selectedOperations.includes(
-                                  operation.trim().toLowerCase()
-                                )}
-                                onChange={handleOperationChange}
-                                value={operation.trim().toLowerCase()}
-                              />
+                  <Typography
+                    variant='body1'
+                    sx={{ color: "#08397C", fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" },}}
+                  >
+                    Operations:
+                  </Typography>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                      height: "30%",
+                      overflowY: "auto",
+                      mb: 2,
+                      "&::-webkit-scrollbar": {
+                        width: "8px",
+                      },
+                      "&::-webkit-scrollbar-track": {
+                        background: "#f1f1f1",
+                        borderRadius: "4px",
+                      },
+                      "&::-webkit-scrollbar-thumb": {
+                        background: "#08397C",
+                        borderRadius: "4px",
+                      },
+                    }}
+                  >
+                    {operations.length > 0 ? (
+                      operations.map((operation, index) => (
+                        <FormControlLabel
+                          key={index}
+                          control={
+                            <Checkbox
+                              checked={selectedOperations.includes(
+                                operation.trim().toLowerCase()
+                              )}
+                              onChange={handleOperationChange}
+                              value={operation.trim().toLowerCase()}
+                            />
+                          }
+                          label={operation}
+                          sx={{
+                            '& .MuiTypography-root': {
+                              fontSize: { xs: "0.5rem", md: "0.75rem", lg: "0.75rem" }
                             }
-                            label={operation}
-                          />
-                        ))
-                      ) : (
-                        <Typography variant='body2' sx={{ color: "gray" }}>
-                          No operations found.
-                        </Typography>
-                      )}
-                    </Box>
+                          }}
+                        />
+                      ))
+                    ) : (
+                      <Typography variant='body2' sx={{ color: "gray" }}>
+                        No operations found.
+                      </Typography>
+                    )}
                   </Box>
-                  <Box sx={{ flex: 1 }}>
-                    <Typography
-                      variant='body1'
-                      sx={{ mb: 1, color: "#08397C" }}
-                    >
-                      Roles:
-                    </Typography>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        flexDirection: "column",
-                        height: "calc(100% - 24px)",
-                        overflowY: "auto",
-                        "&::-webkit-scrollbar": {
-                          width: "8px",
-                        },
-                        "&::-webkit-scrollbar-track": {
-                          background: "#f1f1f1",
-                          borderRadius: "4px",
-                        },
-                        "&::-webkit-scrollbar-thumb": {
-                          background: "#08397C",
-                          borderRadius: "4px",
-                        },
-                      }}
-                    >
-                      {roles.length > 0 ? (
-                        roles.map((role, index) => (
-                          <FormControlLabel
-                            key={index}
-                            control={
-                              <Checkbox
-                                checked={selectedRoles.includes(role)}
-                                onChange={handleRoleChange}
-                                value={role}
-                              />
+                  <Typography
+                    variant='body1'
+                    sx={{ color: "#08397C", fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" }, }}
+                  >
+                    Roles:
+                  </Typography>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                      height: "30%",
+                      overflowY: "auto",
+                      "&::-webkit-scrollbar": {
+                        width: "8px",
+                      },
+                      "&::-webkit-scrollbar-track": {
+                        background: "#f1f1f1",
+                        borderRadius: "4px",
+                      },
+                      "&::-webkit-scrollbar-thumb": {
+                        background: "#08397C",
+                        borderRadius: "4px",
+                      },
+                    }}
+                  >
+                    {roles.length > 0 ? (
+                      roles.map((role, index) => (
+                        <FormControlLabel
+                          key={index}
+                          control={
+                            <Checkbox
+                              checked={selectedRoles.includes(role)}
+                              onChange={handleRoleChange}
+                              value={role}
+                            />
+                          }
+                          label={role}sx={{
+                            '& .MuiTypography-root': {
+                              fontSize: { xs: "0.5rem", md: "0.75rem", lg: "0.75rem" }
                             }
-                            label={role}
-                          />
-                        ))
-                      ) : (
-                        <Typography variant='body2' sx={{ color: "gray" }}>
-                          No roles found.
-                        </Typography>
-                      )}
-                    </Box>
+                          }}
+                        />
+                      ))
+                    ) : (
+                      <Typography variant='body2' sx={{ color: "gray" }}>
+                        No roles found.
+                      </Typography>
+                    )}
                   </Box>
                 </Box>
               </Grid2>
@@ -501,11 +520,39 @@ const DisplayAuditLog = () => {
                         placeholder='Search by Log ID or Email User'
                         value={searchQuery}
                         onChange={handleSearchChange}
-                        sx={{ flex: 2 }}
+                        sx={{ 
+                          flex: 2,
+                          // Responsive font size
+                          '& .MuiInputBase-input': {
+                            fontSize: { 
+                              xs: '0.75rem',   // Mobile
+                              sm: '0.85rem',   // Small devices
+                              md: '0.9rem',    // Medium devices
+                              lg: '1rem'        // Large devices
+                            },
+                            // Adjust input height
+                            padding: { 
+                              xs: '8px 12px',   // Mobile
+                              md: '12px 14px'   // Larger screens
+                            },
+                            // Optional: adjust overall height
+                            height: { 
+                              xs: '15px',   // Mobile
+                              md: '25px'    // Larger screens
+                            }
+                          }
+                        }}
                         InputProps={{
                           startAdornment: (
                             <InputAdornment position='start'>
-                              <Search />
+                              <Search 
+                                sx={{
+                                  fontSize: { 
+                                    xs: '1rem',   // Mobile
+                                    md: '1.25rem' // Larger screens
+                                  }
+                                }} 
+                              />
                             </InputAdornment>
                           ),
                         }}
@@ -521,7 +568,13 @@ const DisplayAuditLog = () => {
                         flexDirection: "column",
                       }}
                     >
-                      <Box sx={{ flex: 1, overflow: "hidden" }}>
+                      <Box sx={{ 
+                        display: "flex",
+                        flexDirection: "column",
+                        height: "100%",
+                        overflowY: "auto",
+                        }}
+                      >
                         {loading ? (
                           <Typography>Loading...</Typography>
                         ) : (
@@ -530,9 +583,11 @@ const DisplayAuditLog = () => {
                             <Box
                               sx={{
                                 display: "flex",
-                                justifyContent: "space-between",
                                 padding: "10px",
-                                backgroundColor: "#f0f0f0",
+                                justifyContent: 'space-between',
+                                fontSize: { xs: "0.5rem", md: "0.75rem", lg: "0.9rem" },
+                                backgroundColor: "#0A438F",
+                                color: "#FFF",
                                 borderBottom: "1px solid #ccc",
                                 fontWeight: "bold",
                               }}
@@ -541,7 +596,7 @@ const DisplayAuditLog = () => {
                               <Box sx={{ flex: 2 }}>User Email</Box>
                               <Box sx={{ flex: 1 }}>Role</Box>
                               <Box sx={{ flex: 1 }}>Action</Box>
-                              <Box sx={{ flex: 1 }}>Record Reference</Box>
+                              <Box sx={{ flex: 1 }}>Reference</Box>
                               <Box sx={{ flex: 1.5 }}>Date/Time</Box>
                               <Box sx={{ flex: 1 }}>Details</Box>
                             </Box>
@@ -571,9 +626,11 @@ const DisplayAuditLog = () => {
                                   <Box
                                     sx={{
                                       display: "flex",
-                                      justifyContent: "space-between",
                                       padding: "10px",
+                                      justifyContent: 'space-between',
+                                      fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.75rem" },
                                       borderBottom: "1px solid #ccc",
+                                      gap: 2
                                     }}
                                   >
                                     <Box sx={{ flex: 1 }}>{log.audit_log}</Box>
@@ -581,7 +638,7 @@ const DisplayAuditLog = () => {
                                     <Box sx={{ flex: 1 }}>{log.role_name}</Box>
                                     <Box sx={{ flex: 1 }}>{log.operation}</Box>
                                     <Box sx={{ flex: 1 }}>{log.record_id}</Box>
-                                    <Box sx={{ flex: 1.5, paddingRight: 2 }}>
+                                    <Box sx={{ flex: 1.5 }}>
                                       {formattedDateTime}
                                     </Box>
                                     <Box sx={{ flex: 1 }}>

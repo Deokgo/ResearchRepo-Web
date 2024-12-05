@@ -314,28 +314,46 @@ const ManageProgram = () => {
     <>
       <Box
         sx={{
+          margin: 0,
+          padding: 0,
+          height: "100vh",
           display: "flex",
           flexDirection: "column",
+          overflow: "hidden",
         }}
       >
         <Navbar />
         <Box
           sx={{
-            height: { xs: "100%", md: "calc(100vh - 9rem)" },
+            flexGrow: 1,
+            display: "flex",
+            flexDirection: "column",
             marginTop: { xs: "3.5rem", sm: "4rem", md: "6rem" },
+            height: {
+              xs: "calc(100vh - 3.5rem)",
+              sm: "calc(100vh - 4rem)",
+              md: "calc(100vh - 6rem)",
+            },
+            overflow: "hidden",
           }}
         >
+          {/* Header with back button */}
           <Box
             sx={{
               position: "relative",
-              display: "flex",
-              flexDirection: { xs: "column", md: "row" },
-              padding: 4,
-              gap: 4,
+              width: "100%",
+              height: {
+                xs: "clamp(2rem, 3vh, 3rem)",
+                sm: "clamp(3rem, 8vh, 4rem)",
+                md: "clamp(3rem, 14vh, 4rem)",
+                lg: "clamp(4rem, 20vh, 5rem)"
+              },
+              backgroundColor: "#0A438F",
               backgroundSize: "cover",
               backgroundPosition: "center",
-              height: { xs: "5rem", md: "6rem" },
-              backgroundColor: "#0A438F",
+              display: "flex",
+              alignItems: "center",
+              zIndex: 1
             }}
           >
             <Box
@@ -356,42 +374,51 @@ const ManageProgram = () => {
                 onClick={() => navigate(-1)}
                 sx={{
                   color: "#fff",
+                  transform: {
+                    xs: "scale(0.8)",
+                    sm: "scale(1)",
+                    md: "scale(1.2)"
+                  }
                 }}
               >
-                <ArrowBackIosIcon></ArrowBackIosIcon>
+                <ArrowBackIosIcon />
               </IconButton>
               <Typography
                 variant='h3'
                 sx={{
                   fontFamily: "Montserrat, sans-serif",
                   fontWeight: 800,
-                  fontSize: { xs: "1.5rem", sm: "2rem", md: "2.575rem" },
+                  fontSize: {
+                    xs: "clamp(1rem, 2vw, 1rem)",
+                    sm: "clamp(1.5rem, 3.5vw, 1.5rem)",
+                    md: "clamp(2rem, 4vw, 2.25rem)",
+                  },
                   color: "#FFF",
                   lineHeight: 1.25,
                   alignSelf: "center",
-                  zIndex: 2,
+                  zIndex: 2
                 }}
               >
-                Manage Program
+                Manage Programs
               </Typography>
             </Box>
           </Box>
 
           {/* Main content area */}
           <Box
-            ml={10}
+            ml={5}
              sx={{
               flex: 1,
-              padding: 4,
+              padding: 3,
               overflow: "hidden",
               height: "calc(100% - 48px)",
             }}
           >
             <Grid2
               container
-              spacing={6}
+              spacing={4}
               sx={{
-                height: "auto",
+                height: "100%",
                 flexWrap: "nowrap",
               }}
             >
@@ -399,11 +426,11 @@ const ManageProgram = () => {
               <Grid2 size={3}>
                 <Box
                   sx={{
-                    border: "2px solid #0A438F",
+                    border: "1px solid #0A438F",
                     height: "auto",
                     borderRadius: 3,
                     padding: 3,
-                    overflow: "hidden",
+                    overflowY: "hidden",
                     display: "flex",
                     flexDirection: "column",
                   }}
@@ -414,7 +441,7 @@ const ManageProgram = () => {
                   >
                     Filter
                   </Typography>
-                  <Typography variant='body1' sx={{ mb: 1, color: "#08397C" }}>
+                  <Typography variant='body1' sx={{ color: "#08397C", fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" } }}>
                     College:
                   </Typography>
                   <Box
@@ -447,6 +474,11 @@ const ManageProgram = () => {
                           />
                         }
                         label={college.college_name}
+                        sx={{
+                          '& .MuiTypography-root': {
+                            fontSize: { xs: "0.5rem", md: "0.75rem", lg: "0.75rem" }
+                          }
+                        }}
                       />
                     ))}
                   </Box>
@@ -456,111 +488,167 @@ const ManageProgram = () => {
                 {/* Search Bar */}
                 <Box
                   sx={{
-                    width: "90%", // Center search bar and button
+                    height: "100%",
                     display: "flex",
-                    paddingBottom: 3,
-                    justifyContent: "space-between",
-                    alignItems: "center",
+                    flexDirection: "column",
                   }}
                 >
-                  <TextField
-                    variant='outlined'
-                    placeholder='Search Program...'
-                    value={searchQuery}
-                    onChange={handleSearchChange}
-                    sx={{ width: "30rem" }}
-                    InputProps={{
-                    startAdornment: (
-                        <InputAdornment position='start'>
-                        <Search />
-                        </InputAdornment>
-                    ),
-                    }}
-                  />
-                  <Button
-                    variant='contained'
-                    color='primary'
+                  <Box
                     sx={{
-                    backgroundColor: "#F40824",
-                    color: "#FFF",
-                    fontFamily: "Montserrat, sans-serif",
-                    fontWeight: 600,
-                    textTransform: "none",
-                    fontSize: { xs: "0.875rem", md: "1.375rem" },
-                    padding: { xs: "0.5rem 1rem", md: "1.5rem" },
-                    borderRadius: "100px",
-                    maxHeight: "3rem"        
-                    }}    
-                    onClick={handleOpenAddModal}
+                      height: "100%",
+                      display: "flex",
+                      flexDirection: "column",
+                    }}
                   >
-                    Add New Program
-                  </Button>
-                </Box>
-
-                {/* Virtuoso Table */}
-                <Box sx={{ width: "90%" }}>
-                  {loading ? (
-                    <Typography>Loading users...</Typography>
-                  ) : (
-                    <Virtuoso
-                    style={{ height: "30rem" }}
-                    totalCount={filteredProgram.length}
-                    components={{
-                      Header: () => (
-                      <Box
-                          sx={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          backgroundColor: "#0A438F",
-                          color: "#FFF",
-                          padding: "10px",
-                          fontWeight: 700,
-                          position: "sticky",
-                          top: 0,
-                          zIndex: 1000,
-                          }}
+                    <Box
+                      sx={{
+                        display: "flex",
+                        gap: 2,
+                        mb: 2,
+                      }}
+                    >
+                      <TextField
+                        variant='outlined'
+                        placeholder='Search program...'
+                        value={searchQuery}
+                        onChange={handleSearchChange}
+                        sx={{ 
+                          flex: 2,
+                          // Responsive font size
+                          '& .MuiInputBase-input': {
+                            fontSize: { 
+                              xs: '0.75rem',   // Mobile
+                              sm: '0.85rem',   // Small devices
+                              md: '0.9rem',    // Medium devices
+                              lg: '1rem'        // Large devices
+                            },
+                            // Adjust input height
+                            padding: { 
+                              xs: '8px 12px',   // Mobile
+                              md: '12px 14px'   // Larger screens
+                            },
+                            // Optional: adjust overall height
+                            height: { 
+                              xs: '15px',   // Mobile
+                              md: '25px'    // Larger screens
+                            }
+                          }
+                        }}
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position='start'>
+                              <Search 
+                                sx={{
+                                  fontSize: { 
+                                    xs: '1rem',   // Mobile
+                                    md: '1.25rem' // Larger screens
+                                  }
+                                }} 
+                              />
+                            </InputAdornment>
+                          ),
+                        }}
+                      />
+                      <Button
+                        variant='contained'
+                        color='primary'
+                        sx={{
+                        backgroundColor: "#F40824",
+                        color: "#FFF",
+                        fontFamily: "Montserrat, sans-serif",
+                        fontWeight: 600,
+                        textTransform: "none",
+                        marginLeft: "2rem",
+                        fontSize: { xs: "0.875rem", md: "1rem" },
+                        padding: { xs: "0.5rem 1rem", md: "1.25rem" },
+                        borderRadius: "100px",
+                        maxHeight: "3rem"        
+                        }}    
+                        onClick={handleOpenAddModal}
                       >
-                          <Box sx={{ flex: 1 }}>College ID</Box>
-                          <Box sx={{ flex: 1 }}>Program ID</Box>
-                          <Box sx={{ flex: 4 }}>Name</Box>
-                          <Box sx={{ flex: 1 }}>Modify</Box>
-                          <Box sx={{ flex: 1 }}>Delete</Box>
-                      </Box>
-                      ),
-                    }}
-                    itemContent={(index) => {
-                      const program = filteredProgram[index];
-                      return (
-                        <Box
-                          sx={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          padding: "10px",
-                          borderBottom: "1px solid #ccc",
-                          }}
-                        >
-                          <Box sx={{ flex: 1 }}>{program.college_id}</Box>
-                          <Box sx={{ flex: 1 }}>{program.program_id}</Box>
-                          <Box sx={{ flex: 4 }}>{program.program_name}</Box>
-                          <Box sx={{ flex: 1 }}>
-                            <Button
-                                onClick={() => handleOpenModal(program)}
-                            >
-                                <EditIcon color='primary'/>
-                            </Button>
+                        + Add New Program
+                      </Button>
+                    </Box>
+
+                    {/* Virtuoso Table */}
+                    <Box sx={{ 
+                      flex: 1,
+                      backgroundColor: "#F7F9FC",
+                      borderRadius: 1,
+                      overflow: "hidden",
+                      display: "flex",
+                      flexDirection: "column",
+                      }}
+                    >
+                      {loading ? (
+                        <Typography>Loading users...</Typography>
+                      ) : (
+                        <Box sx={{ flex: 1, overflow: "hidden" }}>
+                        <Virtuoso
+                          style={{ height: "400px" }}
+                          totalCount={filteredProgram.length}
+                          components={{
+                          Header: () => (
+                          <Box
+                              sx={{
+                              display: "flex",
+                              justifyContent: "space-between",
+                              backgroundColor: "#0A438F",
+                              color: "#FFF",
+                              padding: "10px",
+                              fontSize: { xs: "0.5rem", md: "0.75rem", lg: "0.9rem" },
+                              fontWeight: 700,
+                              position: "sticky",
+                              top: 0,
+                              zIndex: 1000,
+                              }}
+                          >
+                              <Box sx={{ flex: 1 }}>College ID</Box>
+                              <Box sx={{ flex: 1 }}>Program ID</Box>
+                              <Box sx={{ flex: 4 }}>Name</Box>
+                              <Box sx={{ flex: 1 }}>Modify</Box>
+                              <Box sx={{ flex: 1 }}>Delete</Box>
                           </Box>
-                          <Box sx={{ flex: 1 }}>
-                            <Button
-                                onClick={() => handleDeleteCollege(program)}
+                          ),
+                        }}
+                        itemContent={(index) => {
+                          const program = filteredProgram[index];
+                          return (
+                            <Box
+                              sx={{
+                              display: "flex",
+                              justifyContent: "space-between",
+                              padding: "0.5rem",
+                              borderBottom: "1px solid #ccc",
+                              fontSize: { xs: "0.5rem", md: "0.65rem", lg: "0.9rem" },
+                              }}
                             >
-                                <DeleteIcon color='primary'/>
-                            </Button>
-                          </Box>
+                              <Box sx={{ flex: 1 }}>{program.college_id}</Box>
+                              <Box sx={{ flex: 1 }}>{program.program_id}</Box>
+                              <Box sx={{ flex: 4 }}>{program.program_name}</Box>
+                              <Box sx={{ flex: 1 }}>
+                                <Button
+                                    onClick={() => handleOpenModal(program)}
+                                >
+                                    <EditIcon color='primary'/>
+                                </Button>
+                              </Box>
+                              <Box sx={{ flex: 1 }}>
+                                <Button
+                                    onClick={() => handleDeleteCollege(program)}
+                                >
+                                    <DeleteIcon color='primary'/>
+                                </Button>
+                              </Box>
+                            </Box>
+                          );
+                        }}
+                        />
                         </Box>
-                      );
-                    }}
-                    />
-                  )}
+                        
+                      )}
+                    </Box>
+                  </Box>
                 </Box>
               </Grid2>
             </Grid2>
@@ -587,6 +675,11 @@ const ManageProgram = () => {
                   mb={4}
                   sx={{
                     textAlign: { xs: "left", md: "bottom" },
+                    fontSize: {
+                      xs: "clamp(1rem, 2vw, 1rem)",
+                      sm: "clamp(1.5rem, 3.5vw, 1.5rem)",
+                      md: "clamp(2rem, 4vw, 2.25rem)",
+                    },
                   }}
                 >
                   Add Program
@@ -633,8 +726,8 @@ const ManageProgram = () => {
                       color: "#FFF",
                       fontFamily: "Montserrat, sans-serif",
                       fontWeight: 600,
-                      fontSize: { xs: "0.875rem", md: "1.275rem" },
-                      padding: { xs: "0.5rem", md: "1.5rem" },
+                      fontSize: { xs: "0.875rem", md: "1rem" },
+                      padding: { xs: "0.5rem 1rem", md: "1.25rem" },
                       borderRadius: "100px",
                       maxHeight: "3rem",
                       textTransform: "none",
@@ -655,8 +748,8 @@ const ManageProgram = () => {
                       fontFamily: "Montserrat, sans-serif",
                       fontWeight: 600,
                       textTransform: "none",
-                      fontSize: { xs: "0.875rem", md: "1.275rem" },
-                      padding: { xs: "0.5rem 1rem", md: "1.5rem" },
+                      fontSize: { xs: "0.875rem", md: "1rem" },
+                      padding: { xs: "0.5rem 1rem", md: "1.25rem" },
                       marginLeft: "2rem",
                       borderRadius: "100px",
                       maxHeight: "3rem",
@@ -695,6 +788,11 @@ const ManageProgram = () => {
                   mb={4}
                   sx={{
                     textAlign: { xs: "left", md: "bottom" },
+                    fontSize: {
+                      xs: "clamp(1rem, 2vw, 1rem)",
+                      sm: "clamp(1.5rem, 3.5vw, 1.5rem)",
+                      md: "clamp(2rem, 4vw, 2.25rem)",
+                    },
                   }}
                 >
                   Edit Program
@@ -734,8 +832,8 @@ const ManageProgram = () => {
                       color: "#FFF",
                       fontFamily: "Montserrat, sans-serif",
                       fontWeight: 600,
-                      fontSize: { xs: "0.875rem", md: "1.275rem" },
-                      padding: { xs: "0.5rem", md: "1.5rem" },
+                      fontSize: { xs: "0.875rem", md: "1rem" },
+                      padding: { xs: "0.5rem 1rem", md: "1.25rem" },
                       borderRadius: "100px",
                       maxHeight: "3rem",
                       textTransform: "none",
@@ -756,8 +854,8 @@ const ManageProgram = () => {
                       fontFamily: "Montserrat, sans-serif",
                       fontWeight: 600,
                       textTransform: "none",
-                      fontSize: { xs: "0.875rem", md: "1.275rem" },
-                      padding: { xs: "0.5rem 1rem", md: "1.5rem" },
+                      fontSize: { xs: "0.875rem", md: "1rem" },
+                      padding: { xs: "0.5rem 1rem", md: "1.25rem" },
                       marginLeft: "2rem",
                       borderRadius: "100px",
                       maxHeight: "3rem",
@@ -797,6 +895,11 @@ const ManageProgram = () => {
                     mb={4}
                     sx={{
                       textAlign: { xs: "left", md: "bottom" },
+                      fontSize: {
+                        xs: "clamp(1rem, 2vw, 1rem)",
+                        sm: "clamp(1.5rem, 3.5vw, 1.5rem)",
+                        md: "clamp(2rem, 4vw, 2.25rem)",
+                      },
                     }}
                   >
                     Delete Program
@@ -826,8 +929,8 @@ const ManageProgram = () => {
                         color: "#FFF",
                         fontFamily: "Montserrat, sans-serif",
                         fontWeight: 600,
-                        fontSize: { xs: "0.875rem", md: "1.275rem" },
-                        padding: { xs: "0.5rem", md: "1.5rem" },
+                        fontSize: { xs: "0.875rem", md: "1rem" },
+                        padding: { xs: "0.5rem 1rem", md: "1.25rem" },
                         borderRadius: "100px",
                         maxHeight: "3rem",
                         textTransform: "none",
@@ -848,8 +951,8 @@ const ManageProgram = () => {
                         fontFamily: "Montserrat, sans-serif",
                         fontWeight: 600,
                         textTransform: "none",
-                        fontSize: { xs: "0.875rem", md: "1.275rem" },
-                        padding: { xs: "0.5rem 1rem", md: "1.5rem" },
+                        fontSize: { xs: "0.875rem", md: "1rem" },
+                        padding: { xs: "0.5rem 1rem", md: "1.25rem" },
                         marginLeft: "2rem",
                         borderRadius: "100px",
                         maxHeight: "3rem",

@@ -542,30 +542,46 @@ const ManageUsers = () => {
     <>
       <Box
         sx={{
+          margin: 0,
+          padding: 0,
+          height: "100vh",
           display: "flex",
           flexDirection: "column",
-          minHeight: "100vh",
+          overflow: "hidden",
         }}
       >
         <Navbar />
         <Box
           sx={{
             flexGrow: 1,
-            height: { xs: "100%", md: "calc(100vh - 9rem)" },
+            display: "flex",
+            flexDirection: "column",
             marginTop: { xs: "3.5rem", sm: "4rem", md: "6rem" },
+            height: {
+              xs: "calc(100vh - 3.5rem)",
+              sm: "calc(100vh - 4rem)",
+              md: "calc(100vh - 6rem)",
+            },
+            overflow: "hidden",
           }}
         >
+          {/* Header with back button */}
           <Box
             sx={{
               position: "relative",
-              display: "flex",
-              flexDirection: { xs: "column", md: "row" },
-              padding: 4,
-              gap: 4,
+              width: "100%",
+              height: {
+                xs: "clamp(2rem, 3vh, 3rem)",
+                sm: "clamp(3rem, 8vh, 4rem)",
+                md: "clamp(3rem, 14vh, 4rem)",
+                lg: "clamp(4rem, 20vh, 5rem)"
+              },
+              backgroundColor: "#0A438F",
               backgroundSize: "cover",
               backgroundPosition: "center",
-              height: { xs: "5rem", md: "6rem" },
-              backgroundColor: "#0A438F",
+              display: "flex",
+              alignItems: "center",
+              zIndex: 1
             }}
           >
             <Box
@@ -586,26 +602,37 @@ const ManageUsers = () => {
                 onClick={() => navigate(-1)}
                 sx={{
                   color: "#fff",
+                  transform: {
+                    xs: "scale(0.8)",
+                    sm: "scale(1)",
+                    md: "scale(1.2)"
+                  }
                 }}
               >
-                <ArrowBackIosIcon></ArrowBackIosIcon>
+                <ArrowBackIosIcon />
               </IconButton>
               <Typography
                 variant='h3'
                 sx={{
+                  py: 5,
                   fontFamily: "Montserrat, sans-serif",
                   fontWeight: 800,
-                  fontSize: { xs: "1.5rem", sm: "2rem", md: "2.575rem" },
+                  fontSize: {
+                    xs: "clamp(1rem, 2vw, 1rem)",
+                    sm: "clamp(1.5rem, 3.5vw, 1.5rem)",
+                    md: "clamp(2rem, 4vw, 2.25rem)",
+                  },
                   color: "#FFF",
                   lineHeight: 1.25,
                   alignSelf: "center",
-                  zIndex: 2,
+                  zIndex: 2
                 }}
               >
                 Manage Users
               </Typography>
             </Box>
           </Box>
+
           {/*Main Content */}
           <Box
             sx={{
@@ -620,7 +647,7 @@ const ManageUsers = () => {
                 width: "80%", // Center search bar and button
                 display: "flex",
                 paddingTop: 3,
-                paddingBottom: 3,
+                paddingBottom: 2,
                 justifyContent: "space-between",
                 alignItems: "center",
               }}
@@ -630,11 +657,39 @@ const ManageUsers = () => {
                 placeholder='Search by User ID or Email'
                 value={searchQuery}
                 onChange={handleSearchChange}
-                sx={{ width: "30rem" }}
+                sx={{ 
+                  flex: 2,
+                  // Responsive font size
+                  '& .MuiInputBase-input': {
+                    fontSize: { 
+                      xs: '0.75rem',   // Mobile
+                      sm: '0.85rem',   // Small devices
+                      md: '0.9rem',    // Medium devices
+                      lg: '1rem'        // Large devices
+                    },
+                    // Adjust input height
+                    padding: { 
+                      xs: '8px 12px',   // Mobile
+                      md: '12px 14px'   // Larger screens
+                    },
+                    // Optional: adjust overall height
+                    height: { 
+                      xs: '15px',   // Mobile
+                      md: '25px'    // Larger screens
+                    }
+                  }
+                }}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position='start'>
-                      <Search />
+                      <Search 
+                        sx={{
+                          fontSize: { 
+                            xs: '1rem',   // Mobile
+                            md: '1.25rem' // Larger screens
+                          }
+                        }} 
+                      />
                     </InputAdornment>
                   ),
                 }}
@@ -649,26 +704,36 @@ const ManageUsers = () => {
                   fontFamily: "Montserrat, sans-serif",
                   fontWeight: 600,
                   textTransform: "none",
-                  fontSize: { xs: "0.875rem", md: "1.375rem" },
-                  padding: { xs: "0.5rem 1rem", md: "1.5rem" },
+                  fontSize: { xs: "0.875rem", md: "1rem" },
+                  padding: { xs: "0.5rem 1rem", md: "1.25rem" },
                   marginLeft: "2rem",
                   borderRadius: "100px",
                   maxHeight: "3rem",
                 }}
               >
-                Add Users
+                + Add Users
               </Button>
             </Box>
 
             {/* Virtuoso Table */}
-            <Box sx={{ width: "80%" }}>
+            <Box sx={{ 
+                lex: 1,
+                backgroundColor: "#F7F9FC",
+                borderRadius: 1,
+                overflow: "hidden",
+                display: "flex",
+                flexDirection: "column", 
+                width: "80%"  
+                }}
+              >
               {loading ? (
                 <Box sx={{ display: "flex", justifyContent: "center" }}>
                   <Typography>Loading users...</Typography>
                 </Box>
               ) : (
-                <Virtuoso
-                  style={{ height: "500px" }}
+                <Box sx={{ flex: 1, overflow: "hidden" }}>
+                  <Virtuoso
+                  style={{ height: "400px" }}
                   totalCount={filteredUsers.length}
                   components={{
                     Header: () => (
@@ -677,6 +742,7 @@ const ManageUsers = () => {
                           display: "flex",
                           justifyContent: "space-between",
                           backgroundColor: "#0A438F",
+                          fontSize: { xs: "0.5rem", md: "0.75rem", lg: "0.9rem" },
                           color: "#FFF",
                           padding: "10px",
                           fontWeight: 700,
@@ -699,8 +765,9 @@ const ManageUsers = () => {
                         sx={{
                           display: "flex",
                           justifyContent: "space-between",
-                          padding: "10px",
+                          padding: "0.5rem",
                           borderBottom: "1px solid #ccc",
+                          fontSize: { xs: "0.5rem", md: "0.65rem", lg: "0.9rem" },
                         }}
                       >
                         <Box sx={{ flex: 1 }}>{user.researcher_id}</Box>
@@ -715,6 +782,7 @@ const ManageUsers = () => {
                     );
                   }}
                 />
+                </Box>
               )}
             </Box>
             {selectedUser && (
@@ -739,6 +807,11 @@ const ManageUsers = () => {
                     mb={4}
                     sx={{
                       textAlign: { xs: "left", md: "bottom" },
+                      fontSize: {
+                        xs: "clamp(1rem, 2vw, 1rem)",
+                        sm: "clamp(1.5rem, 3.5vw, 1.5rem)",
+                        md: "clamp(2rem, 4vw, 2.25rem)",
+                      },
                     }}
                   >
                     Edit User
@@ -787,7 +860,7 @@ const ManageUsers = () => {
                       component='legend'
                       variant='h6'
                       fontWeight='700'
-                      sx={{ mb: "0.5rem", color: "#d40821" }}
+                      sx={{ mb: "0.5rem", color: "#d40821", fontSize: { xs: "0.5rem", md: "0.75rem", lg: "0.9rem" }, }}
                     >
                       Account Status
                     </FormLabel>
@@ -821,8 +894,8 @@ const ManageUsers = () => {
                         color: "#FFF",
                         fontFamily: "Montserrat, sans-serif",
                         fontWeight: 600,
-                        fontSize: { xs: "0.875rem", md: "1.275rem" },
-                        padding: { xs: "0.5rem", md: "1.5rem" },
+                        fontSize: { xs: "0.875rem", md: "1rem" },
+                        padding: { xs: "0.5rem 1rem", md: "1.25rem" },
                         borderRadius: "100px",
                         maxHeight: "3rem",
                         textTransform: "none",
@@ -843,8 +916,8 @@ const ManageUsers = () => {
                         fontFamily: "Montserrat, sans-serif",
                         fontWeight: 600,
                         textTransform: "none",
-                        fontSize: { xs: "0.875rem", md: "1.275rem" },
-                        padding: { xs: "0.5rem 1rem", md: "1.5rem" },
+                        fontSize: { xs: "0.875rem", md: "1rem" },
+                        padding: { xs: "0.5rem 1rem", md: "1.25rem" },
                         marginLeft: "2rem",
                         borderRadius: "100px",
                         maxHeight: "3rem",
@@ -890,6 +963,11 @@ const ManageUsers = () => {
             mb={4}
             sx={{
               textAlign: { xs: "left", md: "bottom" },
+              fontSize: {
+                xs: "clamp(1rem, 2vw, 1rem)",
+                sm: "clamp(1.5rem, 3.5vw, 1.5rem)",
+                md: "clamp(2rem, 4vw, 2.25rem)",
+              },
             }}
           >
             Add Users
@@ -961,12 +1039,12 @@ const ManageUsers = () => {
                 component='label'
                 startIcon={<FileUploadIcon />}
                 sx={{
-                  padding: "1rem",
                   color: "#08397C",
                   fontFamily: "Montserrat, sans-serif",
                   fontWeight: 600,
                   textTransform: "none",
                   fontSize: { xs: "0.875rem", md: "1rem" },
+                  padding: { xs: "0.5rem 1rem", md: "1.25rem" },
                   alignSelf: "center",
                   maxHeight: "2rem",
                   "&:hover": {
@@ -989,7 +1067,7 @@ const ManageUsers = () => {
           <TableContainer
             sx={{
               mb: 3,
-              width: "80rem",
+              width: "70rem",
               maxHeight: "400px", // Add fixed height
               overflow: "auto", // Make scrollable
             }}
@@ -1178,8 +1256,8 @@ const ManageUsers = () => {
                   color: "#FFF",
                   fontFamily: "Montserrat, sans-serif",
                   fontWeight: 600,
-                  fontSize: { xs: "0.875rem", md: "1.275rem" },
-                  padding: { xs: "0.5rem", md: "1.5rem" },
+                  fontSize: { xs: "0.875rem", md: "1rem" },
+                  padding: { xs: "0.5rem 1rem", md: "1.25rem" },
                   borderRadius: "100px",
                   maxHeight: "3rem",
                   textTransform: "none",
@@ -1200,8 +1278,8 @@ const ManageUsers = () => {
                   fontFamily: "Montserrat, sans-serif",
                   fontWeight: 600,
                   textTransform: "none",
-                  fontSize: { xs: "0.875rem", md: "1.275rem" },
-                  padding: { xs: "0.5rem 1rem", md: "1.5rem" },
+                  fontSize: { xs: "0.875rem", md: "1rem" },
+                  padding: { xs: "0.5rem 1rem", md: "1.25rem" },
                   borderRadius: "100px",
                   maxHeight: "3rem",
                   "&:hover": {

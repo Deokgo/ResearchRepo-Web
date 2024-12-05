@@ -361,25 +361,44 @@ const ResearchThrust = () => {
     <>
       <Box
         sx={{
+          margin: 0,
+          padding: 0,
+          height: "100vh",
           display: "flex",
           flexDirection: "column",
-          minHeight: "100vh",
         }}
       >
         <Navbar />
-        <Box sx={{ flexGrow: 1 }}>
+        <Box
+          sx={{
+            flexGrow: 1,
+            display: "flex",
+            flexDirection: "column",
+            marginTop: { xs: "3.5rem", sm: "4rem", md: "6rem" },
+            height: {
+              xs: "calc(100vh - 3.5rem)",
+              sm: "calc(100vh - 4rem)",
+              md: "calc(100vh - 6rem)",
+            },
+          }}
+        >
+          {/* Header with back button */}
           <Box
             sx={{
               position: "relative",
-              marginTop: { xs: "3.5rem", sm: "4rem", md: "6rem" },
-              display: "flex",
-              flexDirection: { xs: "column", md: "row" },
-              padding: 4,
-              gap: 4,
+              width: "100%",
+              height: {
+                xs: "clamp(2rem, 3vh, 3rem)",
+                sm: "clamp(3rem, 8vh, 4rem)",
+                md: "clamp(3rem, 14vh, 4rem)",
+                lg: "clamp(4rem, 20vh, 5rem)"
+              },
+              backgroundColor: "#0A438F",
               backgroundSize: "cover",
               backgroundPosition: "center",
-              height: { xs: "5rem", md: "6rem" },
-              backgroundColor: "#0A438F",
+              display: "flex",
+              alignItems: "center",
+              zIndex: 1
             }}
           >
             <Box
@@ -400,6 +419,11 @@ const ResearchThrust = () => {
                 onClick={() => navigate(-1)}
                 sx={{
                   color: "#fff",
+                  transform: {
+                    xs: "scale(0.8)",
+                    sm: "scale(0.75)",
+                    md: "scale(0.75)"
+                  }
                 }}
               >
                 <ArrowBackIosIcon />
@@ -407,25 +431,32 @@ const ResearchThrust = () => {
               <Typography
                 variant='h3'
                 sx={{
+                  py: 15,
                   fontFamily: "Montserrat, sans-serif",
                   fontWeight: 800,
-                  fontSize: { xs: "1.5rem", sm: "2rem", md: "2.575rem" },
+                  fontSize: {
+                    xs: "clamp(1rem, 2vw, 1rem)",
+                    sm: "clamp(1.5rem, 3.5vw, 1.5rem)",
+                    md: "clamp(2rem, 4vw, 2.25rem)",
+                  },
                   color: "#FFF",
                   lineHeight: 1.25,
                   alignSelf: "center",
-                  zIndex: 2,
+                  zIndex: 2
                 }}
               >
-                Research Thrusts
+                Research Thrust
               </Typography>
             </Box>
           </Box>
-          
+        
           {/* Content Section */}
           <Box
             sx={{
               display: "flex",
               padding: 5,
+              marginLeft: 5,
+              marginRight: 5,
               justifyContent: 'space-around',
             }}
           >
@@ -442,7 +473,7 @@ const ResearchThrust = () => {
                 }}
               >
                 {departments.map((department) => (
-                  <Box key={department.id} sx={{ m: 2 }}>
+                  <Box key={department.id} sx={{ m: { xs: "0.5rem", md: "0.75rem", lg: "1rem" } }}>
                     <Accordion
                       expanded={expandedPanel === department.id}
                       onChange={handleAccordionChange(department.id)}
@@ -451,8 +482,9 @@ const ResearchThrust = () => {
                         <Typography
                           variant="h5"
                           sx={{
-                            padding: 2,
+                            padding: { xs: "0.25rem", md: "0.5rem", lg: "0.75rem" },
                             fontWeight: 700,
+                            fontSize: { xs: "0.75rem", md: "0.95rem", lg: "1.3rem" },
                             fontFamily: "Montserrat, sans-serif",
                             color: "#08397C",
                           }}
@@ -461,18 +493,24 @@ const ResearchThrust = () => {
                         </Typography>
                       </AccordionSummary>
                       <AccordionDetails>
-                        <Typography sx={{ paddingLeft: 2 }}>{department.description}</Typography>
+                        <Typography 
+                          sx={{ 
+                            paddingLeft: { xs: "0.5rem", md: "0.75rem", lg: "1rem" },
+                            fontSize: { xs: "0.65rem", md: "0.85rem", lg: "1rem" },
+                          }}
+                        >
+                          {department.description}</Typography>
                           {!isLoggedIn ? (
                             <Button
                               onClick={handleLogin}
                               variant='text'
                               sx={{
-                                mt: 5,
+                                mt: 3,
                                 color: "#CA031B",
                                 fontFamily: "Montserrat, sans-serif",
                                 fontWeight: 600,
-                                fontSize: { xs: "0.875rem", md: "1rem" },
-                                paddingLeft: '1rem'
+                                paddingLeft: { xs: "0.5rem", md: "0.75rem", lg: "1rem" },
+                                fontSize: { xs: "0.5rem", md: "0.75rem", lg: "1rem" },
                               }}
                             >
                               Learn More <InfoIcon/>

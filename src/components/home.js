@@ -24,6 +24,7 @@ import {
   Paper,
   Typography,
   useMediaQuery,
+  Grid2
 } from "@mui/material";
 import { useModalContext } from "./modalcontext";
 
@@ -104,11 +105,28 @@ const Home = () => {
     dots: true,
     infinite: true,
     speed: 1000,
+    slidesToShow: 1, // Add this line to explicitly set the number of slides to show
     slidesToScroll: 1,
     autoplay: true,
     autoplaySpeed: 4000,
     nextArrow: <NextArrow />, // Use custom NextArrow
     prevArrow: <PrevArrow />,
+  };
+
+  const buttonStyles = {
+    fontSize: 'clamp(0.8rem, 3vw, 1.2rem)', // Responsive font size
+    padding: '0.5rem 1.5rem', // Consistent padding
+    minWidth: '100px', // Minimum width
+    borderRadius: '50px', // Rounded corners
+    transition: 'transform 0.2s ease', // Smooth interaction
+    
+    '&:hover': {
+      transform: 'scale(1.05)' // Slight grow on hover
+    },
+    
+    '&:active': {
+      transform: 'scale(0.95)' // Slight shrink when pressed
+    }
   };
 
   const togglePasswordVisibility = () => {
@@ -126,11 +144,12 @@ const Home = () => {
     <>
       <Box
         sx={{
-          // display: "flex",
-          // height: "100vh",
-          // width: "100vw",
           margin: 0,
           padding: 0,
+          height: "100vh",
+          display: "flex",
+          flexDirection: "column",
+          overflow: "hidden",
         }}
       >
         <Navbar />
@@ -146,6 +165,7 @@ const Home = () => {
             backgroundPosition: "center",
             height: { xs: "100%", md: "calc(100vh - 6rem)" },
             backgroundColor: "#0A438F",
+            
           }}
         >
           <Box
@@ -158,161 +178,180 @@ const Home = () => {
               backgroundImage: `url(${homeBg})`,
               backgroundSize: "cover",
               opacity: 0.25, // 25% opacity for the background image
-              zIndex: 1,
+              zIndex: 2,
             }}
           />
           <Box
             sx={{
-              display: "flex",
-              flexDirection: { xs: "column", md: "row" },
-              zIndex: 2,
+              position: 'relative',
               width: "100%",
+              zIndex: 2,
+              padding: { xs: 2, md: 4 },
             }}
           >
-            <Box
+            <Grid2 
+              container
+              spacing={2}
               sx={{
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
-                zIndex: 2,
-                width: "auto",
+                height: "100%",
+                flexWrap: "nowrap",
               }}
             >
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignContent: "center",
-                  alignItems: "center",
-                  width: "75rem",
-                  mb: "3rem",
-                  paddingLeft: "1em",
-                }}
-              >
-                <Slider
-                  {...settings}
-                  style={{ width: isMobile ? "60%" : "95%" }}
+              <Grid2 size={9}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignContent: "center",
+                    alignItems: "center",
+                    mt: "1rem",
+                    mb: "3rem",
+                    paddingLeft: "1rem",
+                    width: "100%", // Ensure full width
+                    "& .slick-list": {
+                      width: "100%", // Ensure slider list takes full width
+                    },
+                    "& .slick-slide": {
+                      padding: "0 10px", // Add some padding between slides
+                    },
+                  }}
                 >
-                  {departments.map((department) => (
-                    <Box key={department.id} sx={{ px: 3 }}>
-                      <Paper
-                        elevation={3}
-                        sx={{
-                          padding: 2,
-                          textAlign: "center",
-                          width: { xs: "70%", md: "100%" },
-                          height: "32rem",
-                          display: "flex",
-                          flexDirection: "column",
-                          alignItems: "center",
-                          justifyContent: "end",
-                          backgroundImage: `url(${department.image})`,
-                          backgroundSize: "cover",
-                        }}
-                      >
-                        <Typography
-                          variant='h5'
+                  <Slider
+                    {...settings}
+                    style={{ width:"100%" }}
+                  >
+                    {departments.map((department) => (
+                      <Box key={department.id} sx={{ px: 1 }}>
+                        <Paper
+                          elevation={3}
                           sx={{
-                            fontWeight: 600,
-                            fontFamily: "Montserrat, sans-serif",
-                            color: "#FFF",
-                            minHeight: "3rem",
-                            lineHeight: 1.2,
-                            textShadow: 10,
-                            WebkitBoxOrient: "vertical",
+                            textAlign: "center",
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                            justifyContent: "end",
+                            backgroundImage: `url(${department.image})`,
+                            backgroundSize: "cover",
+                            backgroundPosition: "center",
+                            height: { xs: "300px", md: "400px" }, // Set a consistent height
+                            width: "100%", // Ensure full width
+                            position: "relative", // Add this for better positioning
                           }}
                         >
-                          {department.name}
-                        </Typography>
-                      </Paper>
-                    </Box>
-                  ))}
-                </Slider>
-              </Box>
-              <Box
-                sx={{
-                  display: "flex",
-                  gap: 7,
-                  justifyContent: { xs: "center" },
-                }}
-              >
-                <Button
-                  variant='contained'
-                  onClick={handleReadMore}
+                          <Box
+                            sx={{
+                              position: 'absolute',
+                              bottom: 0,
+                              left: 0,
+                              right: 0,
+                              backgroundColor: 'rgba(256,256,256,0.1)', // Semi-transparent background for text
+                              padding: 2,
+                            }}
+                            >
+                            <Typography
+                              variant='h5'
+                              sx={{
+                                fontWeight: 600,
+                                fontFamily: "Montserrat, sans-serif",
+                                color: "#FFF",
+                                lineHeight: 1.2,
+                                textShadow: '1px 1px 2px rgba(0,0,0,0.5)', // Add text shadow for better readability
+                              }}
+                            >
+                              {department.name}
+                            </Typography>
+                            </Box>
+                        </Paper>
+                      </Box>
+                    ))}
+                  </Slider>
+                </Box>
+                <Box
                   sx={{
-                    backgroundColor: "#001C43",
-                    color: "#FFF",
-                    fontFamily: "Montserrat, sans-serif",
-                    fontWeight: 600,
-                    textTransform: "none",
-                    fontSize: { xs: "0.875rem", md: "1.375rem" },
-                    padding: { xs: "0.5rem 1rem", md: "1.5rem 2rem" },
-                    borderRadius: "100px",
-                    maxHeight: "3rem",
+                    display: "flex",
+                    gap: 7,
+                    justifyContent: { xs: "center" },
+                    
                   }}
-                  flexItem
                 >
-                  Read More
-                </Button>
-                <Button
-                  variant='contained'
-                  key={"Get Started"}
-                  onClick={openLoginModal}
+                  <Button
+                    variant='contained'
+                    onClick={handleReadMore}
+                    sx={{
+                      backgroundColor: "#001C43",
+                      color: "#FFF",
+                      fontFamily: "Montserrat, sans-serif",
+                      fontWeight: 600,
+                      textTransform: "none",
+                      fontSize: { xs: "0.875rem", md: "1rem" },
+                      padding: { xs: "0.5rem 1rem", md: "1.5rem" },
+                      borderRadius: "100px",
+                      maxHeight: "3rem",
+                    }}
+                    flexItem
+                  >
+                    Read More
+                  </Button>
+                  <Button
+                    variant='contained'
+                    key={"Get Started"}
+                    onClick={openLoginModal}
+                    sx={{
+                      backgroundColor: "#CA031B",
+                      color: "#FFF",
+                      fontFamily: "Montserrat, sans-serif",
+                      fontWeight: 600,
+                      textTransform: "none",
+                      fontSize: { xs: "0.875rem", md: "1rem" },
+                      padding: { xs: "0.5rem 1rem", md: "1.5rem" },
+                      borderRadius: "100px",
+                      maxHeight: "3rem",
+                    }}
+                    flexItem
+                  >
+                    Get Started
+                  </Button>
+                </Box>
+              </Grid2>
+              <Grid2 size={3}>
+                {/* Knowledge Graph */}
+                <Box
                   sx={{
-                    backgroundColor: "#CA031B",
-                    color: "#FFF",
-                    fontFamily: "Montserrat, sans-serif",
-                    fontWeight: 600,
-                    textTransform: "none",
-                    fontSize: { xs: "0.875rem", md: "1.375rem" },
-                    padding: { xs: "0.5rem 1rem", md: "1.5rem 2rem" },
-                    borderRadius: "100px",
-                    maxHeight: "3rem",
+                    flex: 2,
+                    display: { xs: "none", md: "flex" },
+                    flexDirection: "column",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    alignSelf: "center",
                   }}
-                  flexItem
                 >
-                  Get Started
-                </Button>
-              </Box>
-            </Box>
-
-            {/* Knowledge Graph */}
-            <Box
-              sx={{
-                flex: 1,
-                display: { xs: "none", md: "flex" },
-                flexDirection: "column",
-                justifyContent: "center",
-                alignItems: "center",
-                alignSelf: "center",
-              }}
-            >
-              <img
-                src={DummyKG}
-                alt='Dummy Knowledge Graph'
-                style={{
-                  width: "100%",
-                  height: "auto",
-                  objectFit: "contain",
-                  paddingTop: "5rem",
-                }}
-              />
-              <Typography
-                variant='body1'
-                sx={{
-                  fontFamily: "Montserrat, sans-serif",
-                  fontWeight: 300,
-                  fontSize: { xs: "1rem", md: "1.15rem" },
-                  color: "#F0F0F0",
-                  maxWidth: { xs: "100%", md: "80%" },
-                  paddingTop: "5rem",
-                  paddingLeft: "5rem",
-                }}
-              >
-                A research platform for researchers, built by Mapúa MCL
-                researchers
-              </Typography>
-            </Box>
+                  <img
+                    src={DummyKG}
+                    alt='Dummy Knowledge Graph'
+                    style={{
+                      width: "100%",
+                      height: "auto",
+                      objectFit: "contain",
+                      paddingTop: "5rem",
+                    }}
+                  />
+                  <Typography
+                    variant='body1'
+                    sx={{
+                      fontFamily: "Montserrat, sans-serif",
+                      fontWeight: 300,
+                      fontSize: { xs: "1rem", md: "1rem" },
+                      color: "#F0F0F0",
+                      maxWidth: { xs: "100%", md: "80%" },
+                      py: 15
+                    }}
+                  >
+                    A research platform for researchers, built by Mapúa MCL
+                    researchers
+                  </Typography>
+                </Box>
+              </Grid2>
+            </Grid2>
           </Box>
         </Box>
 

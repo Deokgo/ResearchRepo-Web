@@ -74,7 +74,7 @@ const SignUpModal = () => {
     height: "auto",
     bgcolor: "background.paper",
     boxShadow: 24,
-    p: 4,
+    p: 2,
     borderRadius: "10px",
   };
   const togglePasswordVisibility = () => {
@@ -239,6 +239,11 @@ const SignUpModal = () => {
             fontWeight='500'
             sx={{
               textAlign: { xs: "center", md: "bottom" },
+              fontSize: {
+                xs: "clamp(0.5rem, 2vw, 0.5rem)",
+                sm: "clamp(0.75rem, 3.5vw, 0.75rem)",
+                md: "clamp(1rem, 4vw, 1rem)",
+              },
             }}
           >
             Mapúa MCL Research Repository
@@ -247,9 +252,14 @@ const SignUpModal = () => {
             variant='h2'
             color='#F40824'
             fontWeight='700'
-            paddingTop='1rem'
             sx={{
+              py: 2,
               textAlign: { xs: "center", md: "bottom" },
+              fontSize: {
+                xs: "clamp(1rem, 2vw, 1rem)",
+                sm: "clamp(2rem, 3.5vw, 2rem)",
+                md: "clamp(3rem, 4vw, 3rem)",
+              },
             }}
           >
             Sign Up
@@ -270,16 +280,28 @@ const SignUpModal = () => {
                     name='firstName'
                     value={formData.firstName}
                     onChange={handleChange}
-                    margin='normal'
                     variant='outlined'
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position='end'>
-                          <IconButton onClick={() => clearField("firstName")}>
-                            <ClearIcon />
-                          </IconButton>
-                        </InputAdornment>
-                      ),
+                    sx={{ 
+                      flex: 2,
+                      // Responsive font size
+                      '& .MuiInputBase-input': {
+                        fontSize: { 
+                          xs: '0.75rem',   // Mobile
+                          sm: '0.85rem',   // Small devices
+                          md: '0.9rem',    // Medium devices
+                          lg: '1rem'        // Large devices
+                        },
+                        // Adjust input height
+                        padding: { 
+                          xs: '8px 12px',   // Mobile
+                          md: '12px 14px'   // Larger screens
+                        },
+                        // Optional: adjust overall height
+                        height: { 
+                          xs: '15px',   // Mobile
+                          md: '25px'    // Larger screens
+                        }
+                      }
                     }}
                   ></TextField>
                 </Grid2>
@@ -290,16 +312,28 @@ const SignUpModal = () => {
                     name='middleName'
                     value={formData.middleName}
                     onChange={handleChange}
-                    margin='normal'
                     variant='outlined'
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position='end'>
-                          <IconButton onClick={() => clearField("middleName")}>
-                            <ClearIcon />
-                          </IconButton>
-                        </InputAdornment>
-                      ),
+                    sx={{ 
+                      flex: 2,
+                      // Responsive font size
+                      '& .MuiInputBase-input': {
+                        fontSize: { 
+                          xs: '0.75rem',   // Mobile
+                          sm: '0.85rem',   // Small devices
+                          md: '0.9rem',    // Medium devices
+                          lg: '1rem'        // Large devices
+                        },
+                        // Adjust input height
+                        padding: { 
+                          xs: '8px 12px',   // Mobile
+                          md: '12px 14px'   // Larger screens
+                        },
+                        // Optional: adjust overall height
+                        height: { 
+                          xs: '15px',   // Mobile
+                          md: '25px'    // Larger screens
+                        }
+                      }
                     }}
                   />
                 </Grid2>
@@ -310,16 +344,28 @@ const SignUpModal = () => {
                     name='lastName'
                     value={formData.lastName}
                     onChange={handleChange}
-                    margin='normal'
                     variant='outlined'
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position='end'>
-                          <IconButton onClick={() => clearField("lastName")}>
-                            <ClearIcon />
-                          </IconButton>
-                        </InputAdornment>
-                      ),
+                    sx={{ 
+                      flex: 2,
+                      // Responsive font size
+                      '& .MuiInputBase-input': {
+                        fontSize: { 
+                          xs: '0.75rem',   // Mobile
+                          sm: '0.85rem',   // Small devices
+                          md: '0.9rem',    // Medium devices
+                          lg: '1rem'        // Large devices
+                        },
+                        // Adjust input height
+                        padding: { 
+                          xs: '8px 12px',   // Mobile
+                          md: '12px 14px'   // Larger screens
+                        },
+                        // Optional: adjust overall height
+                        height: { 
+                          xs: '15px',   // Mobile
+                          md: '25px'    // Larger screens
+                        }
+                      }
                     }}
                   ></TextField>
                 </Grid2>
@@ -331,14 +377,27 @@ const SignUpModal = () => {
                     value={formData.suffix}
                     onChange={handleChange}
                     variant='outlined'
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position='end'>
-                          <IconButton onClick={() => clearField("suffix")}>
-                            <ClearIcon />
-                          </IconButton>
-                        </InputAdornment>
-                      ),
+                    sx={{ 
+                      flex: 2,
+                      // Responsive font size
+                      '& .MuiInputBase-input': {
+                        fontSize: { 
+                          xs: '0.75rem',   // Mobile
+                          sm: '0.85rem',   // Small devices
+                          md: '0.9rem',    // Medium devices
+                          lg: '1rem'        // Large devices
+                        },
+                        // Adjust input height
+                        padding: { 
+                          xs: '8px 12px',   // Mobile
+                          md: '12px 14px'   // Larger screens
+                        },
+                        // Optional: adjust overall height
+                        height: { 
+                          xs: '15px',   // Mobile
+                          md: '25px'    // Larger screens
+                        }
+                      }
                     }}
                   ></TextField>
                 </Grid2>
@@ -351,14 +410,27 @@ const SignUpModal = () => {
                     value={formData.email}
                     onChange={handleChange}
                     variant='outlined'
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position='end'>
-                          <IconButton onClick={() => clearField("email")}>
-                            <ClearIcon />
-                          </IconButton>
-                        </InputAdornment>
-                      ),
+                    sx={{ 
+                      flex: 2,
+                      // Responsive font size
+                      '& .MuiInputBase-input': {
+                        fontSize: { 
+                          xs: '0.75rem',   // Mobile
+                          sm: '0.85rem',   // Small devices
+                          md: '0.9rem',    // Medium devices
+                          lg: '1rem'        // Large devices
+                        },
+                        // Adjust input height
+                        padding: { 
+                          xs: '8px 12px',   // Mobile
+                          md: '12px 14px'   // Larger screens
+                        },
+                        // Optional: adjust overall height
+                        height: { 
+                          xs: '15px',   // Mobile
+                          md: '25px'    // Larger screens
+                        }
+                      }
                     }}
                   ></TextField>
                 </Grid2>
@@ -373,14 +445,27 @@ const SignUpModal = () => {
                 onChange={handleChange}
                 margin='normal'
                 variant='outlined'
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position='end'>
-                      <IconButton onClick={() => clearField("institution")}>
-                        <ClearIcon />
-                      </IconButton>
-                    </InputAdornment>
-                  ),
+                sx={{ 
+                  flex: 2,
+                  // Responsive font size
+                  '& .MuiInputBase-input': {
+                    fontSize: { 
+                      xs: '0.75rem',   // Mobile
+                      sm: '0.85rem',   // Small devices
+                      md: '0.9rem',    // Medium devices
+                      lg: '1rem'        // Large devices
+                    },
+                    // Adjust input height
+                    padding: { 
+                      xs: '8px 12px',   // Mobile
+                      md: '12px 14px'   // Larger screens
+                    },
+                    // Optional: adjust overall height
+                    height: { 
+                      xs: '15px',   // Mobile
+                      md: '25px'    // Larger screens
+                    }
+                  }
                 }}
                 required
                 error={Boolean(institutionError)}
@@ -495,23 +580,30 @@ const SignUpModal = () => {
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "center",
-                  marginTop: "20px",
                 }}
               >
                 <Button
-                  fullWidth
                   variant='contained'
                   type='submit'
                   sx={{
-                    maxWidth: "200px",
-                    marginTop: "20px",
-                    padding: "15px",
-                    backgroundColor: "#EC1F28",
+                    backgroundColor: "#CA031B",
+                    color: "#FFF",
+                    fontFamily: "Montserrat, sans-serif",
+                    fontWeight: 600,
+                    textTransform: "none",
+                    fontSize: { xs: "0.875rem", md: "1rem" },
+                    padding: { xs: "0.5rem 1rem", md: "1.5rem" },
+                    borderRadius: "100px",
+                    maxHeight: "3rem",
+                    "&:hover": {
+                      backgroundColor: "#A30417",
+                      color: "#FFF",
+                    },
                   }}
                 >
                   Create Account
                 </Button>
-                <Typography sx={{ marginTop: "20px" }}>
+                <Typography sx={{ marginTop: "0.5rem" }}>
                   Already a member?{" "}
                   <a
                     href='#'

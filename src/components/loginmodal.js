@@ -112,6 +112,11 @@ const LoginModal = () => {
             fontWeight='500'
             sx={{
               textAlign: { xs: "center", md: "bottom" },
+              fontSize: {
+                xs: "clamp(0.5rem, 2vw, 0.5rem)",
+                sm: "clamp(0.75rem, 3.5vw, 0.75rem)",
+                md: "clamp(1rem, 4vw, 1rem)",
+              },
             }}
           >
             Mapúa MCL Research Repository
@@ -123,6 +128,11 @@ const LoginModal = () => {
             padding={3}
             sx={{
               textAlign: { xs: "center", md: "bottom" },
+              fontSize: {
+                xs: "clamp(1rem, 2vw, 1rem)",
+                sm: "clamp(2rem, 3.5vw, 2rem)",
+                md: "clamp(3rem, 4vw, 3rem)",
+              },
             }}
           >
             Login
@@ -166,17 +176,26 @@ const LoginModal = () => {
                 }}
               >
                 <Button
-                  type='submit'
-                  fullWidth
                   variant='contained'
+                  fullWidth
+                  type='submit'
                   sx={{
-                    maxWidth: "200px",
-                    marginTop: "20px",
-                    padding: "15px",
-                    backgroundColor: "#EC1F28",
+                    backgroundColor: "#CA031B",
+                    color: "#FFF",
+                    fontFamily: "Montserrat, sans-serif",
+                    fontWeight: 600,
+                    textTransform: "none",
+                    fontSize: { xs: "0.875rem", md: "1rem" },
+                    padding: { xs: "0.5rem 1rem", md: "1.25rem" },
+                    borderRadius: "100px",
+                    maxHeight: "3rem",
+                    "&:hover": {
+                      backgroundColor: "#A30417",
+                      color: "#FFF",
+                    },
                   }}
                 >
-                  Log in
+                  Login
                 </Button>
 
                 <Button

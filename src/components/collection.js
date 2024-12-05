@@ -382,14 +382,19 @@ const Collection = () => {
           <Box
             sx={{
               position: "relative",
-              height: { xs: "5rem", md: "6rem" },
+              width: "100%",
+              height: {
+                xs: "clamp(2rem, 3vh, 3rem)",
+                sm: "clamp(3rem, 8vh, 4rem)",
+                md: "clamp(3rem, 14vh, 4rem)",
+                lg: "clamp(4rem, 20vh, 5rem)"
+              },
               backgroundColor: "#0A438F",
               backgroundSize: "cover",
               backgroundPosition: "center",
               display: "flex",
               alignItems: "center",
-              padding: 2,
-              zIndex: 1,
+              zIndex: 1
             }}
           >
             <Box
@@ -410,6 +415,11 @@ const Collection = () => {
                 onClick={() => navigate(-1)}
                 sx={{
                   color: "#fff",
+                  transform: {
+                    xs: "scale(0.8)",
+                    sm: "scale(1)",
+                    md: "scale(1.2)"
+                  }
                 }}
               >
                 <ArrowBackIosIcon />
@@ -419,14 +429,18 @@ const Collection = () => {
                 sx={{
                   fontFamily: "Montserrat, sans-serif",
                   fontWeight: 800,
-                  fontSize: { xs: "1.5rem", sm: "2rem", md: "2.575rem" },
+                  fontSize: {
+                    xs: "clamp(1rem, 2vw, 1rem)",
+                    sm: "clamp(1.5rem, 3.5vw, 1.5rem)",
+                    md: "clamp(2rem, 4vw, 2.25rem)",
+                  },
                   color: "#FFF",
                   lineHeight: 1.25,
                   alignSelf: "center",
-                  zIndex: 2,
+                  zIndex: 2
                 }}
               >
-                Collections
+                Collection
               </Typography>
             </Box>
           </Box>
@@ -435,7 +449,7 @@ const Collection = () => {
           <Box
             sx={{
               flex: 1,
-              padding: 5,
+              padding: 3,
               overflow: "hidden",
               height: "calc(100% - 48px)",
             }}
@@ -452,7 +466,7 @@ const Collection = () => {
               <Grid2 size={3}>
                 <Box
                   sx={{
-                    border: "2px solid #0A438F",
+                    border: "1px solid #0A438F",
                     height: "100%",
                     borderRadius: 3,
                     padding: 3,
@@ -463,11 +477,11 @@ const Collection = () => {
                 >
                   <Typography
                     variant='h6'
-                    sx={{ mb: 3, fontWeight: "bold", color: "#F40824" }}
+                    sx={{ mb: 2, fontWeight: "bold", color: "#F40824" }}
                   >
                     Filters
                   </Typography>
-                  <Box sx={{ mb: 4 }}>
+                  <Box sx={{ mb: 2 }}>
                     <Typography
                       variant='body1'
                       sx={{
@@ -475,6 +489,7 @@ const Collection = () => {
                         color: "#08397C",
                         position: "relative",
                         zIndex: 2,
+                        fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" },
                       }}
                     >
                       Year Range:
@@ -512,14 +527,14 @@ const Collection = () => {
                       />
                     </Box>
                   </Box>
-                  <Typography variant='body1' sx={{ mb: 1, color: "#08397C" }}>
+                  <Typography variant='body1' sx={{ color: "#08397C", fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" },}}>
                     College:
                   </Typography>
                   <Box
                     sx={{
                       display: "flex",
                       flexDirection: "column",
-                      height: "25%",
+                      height: "50%",
                       overflowY: "auto",
                       mb: 2,
                       "&::-webkit-scrollbar": {
@@ -548,17 +563,22 @@ const Collection = () => {
                           />
                         }
                         label={college.college_name}
+                        sx={{
+                          '& .MuiTypography-root': {
+                            fontSize: { xs: "0.5rem", md: "0.75rem", lg: "0.9rem" }
+                          }
+                        }}
                       />
                     ))}
                   </Box>
-                  <Typography variant='body1' sx={{ mb: 1, color: "#08397C" }}>
+                  <Typography variant='body1' sx={{ color: "#08397C", fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" }, }}>
                     Program:
                   </Typography>
                   <Box
                     sx={{
                       display: "flex",
                       flexDirection: "column",
-                      height: "30%",
+                      height: "50%",
                       overflowY: "auto",
                       mb: 2,
                       "&::-webkit-scrollbar": {
@@ -587,25 +607,55 @@ const Collection = () => {
                           />
                         }
                         label={program.program_name}
+                        sx={{
+                          '& .MuiTypography-root': {
+                            fontSize: { xs: "0.5rem", md: "0.75rem", lg: "0.9rem" }
+                          }
+                        }}
                       />
                     ))}
                   </Box>
-                  <Typography variant='body1' sx={{ color: "#08397C" }}>
+                  <Typography variant='body1' sx={{ color: "#08397C", fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" }, }}>
                     Publication Format:
                   </Typography>
-                  {["Journal", "Proceeding", "Unpublished"].map((format) => (
-                    <FormControlLabel
-                      key={format}
-                      control={
-                        <Checkbox
-                          checked={selectedFormats.includes(format)}
-                          onChange={handleFormatChange}
-                          value={format}
-                        />
-                      }
-                      label={format}
-                    />
-                  ))}
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                      height: "50%",
+                      overflowY: "auto",
+                      "&::-webkit-scrollbar": {
+                        width: "8px",
+                      },
+                      "&::-webkit-scrollbar-track": {
+                        background: "#f1f1f1",
+                        borderRadius: "4px",
+                      },
+                      "&::-webkit-scrollbar-thumb": {
+                        background: "#08397C",
+                        borderRadius: "4px",
+                      },
+                    }}
+                  >
+                      {["Journal", "Proceeding", "Unpublished"].map((format) => (
+                      <FormControlLabel
+                        key={format}
+                        control={
+                          <Checkbox
+                            checked={selectedFormats.includes(format)}
+                            onChange={handleFormatChange}
+                            value={format}
+                          />
+                        }
+                        label={format}
+                        sx={{
+                          '& .MuiTypography-root': {
+                            fontSize: { xs: "0.5rem", md: "0.75rem", lg: "0.9rem" }
+                          }
+                        }}
+                      />
+                    ))}
+                  </Box>
                 </Box>
               </Grid2>
 
@@ -655,8 +705,8 @@ const Collection = () => {
                           fontFamily: "Montserrat, sans-serif",
                           fontWeight: 600,
                           textTransform: "none",
-                          fontSize: { xs: "0.875rem", md: "1.275rem" },
-                          padding: { xs: "0.5rem 1rem", md: "1.5rem" },
+                          fontSize: { xs: "0.875rem", md: "1rem" },
+                          padding: { xs: "0.5rem 1rem", md: "1.25rem" },
                           marginLeft: "2rem",
                           borderRadius: "100px",
                           maxHeight: "3rem",
@@ -690,7 +740,7 @@ const Collection = () => {
                               <Box
                                 key={researchItem.research_id}
                                 sx={{
-                                  p: 2,
+                                  p: 3,
                                   cursor: "pointer",
                                   minHeight: "calc((100% - 48px) / 5)",
                                   display: "flex",
@@ -708,8 +758,8 @@ const Collection = () => {
                                 <Typography
                                   variant='h6'
                                   sx={{
-                                    mb: 1.5,
-                                    fontSize: "1.1rem",
+                                    mb: 1,
+                                    fontSize: { xs: "0.5rem", md: "0.75rem", lg: "1rem" },
                                     fontWeight: 500,
                                   }}
                                 >
@@ -718,8 +768,9 @@ const Collection = () => {
                                 <Typography
                                   variant='body2'
                                   sx={{
-                                    mb: 1,
+                                    mb: 0.5,
                                     color: "#666",
+                                    fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.75rem" },
                                   }}
                                 >
                                   {researchItem.program_name} |{" "}
@@ -733,6 +784,7 @@ const Collection = () => {
                                   sx={{
                                     color: "#0A438F",
                                     fontWeight: 500,
+                                    fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.75rem" },
                                   }}
                                 >
                                   {researchItem.journal}
