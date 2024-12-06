@@ -14,7 +14,7 @@ import {
   Toolbar,
   Typography,
   useMediaQuery,
-  useTheme
+  useTheme,
 } from "@mui/material";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -213,32 +213,81 @@ const Navbar = () => {
     color: "#001C43",
     fontFamily: "Montserrat, sans-serif",
     fontWeight: 600,
-    fontSize: { 
-      xs: "0.25rem",   // Smaller on extra small screens
-      sm: "0.25rem",  // Slightly larger on small screens
-      md: "0.60rem",      // Standard size on medium screens
-      lg: "0.75rem"   // Slightly larger on large screens
+    fontSize: {
+      xs: "0.25rem", // Smaller on extra small screens
+      sm: "0.25rem", // Slightly larger on small screens
+      md: "0.60rem", // Standard size on medium screens
+      lg: "0.75rem", // Slightly larger on large screens
     },
-    marginRight: { 
-      xs: "0.75rem", 
-      sm: "0.50rem", 
-      md: "0.25rem" 
+    marginRight: {
+      xs: "0.75rem",
+      sm: "0.50rem",
+      md: "0.25rem",
     },
-    padding: { 
-      xs: "0rem 0.25rem", 
-      sm: "0.25rem 0.5rem", 
-      md: "0.25rem 0.5rem" 
-    }
+    padding: {
+      xs: "0rem 0.25rem",
+      sm: "0.25rem 0.5rem",
+      md: "0.25rem 0.5rem",
+    },
   };
+
+  // Define which menu items are available for each role
+  const getNavbarItems = () => {
+    if (!user) return [];
+
+    // Common items for all roles
+    const commonItems = [
+      { label: "Collections", onClick: handleCollection },
+      { label: "Research Thrusts", onClick: handleResearchThrust },
+    ];
+
+    // Role-specific items
+    const roleSpecificItems = {
+      "01": [
+        // System Administrator
+        { label: "System Management", onClick: handleOpenSymaMenu },
+        ...commonItems,
+      ],
+      "02": [
+        // Director
+        { label: "Dashboard", onClick: handleOpenDashMenu },
+        { label: "Research Tracking", onClick: handleResesearchTrack },
+        ...commonItems,
+      ],
+      "03": [
+        // Head Executive
+        { label: "Dashboard", onClick: handleOpenDashMenu },
+        { label: "Research Tracking", onClick: handleResesearchTrack },
+        ...commonItems,
+      ],
+      "04": [
+        // College Administrator
+        { label: "Dashboard", onClick: handleOpenDashMenu },
+        ...commonItems,
+      ],
+      "05": [
+        // Program Administrator
+        { label: "Research Tracking", onClick: handleResesearchTrack },
+        ...commonItems,
+      ],
+      "06": [
+        // Researcher
+        ...commonItems,
+      ],
+    };
+
+    return roleSpecificItems[user.role] || commonItems;
+  };
+
   return (
     <AppBar
       position='fixed'
       sx={{
         backgroundColor: "#FFF",
-        height: { 
-          xs: 'calc(3.5rem + env(safe-area-inset-top))', 
-          sm: 'calc(4rem + env(safe-area-inset-top))', 
-          md: 'calc(6rem + env(safe-area-inset-top))' 
+        height: {
+          xs: "calc(3.5rem + env(safe-area-inset-top))",
+          sm: "calc(4rem + env(safe-area-inset-top))",
+          md: "calc(6rem + env(safe-area-inset-top))",
         },
         // Ensure navbar doesn't overlap content
         zIndex: theme.zIndex.appBar,
@@ -246,7 +295,7 @@ const Navbar = () => {
     >
       <Toolbar
         sx={{
-          height: '100%',
+          height: "100%",
           display: "flex",
           flexWrap: "nowrap",
           justifyContent: "space-between",
@@ -254,19 +303,19 @@ const Navbar = () => {
           px: { xs: 1, sm: 2, md: 1 }, // Responsive padding
         }}
       >
-        <Box 
+        <Box
           sx={{
-            display: "flex", 
-            alignItems: "center", 
-            flexGrow: { xs: 1, md: 0 } 
+            display: "flex",
+            alignItems: "center",
+            flexGrow: { xs: 1, md: 0 },
           }}
         >
           <IconButton
             onClick={null}
             sx={{
               p: 0,
-              width: { xs: '2rem', sm: '3rem', md: '4rem', lg: '5rem' },
-              height: { xs: '2rem', sm: '3rem', md: '4rem', lg: '5rem' },
+              width: { xs: "2rem", sm: "3rem", md: "4rem", lg: "5rem" },
+              height: { xs: "2rem", sm: "3rem", md: "4rem", lg: "5rem" },
             }}
           >
             <img
@@ -276,7 +325,7 @@ const Navbar = () => {
                 width: "100%",
                 height: "100%",
                 objectFit: "contain",
-                padding: '0.5rem',
+                padding: "0.5rem",
               }}
             />
           </IconButton>
@@ -287,7 +336,7 @@ const Navbar = () => {
               mx: { xs: 1, md: 2 },
               borderColor: "#CA031B",
               height: { xs: "1.5rem", md: "2rem" },
-              borderWidth: { xs: '0.5px', sm: '1px', md: '2px' }, // Responsive padding,
+              borderWidth: { xs: "0.5px", sm: "1px", md: "2px" }, // Responsive padding,
               alignSelf: "center",
             }}
           />
@@ -306,7 +355,12 @@ const Navbar = () => {
                 fontFamily: "Montserrat, sans-serif",
                 fontWeight: 600,
                 color: "#CA031B",
-                fontSize: { xs: "0.25rem", sm: "0.5rem", md: "0.75rem", lg: "1rem" },
+                fontSize: {
+                  xs: "0.25rem",
+                  sm: "0.5rem",
+                  md: "0.75rem",
+                  lg: "1rem",
+                },
               }}
             >
               Institutional
@@ -317,7 +371,12 @@ const Navbar = () => {
                 fontFamily: "Montserrat, sans-serif",
                 fontWeight: 600,
                 color: "#001C43",
-                fontSize: { xs: "0.25rem", sm: "0.5rem", md: "0.75rem", lg: "1rem" },
+                fontSize: {
+                  xs: "0.25rem",
+                  sm: "0.5rem",
+                  md: "0.75rem",
+                  lg: "1rem",
+                },
                 lineHeight: { xs: "1", md: "1.2" },
               }}
             >
@@ -329,85 +388,50 @@ const Navbar = () => {
         {/*Navigation Buttons*/}
         <Box sx={{ display: { xs: "none", md: "flex" }, gap: 3 }}>
           {!isLoggedIn ? (
-            <Box 
-              sx={{ 
-              display: { xs: "none", md: "flex" }, 
-              alignItems: "center", 
-              gap: { md: 1, lg: 2 } 
-            }}>
-              <Button
-                key='Home'
-                onClick={handleNavigateHome}
-                sx={buttonSettings}
-              >
+            <Box
+              sx={{
+                display: { xs: "none", md: "flex" },
+                alignItems: "center",
+                gap: { md: 1, lg: 2 },
+              }}
+            >
+              <Button onClick={handleNavigateHome} sx={buttonSettings}>
                 Home
               </Button>
-              <Button
-                key='Research Thrusts'
-                onClick={handleResearchThrust}
-                sx={buttonSettings}
-              >
+              <Button onClick={handleResearchThrust} sx={buttonSettings}>
                 Research Thrusts
               </Button>
-              <Button key={"Log in"} onClick={handleLogin} sx={buttonSettings}>
+              <Button onClick={handleLogin} sx={buttonSettings}>
                 Log in
               </Button>
             </Box>
           ) : (
-            <Box>
-              <Button
-                key='Dashboard'
-                onClick={handleOpenDashMenu}
-                endIcon={
-                  <KeyboardArrowDownIcon
-                    style={{ color: "red", fontSize: 30 }}
-                  />
-                }
-                sx={buttonSettings}
-              >
-                Dashboard
-              </Button>
-              <Button
-                key='Collections'
-                onClick={handleCollection}
-                sx={buttonSettings}
-              >
-                Collections
-              </Button>
-              <Button
-                key='ResearchTracking'
-                onClick={handleResesearchTrack}
-                sx={buttonSettings}
-              >
-                Research Tracking
-              </Button>
-              <Button
-                key='ResearchThrust'
-                onClick={handleResearchThrust}
-                sx={buttonSettings}
-              >
-                Research Thrusts
-              </Button>
-              <Button
-                key='SystemManagement'
-                onClick={handleOpenSymaMenu}
-                endIcon={
-                  <KeyboardArrowDownIcon
-                    style={{ color: "red", fontSize: 30 }}
-                  />
-                }
-                sx={buttonSettings}
-              >
-                System Management
-              </Button>
+            <Box sx={{ display: "flex", gap: 2 }}>
+              {getNavbarItems().map((item, index) => (
+                <Button
+                  key={index}
+                  onClick={item.onClick}
+                  sx={buttonSettings}
+                  endIcon={
+                    item.label === "Dashboard" ||
+                    item.label === "System Management" ? (
+                      <KeyboardArrowDownIcon
+                        style={{ color: "red", fontSize: 30 }}
+                      />
+                    ) : null
+                  }
+                >
+                  {item.label}
+                </Button>
+              ))}
               <IconButton
                 onClick={handleOpenUserMenu}
-                sx={{ 
-                  color: "#CA031B", 
-                  fontSize: { xs: "2rem", md: "2rem", lg: "3rem" } 
+                sx={{
+                  color: "#CA031B",
+                  fontSize: { xs: "2rem", md: "2rem", lg: "3rem" },
                 }}
               >
-                <AccountCircleIcon fontSize= 'inherit'  />
+                <AccountCircleIcon fontSize='inherit' />
               </IconButton>
             </Box>
           )}
@@ -500,61 +524,47 @@ const Navbar = () => {
         </Menu>
 
         {/*Dashboard Menu*/}
-        <Menu
-          anchorEl={anchorElDash}
-          anchorOrigin={{
-            vertical: "top",
-            horizontal: "right",
-          }}
-          keepMounted
-          transformOrigin={{
-            vertical: "top",
-            horizontal: "right",
-          }}
-          open={Boolean(anchorElDash)}
-          onClose={handleCloseDashMenu}
-          sx={{ "& .MuiPaper-root": { backgroundColor: "#CA031B" } }}
-        >
-          <MenuItem onClick={handleReports}>
-            <Typography color='common.white'>Reports</Typography>
-          </MenuItem>
-          <MenuItem onClick={handleMainDash}>
-            <Typography color='common.white'>Analytics</Typography>
-          </MenuItem>
-          <MenuItem onClick={handleKnowledgeGraph}>
-            <Typography color='common.white'>Knowledge Graph</Typography>
-          </MenuItem>
-        </Menu>
+        {user?.role === "04" && (
+          <Menu
+            anchorEl={anchorElDash}
+            open={Boolean(anchorElDash)}
+            onClose={handleCloseDashMenu}
+            sx={{ "& .MuiPaper-root": { backgroundColor: "#CA031B" } }}
+          >
+            <MenuItem onClick={handleReports}>
+              <Typography color='common.white'>Reports</Typography>
+            </MenuItem>
+            <MenuItem onClick={handleMainDash}>
+              <Typography color='common.white'>Analytics</Typography>
+            </MenuItem>
+            <MenuItem onClick={handleKnowledgeGraph}>
+              <Typography color='common.white'>Knowledge Graph</Typography>
+            </MenuItem>
+          </Menu>
+        )}
 
         {/*System Management Menu*/}
-        <Menu
-          anchorEl={anchorElSyma}
-          anchorOrigin={{
-            vertical: "top",
-            horizontal: "right",
-          }}
-          keepMounted
-          transformOrigin={{
-            vertical: "top",
-            horizontal: "right",
-          }}
-          open={Boolean(anchorElSyma)}
-          onClose={handleCloseSymaMenu}
-          sx={{ "& .MuiPaper-root": { backgroundColor: "#CA031B" } }}
-        >
-          <MenuItem onClick={handleManageUsers}>
-            <Typography color='common.white'>Manage Users</Typography>
-          </MenuItem>
-          <MenuItem onClick={handleManageCollege}>
-            <Typography color='common.white'>Manage College</Typography>
-          </MenuItem>
-          <MenuItem onClick={handleManageProgram}>
-            <Typography color='common.white'>Manage Program</Typography>
-          </MenuItem>
-          <MenuItem onClick={handleViewAuditLog}>
-            <Typography color='common.white'>View Audit Logs</Typography>
-          </MenuItem>
-        </Menu>
+        {user?.role === "01" && (
+          <Menu
+            anchorEl={anchorElSyma}
+            open={Boolean(anchorElSyma)}
+            onClose={handleCloseSymaMenu}
+            sx={{ "& .MuiPaper-root": { backgroundColor: "#CA031B" } }}
+          >
+            <MenuItem onClick={handleManageUsers}>
+              <Typography color='common.white'>Manage Users</Typography>
+            </MenuItem>
+            <MenuItem onClick={handleManageCollege}>
+              <Typography color='common.white'>Manage College</Typography>
+            </MenuItem>
+            <MenuItem onClick={handleManageProgram}>
+              <Typography color='common.white'>Manage Program</Typography>
+            </MenuItem>
+            <MenuItem onClick={handleViewAuditLog}>
+              <Typography color='common.white'>View Audit Logs</Typography>
+            </MenuItem>
+          </Menu>
+        )}
       </Toolbar>
       <LoginModal />
     </AppBar>

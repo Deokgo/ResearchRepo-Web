@@ -21,6 +21,7 @@ import MainDash from "./components/maindash";
 import PubDash from "./components/pubdash";
 import DisplayResearchInfo from "./components/displayresearchinfo";
 import DisplayAuditLog from "./components/auditlog";
+import RoleBasedRoute from "./components/rolebasedroute";
 
 function App() {
   const [data, setData] = useState([{}]);
@@ -38,15 +39,7 @@ function App() {
             <Route path='/readmore' element={<ReadMore />} />
             <Route path='/researchthrust' element={<ResearchThrust />} />
 
-            {/* Protected routes */}
-            <Route
-              path='/knowledgegraph'
-              element={
-                <PrivateRoute>
-                  <KnowledgeGraph />
-                </PrivateRoute>
-              }
-            />
+            {/* Common routes (available to all authenticated users) */}
             <Route
               path='/collection'
               element={
@@ -55,52 +48,25 @@ function App() {
                 </PrivateRoute>
               }
             />
+
+            {/* Knowledge Graph route - accessible to all */}
             <Route
-              path='/maindash'
+              path='/knowledgegraph'
               element={
                 <PrivateRoute>
-                  <MainDash />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path='/publication'
-              element={
-                <PrivateRoute>
-                  <PubDash />
+                  <KnowledgeGraph />
                 </PrivateRoute>
               }
             />
 
+            {/* System Administrator only routes */}
             <Route
-              path='/researchtracking'
+              path='/manage-users'
               element={
                 <PrivateRoute>
-                  <ResearchTracking />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path='/updateresearchinfo'
-              element={
-                <PrivateRoute>
-                  <UpdateResearchInfo />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path='/updatetrackinginfo'
-              element={
-                <PrivateRoute>
-                  <UpdateTrackingInfo />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path='/managepapers'
-              element={
-                <PrivateRoute>
-                  <ManagePapers />
+                  <RoleBasedRoute allowedRoles={["01"]}>
+                    <ManageUsers />
+                  </RoleBasedRoute>
                 </PrivateRoute>
               }
             />
@@ -108,7 +74,9 @@ function App() {
               path='/managecollege'
               element={
                 <PrivateRoute>
-                  <ManageCollege />
+                  <RoleBasedRoute allowedRoles={["01"]}>
+                    <ManageCollege />
+                  </RoleBasedRoute>
                 </PrivateRoute>
               }
             />
@@ -116,18 +84,58 @@ function App() {
               path='/manageprogram'
               element={
                 <PrivateRoute>
-                  <ManageProgram />
+                  <RoleBasedRoute allowedRoles={["01"]}>
+                    <ManageProgram />
+                  </RoleBasedRoute>
                 </PrivateRoute>
               }
             />
             <Route
-              path='/displayresearchinfo/:research_id'
+              path='/auditlog'
               element={
                 <PrivateRoute>
-                  <DisplayResearchInfo />
+                  <RoleBasedRoute allowedRoles={["01"]}>
+                    <DisplayAuditLog />
+                  </RoleBasedRoute>
                 </PrivateRoute>
               }
             />
+
+            {/* Research Tracking (Head Executive, Director, Program Admin) */}
+            <Route
+              path='/researchtracking'
+              element={
+                <PrivateRoute>
+                  <RoleBasedRoute allowedRoles={["02", "03", "05"]}>
+                    <ResearchTracking />
+                  </RoleBasedRoute>
+                </PrivateRoute>
+              }
+            />
+
+            {/* College Administrator only routes */}
+            <Route
+              path='/maindash'
+              element={
+                <PrivateRoute>
+                  <RoleBasedRoute allowedRoles={["04"]}>
+                    <MainDash />
+                  </RoleBasedRoute>
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path='/publication'
+              element={
+                <PrivateRoute>
+                  <RoleBasedRoute allowedRoles={["04"]}>
+                    <PubDash />
+                  </RoleBasedRoute>
+                </PrivateRoute>
+              }
+            />
+
+            {/* Other protected routes */}
             <Route
               path='/profile'
               element={
@@ -136,22 +144,8 @@ function App() {
                 </PrivateRoute>
               }
             />
-            <Route
-              path='/manage-users'
-              element={
-                <PrivateRoute>
-                  <ManageUsers />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path='/auditlog'
-              element={
-                <PrivateRoute>
-                  <DisplayAuditLog />
-                </PrivateRoute>
-              }
-            />
+
+            {/* ... other routes ... */}
           </Routes>
         </ModalProvider>
       </AuthProvider>

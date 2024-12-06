@@ -28,6 +28,7 @@ import DummyKG from "../assets/dummy_kg_keyword.png";
 import Modal from "@mui/material/Modal";
 import { useModalContext } from "./modalcontext";
 import AddPaperModal from "./addpapermodal";
+import { useAuth } from "../context/AuthContext";
 
 const Collection = () => {
   const navigate = useNavigate();
@@ -50,6 +51,7 @@ const Collection = () => {
   const itemsPerPage = 5;
   const { isAddPaperModalOpen, openAddPaperModal, closeAddPaperModal } =
     useModalContext();
+  const { user } = useAuth();
 
   const handleNavigateKnowledgeGraph = () => {
     navigate("/knowledgegraph");
@@ -387,14 +389,14 @@ const Collection = () => {
                 xs: "clamp(2rem, 3vh, 3rem)",
                 sm: "clamp(3rem, 8vh, 4rem)",
                 md: "clamp(3rem, 14vh, 4rem)",
-                lg: "clamp(4rem, 20vh, 5rem)"
+                lg: "clamp(4rem, 20vh, 5rem)",
               },
               backgroundColor: "#0A438F",
               backgroundSize: "cover",
               backgroundPosition: "center",
               display: "flex",
               alignItems: "center",
-              zIndex: 1
+              zIndex: 1,
             }}
           >
             <Box
@@ -418,8 +420,8 @@ const Collection = () => {
                   transform: {
                     xs: "scale(0.8)",
                     sm: "scale(1)",
-                    md: "scale(1.2)"
-                  }
+                    md: "scale(1.2)",
+                  },
                 }}
               >
                 <ArrowBackIosIcon />
@@ -437,7 +439,7 @@ const Collection = () => {
                   color: "#FFF",
                   lineHeight: 1.25,
                   alignSelf: "center",
-                  zIndex: 2
+                  zIndex: 2,
                 }}
               >
                 Collection
@@ -527,7 +529,13 @@ const Collection = () => {
                       />
                     </Box>
                   </Box>
-                  <Typography variant='body1' sx={{ color: "#08397C", fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" },}}>
+                  <Typography
+                    variant='body1'
+                    sx={{
+                      color: "#08397C",
+                      fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" },
+                    }}
+                  >
                     College:
                   </Typography>
                   <Box
@@ -564,14 +572,24 @@ const Collection = () => {
                         }
                         label={college.college_name}
                         sx={{
-                          '& .MuiTypography-root': {
-                            fontSize: { xs: "0.5rem", md: "0.75rem", lg: "0.9rem" }
-                          }
+                          "& .MuiTypography-root": {
+                            fontSize: {
+                              xs: "0.5rem",
+                              md: "0.75rem",
+                              lg: "0.9rem",
+                            },
+                          },
                         }}
                       />
                     ))}
                   </Box>
-                  <Typography variant='body1' sx={{ color: "#08397C", fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" }, }}>
+                  <Typography
+                    variant='body1'
+                    sx={{
+                      color: "#08397C",
+                      fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" },
+                    }}
+                  >
                     Program:
                   </Typography>
                   <Box
@@ -608,14 +626,24 @@ const Collection = () => {
                         }
                         label={program.program_name}
                         sx={{
-                          '& .MuiTypography-root': {
-                            fontSize: { xs: "0.5rem", md: "0.75rem", lg: "0.9rem" }
-                          }
+                          "& .MuiTypography-root": {
+                            fontSize: {
+                              xs: "0.5rem",
+                              md: "0.75rem",
+                              lg: "0.9rem",
+                            },
+                          },
                         }}
                       />
                     ))}
                   </Box>
-                  <Typography variant='body1' sx={{ color: "#08397C", fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" }, }}>
+                  <Typography
+                    variant='body1'
+                    sx={{
+                      color: "#08397C",
+                      fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" },
+                    }}
+                  >
                     Publication Format:
                   </Typography>
                   <Box
@@ -637,7 +665,7 @@ const Collection = () => {
                       },
                     }}
                   >
-                      {["Journal", "Proceeding", "Unpublished"].map((format) => (
+                    {["Journal", "Proceeding", "Unpublished"].map((format) => (
                       <FormControlLabel
                         key={format}
                         control={
@@ -649,9 +677,13 @@ const Collection = () => {
                         }
                         label={format}
                         sx={{
-                          '& .MuiTypography-root': {
-                            fontSize: { xs: "0.5rem", md: "0.75rem", lg: "0.9rem" }
-                          }
+                          "& .MuiTypography-root": {
+                            fontSize: {
+                              xs: "0.5rem",
+                              md: "0.75rem",
+                              lg: "0.9rem",
+                            },
+                          },
                         }}
                       />
                     ))}
@@ -759,7 +791,11 @@ const Collection = () => {
                                   variant='h6'
                                   sx={{
                                     mb: 1,
-                                    fontSize: { xs: "0.5rem", md: "0.75rem", lg: "1rem" },
+                                    fontSize: {
+                                      xs: "0.5rem",
+                                      md: "0.75rem",
+                                      lg: "1rem",
+                                    },
                                     fontWeight: 500,
                                   }}
                                 >
@@ -770,7 +806,11 @@ const Collection = () => {
                                   sx={{
                                     mb: 0.5,
                                     color: "#666",
-                                    fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.75rem" },
+                                    fontSize: {
+                                      xs: "0.5rem",
+                                      md: "0.5rem",
+                                      lg: "0.75rem",
+                                    },
                                   }}
                                 >
                                   {researchItem.program_name} |{" "}
@@ -784,7 +824,11 @@ const Collection = () => {
                                   sx={{
                                     color: "#0A438F",
                                     fontWeight: 500,
-                                    fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.75rem" },
+                                    fontSize: {
+                                      xs: "0.5rem",
+                                      md: "0.5rem",
+                                      lg: "0.75rem",
+                                    },
                                   }}
                                 >
                                   {researchItem.journal}
