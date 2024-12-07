@@ -669,7 +669,7 @@ useEffect(() => {
           sx={{
             flexGrow: 1,
             height: { xs: "100%", md: "calc(100vh - 9rem)" },
-            marginTop: { xs: "3.5rem", sm: "4rem", md: "6rem" },
+            marginTop: { xs: "3.5rem", sm: "4rem", md: "5rem" },
           }}
         >
           <Box

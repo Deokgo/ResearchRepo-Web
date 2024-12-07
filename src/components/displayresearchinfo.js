@@ -502,30 +502,46 @@ const DisplayResearchInfo = ({ route, navigate }) => {
     <>
       <Box
         sx={{
+          margin: 0,
+          padding: 0,
+          height: "100vh",
           display: "flex",
           flexDirection: "column",
-          minHeight: "100vh",
+          overflow: "hidden",
         }}
       >
         <Navbar />
         <Box
           sx={{
-            height: { xs: "100%", md: "calc(100vh - 9rem)" },
-            marginTop: { xs: "3.5rem", sm: "4rem", md: "6rem" },
+            flexGrow: 1,
+            display: "flex",
+            flexDirection: "column",
+            marginTop: { xs: "3.5rem", sm: "4rem", md: "5rem" },
+            height: {
+              xs: "calc(100vh - 3.5rem)",
+              sm: "calc(100vh - 4rem)",
+              md: "calc(100vh - 6rem)",
+            },
+            overflow: "hidden",
           }}
         >
+          {/* Header with back button */}
           <Box
             sx={{
               position: "relative",
-              marginBottom: 2,
-              display: "flex",
-              flexDirection: { xs: "column", md: "row" },
-              padding: 4,
-              gap: 4,
+              width: "100%",
+              height: {
+                xs: "clamp(2rem, 3vh, 3rem)",
+                sm: "clamp(3rem, 8vh, 4rem)",
+                md: "clamp(3rem, 14vh, 4rem)",
+                lg: "clamp(4rem, 20vh, 5rem)"
+              },
+              backgroundColor: "#0A438F",
               backgroundSize: "cover",
               backgroundPosition: "center",
-              height: { xs: "5rem", md: "6rem" },
-              backgroundColor: "#0A438F",
+              display: "flex",
+              alignItems: "center",
+              zIndex: 1
             }}
           >
             <Box
@@ -541,35 +557,38 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                 zIndex: 1,
               }}
             />
-
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "row",
-                ml: "5rem",
-                zIndex: 3,
-              }}
-            >
+            <Box sx={{ display: "flex", ml: "5rem", zIndex: 3 }}>
               <IconButton
                 onClick={() => navpage(-1)}
                 sx={{
                   color: "#fff",
+                  transform: {
+                    xs: "scale(0.8)",
+                    sm: "scale(1)",
+                    md: "scale(1.2)"
+                  }
                 }}
               >
-                <ArrowBackIosIcon></ArrowBackIosIcon>
+                <ArrowBackIosIcon />
               </IconButton>
               <Typography
                 variant='h3'
                 sx={{
+                  py: 5,
                   fontFamily: "Montserrat, sans-serif",
                   fontWeight: 800,
-                  fontSize: { xs: "1.5rem", sm: "2rem", md: "2.575rem" },
+                  fontSize: {
+                    xs: "clamp(1rem, 2vw, 1rem)",
+                    sm: "clamp(1.5rem, 3.5vw, 1.5rem)",
+                    md: "clamp(2rem, 4vw, 2.25rem)",
+                  },
                   color: "#FFF",
+                  lineHeight: 1.25,
                   alignSelf: "center",
-                  zIndex: 2,
+                  zIndex: 2
                 }}
               >
-                Research Output Information
+                Research information
               </Typography>
             </Box>
           </Box>
@@ -577,7 +596,7 @@ const DisplayResearchInfo = ({ route, navigate }) => {
           {/*Main Content */}
           <Box
             sx={{
-              padding: "5%",
+              padding: "3rem",
               width: "100%", // Ensure the container stretches across the full width
             }}
           >
@@ -607,14 +626,27 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                             alignSelf='center'
                             textAlign='center'
                             fontWeight='700'
-                            sx={{ color: "#08397C" }}
+                            sx={{ 
+                              color: "#08397C",
+                              fontSize: {
+                                xs: "clamp(1rem, 2vw, 1rem)",
+                                sm: "clamp(1.5rem, 3.5vw, 1.5rem)",
+                                md: "clamp(2rem, 4vw, 2.25rem)",
+                              }
+                            }}
                             gutterBottom
                           >
                             {item.title}
                           </Typography>
                           <Typography
                             variant='h6'
-                            sx={{ mb: "1rem" }}
+                            sx={{ mb: "1rem",
+                              fontSize: {
+                                xs: "clamp(1rem, 2vw, 1rem)",
+                                sm: "clamp(1rem, 3.5vw, 1rem)",
+                                md: "clamp(1.25rem, 4vw, 1.5rem)",
+                              },
+                            }}
                             alignSelf='center'
                             fontWeight='600'
                           >
@@ -626,7 +658,11 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                           </Typography>
                           <Typography
                             variant='h7'
-                            sx={{ mb: "1rem", color: "#8B8B8B" }}
+                            sx={{ mb: "1rem", color: "#8B8B8B", fontSize: {
+                              xs: "clamp(0.75rem, 2vw, 0.75rem)",
+                              sm: "clamp(0.75rem, 3.5vw, 1rem)",
+                              md: "clamp(0.75rem, 4vw, 1rem)",
+                            },}}
                             alignSelf='center'
                             fontWeight='500'
                           >

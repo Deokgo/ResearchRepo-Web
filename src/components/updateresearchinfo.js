@@ -492,7 +492,7 @@ const UpdateResearchInfo = () => {
           display: "flex",
           flexDirection: "column",
           height: { size: "100%", md: "calc(100vh - 9rem)" },
-          marginTop: { size: "3.5rem", sm: "4rem", md: "6rem" },
+          marginTop: { size: "3.5rem", sm: "4rem", md: "5rem" },
         }}
       >
         <Box

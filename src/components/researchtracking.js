@@ -326,7 +326,7 @@ const ResearchTracking = () => {
             flexGrow: 1,
             display: "flex",
             flexDirection: "column",
-            marginTop: { xs: "3.5rem", sm: "4rem", md: "6rem" },
+            marginTop: { xs: "3.5rem", sm: "4rem", md: "5rem" },
             height: {
               xs: "calc(100vh - 3.5rem)",
               sm: "calc(100vh - 4rem)",
@@ -407,60 +407,91 @@ const ResearchTracking = () => {
           {/* Main Content */}
           <Box
             sx={{
-              flexGrow: 1,
-              padding: 2,
-              mb: 2,
+              flex: 1,
+              padding: 3,
+              overflow: "hidden",
+              height: "calc(100% - 48px)",
             }}
           >
-            <Grid2 container spacing={5} sx={{ height: "100%" }}>
+            <Grid2 container spacing={4} sx={{ height: "100%", flexWrap: "nowrap", }}>
               {/* Filter Section (Left) */}
-              <Grid2 display='flex' justifyContent='flex-end' size={3}>
+              <Grid2 size={3}>
                 <Box
                   sx={{
-                    border: "2px solid #0A438F",
-                    padding: 2,
+                    border: "1px solid #0A438F",
+                    height: "100%",
+                    borderRadius: 3,
+                    padding: 3,
+                    overflow: "hidden",
                     display: "flex",
                     flexDirection: "column",
-                    width: "80%",
-                    height: "auto",
-                    borderRadius: 3,
                   }}
                 >
-                  <Typography
-                    variant='h6'
-                    sx={{
-                      mb: 2,
-                      fontWeight: "bold",
-                      color: "#0A438F",
-                      fontSize: "1.5rem",
-                    }}
-                  >
-                    {department}
-                  </Typography>
                   <Typography
                     variant='h6'
                     sx={{ mb: 2, fontWeight: "bold", color: "#F40824" }}
                   >
                     Filters
                   </Typography>
-                  <Typography variant='body1' sx={{ mb: 1, color: "#08397C" }}>
-                    Year Range:
-                  </Typography>
-                  <Slider
-                    value={sliderValue}
-                    onChange={handleDateRangeChange}
-                    valueLabelDisplay='on'
-                    min={dateRange[0]}
-                    max={dateRange[1]}
-                    sx={{ my: 3, width: "80%", alignSelf: "center" }}
-                  />
-                  <Typography variant='body1' sx={{ mb: 1, color: "#08397C" }}>
+                  <Box sx={{ mb: 2 }}>
+                      <Typography variant='body1' sx={{ mb: 1, color: "#08397C", fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" }, }}>
+                      Year Range:
+                    </Typography>
+                    <Box
+                        sx={{
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                          width: "100%",
+                          mt: 4,
+                        }}
+                    >
+                        <Slider
+                        value={sliderValue}
+                        onChange={handleDateRangeChange}
+                        valueLabelDisplay='on'
+                        min={dateRange[0]}
+                        max={dateRange[1]}
+                        sx={{
+                          width: "90%",
+                          "& .MuiSlider-valueLabel": {
+                            backgroundColor: "#08397C",
+                          },
+                          "& .MuiSlider-rail": {
+                            backgroundColor: "#ccc",
+                          },
+                          "& .MuiSlider-track": {
+                            backgroundColor: "#08397C",
+                          },
+                          "& .MuiSlider-thumb": {
+                            backgroundColor: "#08397C",
+                          },
+                        }}
+                      />
+                    </Box>
+                  </Box>
+                  
+                  <Typography variant='body1' sx={{ mb: 1, color: "#08397C", fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" } }}>
                     College:
                   </Typography>
                   <Box
                     sx={{
-                      height: "15rem",
+                      display: "flex",
+                      flexDirection: "column",
+                      height: "50%",
                       overflowY: "auto",
+                      mb: 2,
+                      "&::-webkit-scrollbar": {
+                        width: "8px",
+                      },
+                      "&::-webkit-scrollbar-track": {
+                        background: "#f1f1f1",
+                        borderRadius: "4px",
+                      },
+                      "&::-webkit-scrollbar-thumb": {
+                        background: "#08397C",
+                        borderRadius: "4px",
+                      },
                     }}
                   >
                     {colleges.map((college) => (
@@ -476,16 +507,39 @@ const ResearchTracking = () => {
                           />
                         }
                         label={college.college_name}
+                        sx={{
+                          "& .MuiTypography-root": {
+                            fontSize: {
+                              xs: "0.5rem",
+                              md: "0.75rem",
+                              lg: "0.9rem",
+                            },
+                          },
+                        }}
                       />
                     ))}
                   </Box>
-                  <Typography variant='body1' sx={{ mb: 1, color: "#08397C" }}>
+                  <Typography variant='body1' sx={{ mb: 1, color: "#08397C", fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" }, }}>
                     Program:
                   </Typography>
                   <Box
                     sx={{
-                      height: "15rem",
+                      display: "flex",
+                      flexDirection: "column",
+                      height: "50%",
                       overflowY: "auto",
+                      mb: 2,
+                      "&::-webkit-scrollbar": {
+                        width: "8px",
+                      },
+                      "&::-webkit-scrollbar-track": {
+                        background: "#f1f1f1",
+                        borderRadius: "4px",
+                      },
+                      "&::-webkit-scrollbar-thumb": {
+                        background: "#08397C",
+                        borderRadius: "4px",
+                      },
                     }}
                   >
                     {programs.map((program) => (
@@ -501,6 +555,15 @@ const ResearchTracking = () => {
                           />
                         }
                         label={program.program_name}
+                        sx={{
+                          "& .MuiTypography-root": {
+                            fontSize: {
+                              xs: "0.5rem",
+                              md: "0.75rem",
+                              lg: "0.9rem",
+                            },
+                          },
+                        }}
                       />
                     ))}
                   </Box>
@@ -511,10 +574,14 @@ const ResearchTracking = () => {
               <Grid2 display='flex' justifyContent='flex-start' size={9}>
                 {/* Container for Stats, Search Bar, and Virtuoso Table (Right) */}
                 
-                <Box sx={{ flexBasis: "90%" }}>
+                <Box sx={{ flexBasis: "100%" }}>
                 
                   {/* Stats Section */}
-                  <div className="App">
+                  <div className="App" style={{ 
+                    width: '100%',  // Full width
+                    transform: 'scale(0.8)', // Reduce size
+                    transformOrigin: 'center' // Keep alignment
+                  }} >
                     <ArrowSteps steps={steps} onStepClick={handleStepClick} />
                   </div>
                 
@@ -523,7 +590,6 @@ const ResearchTracking = () => {
                     sx={{ 
                       width: "100%", // Center search bar and button
                       display: "flex",
-                      padding: 1,
                       justifyContent: "space-between",
                       alignItems: "center",
                     }}
@@ -533,11 +599,39 @@ const ResearchTracking = () => {
                       placeholder='Search by Title or Code'
                       value={searchQuery}
                       onChange={handleSearchChange}
-                      sx={{ width: "30rem" }}
+                      sx={{ 
+                        flex: 2,
+                        // Responsive font size
+                        '& .MuiInputBase-input': {
+                          fontSize: { 
+                            xs: '0.75rem',   // Mobile
+                            sm: '0.85rem',   // Small devices
+                            md: '0.9rem',    // Medium devices
+                            lg: '1rem'        // Large devices
+                          },
+                          // Adjust input height
+                          padding: { 
+                            xs: '8px 12px',   // Mobile
+                            md: '12px 14px'   // Larger screens
+                          },
+                          // Optional: adjust overall height
+                          height: { 
+                            xs: '15px',   // Mobile
+                            md: '25px'    // Larger screens
+                          }
+                        }
+                      }}
                       InputProps={{
                         startAdornment: (
                           <InputAdornment position='start'>
-                            <Search />
+                            <Search 
+                              sx={{
+                                fontSize: { 
+                                  xs: '1rem',   // Mobile
+                                  md: '1.25rem' // Larger screens
+                                }
+                              }} 
+                            />
                           </InputAdornment>
                         ),
                       }}
@@ -548,52 +642,76 @@ const ResearchTracking = () => {
                         display: "flex", 
                       }}
                     >
-                      
-                        <Typography padding={2} variant='h6' sx={{ justifyContent: "center", color: "#8B8B8B" }}>
+                        <Typography padding={5} variant='h6' sx={{ justifyContent: "center", color: "#8B8B8B", fontSize: { xs: "0.75rem", md: "0.75rem", lg: "1rem" },}}>
                         {filteredResearch.length} results found
                         </Typography>
                     </Box>       
-                    
                   </Box>
-                  
-
-                  <Box sx={{ padding: 2, backgroundColor: "#F7F9FC" }}>
-                  {loading ? (
-                    <Typography>Loading...</Typography>
-                  ) : (
-                    <>
-                      {/* Virtuoso Table */}
-                      <Virtuoso
-                        style={{ height: "400px" }}
-                        data={paginatedResearch}
-                        itemContent={(index, paper, key) => (
-                          <Box
-                            key={paper.research_id}
-                            sx={{
-                              padding: 2,
-                              borderBottom: "1px solid #ddd",
-                              cursor: "pointer",
-                            }}
-                            onClick={() => handleKey(paper.research_id)}
-                          >
-                            <Typography variant="h6">{paper.title}</Typography>
-                            <Typography variant="body2" color="textSecondary">
-                              Status: {paper.status} | Last Updated: {paper.timestamp}
-                            </Typography>
+                  <Box 
+                    sx={{ 
+                      backgroundColor: "#F7F9FC",
+                      borderRadius: 1,
+                      overflow: "hidden",
+                      display: "flex",
+                      height: '220px',
+                      flexDirection: "column"
+                    }}
+                  >
+                    <Box sx={{ flex: 1, overflow: "hidden" }}>
+                      {loading ? (
+                        <Typography>Loading...</Typography>
+                      ) : (
+                        <>
+                          {/* Virtuoso Table */}
+                          <Virtuoso
+                            style={{ height: "100%" }}
+                            data={paginatedResearch}
+                            itemContent={(index, paper, key) => (
+                              <Box
+                                key={paper.research_id}
+                                sx={{
+                                  padding: 2,
+                                  borderBottom: "1px solid #ddd",
+                                  cursor: "pointer",
+                                }}
+                                onClick={() => handleKey(paper.research_id)}
+                              >
+                                <Typography variant="h6" sx={{
+                                    mb: 1,
+                                    fontSize: {
+                                      xs: "0.5rem",
+                                      md: "0.75rem",
+                                      lg: "1rem",
+                                    },
+                                    fontWeight: 500,
+                                  }}
+                                  >{paper.title}</Typography>
+                                <Typography variant="body2" color="textSecondary" sx={{
+                                    mb: 0.5,
+                                    color: "#666",
+                                    fontSize: {
+                                      xs: "0.5rem",
+                                      md: "0.5rem",
+                                      lg: "0.75rem",
+                                    },
+                                  }}>
+                                  Status: {paper.status} | Last Updated: {paper.timestamp}
+                                </Typography>
+                              </Box>
+                            )}
+                          />
+                          
+                          {/* Centered Pagination */}
+                          <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
+                            <Pagination
+                              count={Math.ceil(filteredResearch.length / rowsPerPage)}
+                              page={page}
+                              onChange={handleChangePage}
+                            />
                           </Box>
-                        )}
-                      />
-                      
-                      {/* Centered Pagination */}
-                      <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
-                        <Pagination
-                          count={Math.ceil(filteredResearch.length / rowsPerPage)}
-                          page={page}
-                          onChange={handleChangePage}
-                        />
-                      </Box>
-                    </>
-                  )}
+                        </>
+                      )}
+                    </Box>
                 </Box>
                 </Box>
               </Grid2>

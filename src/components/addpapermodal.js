@@ -267,6 +267,31 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
     }
   }, [isAddPaperModalOpen]);
 
+  // Utility function to create responsive TextField styles
+const createTextFieldStyles = (customFlex = 2) => ({
+  flex: customFlex,
+  '& .MuiInputBase-input': {
+    fontSize: { 
+      xs: '0.6em',   // Mobile
+      sm: '0.7rem',   // Small devices
+      md: '0.8rem',    // Medium devices
+      lg: '0.8rem'        // Large devices
+    },
+  }
+});
+
+// Utility function to create responsive label styles
+const createInputLabelProps = () => ({
+  sx: {
+    fontSize: { 
+      xs: '0.45rem',   // Mobile
+      sm: '0.55rem',   // Small devices
+      md: '0.65rem',    // Medium devices
+      lg: '0.75rem'     // Large devices
+    }
+  }
+});
+
   return (
     <Modal
       open={isAddPaperModalOpen}
@@ -284,16 +309,21 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
           p: 5,
           borderRadius: 2,
           width: "auto",
-          margin: "10rem",
+          margin: "5rem",
         }}
       >
         <Typography
           variant='h3'
           color='#08397C'
           fontWeight='1000'
-          mb={4}
+          mb={3}
           sx={{
             textAlign: { xs: "left", md: "bottom" },
+            fontSize: {
+              xs: "clamp(1rem, 2vw, 1rem)",
+              sm: "clamp(1.5rem, 3.5vw, 1.5rem)",
+              md: "clamp(2rem, 4vw, 2.25rem)",
+            },
           }}
         >
           Add New Paper
@@ -303,22 +333,24 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
             <TextField
               fullWidth
               label='Group Code'
-              variant='filled'
+              variant='outlined'
               value={groupCode}
               onChange={(e) => setGroupCode(e.target.value)}
               inputProps={{ maxLength: 15 }} // Limits input to 15 characters
+              sx={createTextFieldStyles()}
+              InputLabelProps={createInputLabelProps()}
             />
           </Grid2>
           <Grid2 size={3}>
-            <FormControl fullWidth variant='filled'>
-              <InputLabel>Department</InputLabel>
+            <FormControl fullWidth variant='outlined' sx={createTextFieldStyles()}>
+              <InputLabel sx={{fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }}}>Department</InputLabel>
               <Select
                 value={selectedCollege}
                 onChange={handleCollegeChange}
                 label='Department'
               >
                 {colleges.map((college) => (
-                  <MenuItem key={college.college_id} value={college.college_id}>
+                  <MenuItem key={college.college_id} value={college.college_id} sx={{fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }}}>
                     {college.college_name}
                   </MenuItem>
                 ))}
@@ -326,8 +358,8 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
             </FormControl>
           </Grid2>
           <Grid2 size={3}>
-            <FormControl fullWidth variant='filled'>
-              <InputLabel>Program</InputLabel>
+            <FormControl fullWidth variant='outlined' sx={createTextFieldStyles()}>
+              <InputLabel sx={{fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }}} >Program</InputLabel>
               <Select
                 value={selectedProgram}
                 onChange={(e) => setSelectedProgram(e.target.value)}
@@ -335,7 +367,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
                 disabled={!selectedCollege} // Disable if no college is selected
               >
                 {programs.map((program) => (
-                  <MenuItem key={program.program_id} value={program.program_id}>
+                  <MenuItem key={program.program_id} value={program.program_id} sx={{fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }}}>
                     {program.program_name}
                   </MenuItem>
                 ))}
@@ -343,15 +375,16 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
             </FormControl>
           </Grid2>
           <Grid2 size={2}>
-            <FormControl fullWidth variant='filled'>
-              <InputLabel>Research Type</InputLabel>
+            <FormControl fullWidth variant='outlined' sx={createTextFieldStyles()}>
+              <InputLabel sx={{fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }}} >Research Type</InputLabel>
               <Select
                 value={researchType}
                 onChange={(e) => setResearchType(e.target.value)}
+                label='Research Type'
               >
-                <MenuItem value='COLLEGE-DRIVEN'>COLLEGE-DRIVEN</MenuItem>
-                <MenuItem value='INTEGRATIVE'>INTEGRATIVE</MenuItem>
-                <MenuItem value='EXTRAMURAL'>EXTRAMURAL</MenuItem>
+                <MenuItem value='COLLEGE-DRIVEN' sx={{fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }}}>COLLEGE-DRIVEN</MenuItem>
+                <MenuItem value='INTEGRATIVE' sx={{fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }}}>INTEGRATIVE</MenuItem>
+                <MenuItem value='EXTRAMURAL' sx={{fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }}}>EXTRAMURAL</MenuItem>
               </Select>
             </FormControl>
           </Grid2>
@@ -359,11 +392,12 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
             <TextField
               fullWidth
               label='Date Approved'
-              variant='filled'
+              variant='outlined'
               type='date'
               value={dateApproved}
               onChange={(e) => setDateApproved(e.target.value)}
               InputLabelProps={{ shrink: true }}
+              sx={createTextFieldStyles()}
             />
           </Grid2>
           <Grid2 size={4}>
@@ -375,6 +409,15 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
                   option.email || ""
                 })`
               }
+              componentsProps={{
+                popper: {
+                  sx: {
+                    '& .MuiAutocomplete-listbox': {
+                      fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }
+                    }
+                  }
+                }
+              }}
               value={authors}
               onChange={(event, newValue) => setAuthors(newValue)}
               inputValue={authorInputValue}
@@ -386,8 +429,10 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
                 <TextField
                   {...params}
                   label='Authors'
-                  variant='filled'
+                  variant='outlined'
                   helperText='Type at least 3 characters to search and select author/s'
+                  sx={createTextFieldStyles()}
+                  InputLabelProps={createInputLabelProps()}
                 />
               )}
             />
@@ -401,6 +446,15 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
                   option.email || ""
                 })`
               }
+              componentsProps={{
+                popper: {
+                  sx: {
+                    '& .MuiAutocomplete-listbox': {
+                      fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }
+                    }
+                  }
+                }
+              }}
               value={adviser}
               onChange={(event, newValue) => setAdviser(newValue)}
               inputValue={adviserInputValue}
@@ -412,8 +466,10 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
                 <TextField
                   {...params}
                   label='Adviser'
-                  variant='filled'
+                  variant='outlined'
                   helperText='Type at least 3 characters to search for an adviser'
+                  sx={createTextFieldStyles()}
+                  InputLabelProps={createInputLabelProps()}
                 />
               )}
             />
@@ -427,6 +483,15 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
                   option.email || ""
                 })`
               }
+              componentsProps={{
+                popper: {
+                  sx: {
+                    '& .MuiAutocomplete-listbox': {
+                      fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }
+                    }
+                  }
+                }
+              }}
               value={panels}
               onChange={(event, newValue) => setPanels(newValue)}
               inputValue={panelInputValue}
@@ -438,8 +503,10 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
                 <TextField
                   {...params}
                   label='Panels'
-                  variant='filled'
+                  variant='outlined'
                   helperText='Type at least 3 characters to search and select multiple panel members'
+                  sx={createTextFieldStyles()}
+                  InputLabelProps={createInputLabelProps()}
                 />
               )}
             />
@@ -448,9 +515,11 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
             <TextField
               fullWidth
               label='Title'
-              variant='filled'
+              variant='outlined'
               value={title}
               onChange={(e) => setTitle(e.target.value)}
+              sx={createTextFieldStyles()}
+              InputLabelProps={createInputLabelProps()}
             />
           </Grid2>
           <Grid2 size={6}>
@@ -464,8 +533,10 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
                 <TextField
                   {...params}
                   label='SDG Goals'
-                  variant='filled'
+                  variant='outlined'
                   helperText='Select one or more SDG goals'
+                  sx={createTextFieldStyles()}
+                  InputLabelProps={createInputLabelProps()}
                 />
               )}
               renderOption={(props, option) => (
@@ -488,8 +559,10 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
                 <TextField
                   {...params}
                   label='Keywords'
-                  variant='filled'
+                  variant='outlined'
                   helperText='Type and press Enter to add multiple keywords'
+                  sx={createTextFieldStyles()}
+                  InputLabelProps={createInputLabelProps()}
                 />
               )}
             />
@@ -499,26 +572,25 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
               fullWidth
               label='Abstract'
               multiline
-              rows={4}
-              variant='filled'
+              rows={3}
+              variant='outlined'
               value={abstract}
               onChange={(e) => setAbstract(e.target.value)}
+              sx={createTextFieldStyles()}
+              InputLabelProps={createInputLabelProps()}
             />
           </Grid2>
           <Grid2 size={3}>
-            <Typography variant='body1' sx={{ color: "#8B8B8B" }}>
+            <Typography variant='body1' sx={{ color: "#8B8B8B", fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" }}}>
               Upload Full Manuscript:
             </Typography>
             <Box
               sx={{
                 display: "flex",
                 alignItems: "center",
-                border: "1px dashed #ccc",
-                width: "17rem",
-                height: "5rem",
-                maxWidth: "25rem",
-                maxHeight: "5rem",
-                p: 3,
+                border: "1px dashed #0A438F",
+                borderRadius: 1,
+                m: 1,
                 cursor: "pointer",
                 justifyContent: "center",
                 gap: 2,
@@ -531,19 +603,16 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
             </Box>
           </Grid2>
           <Grid2 size={3}>
-            <Typography variant='body1' sx={{ color: "#8B8B8B" }}>
+            <Typography variant='body1' sx={{ color: "#8B8B8B", fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" } }}>
               Upload Extended Abstract:
             </Typography>
             <Box
               sx={{
                 display: "flex",
                 alignItems: "center",
-                border: "1px dashed #ccc",
-                width: "17rem",
-                height: "5rem",
-                maxWidth: "25rem",
-                maxHeight: "5rem",
-                p: 3,
+                border: "1px dashed #0A438F",
+                borderRadius: 1,
+                m: 1,
                 cursor: "pointer",
                 justifyContent: "center",
                 gap: 2,
@@ -559,8 +628,10 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
         <Box
           sx={{
             display: "flex",
-            justifyContent: "center",
-            mt: 5,
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+            mt: 2,
+            gap: 2,
           }}
         >
           <Button
@@ -570,9 +641,8 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
               color: "#FFF",
               fontFamily: "Montserrat, sans-serif",
               fontWeight: 600,
-              fontSize: { xs: "0.875rem", md: "1.275rem" },
-              padding: { xs: "0.5rem", md: "1.5rem" },
-              marginLeft: "2rem",
+              fontSize: { xs: "0.875rem", md: "1rem" },
+              padding: { xs: "0.5rem 1rem", md: "1.25rem" },
               borderRadius: "100px",
               maxHeight: "3rem",
               textTransform: "none",
@@ -591,9 +661,8 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
               fontFamily: "Montserrat, sans-serif",
               fontWeight: 600,
               textTransform: "none",
-              fontSize: { xs: "0.875rem", md: "1.275rem" },
-              padding: { xs: "0.5rem 1rem", md: "1.5rem" },
-              marginLeft: "2rem",
+              fontSize: { xs: "0.875rem", md: "1rem" },
+              padding: { xs: "0.5rem 1rem", md: "1.25rem" },
               borderRadius: "100px",
               maxHeight: "3rem",
               "&:hover": {

@@ -156,7 +156,7 @@ const Home = () => {
         <Box
           sx={{
             position: "relative",
-            marginTop: { xs: "3.5rem", sm: "4rem", md: "6rem" },
+            marginTop: { xs: "3.5rem", sm: "4rem", md: "5rem" },
             display: "flex",
             flexDirection: { xs: "column", md: "row" },
             gap: 4,
@@ -191,7 +191,7 @@ const Home = () => {
           >
             <Grid2 
               container
-              spacing={2}
+              spacing={5}
               sx={{
                 height: "100%",
                 flexWrap: "nowrap",
@@ -212,7 +212,7 @@ const Home = () => {
                       width: "100%", // Ensure slider list takes full width
                     },
                     "& .slick-slide": {
-                      padding: "0 10px", // Add some padding between slides
+                      padding: "1rem 12px", // Add some padding between slides
                     },
                   }}
                 >
@@ -221,7 +221,7 @@ const Home = () => {
                     style={{ width:"100%" }}
                   >
                     {departments.map((department) => (
-                      <Box key={department.id} sx={{ px: 1 }}>
+                      <Box key={department.id} sx={{ px: 2 }}>
                         <Paper
                           elevation={3}
                           sx={{
@@ -332,7 +332,7 @@ const Home = () => {
                       width: "100%",
                       height: "auto",
                       objectFit: "contain",
-                      paddingTop: "5rem",
+                      paddingTop: "8rem",
                     }}
                   />
                   <Typography

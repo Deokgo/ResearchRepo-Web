@@ -374,7 +374,7 @@ const ResearchThrust = () => {
             flexGrow: 1,
             display: "flex",
             flexDirection: "column",
-            marginTop: { xs: "3.5rem", sm: "4rem", md: "6rem" },
+            marginTop: { xs: "3.5rem", sm: "4rem", md: "5rem" },
             height: {
               xs: "calc(100vh - 3.5rem)",
               sm: "calc(100vh - 4rem)",
@@ -421,8 +421,8 @@ const ResearchThrust = () => {
                   color: "#fff",
                   transform: {
                     xs: "scale(0.8)",
-                    sm: "scale(0.75)",
-                    md: "scale(0.75)"
+                    sm: "scale(1)",
+                    md: "scale(1.2)"
                   }
                 }}
               >

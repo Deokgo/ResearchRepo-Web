@@ -284,10 +284,10 @@ const Navbar = () => {
       position='fixed'
       sx={{
         backgroundColor: "#FFF",
-        height: {
-          xs: "calc(3.5rem + env(safe-area-inset-top))",
-          sm: "calc(4rem + env(safe-area-inset-top))",
-          md: "calc(6rem + env(safe-area-inset-top))",
+        height: { 
+          xs: 'calc(3rem + env(safe-area-inset-top))', 
+          sm: 'calc(4rem + env(safe-area-inset-top))', 
+          md: 'calc(5rem + env(safe-area-inset-top))' 
         },
         // Ensure navbar doesn't overlap content
         zIndex: theme.zIndex.appBar,
@@ -300,7 +300,7 @@ const Navbar = () => {
           flexWrap: "nowrap",
           justifyContent: "space-between",
           alignItems: "center",
-          px: { xs: 1, sm: 2, md: 1 }, // Responsive padding
+          px: { xs: 1, sm: 2, md: 3 }, // Responsive padding
         }}
       >
         <Box
@@ -524,7 +524,7 @@ const Navbar = () => {
         </Menu>
 
         {/*Dashboard Menu*/}
-        {user?.role === "04" && (
+        {user?.role === "02" && (
           <Menu
             anchorEl={anchorElDash}
             open={Boolean(anchorElDash)}

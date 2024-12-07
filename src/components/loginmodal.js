@@ -101,6 +101,36 @@ const LoginModal = () => {
     openPassresetModal();
   };
 
+  // Utility function to create responsive TextField styles
+  const createTextFieldStyles = (customFlex = 2) => ({
+    flex: customFlex,
+    '& .MuiInputBase-input': {
+      fontSize: { 
+        xs: '0.75rem',   // Mobile
+        sm: '0.75rem',   // Small devices
+        md: '0.8rem',    // Medium devices
+        lg: '1rem'     // Large devices
+      },
+      // Adjust input height
+      padding: { 
+        xs: '8px 12px',   // Mobile
+        md: '12px 14px'   // Larger screens
+      },
+    }
+  });
+
+  // Utility function to create responsive label styles
+  const createInputLabelProps = () => ({
+    sx: {
+      fontSize: { 
+        xs: '0.75rem',   // Mobile
+        sm: '0.75rem',   // Small devices
+        md: '0.8rem',    // Medium devices
+        lg: '0.9rem'     // Large devices
+      }
+    }
+  });
+
   return (
     <>
       {/*Log In Modal*/}
@@ -143,8 +173,8 @@ const LoginModal = () => {
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
-                marginLeft: "4rem",
-                marginRight: "4rem",
+                marginLeft: "5rem",
+                marginRight: "5rem",
               }}
             >
               <TextField
@@ -156,6 +186,9 @@ const LoginModal = () => {
                 onChange={handleChange}
                 margin='normal'
                 variant='outlined'
+                sx={createTextFieldStyles()}
+                InputLabelProps={createInputLabelProps()}
+                
               />
               <TextField
                 label='Password'
@@ -166,6 +199,8 @@ const LoginModal = () => {
                 value={formValues.password}
                 margin='normal'
                 variant='outlined'
+                sx={createTextFieldStyles()}
+                InputLabelProps={createInputLabelProps()}
               />
               <Box
                 sx={{

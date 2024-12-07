@@ -104,23 +104,45 @@ const ReadMore = () => {
     <>
       <Box
         sx={{
+          margin: 0,
+          padding: 0,
+          height: "100vh",
           display: "flex",
           flexDirection: "column",
-          minHeight: "100vh",
+          justifyContent: "center",
         }}
       >
         <Navbar />
-        <Box sx={{ flexGrow: 1 }}>
+        <Box
+          sx={{
+            flexGrow: 1,
+            display: "flex",
+            flexDirection: "column",
+            marginTop: { xs: "3.5rem", sm: "4rem", md: "5rem" },
+            height: {
+              xs: "calc(100vh - 3.5rem)",
+              sm: "calc(100vh - 4rem)",
+              md: "calc(100vh - 6rem)",
+            },
+          }}
+        >
+          {/* Header with back button */}
           <Box
             sx={{
               position: "relative",
-              marginTop: { xs: "3.5rem", sm: "4rem", md: "6rem" },
-              display: "flex",
-              flexDirection: { xs: "column", md: "row" },
+              width: "100%",
+              height: {
+                xs: "clamp(2rem, 3vh, 3rem)",
+                sm: "clamp(3rem, 8vh, 4rem)",
+                md: "clamp(3rem, 14vh, 4rem)",
+                lg: "clamp(4rem, 20vh, 5rem)"
+              },
+              backgroundColor: "#0A438F",
               backgroundSize: "cover",
               backgroundPosition: "center",
-              height: { xs: "5rem", md: "6rem" },
-              backgroundColor: "#0A438F",
+              display: "flex",
+              alignItems: "center",
+              zIndex: 1
             }}
           >
             <Box
@@ -136,27 +158,35 @@ const ReadMore = () => {
                 zIndex: 1,
               }}
             />
-            <Box sx={{ display: "flex", ml: "12rem", zIndex: 3 }}>
+            <Box sx={{ display: "flex", ml: "5rem", zIndex: 3 }}>
               <IconButton
                 onClick={() => navigate(-1)}
                 sx={{
                   color: "#fff",
+                  transform: {
+                    xs: "scale(0.8)",
+                    sm: "scale(1)",
+                    md: "scale(1.2)"
+                  }
                 }}
               >
-                <ArrowBackIosIcon></ArrowBackIosIcon>
+                <ArrowBackIosIcon />
               </IconButton>
               <Typography
                 variant='h3'
                 sx={{
+                  py: 15,
                   fontFamily: "Montserrat, sans-serif",
                   fontWeight: 800,
-                  fontSize: { xs: "1.5rem", sm: "2rem", md: "2.575rem" },
+                  fontSize: {
+                    xs: "clamp(1rem, 2vw, 1rem)",
+                    sm: "clamp(1.5rem, 3.5vw, 1.5rem)",
+                    md: "clamp(2rem, 4vw, 2.25rem)",
+                  },
                   color: "#FFF",
                   lineHeight: 1.25,
-                  maxWidth: { xs: "100%", md: "100%" },
                   alignSelf: "center",
-                  paddingLeft: 3,
-                  zIndex: 2,
+                  zIndex: 2
                 }}
               >
                 Read More
@@ -165,17 +195,11 @@ const ReadMore = () => {
           </Box>
 
           {/* Content Section */}
-          <Box
-            sx={{
-              flexGrow: 1,
-              mt: 12,
-            }}
-          >
-            <Grid2 container sx={{ paddingLeft: 25, height: "100%" }}>
+          <Box sx={{ display:'flex', p: 10 }}>
+            <Grid2 spacing={10} container>
               <Grid2
                 display='flex'
                 flexDirection='column'
-                justifyContent='flex-end'
                 size={6}
               >
                 <Typography
@@ -183,17 +207,17 @@ const ReadMore = () => {
                   sx={{
                     fontFamily: "Montserrat, sans-serif",
                     fontWeight: 600,
-                    fontSize: { xs: "2.5rem", md: "4.375rem" },
+                    fontSize: { xs: "2rem", md: "3rem", lg: "4rem" },
                     color: "#001C43",
                     lineHeight: 1.25,
-                    maxWidth: "80%",
+                    maxWidth: "100%",
                   }}
                 >
                   A centralized hub for all your
                   <Box
                     sx={{
                       backgroundColor: "#DF031D",
-                      width: "33rem",
+                      width: { xs: "17rem", md: "25rem", lg: "33rem" },
                     }}
                   >
                     <Typography
@@ -201,7 +225,7 @@ const ReadMore = () => {
                       sx={{
                         fontFamily: "Montserrat, sans-serif",
                         fontWeight: 600,
-                        fontSize: { xs: "2.5rem", md: "4rem" },
+                        fontSize: { xs: "2rem", md: "3rem", lg: "4rem" },
                         color: "#FFF",
                         lineHeight: 1.25,
                       }}
@@ -215,7 +239,7 @@ const ReadMore = () => {
                   sx={{
                     fontFamily: "Montserrat, sans-serif",
                     fontWeight: 500,
-                    fontSize: { xs: "1rem", md: "1.5rem" },
+                    fontSize: { xs: "0.75rem", md: "0.75rem", lg: "1.2em" },
                     color: "#001C43",
                     width: "80%",
                     mt: 4,
@@ -234,8 +258,8 @@ const ReadMore = () => {
                   src={navLogo}
                   alt='Logo'
                   style={{
-                    width: "80%",
-                    height: "80%",
+                    width: { xs: "40%", md: "80%", lg: "60%" },
+                    height: { xs: "40%", md: "80%", lg: "60%" },
                     objectFit: "contain",
                   }}
                 />
@@ -244,7 +268,7 @@ const ReadMore = () => {
                   sx={{
                     fontFamily: "Montserrat, sans-serif",
                     fontWeight: 300,
-                    fontSize: { xs: "1rem", md: "1.25rem" },
+                    fontSize: { xs: "0.75rem", md: "0.75rem", lg: "1.2em" },
                     color: "#001C43",
                     width: "80%",
                     mt: 6,
