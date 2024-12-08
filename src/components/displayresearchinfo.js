@@ -29,6 +29,7 @@ import axios from "axios";
 import FileUploader from "./FileUploader";
 import EditIcon from "@mui/icons-material/Edit";
 import sdgGoalsData from "../data/sdgGoals.json";
+import { useAuth } from "../context/AuthContext";
 
 const DisplayResearchInfo = ({ route, navigate }) => {
   const [users, setUsers] = useState([]);
@@ -62,6 +63,8 @@ const DisplayResearchInfo = ({ route, navigate }) => {
   const [programs, setPrograms] = useState([]);
   const [file, setFile] = useState(null);
   const [extendedAbstract, setExtendedAbstract] = useState(null);
+
+  const { user } = useAuth();
 
   useEffect(() => {
     if (id) {
@@ -428,9 +431,12 @@ const DisplayResearchInfo = ({ route, navigate }) => {
     setEditableData((prev) => ({ ...prev, college_id: selectedCollegeId }));
 
     try {
-      const response = await axios.get(`/deptprogs/programs/${selectedCollegeId}`, {
-        params: { department: selectedCollegeId },
-      });
+      const response = await axios.get(
+        `/deptprogs/programs/${selectedCollegeId}`,
+        {
+          params: { department: selectedCollegeId },
+        }
+      );
       setPrograms(response.data.programs);
     } catch (error) {
       console.error("Error fetching programs:", error);
@@ -498,30 +504,29 @@ const DisplayResearchInfo = ({ route, navigate }) => {
     setFile(null);
   };
 
-
   // Utility function to create responsive TextField styles
   const createTextFieldStyles = (customFlex = 2) => ({
     flex: customFlex,
-    '& .MuiInputBase-input': {
-      fontSize: { 
-        xs: '0.6em',   // Mobile
-        sm: '0.7rem',   // Small devices
-        md: '0.8rem',    // Medium devices
-        lg: '0.8rem'        // Large devices
+    "& .MuiInputBase-input": {
+      fontSize: {
+        xs: "0.6em", // Mobile
+        sm: "0.7rem", // Small devices
+        md: "0.8rem", // Medium devices
+        lg: "0.8rem", // Large devices
       },
-    }
+    },
   });
 
   // Utility function to create responsive label styles
   const createInputLabelProps = () => ({
     sx: {
-      fontSize: { 
-        xs: '0.45rem',   // Mobile
-        sm: '0.55rem',   // Small devices
-        md: '0.65rem',    // Medium devices
-        lg: '0.75rem'     // Large devices
-      }
-    }
+      fontSize: {
+        xs: "0.45rem", // Mobile
+        sm: "0.55rem", // Small devices
+        md: "0.65rem", // Medium devices
+        lg: "0.75rem", // Large devices
+      },
+    },
   });
 
   return (
@@ -558,14 +563,14 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                 xs: "clamp(2rem, 3vh, 3rem)",
                 sm: "clamp(3rem, 8vh, 4rem)",
                 md: "clamp(3rem, 14vh, 4rem)",
-                lg: "clamp(4rem, 20vh, 5rem)"
+                lg: "clamp(4rem, 20vh, 5rem)",
               },
               backgroundColor: "#0A438F",
               backgroundSize: "cover",
               backgroundPosition: "center",
               display: "flex",
               alignItems: "center",
-              zIndex: 1
+              zIndex: 1,
             }}
           >
             <Box
@@ -589,8 +594,8 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                   transform: {
                     xs: "scale(0.8)",
                     sm: "scale(1)",
-                    md: "scale(1.2)"
-                  }
+                    md: "scale(1.2)",
+                  },
                 }}
               >
                 <ArrowBackIosIcon />
@@ -609,7 +614,7 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                   color: "#FFF",
                   lineHeight: 1.25,
                   alignSelf: "center",
-                  zIndex: 2
+                  zIndex: 2,
                 }}
               >
                 Research information
@@ -650,20 +655,22 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                             alignSelf='center'
                             textAlign='center'
                             fontWeight='700'
-                            sx={{ mb: "0.5rem",
+                            sx={{
+                              mb: "0.5rem",
                               color: "#08397C",
                               fontSize: {
                                 xs: "clamp(1rem, 2vw, 1rem)",
                                 sm: "clamp(1.5rem, 3.5vw, 1.5rem)",
                                 md: "clamp(2rem, 4vw, 2.25rem)",
-                              }
+                              },
                             }}
                           >
                             {item.title}
                           </Typography>
                           <Typography
                             variant='h6'
-                            sx={{ mb: "0.5rem",
+                            sx={{
+                              mb: "0.5rem",
                               fontSize: {
                                 xs: "clamp(1rem, 2vw, 1rem)",
                                 sm: "clamp(1rem, 3.5vw, 1rem)",
@@ -681,11 +688,15 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                           </Typography>
                           <Typography
                             variant='h7'
-                            sx={{ mb: "1rem", color: "#8B8B8B", fontSize: {
-                              xs: "clamp(0.75rem, 2vw, 0.75rem)",
-                              sm: "clamp(0.75rem, 3.5vw, 1rem)",
-                              md: "clamp(0.75rem, 4vw, 1rem)",
-                            },}}
+                            sx={{
+                              mb: "1rem",
+                              color: "#8B8B8B",
+                              fontSize: {
+                                xs: "clamp(0.75rem, 2vw, 0.75rem)",
+                                sm: "clamp(0.75rem, 3.5vw, 1rem)",
+                                md: "clamp(0.75rem, 4vw, 1rem)",
+                              },
+                            }}
                             alignSelf='center'
                             fontWeight='500'
                           >
@@ -697,39 +708,86 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                           display='flex'
                           justifyContent='flex-end'
                         >
-                          <Stack direction='row' alignItems='center' justifyContent='space-between' gap={3}>
-                            <Button
-                              startIcon={<EditIcon />}
-                              variant='contained'
-                              color='primary'
-                              sx={{
-                                backgroundColor: "#08397C",
-                                color: "#FFF",
-                                fontFamily: "Montserrat, sans-serif",
-                                fontWeight: 600,
-                                textTransform: "none",
-                                fontSize: { xs: "0.55rem", md: "0.75rem", lg: "0.9rem" },
-                                paddingLeft: '1.5rem',
-                                paddingRight: '1.5rem',
-                                borderRadius: "100px",
-                                maxHeight: "3rem",
-                                "&:hover": {
-                                  backgroundColor: "#072d61",
-                                },
-                              }}
-                              onClick={() => handleEdit(item)}
-                            >
-                              Edit
-                            </Button>
+                          <Stack
+                            direction='row'
+                            alignItems='center'
+                            justifyContent='space-between'
+                            gap={3}
+                          >
+                            {user?.role === "05" && (
+                              <Button
+                                startIcon={<EditIcon />}
+                                variant='contained'
+                                color='primary'
+                                sx={{
+                                  backgroundColor: "#08397C",
+                                  color: "#FFF",
+                                  fontFamily: "Montserrat, sans-serif",
+                                  fontWeight: 600,
+                                  textTransform: "none",
+                                  fontSize: {
+                                    xs: "0.55rem",
+                                    md: "0.75rem",
+                                    lg: "0.9rem",
+                                  },
+                                  paddingLeft: "1.5rem",
+                                  paddingRight: "1.5rem",
+                                  borderRadius: "100px",
+                                  maxHeight: "3rem",
+                                  "&:hover": {
+                                    backgroundColor: "#072d61",
+                                  },
+                                }}
+                                onClick={() => handleEdit(item)}
+                              >
+                                Edit
+                              </Button>
+                            )}
                             <Stack direction='row' alignItems='center' gap={1}>
-                              <DownloadIcon color='primary' sx={{ fontSize: { xs: "0.8rem", md: "1rem", lg: "1.2rem" } }} />
-                              <Typography variant='h7' sx={{ fontSize: { xs: "0.55rem", md: "0.65rem", lg: "0.9rem" } }}>
+                              <DownloadIcon
+                                color='primary'
+                                sx={{
+                                  fontSize: {
+                                    xs: "0.8rem",
+                                    md: "1rem",
+                                    lg: "1.2rem",
+                                  },
+                                }}
+                              />
+                              <Typography
+                                variant='h7'
+                                sx={{
+                                  fontSize: {
+                                    xs: "0.55rem",
+                                    md: "0.65rem",
+                                    lg: "0.9rem",
+                                  },
+                                }}
+                              >
                                 {item.download_count} Downloads
                               </Typography>
                             </Stack>
                             <Stack direction='row' alignItems='center' gap={1}>
-                              <VisibilityIcon color='primary' sx={{ fontSize: { xs: "0.8rem", md: "1rem", lg: "1.2rem" } }} />
-                              <Typography variant='h7' sx={{ fontSize: { xs: "0.55rem", md: "0.65rem", lg: "0.9rem" } }}>
+                              <VisibilityIcon
+                                color='primary'
+                                sx={{
+                                  fontSize: {
+                                    xs: "0.8rem",
+                                    md: "1rem",
+                                    lg: "1.2rem",
+                                  },
+                                }}
+                              />
+                              <Typography
+                                variant='h7'
+                                sx={{
+                                  fontSize: {
+                                    xs: "0.55rem",
+                                    md: "0.65rem",
+                                    lg: "0.9rem",
+                                  },
+                                }}
+                              >
                                 {item.view_count} Views
                               </Typography>
                             </Stack>
@@ -753,11 +811,27 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                             <Typography
                               variant='h6'
                               fontWeight='700'
-                              sx={{ mb: "1rem", fontSize: { xs: "0.75rem", md: "0.75rem", lg: "1.1rem" } }}
+                              sx={{
+                                mb: "1rem",
+                                fontSize: {
+                                  xs: "0.75rem",
+                                  md: "0.75rem",
+                                  lg: "1.1rem",
+                                },
+                              }}
                             >
                               Keywords:
                             </Typography>
-                            <Typography variant='body1' sx={{ fontSize: { xs: "0.6rem", md: "0.7rem", lg: "0.9rem" } }}>
+                            <Typography
+                              variant='body1'
+                              sx={{
+                                fontSize: {
+                                  xs: "0.6rem",
+                                  md: "0.7rem",
+                                  lg: "0.9rem",
+                                },
+                              }}
+                            >
                               {Array.isArray(item.keywords)
                                 ? item.keywords.join("; ")
                                 : "No keywords available"}
@@ -765,11 +839,28 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                             <Typography
                               variant='h6'
                               fontWeight='700'
-                              sx={{ mt: "2rem", mb: "1rem", fontSize: { xs: "0.75rem", md: "0.75rem", lg: "1.1rem" } }}
+                              sx={{
+                                mt: "2rem",
+                                mb: "1rem",
+                                fontSize: {
+                                  xs: "0.75rem",
+                                  md: "0.75rem",
+                                  lg: "1.1rem",
+                                },
+                              }}
                             >
                               Abstract:
                             </Typography>
-                            <Typography variant='body1' sx={{ fontSize: { xs: "0.6rem", md: "0.7rem", lg: "0.9rem" } }}>
+                            <Typography
+                              variant='body1'
+                              sx={{
+                                fontSize: {
+                                  xs: "0.6rem",
+                                  md: "0.7rem",
+                                  lg: "0.9rem",
+                                },
+                              }}
+                            >
                               {item.abstract || "No abstract available"}
                             </Typography>
                           </Grid2>
@@ -790,20 +881,60 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                                 height: "auto",
                               }}
                             >
-                              <Typography variant='h7' sx={{ mb: "1rem", fontSize: { xs: "0.6rem", md: "0.65rem", lg: "0.8rem" } }}>
+                              <Typography
+                                variant='h7'
+                                sx={{
+                                  mb: "1rem",
+                                  fontSize: {
+                                    xs: "0.6rem",
+                                    md: "0.65rem",
+                                    lg: "0.8rem",
+                                  },
+                                }}
+                              >
                                 <strong>College Department:</strong>{" "}
                                 {item.college_id}
                               </Typography>
-                              <Typography variant='h7' sx={{ mb: "1rem", fontSize: { xs: "0.6rem", md: "0.65rem", lg: "0.8rem" }}}>
+                              <Typography
+                                variant='h7'
+                                sx={{
+                                  mb: "1rem",
+                                  fontSize: {
+                                    xs: "0.6rem",
+                                    md: "0.65rem",
+                                    lg: "0.8rem",
+                                  },
+                                }}
+                              >
                                 <strong>Program:</strong> {item.program_name}
                               </Typography>
-                              <Typography variant='body1' sx={{ mb: "1rem", fontSize: { xs: "0.6rem", md: "0.65rem", lg: "0.8rem" } }}>
+                              <Typography
+                                variant='body1'
+                                sx={{
+                                  mb: "1rem",
+                                  fontSize: {
+                                    xs: "0.6rem",
+                                    md: "0.65rem",
+                                    lg: "0.8rem",
+                                  },
+                                }}
+                              >
                                 <strong>Adviser:</strong>{" "}
                                 {item.adviser
                                   ? `${item.adviser.name}`
                                   : "No adviser available"}
                               </Typography>
-                              <Typography variant='body1' sx={{ mb: "1rem", fontSize: { xs: "0.5rem", md: "0.65rem", lg: "0.8rem" } }}>
+                              <Typography
+                                variant='body1'
+                                sx={{
+                                  mb: "1rem",
+                                  fontSize: {
+                                    xs: "0.5rem",
+                                    md: "0.65rem",
+                                    lg: "0.8rem",
+                                  },
+                                }}
+                              >
                                 <strong>Panel Members:</strong>{" "}
                                 {Array.isArray(item.panels) &&
                                 item.panels.length > 0
@@ -812,33 +943,74 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                                       .join("; ")
                                   : "No panel members available"}
                               </Typography>
-                              <Divider
-                                variant='middle'
-                                sx={{ mb: "1rem" }}
-                              />
-                              <Typography variant='body1' sx={{ mb: "1rem", fontSize: { xs: "0.5rem", md: "0.65rem", lg: "0.8rem" } }}>
+                              <Divider variant='middle' sx={{ mb: "1rem" }} />
+                              <Typography
+                                variant='body1'
+                                sx={{
+                                  mb: "1rem",
+                                  fontSize: {
+                                    xs: "0.5rem",
+                                    md: "0.65rem",
+                                    lg: "0.8rem",
+                                  },
+                                }}
+                              >
                                 <strong>Journal:</strong> {item.journal}
                               </Typography>
-                              <Typography variant='body1' sx={{ mb: "1rem", fontSize: { xs: "0.5rem", md: "0.65rem", lg: "0.8rem" } }}>
+                              <Typography
+                                variant='body1'
+                                sx={{
+                                  mb: "1rem",
+                                  fontSize: {
+                                    xs: "0.5rem",
+                                    md: "0.65rem",
+                                    lg: "0.8rem",
+                                  },
+                                }}
+                              >
                                 <strong>Research Type:</strong>{" "}
                                 {item.research_type}
                               </Typography>
-                              <Typography variant='body1' sx={{ mb: "1rem", fontSize: { xs: "0.5rem", md: "0.65rem", lg: "0.8rem" } }}>
+                              <Typography
+                                variant='body1'
+                                sx={{
+                                  mb: "1rem",
+                                  fontSize: {
+                                    xs: "0.5rem",
+                                    md: "0.65rem",
+                                    lg: "0.8rem",
+                                  },
+                                }}
+                              >
                                 <strong>SDG:</strong> {item.sdg}
                               </Typography>
                               <Button
                                 variant='contained'
                                 color='primary'
-                                startIcon={<VisibilityIcon sx={{ fontSize: { xs: "0.65rem", md: "0.75rem", lg: "1rem" } }}/>}
+                                startIcon={
+                                  <VisibilityIcon
+                                    sx={{
+                                      fontSize: {
+                                        xs: "0.65rem",
+                                        md: "0.75rem",
+                                        lg: "1rem",
+                                      },
+                                    }}
+                                  />
+                                }
                                 sx={{
                                   backgroundColor: "#08397C",
                                   color: "#FFF",
                                   fontFamily: "Montserrat, sans-serif",
                                   fontWeight: 400,
                                   textTransform: "none",
-                                  fontSize: { xs: "0.5rem", md: "0.65rem", lg: "0.8rem" },
+                                  fontSize: {
+                                    xs: "0.5rem",
+                                    md: "0.65rem",
+                                    lg: "0.8rem",
+                                  },
                                   marginTop: "2rem",
-                                  width: 'inherit',
+                                  width: "inherit",
                                   alignSelf: "center",
                                   borderRadius: "100px",
                                   maxHeight: "3rem",
@@ -853,16 +1025,30 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                               <Button
                                 variant='contained'
                                 color='primary'
-                                startIcon={<VisibilityIcon sx={{ fontSize: { xs: "0.65rem", md: "0.75rem", lg: "1rem" } }}/>}
+                                startIcon={
+                                  <VisibilityIcon
+                                    sx={{
+                                      fontSize: {
+                                        xs: "0.65rem",
+                                        md: "0.75rem",
+                                        lg: "1rem",
+                                      },
+                                    }}
+                                  />
+                                }
                                 sx={{
                                   backgroundColor: "#08397C",
                                   color: "#FFF",
                                   fontFamily: "Montserrat, sans-serif",
                                   fontWeight: 400,
                                   textTransform: "none",
-                                  fontSize: { xs: "0.5rem", md: "0.65rem", lg: "0.8rem" },
+                                  fontSize: {
+                                    xs: "0.5rem",
+                                    md: "0.65rem",
+                                    lg: "0.8rem",
+                                  },
                                   marginTop: "1rem",
-                                  width: 'inherit', 
+                                  width: "inherit",
                                   alignSelf: "center",
                                   borderRadius: "100px",
                                   maxHeight: "3rem",
@@ -894,7 +1080,17 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                           </Grid2>
                           <Grid2 size={4}>
                             <FormControl fullWidth variant='outlined'>
-                              <InputLabel sx={{fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }}}>Department</InputLabel>
+                              <InputLabel
+                                sx={{
+                                  fontSize: {
+                                    xs: "0.75rem",
+                                    md: "0.75rem",
+                                    lg: "0.8rem",
+                                  },
+                                }}
+                              >
+                                Department
+                              </InputLabel>
                               <Select
                                 label='Department'
                                 sx={createTextFieldStyles()}
@@ -905,7 +1101,13 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                                   <MenuItem
                                     key={college.college_id}
                                     value={college.college_id}
-                                    sx={{fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }}}
+                                    sx={{
+                                      fontSize: {
+                                        xs: "0.75rem",
+                                        md: "0.75rem",
+                                        lg: "0.8rem",
+                                      },
+                                    }}
                                   >
                                     {college.college_name}
                                   </MenuItem>
@@ -915,7 +1117,17 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                           </Grid2>
                           <Grid2 size={2}>
                             <FormControl fullWidth variant='outlined'>
-                              <InputLabel sx={{fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }}}>Program</InputLabel>
+                              <InputLabel
+                                sx={{
+                                  fontSize: {
+                                    xs: "0.75rem",
+                                    md: "0.75rem",
+                                    lg: "0.8rem",
+                                  },
+                                }}
+                              >
+                                Program
+                              </InputLabel>
                               <Select
                                 label='Program'
                                 sx={createTextFieldStyles()}
@@ -931,7 +1143,13 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                                   <MenuItem
                                     key={program.program_id}
                                     value={program.program_id}
-                                    sx={{fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }}}
+                                    sx={{
+                                      fontSize: {
+                                        xs: "0.75rem",
+                                        md: "0.75rem",
+                                        lg: "0.8rem",
+                                      },
+                                    }}
                                   >
                                     {program.program_name}
                                   </MenuItem>
@@ -940,8 +1158,18 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                             </FormControl>
                           </Grid2>
                           <Grid2 size={2}>
-                          <FormControl fullWidth variant='outlined'>
-                              <InputLabel sx={{fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }}}>Research Type</InputLabel>
+                            <FormControl fullWidth variant='outlined'>
+                              <InputLabel
+                                sx={{
+                                  fontSize: {
+                                    xs: "0.75rem",
+                                    md: "0.75rem",
+                                    lg: "0.8rem",
+                                  },
+                                }}
+                              >
+                                Research Type
+                              </InputLabel>
                               <Select
                                 label='Research Type'
                                 sx={createTextFieldStyles()}
@@ -953,13 +1181,40 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                                   }))
                                 }
                               >
-                                <MenuItem value='EXTRAMURAL' sx={{fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }}}>
+                                <MenuItem
+                                  value='EXTRAMURAL'
+                                  sx={{
+                                    fontSize: {
+                                      xs: "0.75rem",
+                                      md: "0.75rem",
+                                      lg: "0.8rem",
+                                    },
+                                  }}
+                                >
                                   EXTRAMURAL
                                 </MenuItem>
-                                <MenuItem value='COLLEGE-DRIVEN' sx={{fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }}}>
+                                <MenuItem
+                                  value='COLLEGE-DRIVEN'
+                                  sx={{
+                                    fontSize: {
+                                      xs: "0.75rem",
+                                      md: "0.75rem",
+                                      lg: "0.8rem",
+                                    },
+                                  }}
+                                >
                                   COLLEGE-DRIVEN
                                 </MenuItem>
-                                <MenuItem value='INTEGRATIVE' sx={{fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }}}>
+                                <MenuItem
+                                  value='INTEGRATIVE'
+                                  sx={{
+                                    fontSize: {
+                                      xs: "0.75rem",
+                                      md: "0.75rem",
+                                      lg: "0.8rem",
+                                    },
+                                  }}
+                                >
                                   INTEGRATIVE
                                 </MenuItem>
                               </Select>
@@ -1016,11 +1271,15 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                               componentsProps={{
                                 popper: {
                                   sx: {
-                                    '& .MuiAutocomplete-listbox': {
-                                      fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }
-                                    }
-                                  }
-                                }
+                                    "& .MuiAutocomplete-listbox": {
+                                      fontSize: {
+                                        xs: "0.75rem",
+                                        md: "0.75rem",
+                                        lg: "0.8rem",
+                                      },
+                                    },
+                                  },
+                                },
                               }}
                               renderInput={(params) => (
                                 <TextField
@@ -1068,11 +1327,15 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                               componentsProps={{
                                 popper: {
                                   sx: {
-                                    '& .MuiAutocomplete-listbox': {
-                                      fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }
-                                    }
-                                  }
-                                }
+                                    "& .MuiAutocomplete-listbox": {
+                                      fontSize: {
+                                        xs: "0.75rem",
+                                        md: "0.75rem",
+                                        lg: "0.8rem",
+                                      },
+                                    },
+                                  },
+                                },
                               }}
                               renderInput={(params) => (
                                 <TextField
@@ -1120,11 +1383,15 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                               componentsProps={{
                                 popper: {
                                   sx: {
-                                    '& .MuiAutocomplete-listbox': {
-                                      fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }
-                                    }
-                                  }
-                                }
+                                    "& .MuiAutocomplete-listbox": {
+                                      fontSize: {
+                                        xs: "0.75rem",
+                                        md: "0.75rem",
+                                        lg: "0.8rem",
+                                      },
+                                    },
+                                  },
+                                },
                               }}
                               renderInput={(params) => (
                                 <TextField
@@ -1216,10 +1483,23 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                               }
                             />
                           </Grid2>
-                          <Grid2 size={3} display='flex' flexDirection='column' justifyContent='center'>
+                          <Grid2
+                            size={3}
+                            display='flex'
+                            flexDirection='column'
+                            justifyContent='center'
+                          >
                             <Typography
                               variant='body1'
-                              sx={{ color: "#8B8B8B", mb: 1, fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" } }}
+                              sx={{
+                                color: "#8B8B8B",
+                                mb: 1,
+                                fontSize: {
+                                  xs: "0.5rem",
+                                  md: "0.5rem",
+                                  lg: "0.9rem",
+                                },
+                              }}
                             >
                               Modify Full Manuscript:
                             </Typography>
@@ -1243,14 +1523,28 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                             <Button
                               variant='contained'
                               onClick={() => handleViewManuscript(editableData)}
-                              startIcon={<VisibilityIcon sx={{ fontSize: { xs: "0.65rem", md: "0.75rem", lg: "1rem" } }}/>}
+                              startIcon={
+                                <VisibilityIcon
+                                  sx={{
+                                    fontSize: {
+                                      xs: "0.65rem",
+                                      md: "0.75rem",
+                                      lg: "1rem",
+                                    },
+                                  }}
+                                />
+                              }
                               sx={{
                                 backgroundColor: "#08397C",
                                 color: "#FFF",
                                 fontFamily: "Montserrat, sans-serif",
                                 fontWeight: 400,
                                 textTransform: "none",
-                                fontSize: { xs: "0.5rem", md: "0.65rem", lg: "0.8rem" },
+                                fontSize: {
+                                  xs: "0.5rem",
+                                  md: "0.65rem",
+                                  lg: "0.8rem",
+                                },
                                 marginTop: "1.5rem",
                                 alignSelf: "center",
                                 borderRadius: "100px",
@@ -1263,10 +1557,23 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                               View Manuscript
                             </Button>
                           </Grid2>
-                          <Grid2 size={3} display='flex' flexDirection='column' justifyContent='center'>
+                          <Grid2
+                            size={3}
+                            display='flex'
+                            flexDirection='column'
+                            justifyContent='center'
+                          >
                             <Typography
                               variant='body1'
-                              sx={{ color: "#8B8B8B", mb: 1, fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" } }}
+                              sx={{
+                                color: "#8B8B8B",
+                                mb: 1,
+                                fontSize: {
+                                  xs: "0.5rem",
+                                  md: "0.5rem",
+                                  lg: "0.9rem",
+                                },
+                              }}
                             >
                               Modify Extended Abstract:
                             </Typography>
@@ -1290,14 +1597,28 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                             <Button
                               variant='contained'
                               onClick={() => handleViewEA(editableData)}
-                              startIcon={<VisibilityIcon sx={{ fontSize: { xs: "0.65rem", md: "0.75rem", lg: "1rem" } }}/>}
+                              startIcon={
+                                <VisibilityIcon
+                                  sx={{
+                                    fontSize: {
+                                      xs: "0.65rem",
+                                      md: "0.75rem",
+                                      lg: "1rem",
+                                    },
+                                  }}
+                                />
+                              }
                               sx={{
                                 backgroundColor: "#08397C",
                                 color: "#FFF",
                                 fontFamily: "Montserrat, sans-serif",
                                 fontWeight: 400,
                                 textTransform: "none",
-                                fontSize: { xs: "0.5rem", md: "0.65rem", lg: "0.8rem" },
+                                fontSize: {
+                                  xs: "0.5rem",
+                                  md: "0.65rem",
+                                  lg: "0.8rem",
+                                },
                                 marginTop: "1.5rem",
                                 alignSelf: "center",
                                 borderRadius: "100px",
@@ -1310,12 +1631,15 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                               View Extended Abstract
                             </Button>
                           </Grid2>
-                          <Box sx={{ 
+                          <Box
+                            sx={{
                               display: "flex",
                               justifyContent: "space-between",
                               alignItems: "flex-start",
                               mt: 2,
-                              gap: 2, }}>
+                              gap: 2,
+                            }}
+                          >
                             <Button
                               variant='contained'
                               onClick={handleCancelEdit}

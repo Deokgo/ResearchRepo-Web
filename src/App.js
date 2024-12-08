@@ -24,7 +24,6 @@ import DisplayAuditLog from "./components/auditlog";
 import RoleBasedRoute from "./components/rolebasedroute";
 import DashEmbed from "./components/DashEmbed";
 
-
 function App() {
   const [data, setData] = useState([{}]);
   const isLoggedIn = !!localStorage.getItem("token");
@@ -40,7 +39,7 @@ function App() {
             <Route path='/home' element={<Home />} />
             <Route path='/readmore' element={<ReadMore />} />
             <Route path='/researchthrust' element={<ResearchThrust />} />
-            <Route path="/dash" element={<DashEmbed/>} />
+            <Route path='/dash' element={<DashEmbed />} />
 
             {/* Common routes (available to all authenticated users) */}
             <Route
@@ -63,16 +62,14 @@ function App() {
             />
 
             <Route
-              path="/displayresearchinfo/:id"
+              path='/displayresearchinfo/:id'
               element={
                 <PrivateRoute>
-                  <RoleBasedRoute allowedRoles={["05"]}>
-                    <DisplayResearchInfo />
-                  </RoleBasedRoute>
+                  <DisplayResearchInfo />
                 </PrivateRoute>
               }
             />
-            
+
             <Route
               path='/updatetrackinginfo'
               element={

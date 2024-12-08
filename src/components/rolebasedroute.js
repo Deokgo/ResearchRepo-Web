@@ -12,7 +12,7 @@ const RoleBasedRoute = ({ allowedRoles, children }) => {
 
   // If user's role is not in the allowed roles, redirect to home
   if (!allowedRoles.includes(user.role)) {
-    return <Navigate to='/home' replace />;
+    return <Navigate to='/collection' replace />;
   }
 
   // If user has permission, render the protected component
