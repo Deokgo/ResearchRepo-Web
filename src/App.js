@@ -22,6 +22,8 @@ import PubDash from "./components/pubdash";
 import DisplayResearchInfo from "./components/displayresearchinfo";
 import DisplayAuditLog from "./components/auditlog";
 import RoleBasedRoute from "./components/rolebasedroute";
+import DashEmbed from "./components/DashEmbed";
+
 
 function App() {
   const [data, setData] = useState([{}]);
@@ -38,6 +40,7 @@ function App() {
             <Route path='/home' element={<Home />} />
             <Route path='/readmore' element={<ReadMore />} />
             <Route path='/researchthrust' element={<ResearchThrust />} />
+            <Route path="/dash" element={<DashEmbed/>} />
 
             {/* Common routes (available to all authenticated users) */}
             <Route
