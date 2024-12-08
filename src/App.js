@@ -62,6 +62,28 @@ function App() {
               }
             />
 
+            <Route
+              path="/displayresearchinfo/:id"
+              element={
+                <PrivateRoute>
+                  <RoleBasedRoute allowedRoles={["05"]}>
+                    <DisplayResearchInfo />
+                  </RoleBasedRoute>
+                </PrivateRoute>
+              }
+            />
+            
+            <Route
+              path='/updatetrackinginfo'
+              element={
+                <PrivateRoute>
+                  <RoleBasedRoute allowedRoles={["05"]}>
+                    <UpdateTrackingInfo />
+                  </RoleBasedRoute>
+                </PrivateRoute>
+              }
+            />
+
             {/* System Administrator only routes */}
             <Route
               path='/manage-users'
@@ -93,6 +115,7 @@ function App() {
                 </PrivateRoute>
               }
             />
+
             <Route
               path='/auditlog'
               element={
