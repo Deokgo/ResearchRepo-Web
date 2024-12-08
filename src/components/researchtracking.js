@@ -63,15 +63,15 @@ const ResearchTracking = () => {
       color: "#B0B0B0",
       hoverColor: "#888888",
       label: "READY",
-      icon: "fa-solid fa-check-to-slot",
+      icon: "fa-check-to-slot",
       badge: badgeValues.total_ready,
-      activeColor: "#F44336"
+      activeColor: "#F44336",
     },
     {
       color: "#FFC107",
       hoverColor: "#FFD54F",
       label: "SUBMITTED",
-      icon: "fa-solid fa-paper-plane",
+      icon: "fa-paper-plane",
       badge: badgeValues.total_submitted,
       activeColor: "#F44336"
     },
@@ -79,7 +79,7 @@ const ResearchTracking = () => {
       color: "#2196F3",
       hoverColor: "#64B5F6",
       label: "ACCEPTED",
-      icon: "fa-solid fa-thumbs-up",
+      icon: "fa-thumbs-up",
       badge: badgeValues.total_accepted,
       activeColor: "#F44336"
     },
@@ -87,7 +87,7 @@ const ResearchTracking = () => {
       color: "#4CAF50",
       hoverColor: "#81C784",
       label: "PUBLISHED",
-      icon: "fa-solid fa-file-arrow-up",
+      icon: "fa-file-arrow-up",
       badge: badgeValues.total_published,
       activeColor: "#F44336"
     },
@@ -569,150 +569,144 @@ const ResearchTracking = () => {
                   </Box>
                 </Box>
               </Grid2>
-
               
-              <Grid2 display='flex' justifyContent='flex-start' size={9}>
-                {/* Container for Stats, Search Bar, and Virtuoso Table (Right) */}
-                
-                <Box sx={{ flexBasis: "100%" }}>
-                
-                  {/* Stats Section */}
-                  <div className="App" style={{ 
-                    width: '100%',  // Full width
-                    transform: 'scale(0.8)', // Reduce size
-                    transformOrigin: 'center' // Keep alignment
-                  }} >
-                    <ArrowSteps steps={steps} onStepClick={handleStepClick} />
-                  </div>
-                
-                  {/* Search Bar */}
-                  <Box 
+              <Grid2 display='flex' flexDirection='column' justifyContent='flex-start' size={9}>
+                                
+                {/* Stats Section */}
+                <div className="App" style={{ 
+                  width: '100%',  // Full width
+                  transform: 'scale(0.8)', // Reduce size
+                  transformOrigin: 'center' // Keep alignment
+                }} >
+                  <ArrowSteps steps={steps} onStepClick={handleStepClick} />
+                </div>
+            
+                {/* Search Bar */}
+                <Box 
+                  sx={{ 
+                    width: "100%", // Center search bar and button
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
+                  <TextField
+                    variant='outlined'
+                    placeholder='Search by Title or Code'
+                    value={searchQuery}
+                    onChange={handleSearchChange}
                     sx={{ 
-                      width: "100%", // Center search bar and button
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                    }}
-                  >
-                    <TextField
-                      variant='outlined'
-                      placeholder='Search by Title or Code'
-                      value={searchQuery}
-                      onChange={handleSearchChange}
-                      sx={{ 
-                        flex: 2,
-                        // Responsive font size
-                        '& .MuiInputBase-input': {
-                          fontSize: { 
-                            xs: '0.75rem',   // Mobile
-                            sm: '0.85rem',   // Small devices
-                            md: '0.9rem',    // Medium devices
-                            lg: '1rem'        // Large devices
-                          },
-                          // Adjust input height
-                          padding: { 
-                            xs: '8px 12px',   // Mobile
-                            md: '12px 14px'   // Larger screens
-                          },
-                          // Optional: adjust overall height
-                          height: { 
-                            xs: '15px',   // Mobile
-                            md: '25px'    // Larger screens
-                          }
+                      flex: 2,
+                      // Responsive font size
+                      '& .MuiInputBase-input': {
+                        fontSize: { 
+                          xs: '0.75rem',   // Mobile
+                          sm: '0.85rem',   // Small devices
+                          md: '0.9rem',    // Medium devices
+                          lg: '1rem'        // Large devices
+                        },
+                        // Adjust input height
+                        padding: { 
+                          xs: '8px 12px',   // Mobile
+                          md: '12px 14px'   // Larger screens
+                        },
+                        // Optional: adjust overall height
+                        height: { 
+                          xs: '15px',   // Mobile
+                          md: '25px'    // Larger screens
                         }
-                      }}
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position='start'>
-                            <Search 
-                              sx={{
-                                fontSize: { 
-                                  xs: '1rem',   // Mobile
-                                  md: '1.25rem' // Larger screens
-                                }
-                              }} 
-                            />
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                    
-                    <Box 
-                      sx={{ 
-                        display: "flex", 
-                      }}
-                    >
-                        <Typography padding={5} variant='h6' sx={{ justifyContent: "center", color: "#8B8B8B", fontSize: { xs: "0.75rem", md: "0.75rem", lg: "1rem" },}}>
-                        {filteredResearch.length} results found
-                        </Typography>
-                    </Box>       
-                  </Box>
+                      }
+                    }}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position='start'>
+                          <Search 
+                            sx={{
+                              fontSize: { 
+                                xs: '1rem',   // Mobile
+                                md: '1.25rem' // Larger screens
+                              }
+                            }} 
+                          />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                  
                   <Box 
                     sx={{ 
-                      backgroundColor: "#F7F9FC",
-                      borderRadius: 1,
-                      overflow: "hidden",
-                      display: "flex",
-                      height: '220px',
-                      flexDirection: "column"
+                      display: "flex", 
                     }}
                   >
-                    <Box sx={{ flex: 1, overflow: "hidden" }}>
-                      {loading ? (
-                        <Typography>Loading...</Typography>
-                      ) : (
-                        <>
-                          {/* Virtuoso Table */}
-                          <Virtuoso
-                            style={{ height: "100%" }}
-                            data={paginatedResearch}
-                            itemContent={(index, paper, key) => (
-                              <Box
-                                key={paper.research_id}
-                                sx={{
-                                  padding: 2,
-                                  borderBottom: "1px solid #ddd",
-                                  cursor: "pointer",
-                                }}
-                                onClick={() => handleKey(paper.research_id)}
-                              >
-                                <Typography variant="h6" sx={{
-                                    mb: 1,
-                                    fontSize: {
-                                      xs: "0.5rem",
-                                      md: "0.75rem",
-                                      lg: "1rem",
-                                    },
-                                    fontWeight: 500,
-                                  }}
-                                  >{paper.title}</Typography>
-                                <Typography variant="body2" color="textSecondary" sx={{
-                                    mb: 0.5,
-                                    color: "#666",
-                                    fontSize: {
-                                      xs: "0.5rem",
-                                      md: "0.5rem",
-                                      lg: "0.75rem",
-                                    },
-                                  }}>
-                                  Status: {paper.status} | Last Updated: {paper.timestamp}
-                                </Typography>
-                              </Box>
-                            )}
-                          />
-                          
-                          {/* Centered Pagination */}
-                          <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
-                            <Pagination
-                              count={Math.ceil(filteredResearch.length / rowsPerPage)}
-                              page={page}
-                              onChange={handleChangePage}
-                            />
-                          </Box>
-                        </>
-                      )}
-                    </Box>
+                      <Typography padding={5} variant='h6' sx={{ justifyContent: "center", color: "#8B8B8B", fontSize: { xs: "0.75rem", md: "0.75rem", lg: "1rem" },}}>
+                      {filteredResearch.length} results found
+                      </Typography>
+                  </Box>       
                 </Box>
+                <Box 
+                  sx={{ 
+                    backgroundColor: "#F7F9FC",
+                    borderRadius: 1,
+                    overflow: "hidden",
+                    display: "flex",
+                    height: '100%',
+                    flexDirection: "column"
+                  }}
+                >
+                  <Box sx={{ flex: 1, overflow: "hidden" }}>
+                    {loading ? (
+                      <Typography>Loading...</Typography>
+                    ) : (
+                      <>
+                        {/* Virtuoso Table */}
+                        <Virtuoso
+                          style={{ height: "100%" }}
+                          data={paginatedResearch}
+                          itemContent={(index, paper, key) => (
+                            <Box
+                              key={paper.research_id}
+                              sx={{
+                                padding: 2,
+                                borderBottom: "1px solid #ddd",
+                                cursor: "pointer",
+                              }}
+                              onClick={() => handleKey(paper.research_id)}
+                            >
+                              <Typography variant="h6" sx={{
+                                  mb: 1,
+                                  fontSize: {
+                                    xs: "0.5rem",
+                                    md: "0.75rem",
+                                    lg: "1rem",
+                                  },
+                                  fontWeight: 500,
+                                }}
+                                >{paper.title}</Typography>
+                              <Typography variant="body2" color="textSecondary" sx={{
+                                  mb: 0.5,
+                                  color: "#666",
+                                  fontSize: {
+                                    xs: "0.5rem",
+                                    md: "0.5rem",
+                                    lg: "0.75rem",
+                                  },
+                                }}>
+                                Status: {paper.status} | Last Updated: {paper.timestamp}
+                              </Typography>
+                            </Box>
+                          )}
+                        />
+                      </>
+                    )}
+                  </Box>
+                  {/* Centered Pagination */}
+                  <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
+                    <Pagination
+                      count={Math.ceil(filteredResearch.length / rowsPerPage)}
+                      page={page}
+                      onChange={handleChangePage}
+                    />
+                  </Box>
                 </Box>
               </Grid2>
             </Grid2>

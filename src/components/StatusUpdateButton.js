@@ -46,10 +46,8 @@ const StatusUpdateButton = ({
           fontFamily: "Montserrat, sans-serif",
           fontWeight: 600,
           textTransform: "none",
-          fontSize: { xs: "0.875rem", md: "1.275rem" },
-          padding: { xs: "0.5rem 1rem", md: "1.5rem" },
-          marginTop: "1rem",
-          width: "auto",
+          fontSize: { xs: "0.65rem", md: "0.8rem", lg: "1rem" },
+          marginTop: '1rem',
           borderRadius: "100px",
           maxHeight: "3rem",
           "&:hover": {

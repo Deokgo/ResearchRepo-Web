@@ -268,29 +268,29 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
   }, [isAddPaperModalOpen]);
 
   // Utility function to create responsive TextField styles
-const createTextFieldStyles = (customFlex = 2) => ({
-  flex: customFlex,
-  '& .MuiInputBase-input': {
-    fontSize: { 
-      xs: '0.6em',   // Mobile
-      sm: '0.7rem',   // Small devices
-      md: '0.8rem',    // Medium devices
-      lg: '0.8rem'        // Large devices
-    },
-  }
-});
-
-// Utility function to create responsive label styles
-const createInputLabelProps = () => ({
-  sx: {
-    fontSize: { 
-      xs: '0.45rem',   // Mobile
-      sm: '0.55rem',   // Small devices
-      md: '0.65rem',    // Medium devices
-      lg: '0.75rem'     // Large devices
+  const createTextFieldStyles = (customFlex = 2) => ({
+    flex: customFlex,
+    '& .MuiInputBase-input': {
+      fontSize: { 
+        xs: '0.6em',   // Mobile
+        sm: '0.7rem',   // Small devices
+        md: '0.8rem',    // Medium devices
+        lg: '0.8rem'        // Large devices
+      },
     }
-  }
-});
+  });
+
+  // Utility function to create responsive label styles
+  const createInputLabelProps = () => ({
+    sx: {
+      fontSize: { 
+        xs: '0.45rem',   // Mobile
+        sm: '0.55rem',   // Small devices
+        md: '0.65rem',    // Medium devices
+        lg: '0.75rem'     // Large devices
+      }
+    }
+  });
 
   return (
     <Modal
@@ -342,7 +342,7 @@ const createInputLabelProps = () => ({
             />
           </Grid2>
           <Grid2 size={3}>
-            <FormControl fullWidth variant='outlined' sx={createTextFieldStyles()}>
+            <FormControl fullWidth variant='outlined'>
               <InputLabel sx={{fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }}}>Department</InputLabel>
               <Select
                 value={selectedCollege}

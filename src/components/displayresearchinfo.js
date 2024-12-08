@@ -498,6 +498,32 @@ const DisplayResearchInfo = ({ route, navigate }) => {
     setFile(null);
   };
 
+
+  // Utility function to create responsive TextField styles
+  const createTextFieldStyles = (customFlex = 2) => ({
+    flex: customFlex,
+    '& .MuiInputBase-input': {
+      fontSize: { 
+        xs: '0.6em',   // Mobile
+        sm: '0.7rem',   // Small devices
+        md: '0.8rem',    // Medium devices
+        lg: '0.8rem'        // Large devices
+      },
+    }
+  });
+
+  // Utility function to create responsive label styles
+  const createInputLabelProps = () => ({
+    sx: {
+      fontSize: { 
+        xs: '0.45rem',   // Mobile
+        sm: '0.55rem',   // Small devices
+        md: '0.65rem',    // Medium devices
+        lg: '0.75rem'     // Large devices
+      }
+    }
+  });
+
   return (
     <>
       <Box
@@ -507,7 +533,6 @@ const DisplayResearchInfo = ({ route, navigate }) => {
           height: "100vh",
           display: "flex",
           flexDirection: "column",
-          overflow: "hidden",
         }}
       >
         <Navbar />
@@ -522,7 +547,6 @@ const DisplayResearchInfo = ({ route, navigate }) => {
               sm: "calc(100vh - 4rem)",
               md: "calc(100vh - 6rem)",
             },
-            overflow: "hidden",
           }}
         >
           {/* Header with back button */}
@@ -596,7 +620,7 @@ const DisplayResearchInfo = ({ route, navigate }) => {
           {/*Main Content */}
           <Box
             sx={{
-              padding: "3rem",
+              padding: 6,
               width: "100%", // Ensure the container stretches across the full width
             }}
           >
@@ -611,7 +635,7 @@ const DisplayResearchInfo = ({ route, navigate }) => {
             >
               {data && data.dataset && data.dataset.length > 0 ? (
                 data.dataset.map((item, index) => (
-                  <Box key={index} sx={{ width: "100%" }}>
+                  <Box key={index} sx={{ width: "90%" }}>
                     {!isEditMode ? (
                       <>
                         <Grid2
@@ -626,7 +650,7 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                             alignSelf='center'
                             textAlign='center'
                             fontWeight='700'
-                            sx={{ 
+                            sx={{ mb: "0.5rem",
                               color: "#08397C",
                               fontSize: {
                                 xs: "clamp(1rem, 2vw, 1rem)",
@@ -634,13 +658,12 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                                 md: "clamp(2rem, 4vw, 2.25rem)",
                               }
                             }}
-                            gutterBottom
                           >
                             {item.title}
                           </Typography>
                           <Typography
                             variant='h6'
-                            sx={{ mb: "1rem",
+                            sx={{ mb: "0.5rem",
                               fontSize: {
                                 xs: "clamp(1rem, 2vw, 1rem)",
                                 sm: "clamp(1rem, 3.5vw, 1rem)",
@@ -674,41 +697,39 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                           display='flex'
                           justifyContent='flex-end'
                         >
-                          <Stack direction='row' alignContent='center' gap={2}>
+                          <Stack direction='row' alignItems='center' justifyContent='space-between' gap={3}>
                             <Button
-                              variant='outlined'
                               startIcon={<EditIcon />}
+                              variant='contained'
+                              color='primary'
                               sx={{
-                                color: "#08397C",
-                                borderColor: "#08397C",
-                                mr: "2rem",
+                                backgroundColor: "#08397C",
+                                color: "#FFF",
+                                fontFamily: "Montserrat, sans-serif",
+                                fontWeight: 600,
+                                textTransform: "none",
+                                fontSize: { xs: "0.55rem", md: "0.75rem", lg: "0.9rem" },
+                                paddingLeft: '1.5rem',
+                                paddingRight: '1.5rem',
+                                borderRadius: "100px",
+                                maxHeight: "3rem",
                                 "&:hover": {
-                                  borderColor: "#072d61",
-                                  backgroundColor: "transparent",
+                                  backgroundColor: "#072d61",
                                 },
                               }}
                               onClick={() => handleEdit(item)}
                             >
                               Edit
                             </Button>
-
-                            <Stack
-                              direction='row'
-                              alignContent='center'
-                              gap={1}
-                            >
-                              <DownloadIcon color='primary' />
-                              <Typography variant='h7' sx={{ mr: "2rem" }}>
+                            <Stack direction='row' alignItems='center' gap={1}>
+                              <DownloadIcon color='primary' sx={{ fontSize: { xs: "0.8rem", md: "1rem", lg: "1.2rem" } }} />
+                              <Typography variant='h7' sx={{ fontSize: { xs: "0.55rem", md: "0.65rem", lg: "0.9rem" } }}>
                                 {item.download_count} Downloads
                               </Typography>
                             </Stack>
-                            <Stack
-                              direction='row'
-                              alignContent='center'
-                              gap={1}
-                            >
-                              <VisibilityIcon color='primary' />
-                              <Typography variant='h7' sx={{ mr: "1rem" }}>
+                            <Stack direction='row' alignItems='center' gap={1}>
+                              <VisibilityIcon color='primary' sx={{ fontSize: { xs: "0.8rem", md: "1rem", lg: "1.2rem" } }} />
+                              <Typography variant='h7' sx={{ fontSize: { xs: "0.55rem", md: "0.65rem", lg: "0.9rem" } }}>
                                 {item.view_count} Views
                               </Typography>
                             </Stack>
@@ -716,7 +737,7 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                         </Grid2>
                         <Divider
                           variant='middle'
-                          sx={{ mt: "1rem", mb: "2rem" }}
+                          sx={{ mt: "1rem", mb: "1rem" }}
                         />
                         <Grid2
                           container
@@ -732,11 +753,11 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                             <Typography
                               variant='h6'
                               fontWeight='700'
-                              sx={{ mb: "1rem" }}
+                              sx={{ mb: "1rem", fontSize: { xs: "0.75rem", md: "0.75rem", lg: "1.1rem" } }}
                             >
                               Keywords:
                             </Typography>
-                            <Typography variant='body1'>
+                            <Typography variant='body1' sx={{ fontSize: { xs: "0.6rem", md: "0.7rem", lg: "0.9rem" } }}>
                               {Array.isArray(item.keywords)
                                 ? item.keywords.join("; ")
                                 : "No keywords available"}
@@ -744,11 +765,11 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                             <Typography
                               variant='h6'
                               fontWeight='700'
-                              sx={{ mt: "2rem", mb: "1rem" }}
+                              sx={{ mt: "2rem", mb: "1rem", fontSize: { xs: "0.75rem", md: "0.75rem", lg: "1.1rem" } }}
                             >
                               Abstract:
                             </Typography>
-                            <Typography variant='body1'>
+                            <Typography variant='body1' sx={{ fontSize: { xs: "0.6rem", md: "0.7rem", lg: "0.9rem" } }}>
                               {item.abstract || "No abstract available"}
                             </Typography>
                           </Grid2>
@@ -769,20 +790,20 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                                 height: "auto",
                               }}
                             >
-                              <Typography variant='h7' sx={{ mb: "1rem" }}>
+                              <Typography variant='h7' sx={{ mb: "1rem", fontSize: { xs: "0.6rem", md: "0.65rem", lg: "0.8rem" } }}>
                                 <strong>College Department:</strong>{" "}
                                 {item.college_id}
                               </Typography>
-                              <Typography variant='h7' sx={{ mb: "1rem" }}>
+                              <Typography variant='h7' sx={{ mb: "1rem", fontSize: { xs: "0.6rem", md: "0.65rem", lg: "0.8rem" }}}>
                                 <strong>Program:</strong> {item.program_name}
                               </Typography>
-                              <Typography variant='body1' sx={{ mb: "1rem" }}>
+                              <Typography variant='body1' sx={{ mb: "1rem", fontSize: { xs: "0.6rem", md: "0.65rem", lg: "0.8rem" } }}>
                                 <strong>Adviser:</strong>{" "}
                                 {item.adviser
                                   ? `${item.adviser.name}`
                                   : "No adviser available"}
                               </Typography>
-                              <Typography variant='body1' sx={{ mb: "1rem" }}>
+                              <Typography variant='body1' sx={{ mb: "1rem", fontSize: { xs: "0.5rem", md: "0.65rem", lg: "0.8rem" } }}>
                                 <strong>Panel Members:</strong>{" "}
                                 {Array.isArray(item.panels) &&
                                 item.panels.length > 0
@@ -793,31 +814,31 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                               </Typography>
                               <Divider
                                 variant='middle'
-                                sx={{ mt: "1rem", mb: "1rem" }}
+                                sx={{ mb: "1rem" }}
                               />
-                              <Typography variant='body1' sx={{ mb: "1rem" }}>
+                              <Typography variant='body1' sx={{ mb: "1rem", fontSize: { xs: "0.5rem", md: "0.65rem", lg: "0.8rem" } }}>
                                 <strong>Journal:</strong> {item.journal}
                               </Typography>
-                              <Typography variant='body1' sx={{ mb: "1rem" }}>
+                              <Typography variant='body1' sx={{ mb: "1rem", fontSize: { xs: "0.5rem", md: "0.65rem", lg: "0.8rem" } }}>
                                 <strong>Research Type:</strong>{" "}
                                 {item.research_type}
                               </Typography>
-                              <Typography variant='body1' sx={{ mb: "1rem" }}>
+                              <Typography variant='body1' sx={{ mb: "1rem", fontSize: { xs: "0.5rem", md: "0.65rem", lg: "0.8rem" } }}>
                                 <strong>SDG:</strong> {item.sdg}
                               </Typography>
                               <Button
                                 variant='contained'
                                 color='primary'
+                                startIcon={<VisibilityIcon sx={{ fontSize: { xs: "0.65rem", md: "0.75rem", lg: "1rem" } }}/>}
                                 sx={{
                                   backgroundColor: "#08397C",
                                   color: "#FFF",
                                   fontFamily: "Montserrat, sans-serif",
                                   fontWeight: 400,
                                   textTransform: "none",
-                                  fontSize: { xs: "0.875rem", md: "1rem" },
-                                  padding: { xs: "0.5rem 1rem", md: "1rem" },
+                                  fontSize: { xs: "0.5rem", md: "0.65rem", lg: "0.8rem" },
                                   marginTop: "2rem",
-                                  width: "13rem",
+                                  width: 'inherit',
                                   alignSelf: "center",
                                   borderRadius: "100px",
                                   maxHeight: "3rem",
@@ -827,21 +848,21 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                                 }}
                                 onClick={() => handleViewManuscript(item)}
                               >
-                                View Full Manuscript
+                                Full Manuscript
                               </Button>
                               <Button
                                 variant='contained'
                                 color='primary'
+                                startIcon={<VisibilityIcon sx={{ fontSize: { xs: "0.65rem", md: "0.75rem", lg: "1rem" } }}/>}
                                 sx={{
                                   backgroundColor: "#08397C",
                                   color: "#FFF",
                                   fontFamily: "Montserrat, sans-serif",
                                   fontWeight: 400,
                                   textTransform: "none",
-                                  fontSize: { xs: "0.875rem", md: "1rem" },
-                                  padding: { xs: "0.5rem 1rem", md: "1rem" },
-                                  marginTop: "2rem",
-                                  width: "13rem",
+                                  fontSize: { xs: "0.5rem", md: "0.65rem", lg: "0.8rem" },
+                                  marginTop: "1rem",
+                                  width: 'inherit', 
                                   alignSelf: "center",
                                   borderRadius: "100px",
                                   maxHeight: "3rem",
@@ -851,7 +872,7 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                                 }}
                                 onClick={() => handleViewEA(item)}
                               >
-                                View Extended Abstract
+                                Extended Abstract
                               </Button>
                             </Box>
                           </Grid2>
@@ -864,15 +885,19 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                             <TextField
                               fullWidth
                               label='Group Code'
-                              variant='filled'
+                              variant='outlined'
                               value={editableData.research_id}
+                              sx={createTextFieldStyles()}
+                              InputLabelProps={createInputLabelProps()}
                               disabled
                             />
                           </Grid2>
-                          <Grid2 size={3}>
-                            <FormControl fullWidth variant='filled'>
-                              <InputLabel>Department</InputLabel>
+                          <Grid2 size={4}>
+                            <FormControl fullWidth variant='outlined'>
+                              <InputLabel sx={{fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }}}>Department</InputLabel>
                               <Select
+                                label='Department'
+                                sx={createTextFieldStyles()}
                                 value={editableData.college_id}
                                 onChange={handleCollegeChange}
                               >
@@ -880,6 +905,7 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                                   <MenuItem
                                     key={college.college_id}
                                     value={college.college_id}
+                                    sx={{fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }}}
                                   >
                                     {college.college_name}
                                   </MenuItem>
@@ -887,10 +913,12 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                               </Select>
                             </FormControl>
                           </Grid2>
-                          <Grid2 size={3}>
-                            <FormControl fullWidth variant='filled'>
-                              <InputLabel>Program</InputLabel>
+                          <Grid2 size={2}>
+                            <FormControl fullWidth variant='outlined'>
+                              <InputLabel sx={{fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }}}>Program</InputLabel>
                               <Select
+                                label='Program'
+                                sx={createTextFieldStyles()}
                                 value={editableData.program_id || ""}
                                 onChange={(e) =>
                                   setEditableData((prev) => ({
@@ -903,6 +931,7 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                                   <MenuItem
                                     key={program.program_id}
                                     value={program.program_id}
+                                    sx={{fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }}}
                                   >
                                     {program.program_name}
                                   </MenuItem>
@@ -911,9 +940,11 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                             </FormControl>
                           </Grid2>
                           <Grid2 size={2}>
-                            <FormControl fullWidth variant='filled'>
-                              <InputLabel>Research Type</InputLabel>
+                          <FormControl fullWidth variant='outlined'>
+                              <InputLabel sx={{fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }}}>Research Type</InputLabel>
                               <Select
+                                label='Research Type'
+                                sx={createTextFieldStyles()}
                                 value={editableData.research_type}
                                 onChange={(e) =>
                                   setEditableData((prev) => ({
@@ -922,13 +953,13 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                                   }))
                                 }
                               >
-                                <MenuItem value='EXTRAMURAL'>
+                                <MenuItem value='EXTRAMURAL' sx={{fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }}}>
                                   EXTRAMURAL
                                 </MenuItem>
-                                <MenuItem value='COLLEGE-DRIVEN'>
+                                <MenuItem value='COLLEGE-DRIVEN' sx={{fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }}}>
                                   COLLEGE-DRIVEN
                                 </MenuItem>
-                                <MenuItem value='INTEGRATIVE'>
+                                <MenuItem value='INTEGRATIVE' sx={{fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }}}>
                                   INTEGRATIVE
                                 </MenuItem>
                               </Select>
@@ -939,8 +970,9 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                               fullWidth
                               label='Date Approved'
                               type='date'
-                              variant='filled'
+                              variant='outlined'
                               value={editableData.date_approved}
+                              sx={createTextFieldStyles()}
                               onChange={(e) =>
                                 setEditableData((prev) => ({
                                   ...prev,
@@ -981,12 +1013,23 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                                   ? `${option.name} (${option.email})`
                                   : `${option.first_name} ${option.last_name} (${option.email})`
                               }
+                              componentsProps={{
+                                popper: {
+                                  sx: {
+                                    '& .MuiAutocomplete-listbox': {
+                                      fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }
+                                    }
+                                  }
+                                }
+                              }}
                               renderInput={(params) => (
                                 <TextField
                                   {...params}
                                   label='Authors'
-                                  variant='filled'
+                                  variant='outlined'
                                   helperText='Type at least 3 characters to search and select author/s'
+                                  sx={createTextFieldStyles()}
+                                  InputLabelProps={createInputLabelProps()}
                                 />
                               )}
                             />
@@ -1022,12 +1065,23 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                                   ? `${option.name} (${option.email})`
                                   : `${option.first_name} ${option.last_name} (${option.email})`
                               }
+                              componentsProps={{
+                                popper: {
+                                  sx: {
+                                    '& .MuiAutocomplete-listbox': {
+                                      fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }
+                                    }
+                                  }
+                                }
+                              }}
                               renderInput={(params) => (
                                 <TextField
                                   {...params}
                                   label='Adviser'
-                                  variant='filled'
+                                  variant='outlined'
                                   helperText='Type at least 3 characters to search for an adviser'
+                                  sx={createTextFieldStyles()}
+                                  InputLabelProps={createInputLabelProps()}
                                 />
                               )}
                             />
@@ -1063,12 +1117,23 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                                   ? `${option.name} (${option.email})`
                                   : `${option.first_name} ${option.last_name} (${option.email})`
                               }
+                              componentsProps={{
+                                popper: {
+                                  sx: {
+                                    '& .MuiAutocomplete-listbox': {
+                                      fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }
+                                    }
+                                  }
+                                }
+                              }}
                               renderInput={(params) => (
                                 <TextField
                                   {...params}
                                   label='Panel Members'
-                                  variant='filled'
+                                  variant='outlined'
                                   helperText='Type at least 3 characters to search and select panel members'
+                                  sx={createTextFieldStyles()}
+                                  InputLabelProps={createInputLabelProps()}
                                 />
                               )}
                             />
@@ -1077,8 +1142,10 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                             <TextField
                               fullWidth
                               label='Title'
-                              variant='filled'
+                              variant='outlined'
                               value={editableData.title}
+                              sx={createTextFieldStyles()}
+                              InputLabelProps={createInputLabelProps()}
                               onChange={(e) =>
                                 setEditableData((prev) => ({
                                   ...prev,
@@ -1102,8 +1169,10 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                                 <TextField
                                   {...params}
                                   label='SDG Goals'
-                                  variant='filled'
+                                  variant='outlined'
                                   helperText='Select one or more SDG goals'
+                                  sx={createTextFieldStyles()}
+                                  InputLabelProps={createInputLabelProps()}
                                 />
                               )}
                             />
@@ -1121,8 +1190,10 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                                 <TextField
                                   {...params}
                                   label='Keywords'
-                                  variant='filled'
+                                  variant='outlined'
                                   helperText='Type and press Enter to add multiple keywords'
+                                  sx={createTextFieldStyles()}
+                                  InputLabelProps={createInputLabelProps()}
                                 />
                               )}
                             />
@@ -1132,9 +1203,11 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                               fullWidth
                               label='Abstract'
                               multiline
-                              rows={4}
-                              variant='filled'
+                              rows={3}
+                              variant='outlined'
                               value={editableData.abstract}
+                              sx={createTextFieldStyles()}
+                              InputLabelProps={createInputLabelProps()}
                               onChange={(e) =>
                                 setEditableData((prev) => ({
                                   ...prev,
@@ -1143,21 +1216,20 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                               }
                             />
                           </Grid2>
-                          <Grid2 size={3}>
+                          <Grid2 size={3} display='flex' flexDirection='column' justifyContent='center'>
                             <Typography
                               variant='body1'
-                              sx={{ color: "#8B8B8B", mb: 1 }}
+                              sx={{ color: "#8B8B8B", mb: 1, fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" } }}
                             >
-                              Full Manuscript:
+                              Modify Full Manuscript:
                             </Typography>
                             <Box
                               sx={{
                                 display: "flex",
                                 alignItems: "center",
-                                width: "100%",
-                                flex: 1,
-                                minHeight: "5rem",
-                                p: 3,
+                                border: "1px dashed #0A438F",
+                                borderRadius: 1,
+                                m: 1,
                                 cursor: "pointer",
                                 justifyContent: "center",
                                 gap: 2,
@@ -1171,41 +1243,40 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                             <Button
                               variant='contained'
                               onClick={() => handleViewManuscript(editableData)}
+                              startIcon={<VisibilityIcon sx={{ fontSize: { xs: "0.65rem", md: "0.75rem", lg: "1rem" } }}/>}
                               sx={{
                                 backgroundColor: "#08397C",
                                 color: "#FFF",
                                 fontFamily: "Montserrat, sans-serif",
                                 fontWeight: 400,
                                 textTransform: "none",
-                                fontSize: { xs: "0.875rem", md: "1rem" },
-                                padding: { xs: "0.5rem 1rem", md: "1rem" },
-                                marginTop: "1rem",
-                                width: "100%",
+                                fontSize: { xs: "0.5rem", md: "0.65rem", lg: "0.8rem" },
+                                marginTop: "1.5rem",
+                                alignSelf: "center",
                                 borderRadius: "100px",
                                 maxHeight: "3rem",
                                 "&:hover": {
-                                  backgroundColor: "#052045",
+                                  backgroundColor: "#072d61",
                                 },
                               }}
                             >
                               View Manuscript
                             </Button>
                           </Grid2>
-                          <Grid2 size={3}>
+                          <Grid2 size={3} display='flex' flexDirection='column' justifyContent='center'>
                             <Typography
                               variant='body1'
-                              sx={{ color: "#8B8B8B", mb: 1 }}
+                              sx={{ color: "#8B8B8B", mb: 1, fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" } }}
                             >
-                              Extended Abstract:
+                              Modify Extended Abstract:
                             </Typography>
                             <Box
                               sx={{
                                 display: "flex",
                                 alignItems: "center",
-                                width: "100%",
-                                flex: 1,
-                                minHeight: "5rem",
-                                p: 3,
+                                border: "1px dashed #0A438F",
+                                borderRadius: 1,
+                                m: 1,
                                 cursor: "pointer",
                                 justifyContent: "center",
                                 gap: 2,
@@ -1219,56 +1290,74 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                             <Button
                               variant='contained'
                               onClick={() => handleViewEA(editableData)}
+                              startIcon={<VisibilityIcon sx={{ fontSize: { xs: "0.65rem", md: "0.75rem", lg: "1rem" } }}/>}
                               sx={{
                                 backgroundColor: "#08397C",
                                 color: "#FFF",
                                 fontFamily: "Montserrat, sans-serif",
                                 fontWeight: 400,
                                 textTransform: "none",
-                                fontSize: { xs: "0.875rem", md: "1rem" },
-                                padding: { xs: "0.5rem 1rem", md: "1rem" },
-                                marginTop: "1rem",
-                                width: "100%",
+                                fontSize: { xs: "0.5rem", md: "0.65rem", lg: "0.8rem" },
+                                marginTop: "1.5rem",
+                                alignSelf: "center",
                                 borderRadius: "100px",
                                 maxHeight: "3rem",
                                 "&:hover": {
-                                  backgroundColor: "#052045",
+                                  backgroundColor: "#072d61",
                                 },
                               }}
                             >
                               View Extended Abstract
                             </Button>
                           </Grid2>
-                          <Grid2 size={12}>
-                            <Box sx={{ display: "flex", gap: 2, mt: 2 }}>
-                              <Button
-                                variant='contained'
-                                onClick={handleCancelEdit}
-                                sx={{
-                                  backgroundColor: "#08397C",
+                          <Box sx={{ 
+                              display: "flex",
+                              justifyContent: "space-between",
+                              alignItems: "flex-start",
+                              mt: 2,
+                              gap: 2, }}>
+                            <Button
+                              variant='contained'
+                              onClick={handleCancelEdit}
+                              sx={{
+                                backgroundColor: "#08397C",
+                                color: "#FFF",
+                                fontFamily: "Montserrat, sans-serif",
+                                fontWeight: 600,
+                                fontSize: { xs: "0.875rem", md: "1rem" },
+                                padding: { xs: "0.5rem 1rem", md: "1.25rem" },
+                                borderRadius: "100px",
+                                maxHeight: "3rem",
+                                textTransform: "none",
+                                "&:hover": {
+                                  backgroundColor: "#072d61",
+                                },
+                              }}
+                            >
+                              Cancel
+                            </Button>
+                            <Button
+                              variant='contained'
+                              onClick={handleSaveChanges}
+                              sx={{
+                                backgroundColor: "#CA031B",
+                                color: "#FFF",
+                                fontFamily: "Montserrat, sans-serif",
+                                fontWeight: 600,
+                                textTransform: "none",
+                                fontSize: { xs: "0.875rem", md: "1rem" },
+                                padding: { xs: "0.5rem 1rem", md: "1.25rem" },
+                                borderRadius: "100px",
+                                maxHeight: "3rem",
+                                "&:hover": {
+                                  backgroundColor: "#A30417",
                                   color: "#FFF",
-                                  "&:hover": {
-                                    backgroundColor: "#052045",
-                                  },
-                                }}
-                              >
-                                Cancel
-                              </Button>
-                              <Button
-                                variant='contained'
-                                onClick={handleSaveChanges}
-                                sx={{
-                                  backgroundColor: "#d40821",
-                                  color: "#FFF",
-                                  "&:hover": {
-                                    backgroundColor: "#8a0b14",
-                                  },
-                                }}
-                              >
-                                Save Changes
-                              </Button>
-                            </Box>
-                          </Grid2>
+                                },
+                              }}
+                            >
+                              Save Changes
+                            </Button>
+                          </Box>
                         </Grid2>
                       </>
                     )}

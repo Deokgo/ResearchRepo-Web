@@ -65,26 +65,6 @@ const Navbar = () => {
     openLoginModal();
   };
 
-  const handleCloseLoginModal = () => {
-    closeLoginModal();
-  };
-
-  const handleOpenSignupModal = () => {
-    openSignupModal();
-  };
-
-  const handleCloseSignupModal = () => {
-    closeSignupModal();
-  };
-
-  const handleOpenPassresetModal = () => {
-    openPassresetModal();
-  };
-
-  const handleClosePassresetModal = () => {
-    closePassresetModal();
-  };
-
   {
     /*Logged In*/
   }
@@ -158,10 +138,6 @@ const Navbar = () => {
 
   const handleResesearchTrack = () => {
     navigate("/researchtracking");
-  };
-
-  const handleManagePapers = () => {
-    navigate("/managepapers");
   };
 
   const handleNavigateHome = () => {

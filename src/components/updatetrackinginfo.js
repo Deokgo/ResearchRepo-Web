@@ -637,6 +637,8 @@ useEffect(() => {
     setOpenModalCon(false);
 
     setOpenModal(false);
+
+    handleFormCleanup();
   };
   
   const handleFormCleanup = () => {
@@ -655,35 +657,73 @@ useEffect(() => {
     setSelectedDate("");
   }
 
+  // Utility function to create responsive TextField styles
+  const createTextFieldStyles = (customFlex = 2) => ({
+    flex: customFlex,
+    '& .MuiInputBase-input': {
+      fontSize: { 
+        xs: '0.6em',   // Mobile
+        sm: '0.7rem',   // Small devices
+        md: '0.8rem',    // Medium devices
+        lg: '0.9rem'        // Large devices
+      },
+    }
+  });
+
+  // Utility function to create responsive label styles
+  const createInputLabelProps = () => ({
+    sx: {
+      fontSize: { 
+        xs: '0.55rem',   // Mobile
+        sm: '0.65rem',   // Small devices
+        md: '0.75rem',    // Medium devices
+        lg: '0.85rem'     // Large devices
+      }
+    }
+  });
+
   return (
     <>
       <Box
         sx={{
+          margin: 0,
+          padding: 0,
+          height: "100vh",
           display: "flex",
           flexDirection: "column",
-          minHeight: "100vh",
         }}
       >
         <Navbar />
         <Box
           sx={{
             flexGrow: 1,
-            height: { xs: "100%", md: "calc(100vh - 9rem)" },
+            display: "flex",
+            flexDirection: "column",
             marginTop: { xs: "3.5rem", sm: "4rem", md: "5rem" },
+            height: {
+              xs: "calc(100vh - 3.5rem)",
+              sm: "calc(100vh - 4rem)",
+              md: "calc(100vh - 6rem)",
+            },
           }}
         >
+          {/* Header with back button */}
           <Box
             sx={{
               position: "relative",
-              marginBottom: 2,
-              display: "flex",
-              flexDirection: { xs: "column", md: "row" },
-              padding: 4,
-              gap: 4,
+              width: "100%",
+              height: {
+                xs: "clamp(2rem, 3vh, 3rem)",
+                sm: "clamp(3rem, 8vh, 4rem)",
+                md: "clamp(3rem, 14vh, 4rem)",
+                lg: "clamp(4rem, 20vh, 5rem)"
+              },
+              backgroundColor: "#0A438F",
               backgroundSize: "cover",
               backgroundPosition: "center",
-              height: { xs: "5rem", md: "6rem" },
-              backgroundColor: "#0A438F",
+              display: "flex",
+              alignItems: "center",
+              zIndex: 1
             }}
           >
             <Box
@@ -699,32 +739,35 @@ useEffect(() => {
                 zIndex: 1,
               }}
             />
-
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "row",
-                ml: "5rem",
-                zIndex: 3,
-              }}
-            >
+            <Box sx={{ display: "flex", ml: "5rem", zIndex: 3 }}>
               <IconButton
                 onClick={() => navpage(-1)}
                 sx={{
                   color: "#fff",
+                  transform: {
+                    xs: "scale(0.8)",
+                    sm: "scale(1)",
+                    md: "scale(1.2)"
+                  }
                 }}
               >
-                <ArrowBackIosIcon></ArrowBackIosIcon>
+                <ArrowBackIosIcon />
               </IconButton>
               <Typography
                 variant='h3'
                 sx={{
+                  py: 5,
                   fontFamily: "Montserrat, sans-serif",
                   fontWeight: 800,
-                  fontSize: { xs: "1.5rem", sm: "2rem", md: "2.575rem" },
+                  fontSize: {
+                    xs: "clamp(1rem, 2vw, 1rem)",
+                    sm: "clamp(1.5rem, 3.5vw, 1.5rem)",
+                    md: "clamp(2rem, 4vw, 2.25rem)",
+                  },
                   color: "#FFF",
+                  lineHeight: 1.25,
                   alignSelf: "center",
-                  zIndex: 2,
+                  zIndex: 2
                 }}
               >
                 Update Tracking Info
@@ -732,11 +775,11 @@ useEffect(() => {
             </Box>
           </Box>
 
+
           {/*Main Content */}
           <Box
             sx={{
               padding: 3,
-              ml: 2
             }}
           >
             {/* Left-side Form Section*/}
@@ -758,10 +801,10 @@ useEffect(() => {
               >
                 <Box
                   sx={{
-                    border: "2px solid #0A438F",
+                    border: "1.5px solid #0A438F",
                     marginLeft: 10,
                     marginRight: 5,
-                    padding: 4,
+                    padding: 3,
                     display: "flex",
                     flexDirection: "column",
                     height: "auto",
@@ -788,13 +831,16 @@ useEffect(() => {
                                 width: "100%",
                               }}
                             >
-                              <Grid2 container display='flex' flexDirection='column' sx={{padding: 2}}>
+                              <Grid2 container display='flex' flexDirection='column' sx={{padding: 1}}>
                               <Typography
-                                  variant="h4"
+                                  variant="h3"
                                   textAlign="left"
                                   fontWeight="700"
-                                  sx={{ color: "#08397C", width: "90%" }}
-                                  gutterBottom
+                                  sx={{ mb: "0.5rem", color: "#08397C", width: "90%", fontSize: {
+                                    xs: "clamp(1rem, 2vw, 1rem)",
+                                    sm: "clamp(1.5rem, 3.5vw, 1.5rem)",
+                                    md: "clamp(2rem, 4vw, 2rem)",
+                                  } }}
                                 >
                                   <Link
                                     to={`/displayresearchinfo/${id}`}
@@ -805,10 +851,14 @@ useEffect(() => {
                                     </Link>
                                 </Typography>
                                 <Typography 
-                                  variant='h6' 
-                                  sx={{ mb: "1rem" }} 
+                                  variant='h7' 
+                                  sx={{ mb: "0.5rem", fontSize: {
+                                    xs: "clamp(0.7rem, 2vw, 0.7rem)",
+                                    sm: "clamp(0.8rem, 3.5vw, 0.8rem)",
+                                    md: "clamp(1rem, 4vw, 1rem)",
+                                  }, }} 
                                   alignSelf='left'
-                                  fontWeight='600'
+                                  fontWeight='700'
                                 >
                                   {Array.isArray(item.authors)
                                     ? item.authors
@@ -818,14 +868,18 @@ useEffect(() => {
                                 </Typography>
                                 <Typography
                                   variant='h7' 
-                                  sx={{ mb: "1rem", color:"#8B8B8B"}} 
+                                  sx={{ mb: "1rem", color:"#8B8B8B", fontSize: {
+                                    xs: "clamp(0.7rem, 2vw, 0.7rem)",
+                                    sm: "clamp(0.7rem, 3.5vw, 0.7rem)",
+                                    md: "clamp(0.8rem, 4vw, 0.8rem)",
+                                  }}} 
                                   alignSelf='left'
                                   fontWeight='500'
                                 >
                                   {item.year}
                                 </Typography>
                               </Grid2>                              
-                              <Divider variant="left" sx={{ mb: "1rem"}}/>
+                              <Divider variant="left" sx={{ mb: "0.5rem"}}/>
                             </Box>
                           ))
                         ) : (
@@ -860,13 +914,13 @@ useEffect(() => {
                                 >
                                   <Grid2 display='flex' flexDirection='row'>
                                     <Grid2 size={6}>
-                                        <Typography variant="h6" color='#d40821' fontWeight="700" sx={{ mb: "1rem" }}>
+                                        <Typography variant="h6" color='#d40821' fontWeight="700" sx={{ mb: "1rem", fontSize: { xs: "0.8rem", md: "1rem", lg: "1.1rem" } }}>
                                             Publication:
                                         </Typography>
                                     </Grid2>
                                     <Grid2 size={6}>
                                       {publicationFormat !== 'journal' && (
-                                        <Typography variant="h6" color='#d40821' fontWeight="700" sx={{ mb: "1rem" }}>
+                                        <Typography variant="h6" color='#d40821' fontWeight="700" sx={{ mb: "1rem", fontSize: { xs: "0.8rem", md: "1rem", lg: "1.1rem" } }}>
                                             Conference:
                                         </Typography>
                                       )}
@@ -883,9 +937,11 @@ useEffect(() => {
                                             value={publicationName || "None"}
                                             variant='outlined'
                                             onChange={(e) => setPublicationName(e.target.value)}
+                                            sx={createTextFieldStyles()}
+                                            InputLabelProps={createInputLabelProps()}
                                             />
                                           ) : (
-                                            <Typography variant="h7" sx={{ mb: "1rem" }}>
+                                            <Typography variant="h7" sx={{ mb: "1rem", fontSize: { xs: "0.7rem", md: "0.8rem", lg: "0.9rem" } }}>
                                                 <strong>Publication Name:</strong> {publicationName || "None"}
                                             </Typography>
                                           )}
@@ -899,13 +955,15 @@ useEffect(() => {
                                             type="date"
                                             value={datePublished ? new Date(datePublished).toLocaleDateString('en-CA') : ''}
                                             variant='outlined'
+                                            sx={createTextFieldStyles()}
                                             InputLabelProps={{
+                                              ...createInputLabelProps(),
                                               shrink: true
                                             }}
                                             onChange={(e) => setDatePublished(e.target.value)}
                                             />
                                           ) : (
-                                            <Typography variant="h7" sx={{ mb: "1rem" }}>
+                                            <Typography variant="h7" sx={{ mb: "1rem", fontSize: { xs: "0.7rem", md: "0.8rem", lg: "0.9rem" } }}>
                                                 <strong>Date Published:</strong> {datePublished || "None"}
                                             </Typography>
                                           )}
@@ -913,9 +971,10 @@ useEffect(() => {
                                       <Grid2 item sx={{ mb: "1rem", mr: "3rem" }}>
                                         {isEditing ? (
                                           <FormControl fullWidth variant='outlined'>
-                                            <InputLabel>Format</InputLabel>
+                                            <InputLabel sx={{fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }}}>Format</InputLabel>
                                               <Select
                                                 label='Format'
+                                                sx={createTextFieldStyles()}
                                                 value={publicationFormat || ''}
                                                 onChange={(e) => setPublicationFormat(e.target.value)}
                                               >
@@ -924,7 +983,7 @@ useEffect(() => {
                                               </Select>
                                           </FormControl>
                                         ) : (
-                                          <Typography variant="h7" sx={{ mb: "1rem" }}>
+                                          <Typography variant="h7" sx={{ mb: "1rem", fontSize: { xs: "0.7rem", md: "0.8rem", lg: "0.9rem" } }}>
                                             <strong>Format:</strong>{" "}
                                             {publicationFormat 
                                               ? publicationFormat.charAt(0).toUpperCase() + publicationFormat.slice(1).toLowerCase() 
@@ -936,9 +995,10 @@ useEffect(() => {
                                       <Grid2 item sx={{ mb: "1rem", mr: "3rem" }}>
                                       {isEditing ? (
                                         <FormControl fullWidth variant='outlined' >
-                                          <InputLabel>Indexing Status</InputLabel>
+                                          <InputLabel sx={{fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }}}>Indexing Status</InputLabel>
                                             <Select
                                               label='Indexing Status'
+                                              sx={createTextFieldStyles()}
                                               value={indexingStatus || ''}
                                               onChange={(e) => setIndexingStatus(e.target.value)}
                                             >
@@ -947,7 +1007,7 @@ useEffect(() => {
                                             </Select>
                                         </FormControl>
                                         ) : (
-                                          <Typography variant="h7" sx={{ mb: "1rem" }}>
+                                          <Typography variant="h7" sx={{ mb: "1rem", fontSize: { xs: "0.7rem", md: "0.8rem", lg: "0.9rem" } }}>
                                             <strong>Indexing Status:</strong>{" "}
                                             {indexingStatus 
                                               ? indexingStatus.charAt(0).toUpperCase() + indexingStatus.slice(1).toLowerCase() 
@@ -962,22 +1022,22 @@ useEffect(() => {
                                         <Grid2 item sx={{ mb: '1rem', mr: '2rem' }}>
                                           {isEditing ? (
                                             <Box display="flex" flexDirection="column">
-                                              <Typography variant="h7" sx={{ mb: '1rem' }}>
+                                              <Typography variant="h7" sx={{ mb: '1rem', fontSize: { xs: "0.7rem", md: "0.8rem", lg: "0.9rem" } }}>
                                                 <strong>Title:</strong> {selectedTitle || 'None'}
                                               </Typography>
-                                              <Typography variant="h7" sx={{ mb: '1rem' }}>
+                                              <Typography variant="h7" sx={{ mb: '1rem', fontSize: { xs: "0.7rem", md: "0.8rem", lg: "0.9rem" } }}>
                                                 <strong>Date:</strong> {selectedDate || 'None'}
                                               </Typography>
-                                              <Typography variant="h7" sx={{ mb: '1rem' }}>
+                                              <Typography variant="h7" sx={{ mb: '1rem', fontSize: { xs: "0.7rem", md: "0.8rem", lg: "0.9rem" } }}>
                                                 <strong>Venue:</strong> {selectedVenue || 'None'}
                                               </Typography>
                                               <Box
                                                 sx={{
                                                   display: 'flex',
                                                   alignItems: 'center',
-                                                  border: '2px dashed #0A438F',
+                                                  border: '1px dashed #0A438F',
                                                   borderRadius: 1,
-                                                  m: 1,
+                                                  m: 0.5,
                                                   cursor: 'pointer',
                                                   justifyContent: 'center',
                                                   gap: 2,
@@ -991,7 +1051,7 @@ useEffect(() => {
                                                     fontFamily: 'Montserrat, sans-serif',
                                                     fontWeight: 600,
                                                     textTransform: 'none',
-                                                    fontSize: { xs: '0.875rem', md: '1rem' },
+                                                    fontSize: { xs: "0.5rem", md: "0.65rem", lg: "0.8rem" },
                                                     alignSelf: 'center',
                                                     maxHeight: '2rem',
                                                     '&:hover': {
@@ -1007,9 +1067,9 @@ useEffect(() => {
                                                 sx={{
                                                   display: 'flex',
                                                   alignItems: 'center',
-                                                  border: '2px dashed #0A438F',
+                                                  border: '1px dashed #0A438F',
                                                   borderRadius: 1,
-                                                  m: 1,
+                                                  m: 0.5,
                                                   cursor: 'pointer',
                                                   justifyContent: 'center',
                                                   gap: 2,
@@ -1024,7 +1084,7 @@ useEffect(() => {
                                                     fontFamily: 'Montserrat, sans-serif',
                                                     fontWeight: 600,
                                                     textTransform: 'none',
-                                                    fontSize: { xs: '0.875rem', md: '1rem' },
+                                                    fontSize: { xs: "0.5rem", md: "0.65rem", lg: "0.8rem" },
                                                     alignSelf: 'center',
                                                     maxHeight: '2rem',
                                                     '&:hover': {
@@ -1040,9 +1100,9 @@ useEffect(() => {
                                                 sx={{
                                                   display: 'flex',
                                                   alignItems: 'center',
-                                                  border: '2px dashed #CA031B',
+                                                  border: '1px dashed #CA031B',
                                                   borderRadius: 1,
-                                                  m: 1,
+                                                  m: 0.5,
                                                   cursor: 'pointer',
                                                   justifyContent: 'center',
                                                   gap: 2,
@@ -1057,7 +1117,7 @@ useEffect(() => {
                                                     fontFamily: 'Montserrat, sans-serif',
                                                     fontWeight: 600,
                                                     textTransform: 'none',
-                                                    fontSize: { xs: '0.875rem', md: '1rem' },
+                                                    fontSize: { xs: "0.5rem", md: "0.65rem", lg: "0.8rem" },
                                                     alignSelf: 'center',
                                                     maxHeight: '2rem',
                                                     '&:hover': {
@@ -1072,13 +1132,13 @@ useEffect(() => {
                                             </Box>
                                           ) : (
                                             <Box display="flex" flexDirection="column">
-                                              <Typography variant="h7" sx={{ mb: '1rem' }}>
+                                              <Typography variant="h7" sx={{ mb: '1rem', fontSize: { xs: "0.7rem", md: "0.8rem", lg: "0.9rem" } }}>
                                                 <strong>Title:</strong> {selectedTitle || 'None'}
                                               </Typography>
-                                              <Typography variant="h7" sx={{ mb: '1rem' }}>
+                                              <Typography variant="h7" sx={{ mb: '1rem', fontSize: { xs: "0.7rem", md: "0.8rem", lg: "0.9rem" } }}>
                                                 <strong>Date:</strong> {selectedDate || 'None'}
                                               </Typography>
-                                              <Typography variant="h7" sx={{ mb: '1rem' }}>
+                                              <Typography variant="h7" sx={{ mb: '1rem', fontSize: { xs: "0.7rem", md: "0.8rem", lg: "0.9rem" } }}>
                                                 <strong>Venue:</strong> {selectedVenue || 'None'}
                                               </Typography>
                                             </Box>
@@ -1101,17 +1161,16 @@ useEffect(() => {
                                         backgroundColor: "#08397C",
                                         color: "#FFF",
                                         fontFamily: "Montserrat, sans-serif",
-                                        fontWeight: 500,
+                                        fontWeight: 600,
                                         textTransform: "none",
-                                        fontSize: { xs: "0.875rem", md: "1rem" },
-                                        padding: { xs: "0.5rem 1rem", md: "1.5rem" },
-                                        marginTop: "1rem",
-                                        width: "auto",
+                                        fontSize: { xs: "0.55rem", md: "0.75rem", lg: "0.9rem" },
+                                        marginTop: '1rem',
+                                        paddingLeft: '1.5rem',
+                                        paddingRight: '1.5rem',
                                         borderRadius: "100px",
                                         maxHeight: "3rem",
                                         "&:hover": {
-                                          backgroundColor: "#052045",
-                                          color: "#FFF",
+                                          backgroundColor: "#072d61",
                                         },
                                       }}
                                       onClick={toggleEdit}
@@ -1128,12 +1187,12 @@ useEffect(() => {
                                           backgroundColor: "#CA031B",
                                           color: "#FFF",
                                           fontFamily: "Montserrat, sans-serif",
-                                          fontWeight: 500,
+                                          fontWeight: 600,
                                           textTransform: "none",
-                                          fontSize: { xs: "0.875rem", md: "1rem" },
-                                          padding: { xs: "0.5rem 1rem", md: "1.5rem" },
-                                          marginTop: "1rem",
-                                          width: "auto",
+                                          fontSize: { xs: "0.55rem", md: "0.75rem", lg: "0.9rem" },
+                                          marginTop: '1rem',
+                                          paddingLeft: '1.5rem',
+                                          paddingRight: '1.5rem',
                                           borderRadius: "100px",
                                           maxHeight: "3rem",
                                           "&:hover": {
@@ -1149,48 +1208,50 @@ useEffect(() => {
                                 </Box>                       
                               ) : (
                                 <Box display='flex' flexDirection='column' justifyContent='center'>
-                                  <Typography variant="h6" color='#d40821' fontWeight="700">
+                                  <Typography variant="h6" color='#d40821' fontWeight="700" sx={{fontSize: { xs: "0.8rem", md: "1rem", lg: "1.1rem" }}}>
                                       Publication:
                                   </Typography>
                                   <Grid2 display='flex' flexDirection='column' padding='1rem'>
-                                    <Typography variant="h7" sx={{ mb: "1rem" }}>
+                                    <Typography variant="h7" sx={{ mb: "1rem", fontSize: { xs: "0.7rem", md: "0.8rem", lg: "0.9rem" } }}>
                                         <strong>Name:</strong> {publicationName || "None"}
                                     </Typography>
-                                    <Typography variant="h7" sx={{ mb: "1rem" }}>
+                                    <Typography variant="h7" sx={{ mb: "1rem", fontSize: { xs: "0.7rem", md: "0.8rem", lg: "0.9rem" }  }}>
                                         <strong>Format:</strong> {publicationFormat || "None"}
                                     </Typography>
-                                    <Typography variant="h7" sx={{ mb: "1rem" }}>
+                                    <Typography variant="h7" sx={{ mb: "1rem", fontSize: { xs: "0.7rem", md: "0.8rem", lg: "0.9rem" }  }}>
                                         <strong>Date:</strong> {datePublished || "None"}
                                     </Typography>
-                                    <Typography variant="h7" >
+                                    <Typography variant="h7" sx={{fontSize: { xs: "0.7rem", md: "0.8rem", lg: "0.9rem" } }}>
                                         <strong>Indexing Status:</strong> {indexingStatus || "None"}
                                     </Typography>
                                   </Grid2>
                                   <Grid2 container size={4} justifyContent='flex-start' margin="1rem">
                                       <Box
                                         sx={{
-                                          display: "flex",
-                                          alignItems: "center",
-                                          border: "2px dashed #0A438F",
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          border: '1px dashed #0A438F',
                                           borderRadius: 1,
-                                          p: 1,
-                                          cursor: "pointer",
-                                          justifyContent: "center",
+                                          cursor: 'pointer',
+                                          justifyContent: 'center',
+                                          gap: 2,
                                         }}
                                       >
                                         <Button
-                                          variant='text'
-                                          color='primary'
+                                          variant="text"
+                                          color="primary"
                                           sx={{
-                                            color: "#08397C",
-                                            fontFamily: "Montserrat, sans-serif",
+                                            width: '100%',
+                                            color: '#08397C',
+                                            fontFamily: 'Montserrat, sans-serif',
                                             fontWeight: 600,
-                                            textTransform: "none",
-                                            fontSize: { xs: "0.875rem", md: "1rem" },
-                                            alignSelf: "center",
-                                            maxHeight: "3rem",
-                                            "&:hover": {
-                                              color: "#052045",
+                                            textTransform: 'none',
+                                            fontSize: { xs: "0.7rem", md: "0.8rem", lg: "0.9rem" },
+                                            padding: '1rem',
+                                            alignSelf: 'center',
+                                            maxHeight: '2rem',
+                                            '&:hover': {
+                                              color: '#052045',
                                             },
                                           }}
                                           onClick={handleOpenModalPub}
@@ -1202,46 +1263,47 @@ useEffect(() => {
                                   <Divider orientation='horizontal' flexItem  sx={{mt: "1rem", mb: "1rem"}}/>
                                   {publicationFormat !== "journal" && ( // Render only if the selected type is not "Journal"
                                     <>
-                                      <Typography variant="h6" color='#d40821' fontWeight="700">
+                                      <Typography variant="h6" color='#d40821' fontWeight="700" sx={{fontSize: { xs: "0.8rem", md: "1rem", lg: "1.1rem" }}}>
                                         Conference:
                                       </Typography>
                                       <Grid2 display='flex' flexDirection='column' padding='1rem'>
-                                        <Typography variant="h7" sx={{ mb: "1rem" }}>
+                                        <Typography variant="h7" sx={{ mb: "1rem", fontSize: { xs: "0.7rem", md: "0.8rem", lg: "0.9rem" } }}>
                                           <strong>Title:</strong> {selectedTitle || "None"}
                                         </Typography>
-                                        <Typography variant="h7" sx={{ mb: "1rem" }}>
+                                        <Typography variant="h7" sx={{ mb: "1rem", fontSize: { xs: "0.7rem", md: "0.8rem", lg: "0.9rem" } }}>
                                           <strong>Venue:</strong> {selectedVenue || "None"}
                                         </Typography>
-                                        <Typography variant="h7" sx={{ mb: "1rem" }}>
+                                        <Typography variant="h7" sx={{ mb: "1rem", fontSize: { xs: "0.7rem", md: "0.8rem", lg: "0.9rem" } }}>
                                           <strong>Date:</strong> {selectedDate || "None"}
                                         </Typography>
                                       </Grid2>
                                       <Grid2 display='flex' paddingLeft='1rem' justifyContent='flex-start' gap={3}>
                                         <Box
                                           sx={{
-                                            display: "flex",
-                                            alignItems: "center",
-                                            border: "2px dashed #0A438F",
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            border: '1px dashed #0A438F',
                                             borderRadius: 1,
-                                            p: 1,
-                                            cursor: "pointer",
-                                            justifyContent: "center",
+                                            cursor: 'pointer',
+                                            justifyContent: 'center',
                                             gap: 2,
                                           }}
                                         >
                                           <Button
-                                            variant='text'
-                                            color='primary'
+                                            variant="text"
+                                            color="primary"
                                             sx={{
-                                              color: "#08397C",
-                                              fontFamily: "Montserrat, sans-serif",
+                                              width: '100%',
+                                              color: '#08397C',
+                                              fontFamily: 'Montserrat, sans-serif',
                                               fontWeight: 600,
-                                              textTransform: "none",
-                                              fontSize: { xs: "0.875rem", md: "1rem" },
-                                              alignSelf: "center",
-                                              maxHeight: "3rem",
-                                              "&:hover": {
-                                                color: "#052045",
+                                              textTransform: 'none',
+                                              fontSize: { xs: "0.6rem", md: "0.7rem", lg: "0.9rem" },
+                                              padding: '1rem',
+                                              alignSelf: 'center',
+                                              maxHeight: '2rem',
+                                              '&:hover': {
+                                                color: '#052045',
                                               },
                                             }}
                                             onClick={handleOpenModalCon}
@@ -1251,29 +1313,30 @@ useEffect(() => {
                                         </Box>
                                         <Box
                                           sx={{
-                                            display: "flex",
-                                            alignItems: "center",
-                                            border: "2px dashed #0A438F",
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            border: '1px dashed #0A438F',
                                             borderRadius: 1,
-                                            p: 1,
-                                            cursor: "pointer",
-                                            justifyContent: "center",
+                                            cursor: 'pointer',
+                                            justifyContent: 'center',
                                             gap: 2,
                                           }}
                                         >
                                           <Button
-                                            variant='text'
-                                            color='primary'
+                                            variant="text"
+                                            color="primary"
                                             sx={{
-                                              color: "#08397C",
-                                              fontFamily: "Montserrat, sans-serif",
+                                              width: '100%',
+                                              color: '#08397C',
+                                              fontFamily: 'Montserrat, sans-serif',
                                               fontWeight: 600,
-                                              textTransform: "none",
-                                              fontSize: { xs: "0.875rem", md: "1rem" },
-                                              alignSelf: "center",
-                                              maxHeight: "3rem",
-                                              "&:hover": {
-                                                color: "#052045",
+                                              textTransform: 'none',
+                                              fontSize: { xs: "0.6rem", md: "0.7rem", lg: "0.9rem" },
+                                              padding: '1rem',
+                                              alignSelf: 'center',
+                                              maxHeight: '2rem',
+                                              '&:hover': {
+                                                color: '#052045',
                                               },
                                             }}
                                             onClick={handleOpenModal}
@@ -1297,15 +1360,17 @@ useEffect(() => {
                                     variant='contained'
                                     color='primary'
                                     sx={{
+                                      display: 'flex',
                                       backgroundColor: "#08397C",
                                       color: "#FFF",
                                       fontFamily: "Montserrat, sans-serif",
                                       fontWeight: 600,
                                       textTransform: "none",
-                                      fontSize: { xs: "0.875rem", md: "1.275rem" },
-                                      padding: { xs: "0.5rem 1rem", md: "1.5rem" },
-                                      marginTop: "1rem",
-                                      width: "auto",
+                                      fontSize: { xs: "0.65rem", md: "0.8rem", lg: "1rem" },
+                                      marginTop: '1rem',
+                                      alignSelf: 'center',
+                                      paddingLeft: '3rem',
+                                      paddingRight: '3rem',
                                       borderRadius: "100px",
                                       maxHeight: "3rem",
                                       "&:hover": {
@@ -1349,6 +1414,11 @@ useEffect(() => {
                     mb={4}
                     sx={{
                       textAlign: { xs: "left", md: "bottom" },
+                      fontSize: {
+                        xs: "clamp(1rem, 2vw, 1rem)",
+                        sm: "clamp(1.5rem, 3.5vw, 1.5rem)",
+                        md: "clamp(2rem, 4vw, 2.25rem)",
+                      },
                     }}
                   >
                     Add Publication
@@ -1359,16 +1429,19 @@ useEffect(() => {
                     fullWidth
                     onChange={(e) => setPublicationName(e.target.value)}
                     margin='normal'
+                    sx={createTextFieldStyles()}
+                    InputLabelProps={createInputLabelProps()}
                   />
                   <FormControl fullWidth variant='outlined' margin='normal'>
-                    <InputLabel>Format</InputLabel>
+                    <InputLabel sx={{fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }}}>Format</InputLabel>
                       <Select
                         label='Format'
+                        sx={createTextFieldStyles()}
                         value={publicationFormat}
                         onChange={(e) => setPublicationFormat(e.target.value)}
                       >
-                        <MenuItem value='journal'>Journal</MenuItem>
-                        <MenuItem value='proceeding'>Proceeding</MenuItem>
+                        <MenuItem value='journal' sx={{fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }}}>Journal</MenuItem>
+                        <MenuItem value='proceeding' sx={{fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }}}>Proceeding</MenuItem>
                       </Select>
                   </FormControl>
                   <TextField
@@ -1379,17 +1452,19 @@ useEffect(() => {
                     margin='normal'
                     value={datePublished}
                     onChange={(e) => setDatePublished(e.target.value)}
-                    InputLabelProps={{ shrink: true }}
+                    sx={createTextFieldStyles()}
+                    InputLabelProps={{ ...createInputLabelProps(), shrink: true }}
                   />
                   <FormControl fullWidth variant='outlined' margin='normal'>
-                    <InputLabel>Indexing Status</InputLabel>
+                    <InputLabel sx={{fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }}}>Indexing Status</InputLabel>
                       <Select
                         label='Indexing Status'
+                        sx={createTextFieldStyles()}
                         value={indexingStatus}
                         onChange={(e) => setIndexingStatus(e.target.value)}
                       >
-                        <MenuItem value='SCOPUS'>Scopus</MenuItem>
-                        <MenuItem value='NON-SCOPUS'>Non-Scopus</MenuItem>
+                        <MenuItem value='SCOPUS' sx={{fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }}}>Scopus</MenuItem>
+                        <MenuItem value='NON-SCOPUS' sx={{fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }}}>Non-Scopus</MenuItem>
                       </Select>
                   </FormControl>
                   <Box
@@ -1411,8 +1486,8 @@ useEffect(() => {
                         color: "#FFF",
                         fontFamily: "Montserrat, sans-serif",
                         fontWeight: 600,
-                        fontSize: { xs: "0.875rem", md: "1.275rem" },
-                        padding: { xs: "0.5rem", md: "1.5rem" },
+                        fontSize: { xs: "0.875rem", md: "1rem" },
+                        padding: { xs: "0.5rem 1rem", md: "1.25rem" },
                         borderRadius: "100px",
                         maxHeight: "3rem",
                         textTransform: "none",
@@ -1433,9 +1508,8 @@ useEffect(() => {
                         fontFamily: "Montserrat, sans-serif",
                         fontWeight: 600,
                         textTransform: "none",
-                        fontSize: { xs: "0.875rem", md: "1.275rem" },
-                        padding: { xs: "0.5rem 1rem", md: "1.5rem" },
-                        marginLeft: "2rem",
+                        fontSize: { xs: "0.875rem", md: "1rem" },
+                        padding: { xs: "0.5rem 1rem", md: "1.25rem" },
                         borderRadius: "100px",
                         maxHeight: "3rem",
                         "&:hover": {
@@ -1471,7 +1545,8 @@ useEffect(() => {
                     placeholder='Search by Title or Venue'
                     value={searchQuery}
                     onChange={handleSearchChange}
-                    sx={{ flex: 2 }}
+                    InputLabelProps={createInputLabelProps()}
+                    sx={{ ...createTextFieldStyles(), flex: 2 }}
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position='start'>
@@ -1491,7 +1566,7 @@ useEffect(() => {
                       height: "auto"
                     }}
                   >
-                    <Box sx={{ height: "32em", overflow: "hidden" }}>
+                    <Box sx={{ height: "25em", overflow: "hidden" }}>
                       {loading ? (
                         <Typography>Loading...</Typography>
                       ) : (
@@ -1523,7 +1598,11 @@ useEffect(() => {
                               <Typography
                                 variant='h6'
                                 sx={{
-                                  fontSize: "1.1rem",
+                                  fontSize: {
+                                    xs: "0.75rem",
+                                    md: "0.85rem",
+                                    lg: "0.95rem",
+                                  },
                                   fontWeight: 500,
                                 }}
                               >
@@ -1533,6 +1612,11 @@ useEffect(() => {
                                 variant='body2'
                                 sx={{
                                   color: "#666",
+                                  fontSize: {
+                                    xs: "0.6rem",
+                                    md: "0.7rem",
+                                    lg: "0.8rem",
+                                  },
                                 }}
                               >
                                 {conference.conference_date} 
@@ -1542,6 +1626,11 @@ useEffect(() => {
                                 sx={{
                                   color: "#0A438F",
                                   fontWeight: 500,
+                                  fontSize: {
+                                    xs: "0.6rem",
+                                    md: "0.7rem",
+                                    lg: "0.8rem",
+                                  },
                                 }}
                               >
                                 {conference.conference_venue}
@@ -1576,8 +1665,8 @@ useEffect(() => {
                       color: "#FFF",
                       fontFamily: "Montserrat, sans-serif",
                       fontWeight: 600,
-                      fontSize: { xs: "0.875rem", md: "1.275rem" },
-                      padding: { xs: "0.5rem", md: "1.5rem" },
+                      fontSize: { xs: "0.875rem", md: "1rem" },
+                      padding: { xs: "0.5rem 1rem", md: "1.25rem" },
                       borderRadius: "100px",
                       maxHeight: "3rem",
                       textTransform: "none",
@@ -1613,6 +1702,11 @@ useEffect(() => {
                     mb={4}
                     sx={{
                       textAlign: { xs: "left", md: "bottom" },
+                      fontSize: {
+                        xs: "clamp(1rem, 2vw, 1rem)",
+                        sm: "clamp(1.5rem, 3.5vw, 1.5rem)",
+                        md: "clamp(2rem, 4vw, 2.25rem)",
+                      },
                     }}
                   >
                     Add Conference
@@ -1623,6 +1717,8 @@ useEffect(() => {
                     fullWidth
                     onChange={(e) => setConferenceTitle(e.target.value)}
                     margin='normal'
+                    sx={createTextFieldStyles()}
+                    InputLabelProps={createInputLabelProps()}
                   />
                   <TextField
                     select
@@ -1634,12 +1730,14 @@ useEffect(() => {
                       fetchCities(e.target.value);
                     }}
                     margin='normal'
+                    sx={createTextFieldStyles()}
+                    InputLabelProps={createInputLabelProps()}
                   >
-                    <MenuItem value='' disabled>
+                    <MenuItem value='' disabled sx={{fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }}}>
                       Select your country
                     </MenuItem>
                     {countries.map((country) => (
-                      <MenuItem key={country.country} value={country.country}>
+                      <MenuItem key={country.country} value={country.country} sx={{fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }}}>
                         {country.country}
                       </MenuItem>
                     ))}
@@ -1653,12 +1751,14 @@ useEffect(() => {
                     margin='normal'
                     disabled={!Cities.length} // Disable if no cities are loaded
                     helperText='Select country first to select city'
+                    sx={createTextFieldStyles()}
+                    InputLabelProps={createInputLabelProps()}
                   >
-                    <MenuItem value='' disabled>
+                    <MenuItem value='' disabled sx={{fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }}}>
                       Select your city
                     </MenuItem>
                     {Cities.map((city) => (
-                      <MenuItem key={city} value={city}>
+                      <MenuItem key={city} value={city} sx={{fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }}}>
                         {city}
                       </MenuItem>
                     ))}
@@ -1671,7 +1771,8 @@ useEffect(() => {
                     margin='normal'
                     value={dateApproved}
                     onChange={(e) => setDateApproved(e.target.value)}
-                    InputLabelProps={{ shrink: true }}
+                    sx={createTextFieldStyles()}
+                    InputLabelProps={{ ...createInputLabelProps(), shrink: true }}
                   />
                   <Box
                     sx={{
@@ -1687,8 +1788,8 @@ useEffect(() => {
                         color: "#FFF",
                         fontFamily: "Montserrat, sans-serif",
                         fontWeight: 600,
-                        fontSize: { xs: "0.875rem", md: "1.275rem" },
-                        padding: { xs: "0.5rem", md: "1.5rem" },
+                        fontSize: { xs: "0.875rem", md: "1rem" },
+                        padding: { xs: "0.5rem 1rem", md: "1.25rem" },
                         borderRadius: "100px",
                         maxHeight: "3rem",
                         textTransform: "none",
@@ -1709,9 +1810,8 @@ useEffect(() => {
                         fontFamily: "Montserrat, sans-serif",
                         fontWeight: 600,
                         textTransform: "none",
-                        fontSize: { xs: "0.875rem", md: "1.275rem" },
-                        padding: { xs: "0.5rem 1rem", md: "1.5rem" },
-                        marginLeft: "2rem",
+                        fontSize: { xs: "0.875rem", md: "1rem" },
+                        padding: { xs: "0.5rem 1rem", md: "1.25rem" },
                         borderRadius: "100px",
                         maxHeight: "3rem",
                         "&:hover": {
@@ -1737,7 +1837,7 @@ useEffect(() => {
               >
                 <Box
                   sx={{
-                    border: "2px solid #0A438F",
+                    border: "1.5px solid #0A438F",
                     display: "flex",
                     flexDirection: "column",
                     width: "100%",
@@ -1782,11 +1882,8 @@ useEffect(() => {
                     fontFamily: "Montserrat, sans-serif",
                     fontWeight: 600,
                     textTransform: "none",
-                    fontSize: { xs: "0.875rem", md: "1.275rem" },
-                    padding: { xs: "0.5rem 1rem", md: "1rem" },
-                    width: '75%',
-                    alignSelf: 'center',
-                    marginTop: "1rem",
+                    fontSize: { xs: "0.65rem", md: "0.8rem", lg: "1rem" },
+                    marginTop: '1rem',
                     borderRadius: "100px",
                     maxHeight: "3rem",
                     "&:hover": {
