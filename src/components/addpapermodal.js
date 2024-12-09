@@ -23,7 +23,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
   const [programs, setPrograms] = useState([]);
   const [selectedCollege, setSelectedCollege] = useState("");
   const [selectedProgram, setSelectedProgram] = useState("");
-  const [researchType, setResearchType] = useState("");
+  const [researchType, setResearchType] = useState("Integrative");
   const [dateApproved, setDateApproved] = useState("");
   const [title, setTitle] = useState("");
   const [groupCode, setGroupCode] = useState("");
@@ -178,11 +178,9 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
         );
         return;
       }
-      
 
       console.log("File:", file);
       console.log("Extended Abstract:", extendedAbstract);
-
 
       const formData = new FormData();
 
@@ -244,13 +242,13 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
     }
   };
 
-  // Add a cleanup function to reset form state when modal closes
+  // Reset form state when modal opens
   useEffect(() => {
     if (!isAddPaperModalOpen) {
       setGroupCode("");
       setSelectedCollege("");
       setSelectedProgram("");
-      setResearchType("");
+      setResearchType("Integrative"); // Reset to Integrative
       setDateApproved("");
       setTitle("");
       setAbstract("");
@@ -267,30 +265,40 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
     }
   }, [isAddPaperModalOpen]);
 
+  // Initialize research type
+  useEffect(() => {
+    setResearchType("Integrative");
+  }, []); // Run once when component mounts
+
   // Utility function to create responsive TextField styles
   const createTextFieldStyles = (customFlex = 2) => ({
     flex: customFlex,
-    '& .MuiInputBase-input': {
-      fontSize: { 
-        xs: '0.6em',   // Mobile
-        sm: '0.7rem',   // Small devices
-        md: '0.8rem',    // Medium devices
-        lg: '0.8rem'        // Large devices
+    "& .MuiInputBase-input": {
+      fontSize: {
+        xs: "0.6em", // Mobile
+        sm: "0.7rem", // Small devices
+        md: "0.8rem", // Medium devices
+        lg: "0.8rem", // Large devices
       },
-    }
+    },
   });
 
   // Utility function to create responsive label styles
   const createInputLabelProps = () => ({
     sx: {
-      fontSize: { 
-        xs: '0.45rem',   // Mobile
-        sm: '0.55rem',   // Small devices
-        md: '0.65rem',    // Medium devices
-        lg: '0.75rem'     // Large devices
-      }
-    }
+      fontSize: {
+        xs: "0.45rem", // Mobile
+        sm: "0.55rem", // Small devices
+        md: "0.65rem", // Medium devices
+        lg: "0.75rem", // Large devices
+      },
+    },
   });
+
+  // Add this function to handle research type changes
+  const handleResearchTypeChange = (event) => {
+    setResearchType(event.target.value);
+  };
 
   return (
     <Modal
@@ -330,6 +338,21 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
         </Typography>
         <Grid2 container spacing={2}>
           <Grid2 size={2}>
+            <FormControl fullWidth sx={{ mb: 2 }}>
+              <InputLabel>Research Type</InputLabel>
+              <Select
+                value={researchType}
+                onChange={handleResearchTypeChange}
+                label='Research Type'
+                defaultValue='Integrative'
+              >
+                <MenuItem value='Integrative'>Integrative</MenuItem>
+                <MenuItem value='College-Driven'>College-Driven</MenuItem>
+                <MenuItem value='Extramural'>Extramural</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid2>
+          <Grid2 size={2}>
             <TextField
               fullWidth
               label='Group Code'
@@ -343,14 +366,26 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
           </Grid2>
           <Grid2 size={3}>
             <FormControl fullWidth variant='outlined'>
-              <InputLabel sx={{fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }}}>Department</InputLabel>
+              <InputLabel
+                sx={{
+                  fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" },
+                }}
+              >
+                Department
+              </InputLabel>
               <Select
                 value={selectedCollege}
                 onChange={handleCollegeChange}
                 label='Department'
               >
                 {colleges.map((college) => (
-                  <MenuItem key={college.college_id} value={college.college_id} sx={{fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }}}>
+                  <MenuItem
+                    key={college.college_id}
+                    value={college.college_id}
+                    sx={{
+                      fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" },
+                    }}
+                  >
                     {college.college_name}
                   </MenuItem>
                 ))}
@@ -358,8 +393,18 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
             </FormControl>
           </Grid2>
           <Grid2 size={3}>
-            <FormControl fullWidth variant='outlined' sx={createTextFieldStyles()}>
-              <InputLabel sx={{fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }}} >Program</InputLabel>
+            <FormControl
+              fullWidth
+              variant='outlined'
+              sx={createTextFieldStyles()}
+            >
+              <InputLabel
+                sx={{
+                  fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" },
+                }}
+              >
+                Program
+              </InputLabel>
               <Select
                 value={selectedProgram}
                 onChange={(e) => setSelectedProgram(e.target.value)}
@@ -367,24 +412,16 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
                 disabled={!selectedCollege} // Disable if no college is selected
               >
                 {programs.map((program) => (
-                  <MenuItem key={program.program_id} value={program.program_id} sx={{fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }}}>
+                  <MenuItem
+                    key={program.program_id}
+                    value={program.program_id}
+                    sx={{
+                      fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" },
+                    }}
+                  >
                     {program.program_name}
                   </MenuItem>
                 ))}
-              </Select>
-            </FormControl>
-          </Grid2>
-          <Grid2 size={2}>
-            <FormControl fullWidth variant='outlined' sx={createTextFieldStyles()}>
-              <InputLabel sx={{fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }}} >Research Type</InputLabel>
-              <Select
-                value={researchType}
-                onChange={(e) => setResearchType(e.target.value)}
-                label='Research Type'
-              >
-                <MenuItem value='COLLEGE-DRIVEN' sx={{fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }}}>COLLEGE-DRIVEN</MenuItem>
-                <MenuItem value='INTEGRATIVE' sx={{fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }}}>INTEGRATIVE</MenuItem>
-                <MenuItem value='EXTRAMURAL' sx={{fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }}}>EXTRAMURAL</MenuItem>
               </Select>
             </FormControl>
           </Grid2>
@@ -412,11 +449,11 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
               componentsProps={{
                 popper: {
                   sx: {
-                    '& .MuiAutocomplete-listbox': {
-                      fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }
-                    }
-                  }
-                }
+                    "& .MuiAutocomplete-listbox": {
+                      fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" },
+                    },
+                  },
+                },
               }}
               value={authors}
               onChange={(event, newValue) => setAuthors(newValue)}
@@ -449,19 +486,28 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
               componentsProps={{
                 popper: {
                   sx: {
-                    '& .MuiAutocomplete-listbox': {
-                      fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }
-                    }
-                  }
-                }
+                    "& .MuiAutocomplete-listbox": {
+                      fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" },
+                    },
+                  },
+                },
               }}
               value={adviser}
               onChange={(event, newValue) => setAdviser(newValue)}
               inputValue={adviserInputValue}
               onInputChange={(event, newInputValue) => {
-                setAdviserInputValue(newInputValue);
-                handleAdviserSearch(newInputValue);
+                if (
+                  researchType !== "College-Driven" &&
+                  researchType !== "Extramural"
+                ) {
+                  setAdviserInputValue(newInputValue);
+                  handleAdviserSearch(newInputValue);
+                }
               }}
+              disabled={
+                researchType === "College-Driven" ||
+                researchType === "Extramural"
+              }
               renderInput={(params) => (
                 <TextField
                   {...params}
@@ -486,19 +532,28 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
               componentsProps={{
                 popper: {
                   sx: {
-                    '& .MuiAutocomplete-listbox': {
-                      fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }
-                    }
-                  }
-                }
+                    "& .MuiAutocomplete-listbox": {
+                      fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" },
+                    },
+                  },
+                },
               }}
               value={panels}
               onChange={(event, newValue) => setPanels(newValue)}
               inputValue={panelInputValue}
               onInputChange={(event, newInputValue) => {
-                setPanelInputValue(newInputValue);
-                handlePanelSearch(newInputValue);
+                if (
+                  researchType !== "College-Driven" &&
+                  researchType !== "Extramural"
+                ) {
+                  setPanelInputValue(newInputValue);
+                  handlePanelSearch(newInputValue);
+                }
               }}
+              disabled={
+                researchType === "College-Driven" ||
+                researchType === "Extramural"
+              }
               renderInput={(params) => (
                 <TextField
                   {...params}
@@ -581,7 +636,13 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
             />
           </Grid2>
           <Grid2 size={3}>
-            <Typography variant='body1' sx={{ color: "#8B8B8B", fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" }}}>
+            <Typography
+              variant='body1'
+              sx={{
+                color: "#8B8B8B",
+                fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" },
+              }}
+            >
               Upload Full Manuscript:
             </Typography>
             <Box
@@ -603,7 +664,13 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
             </Box>
           </Grid2>
           <Grid2 size={3}>
-            <Typography variant='body1' sx={{ color: "#8B8B8B", fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" } }}>
+            <Typography
+              variant='body1'
+              sx={{
+                color: "#8B8B8B",
+                fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" },
+              }}
+            >
               Upload Extended Abstract:
             </Typography>
             <Box
