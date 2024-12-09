@@ -124,10 +124,6 @@ const Navbar = () => {
     navigate("/auditlog");
   };
 
-  const handleKnowledgeGraph = () => {
-    navigate("/knowledgegraph");
-  };
-
   const handleMainDash = () => {
     navigate("/publication");
   };
@@ -260,10 +256,10 @@ const Navbar = () => {
       position='fixed'
       sx={{
         backgroundColor: "#FFF",
-        height: { 
-          xs: 'calc(3rem + env(safe-area-inset-top))', 
-          sm: 'calc(4rem + env(safe-area-inset-top))', 
-          md: 'calc(5rem + env(safe-area-inset-top))' 
+        height: {
+          xs: "calc(3rem + env(safe-area-inset-top))",
+          sm: "calc(4rem + env(safe-area-inset-top))",
+          md: "calc(5rem + env(safe-area-inset-top))",
         },
         // Ensure navbar doesn't overlap content
         zIndex: theme.zIndex.appBar,
@@ -500,22 +496,27 @@ const Navbar = () => {
         </Menu>
 
         {/*Dashboard Menu*/}
-        {user?.role === "02" && (
+        {(user?.role === "02" ||
+          user?.role === "03" ||
+          user?.role === "04") && (
           <Menu
             anchorEl={anchorElDash}
             open={Boolean(anchorElDash)}
             onClose={handleCloseDashMenu}
             sx={{ "& .MuiPaper-root": { backgroundColor: "#CA031B" } }}
           >
-            <MenuItem onClick={handleReports}>
-              <Typography color='common.white'>Reports</Typography>
-            </MenuItem>
-            <MenuItem onClick={handleMainDash}>
-              <Typography color='common.white'>Analytics</Typography>
-            </MenuItem>
-            <MenuItem onClick={handleKnowledgeGraph}>
-              <Typography color='common.white'>Knowledge Graph</Typography>
-            </MenuItem>
+            {(user?.role === "02" ||
+              user?.role === "03" ||
+              user?.role === "04") && (
+              <>
+                <MenuItem onClick={handleReports}>
+                  <Typography color='common.white'>Reports</Typography>
+                </MenuItem>
+                <MenuItem onClick={handleMainDash}>
+                  <Typography color='common.white'>Analytics</Typography>
+                </MenuItem>
+              </>
+            )}
           </Menu>
         )}
 
