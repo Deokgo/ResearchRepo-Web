@@ -695,9 +695,8 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
         <Box
           sx={{
             display: "flex",
-            justifyContent: "space-between",
             alignItems: "flex-start",
-            mt: 2,
+            mt: 3,
             gap: 2,
           }}
         >

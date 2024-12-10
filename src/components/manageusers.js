@@ -699,7 +699,7 @@ const ManageUsers = () => {
                 color='primary'
                 onClick={handleOpenAddModal}
                 sx={{
-                  backgroundColor: "#F40824",
+                  backgroundColor: "#CA031B",
                   color: "#FFF",
                   fontFamily: "Montserrat, sans-serif",
                   fontWeight: 600,
@@ -709,6 +709,10 @@ const ManageUsers = () => {
                   marginLeft: "2rem",
                   borderRadius: "100px",
                   maxHeight: "3rem",
+                  "&:hover": {
+                    backgroundColor: "#A30417",
+                    color: "#FFF",
+                  },
                 }}
               >
                 + Add Users

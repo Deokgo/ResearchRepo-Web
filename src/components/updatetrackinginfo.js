@@ -631,14 +631,19 @@ useEffect(() => {
   };
 
   const handleCloseModal = () => {
-    setOpenModalPub(false);
-
+    
     setSearchQuery("");
-    setOpenModalCon(false);
+    
+    if (!openModal){
+      setOpenModalCon(false);
+    }
+    if (openModalCon){
+      setOpenModal(false);
+    }
 
-    setOpenModal(false);
-
-    handleFormCleanup();
+    if (openModalPub){
+      setOpenModalPub(false);
+    }
   };
   
   const handleFormCleanup = () => {
@@ -1261,7 +1266,7 @@ useEffect(() => {
                                     </Box>
                                   </Grid2>
                                   <Divider orientation='horizontal' flexItem  sx={{mt: "1rem", mb: "1rem"}}/>
-                                  {publicationFormat !== "journal" && ( // Render only if the selected type is not "Journal"
+                                  {publicationFormat === "proceeding" && ( // Render only if the selected type is not "Journal"
                                     <>
                                       <Typography variant="h6" color='#d40821' fontWeight="700" sx={{fontSize: { xs: "0.8rem", md: "1rem", lg: "1.1rem" }}}>
                                         Conference:
@@ -1309,39 +1314,6 @@ useEffect(() => {
                                             onClick={handleOpenModalCon}
                                           >
                                             Select Conference
-                                          </Button>
-                                        </Box>
-                                        <Box
-                                          sx={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            border: '1px dashed #0A438F',
-                                            borderRadius: 1,
-                                            cursor: 'pointer',
-                                            justifyContent: 'center',
-                                            gap: 2,
-                                          }}
-                                        >
-                                          <Button
-                                            variant="text"
-                                            color="primary"
-                                            sx={{
-                                              width: '100%',
-                                              color: '#08397C',
-                                              fontFamily: 'Montserrat, sans-serif',
-                                              fontWeight: 600,
-                                              textTransform: 'none',
-                                              fontSize: { xs: "0.6rem", md: "0.7rem", lg: "0.9rem" },
-                                              padding: '1rem',
-                                              alignSelf: 'center',
-                                              maxHeight: '2rem',
-                                              '&:hover': {
-                                                color: '#052045',
-                                              },
-                                            }}
-                                            onClick={handleOpenModal}
-                                          >
-                                            + Add Conference
                                           </Button>
                                         </Box>
                                       </Grid2>
@@ -1470,8 +1442,8 @@ useEffect(() => {
                   <Box
                     sx={{
                       display: "flex",
-                      justifyContent: "space-between",
-                      mt: 5,
+                      mt: 3,
+                      gap: 2
                     }}
                   >
                     <Button
@@ -1535,7 +1507,7 @@ useEffect(() => {
                     width: "40rem",
                     bgcolor: "background.paper",
                     boxShadow: 24,
-                    p: 5,
+                    p: 3,
                     borderRadius: "8px",
                   }}
                 >
@@ -1658,25 +1630,40 @@ useEffect(() => {
                       />
                     </Box>
                   </Box>
-                  <Button
-                    onClick={handleCloseModal}
-                    sx={{
-                      backgroundColor: "#08397C",
-                      color: "#FFF",
-                      fontFamily: "Montserrat, sans-serif",
-                      fontWeight: 600,
-                      fontSize: { xs: "0.875rem", md: "1rem" },
-                      padding: { xs: "0.5rem 1rem", md: "1.25rem" },
-                      borderRadius: "100px",
-                      maxHeight: "3rem",
-                      textTransform: "none",
-                      "&:hover": {
-                        backgroundColor: "#072d61",
-                      },
-                    }}
-                  >
-                    Cancel
-                  </Button>
+                  <Box display='flex' flexDirection='column' alignItems= "center">
+                    <Typography sx={{ py: 2, fontSize: { xs: "0.7rem", md: "0.8rem", lg: "0.9rem"} }}>
+                      Didn’t found the conference your looking for?{" "}
+                      <a
+                        href='#'
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleOpenModal();
+                        }}
+                        style={{ color: "#CA031B" }}
+                      >
+                        Add Conference
+                      </a>
+                    </Typography>
+                    <Button
+                      onClick={handleCloseModal}
+                      sx={{
+                        backgroundColor: "#08397C",
+                        color: "#FFF",
+                        fontFamily: "Montserrat, sans-serif",
+                        fontWeight: 600,
+                        fontSize: { xs: "0.875rem", md: "1rem" },
+                        padding: { xs: "0.5rem 1rem", md: "1.25rem" },
+                        borderRadius: "100px",
+                        maxHeight: "3rem",
+                        textTransform: "none",
+                        "&:hover": {
+                          backgroundColor: "#072d61",
+                        },
+                      }}
+                    >
+                      Cancel
+                    </Button>
+                  </Box>
                 </Box>
               </Modal>
 
@@ -1688,7 +1675,7 @@ useEffect(() => {
                     top: "50%",
                     left: "50%",
                     transform: "translate(-50%, -50%)",
-                    width: "40rem",
+                    width: "30rem",
                     bgcolor: "background.paper",
                     boxShadow: 24,
                     p: 5,
@@ -1777,8 +1764,8 @@ useEffect(() => {
                   <Box
                     sx={{
                       display: "flex",
-                      justifyContent: "space-between",
-                      mt: 5,
+                      mt: 3,
+                      gap: 2
                     }}
                   >
                     <Button

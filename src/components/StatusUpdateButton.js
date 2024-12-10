@@ -47,7 +47,6 @@ const StatusUpdateButton = ({
           fontWeight: 600,
           textTransform: "none",
           fontSize: { xs: "0.65rem", md: "0.8rem", lg: "1rem" },
-          marginTop: '1rem',
           borderRadius: "100px",
           maxHeight: "3rem",
           "&:hover": {

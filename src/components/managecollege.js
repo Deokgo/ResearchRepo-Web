@@ -428,18 +428,19 @@ const ManageCollege = () => {
                 variant='contained'
                 color='primary'
                 sx={{
-                  backgroundColor: "#08397C",
+                  backgroundColor: "#CA031B",
                   color: "#FFF",
                   fontFamily: "Montserrat, sans-serif",
                   fontWeight: 600,
                   textTransform: "none",
-                  fontSize: { xs: "0.875rem", md: "1.275rem" },
-                  padding: { xs: "0.5rem 1rem", md: "1.5rem" },
+                  fontSize: { xs: "0.875rem", md: "1rem" },
+                  padding: { xs: "0.5rem 1rem", md: "1.25rem" },
                   marginLeft: "2rem",
                   borderRadius: "100px",
                   maxHeight: "3rem",
                   "&:hover": {
-                    backgroundColor: "#072d61",
+                    backgroundColor: "#A30417",
+                    color: "#FFF",
                   },
                 }}    
                 onClick={handleOpenAddModal}
