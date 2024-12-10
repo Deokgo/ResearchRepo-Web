@@ -75,7 +75,7 @@ const LoginModal = () => {
           navigate("/researchtracking");
           break;
         case "04":
-          navigate("/maindash");
+          navigate("/dash");
           break;
         case "05":
         case "06":

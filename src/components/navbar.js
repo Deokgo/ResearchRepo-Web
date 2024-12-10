@@ -129,7 +129,7 @@ const Navbar = () => {
   };
 
   const handleReports = () => {
-    navigate("/maindash");
+    navigate("/dash");
   };
 
   const handleResesearchTrack = () => {

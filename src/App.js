@@ -138,11 +138,11 @@ function App() {
 
             {/* College Administrator only routes */}
             <Route
-              path='/maindash'
+              path='/dash'
               element={
                 <PrivateRoute>
-                  <RoleBasedRoute allowedRoles={["04"]}>
-                    <MainDash />
+                  <RoleBasedRoute allowedRoles={["04", "05", "02"]}>
+                    <DashEmbed />
                   </RoleBasedRoute>
                 </PrivateRoute>
               }
