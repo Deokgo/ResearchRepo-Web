@@ -310,9 +310,7 @@ const Profile = () => {
   const fetchProgramsByCollege = async (collegeId) => {
     if (collegeId) {
       try {
-        const response = await axios.get(`/deptprogs/programs`, {
-          params: { department: collegeId },
-        });
+        const response = await axios.get(`/deptprogs/programs/${collegeId}`);
         setPrograms(response.data.programs);
       } catch (error) {
         console.error("Error fetching programs by college:", error);
