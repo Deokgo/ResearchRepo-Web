@@ -239,6 +239,7 @@ const Navbar = () => {
       ],
       "05": [
         // Program Administrator
+        { label: "Reports", onClick: handleReports },
         { label: "Research Tracking", onClick: handleResesearchTrack },
         ...commonItems,
       ],
@@ -505,18 +506,12 @@ const Navbar = () => {
             onClose={handleCloseDashMenu}
             sx={{ "& .MuiPaper-root": { backgroundColor: "#CA031B" } }}
           >
-            {(user?.role === "02" ||
-              user?.role === "03" ||
-              user?.role === "04") && (
-              <>
-                <MenuItem onClick={handleReports}>
-                  <Typography color='common.white'>Reports</Typography>
-                </MenuItem>
-                <MenuItem onClick={handleMainDash}>
-                  <Typography color='common.white'>Analytics</Typography>
-                </MenuItem>
-              </>
-            )}
+            <MenuItem onClick={handleReports}>
+              <Typography color='common.white'>Reports</Typography>
+            </MenuItem>
+            <MenuItem onClick={handleMainDash}>
+              <Typography color='common.white'>Analytics</Typography>
+            </MenuItem>
           </Menu>
         )}
 
