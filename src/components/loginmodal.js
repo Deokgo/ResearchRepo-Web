@@ -40,10 +40,10 @@ const LoginModal = () => {
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    width: 600,
+    width: { xs: "90%", sm: "80%", md: "600px" }, // Responsive width
     bgcolor: "background.paper",
     boxShadow: 24,
-    p: 4,
+    p: { xs: 2, sm: 3, md: 4 }, // Responsive padding
     borderRadius: "10px",
   };
 
@@ -135,7 +135,11 @@ const LoginModal = () => {
     <>
       {/*Log In Modal*/}
       <Modal open={isLoginModalOpen} onClose={handleModalClose}>
-        <Box sx={modalStyle}>
+        <Box sx={{
+          ...modalStyle,
+          maxHeight: "90vh", // Limit the modal height to 90% of the viewport height
+          overflowY: "auto", // Enable vertical scrolling when content overflows
+        }}>
           <Typography
             variant='h6'
             color='#0A438F'
@@ -234,13 +238,25 @@ const LoginModal = () => {
                 </Button>
 
                 <Button
-                  onClick={handleForgotPassword}
-                  color='primary'
-                  sx={{ textTransform: "none" }}
-                >
-                  Forgot Password?
-                </Button>
-                <Typography sx={{ marginTop: "20px" }}>
+                onClick={handleForgotPassword}
+                color="primary"
+                sx={{
+                  textTransform: "none",
+                  fontSize: { xs: "10px", sm: "12px", md: "14px", lg: "16px" }, // Small base font size
+                  padding: { xs: "4px 6px", sm: "6px 8px", md: "8px 10px", lg: "10px 12px" }, // Smaller base padding
+                }}
+              >
+                Forgot Password?
+              </Button>
+                         
+                <Typography sx={{
+                  textAlign: { xs: "center", md: "bottom" },
+                  fontSize: {
+                    xs: "clamp(0.5rem, 2vw, 0.5rem)",
+                    sm: "clamp(0.75rem, 3.5vw, 0.75rem)",
+                    md: "clamp(1rem, 4vw, 1rem)",
+                  },
+                }}>
                   Don’t have an account?{" "}
                   <a
                     href='#'

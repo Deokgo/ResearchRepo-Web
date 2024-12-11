@@ -34,10 +34,10 @@ const PasswordResetModal = () => {
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    width: 600,
+    width: { xs: "90%", sm: "80%", md: "600px" }, // Responsive width
     bgcolor: "background.paper",
     boxShadow: 24,
-    p: 4,
+    p: { xs: 2, sm: 3, md: 4 }, // Responsive padding
     borderRadius: "10px",
   };
 
@@ -119,18 +119,34 @@ const PasswordResetModal = () => {
     });
     setError("");
   };
-
+  
   return (
     <>
       <Modal open={isPassresetModalOpen} onClose={closePassresetModal}>
         <Box sx={modalStyle}>
-          <Typography variant='h6' color='#0A438F' fontWeight='500'>
+          <Typography
+            variant="h6"
+            sx={{
+              color: "#0A438F",
+              fontWeight: "500",
+              fontSize: { xs: "16px", sm: "18px", md: "20px" }, // Responsive font size
+            }}
+          >
             Mapúa MCL Research Repository
           </Typography>
-          <Typography variant='h3' color='#F40824' fontWeight='700' padding={3}>
+          <Typography
+            variant="h3"
+            sx={{
+              color: "#F40824",
+              fontWeight: "700",
+              padding: { xs: 1, sm: 2, md: 3 }, // Responsive padding
+              fontSize: { xs: "24px", sm: "28px", md: "32px" }, // Responsive font size
+              textAlign: "center",
+            }}
+          >
             Password Reset
           </Typography>
-
+  
           {!isOtpVerified ? (
             <form onSubmit={handleEmailSubmit}>
               <Box
@@ -138,30 +154,35 @@ const PasswordResetModal = () => {
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "center",
-                  mx: "4rem",
+                  mx: { xs: 2, sm: 4 }, // Responsive horizontal margin
                 }}
               >
                 <TextField
-                  label='Email'
+                  label="Email"
                   fullWidth
-                  name='email'
-                  type='email'
+                  name="email"
+                  type="email"
                   value={formValues.email}
                   onChange={handleChange}
-                  margin='normal'
-                  variant='outlined'
+                  margin="normal"
+                  variant="outlined"
                   error={Boolean(error)}
                   helperText={error}
+                  sx={{
+                    width: { xs: "90%", sm: "80%", md: "70%" }, // Responsive width
+                    margin: "0 auto", // Center the TextField
+                  }}
                 />
                 <Button
-                  type='submit'
+                  type="submit"
                   fullWidth
-                  variant='contained'
+                  variant="contained"
                   disabled={loading}
                   sx={{
-                    maxWidth: "200px",
+                    maxWidth: { xs: "150px", sm: "200px" }, // Responsive max width
                     marginTop: "20px",
-                    padding: "15px",
+                    padding: { xs: "10px", sm: "15px" }, // Responsive padding
+                    fontSize: { xs: "14px", sm: "16px" }, // Responsive font size
                     backgroundColor: "#EC1F28",
                   }}
                 >
@@ -176,21 +197,21 @@ const PasswordResetModal = () => {
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "center",
-                  mx: "4rem",
+                  mx: { xs: 2, sm: 4 }, // Responsive horizontal margin
                 }}
               >
                 <TextField
-                  label='New Password'
+                  label="New Password"
                   fullWidth
-                  name='newPassword'
+                  name="newPassword"
                   type={showPassword ? "text" : "password"}
                   value={formValues.newPassword}
                   onChange={handleChange}
-                  margin='normal'
-                  variant='outlined'
+                  margin="normal"
+                  variant="outlined"
                   InputProps={{
                     endAdornment: (
-                      <InputAdornment position='end'>
+                      <InputAdornment position="end">
                         <IconButton
                           onClick={() => setShowPassword(!showPassword)}
                         >
@@ -201,19 +222,19 @@ const PasswordResetModal = () => {
                   }}
                 />
                 <TextField
-                  label='Confirm Password'
+                  label="Confirm Password"
                   fullWidth
-                  name='confirmPassword'
+                  name="confirmPassword"
                   type={showConfirmPassword ? "text" : "password"}
                   value={formValues.confirmPassword}
                   onChange={handleChange}
-                  margin='normal'
-                  variant='outlined'
+                  margin="normal"
+                  variant="outlined"
                   error={Boolean(error)}
                   helperText={error}
                   InputProps={{
                     endAdornment: (
-                      <InputAdornment position='end'>
+                      <InputAdornment position="end">
                         <IconButton
                           onClick={() =>
                             setShowConfirmPassword(!showConfirmPassword)
@@ -230,14 +251,14 @@ const PasswordResetModal = () => {
                   }}
                 />
                 <Button
-                  type='submit'
+                  type="submit"
                   fullWidth
-                  variant='contained'
+                  variant="contained"
                   disabled={loading}
                   sx={{
-                    maxWidth: "200px",
+                    maxWidth: { xs: "150px", sm: "200px" }, // Responsive max width
                     marginTop: "20px",
-                    padding: "15px",
+                    padding: { xs: "10px", sm: "15px" }, // Responsive padding
                     backgroundColor: "#EC1F28",
                   }}
                 >
@@ -248,7 +269,7 @@ const PasswordResetModal = () => {
           )}
         </Box>
       </Modal>
-
+  
       <OtpModal
         open={showOtpModal}
         onClose={() => setShowOtpModal(false)}
@@ -257,7 +278,7 @@ const PasswordResetModal = () => {
         isPasswordReset={true}
       />
     </>
-  );
+  );  
 };
 
 export default PasswordResetModal;

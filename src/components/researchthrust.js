@@ -443,39 +443,40 @@ const ResearchThrust = () => {
                             <Box>
                               <Divider sx={{ marginY: 2 }} />
                               {department.programs.map((program, index) => (
-                                <Box sx={{m: 2}}>
-                                  <Accordion 
-                                    key={index}
-                                    expanded={expandedPanelProgram === program.name}
-                                    onChange={handleAccordionChangeProgram(program.name)}
-                                  >
-                                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                                      <Typography
-                                        variant="h6"
-                                        sx={{
-                                          fontWeight: 700,
-                                          fontFamily: "Montserrat, sans-serif",
-                                          color: "#08397C",
-                                          ml: 2
-                                        }}
-                                      >
-                                        {program.name}
-                                      </Typography>
-                                    </AccordionSummary>
-                                    <AccordionDetails>
-                                      <Typography 
-                                        sx={{ 
-                                          color: "#36454F",
-                                          paddingLeft: { xs: "0.5rem", md: "0.75rem", lg: "1rem" },
-                                          fontSize: { xs: "0.65rem", md: "0.85rem", lg: "1rem" },
-                                        }}
-                                      >
-                                        {program.focusAreas}
-                                      </Typography>
-                                    </AccordionDetails>
-                                  </Accordion>
-                                </Box>
-                              ))}
+                              <Box sx={{ m: 2 }} key={index}>
+                                <Accordion
+                                  expanded={expandedPanelProgram === program.name}
+                                  onChange={handleAccordionChangeProgram(program.name)}
+                                >
+                                  <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                                    <Typography
+                                      variant="h6"
+                                      sx={{
+                                        fontWeight: 700,
+                                        fontFamily: "Montserrat, sans-serif",
+                                        color: "#08397C",
+                                        ml: 2,
+                                        fontSize: { xs: "0.75rem", md: "0.95rem", lg: "1.3rem" }, // Add responsive font sizes
+                                        padding: { xs: "0.25rem", md: "0.5rem", lg: "0.75rem" }, // Add responsive padding
+                                      }}
+                                    >
+                                      {program.name}
+                                    </Typography>
+                                  </AccordionSummary>
+                                  <AccordionDetails>
+                                    <Typography
+                                      sx={{
+                                        color: "#36454F",
+                                        paddingLeft: { xs: "0.5rem", md: "0.75rem", lg: "1rem" },
+                                        fontSize: { xs: "0.65rem", md: "0.85rem", lg: "1rem" },
+                                      }}
+                                    >
+                                      {program.focusAreas}
+                                    </Typography>
+                                  </AccordionDetails>
+                                </Accordion>
+                              </Box>
+                            ))}
                             </Box>
                           )}
                       </AccordionDetails>

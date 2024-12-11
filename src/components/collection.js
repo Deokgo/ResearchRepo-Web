@@ -10,6 +10,7 @@ import {
   Slider,
   TextField,
   Typography,
+  useMediaQuery,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import Navbar from "./navbar";
@@ -32,6 +33,7 @@ import { useAuth } from "../context/AuthContext";
 
 const Collection = () => {
   const navigate = useNavigate();
+  const isMobile = useMediaQuery('(max-width:600px)'); // Checks if the screen is 600px or smaller (mobile)
   const [userDepartment, setUserDepartment] = useState(null);
   const [research, setResearch] = useState([]);
   const [colleges, setColleges] = useState([]);
@@ -52,7 +54,7 @@ const Collection = () => {
   const { isAddPaperModalOpen, openAddPaperModal, closeAddPaperModal } =
     useModalContext();
   const { user } = useAuth();
-
+  const [otherSectionsVisible, setOtherSectionsVisible] = useState(true);
   const handleNavigateKnowledgeGraph = () => {
     navigate("/knowledgegraph");
   };
@@ -353,6 +355,11 @@ const Collection = () => {
     }
   };
 
+  useEffect(() => {
+    // If the screen is mobile, hide the other sections
+    setOtherSectionsVisible(!isMobile);
+  }, [isMobile]);
+
   return (
     <>
       <Box
@@ -465,234 +472,236 @@ const Collection = () => {
               }}
             >
               {/* Filters Section */}
-              <Grid2 size={3}>
-                <Box
-                  sx={{
-                    border: "1px solid #0A438F",
-                    height: "100%",
-                    borderRadius: 3,
-                    padding: 3,
-                    overflow: "hidden",
-                    display: "flex",
-                    flexDirection: "column",
-                  }}
-                >
-                  <Typography
-                    variant='h6'
-                    sx={{ mb: 2, fontWeight: "bold", color: "#F40824" }}
+              {!isMobile && (
+                <Grid2 size={3}>
+                  <Box
+                    sx={{
+                      border: "1px solid #0A438F",
+                      height: "100%",
+                      borderRadius: 3,
+                      padding: 3,
+                      overflow: "hidden",
+                      display: "flex",
+                      flexDirection: "column",
+                    }}
                   >
-                    Filters
-                  </Typography>
-                  <Box sx={{ mb: 2 }}>
+                    <Typography
+                      variant='h6'
+                      sx={{ mb: 2, fontWeight: "bold", color: "#F40824" }}
+                    >
+                      Filters
+                    </Typography>
+                    <Box sx={{ mb: 2 }}>
+                      <Typography
+                        variant='body1'
+                        sx={{
+                          mb: 2,
+                          color: "#08397C",
+                          position: "relative",
+                          zIndex: 2,
+                          fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" },
+                        }}
+                      >
+                        Year Range:
+                      </Typography>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                          width: "100%",
+                          mt: 4,
+                        }}
+                      >
+                        <Slider
+                          value={sliderValue}
+                          onChange={handleDateRangeChange}
+                          valueLabelDisplay='on'
+                          min={dateRange[0]}
+                          max={dateRange[1]}
+                          sx={{
+                            width: "90%",
+                            "& .MuiSlider-valueLabel": {
+                              backgroundColor: "#08397C",
+                            },
+                            "& .MuiSlider-rail": {
+                              backgroundColor: "#ccc",
+                            },
+                            "& .MuiSlider-track": {
+                              backgroundColor: "#08397C",
+                            },
+                            "& .MuiSlider-thumb": {
+                              backgroundColor: "#08397C",
+                            },
+                          }}
+                        />
+                      </Box>
+                    </Box>
                     <Typography
                       variant='body1'
                       sx={{
-                        mb: 2,
                         color: "#08397C",
-                        position: "relative",
-                        zIndex: 2,
                         fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" },
                       }}
                     >
-                      Year Range:
+                      College:
                     </Typography>
                     <Box
                       sx={{
                         display: "flex",
                         flexDirection: "column",
-                        alignItems: "center",
-                        width: "100%",
-                        mt: 4,
+                        height: "50%",
+                        overflowY: "auto",
+                        mb: 2,
+                        "&::-webkit-scrollbar": {
+                          width: "8px",
+                        },
+                        "&::-webkit-scrollbar-track": {
+                          background: "#f1f1f1",
+                          borderRadius: "4px",
+                        },
+                        "&::-webkit-scrollbar-thumb": {
+                          background: "#08397C",
+                          borderRadius: "4px",
+                        },
                       }}
                     >
-                      <Slider
-                        value={sliderValue}
-                        onChange={handleDateRangeChange}
-                        valueLabelDisplay='on'
-                        min={dateRange[0]}
-                        max={dateRange[1]}
-                        sx={{
-                          width: "90%",
-                          "& .MuiSlider-valueLabel": {
-                            backgroundColor: "#08397C",
-                          },
-                          "& .MuiSlider-rail": {
-                            backgroundColor: "#ccc",
-                          },
-                          "& .MuiSlider-track": {
-                            backgroundColor: "#08397C",
-                          },
-                          "& .MuiSlider-thumb": {
-                            backgroundColor: "#08397C",
-                          },
-                        }}
-                      />
+                      {colleges.map((college) => (
+                        <FormControlLabel
+                          key={college.college_id}
+                          control={
+                            <Checkbox
+                              checked={selectedColleges.includes(
+                                college.college_id
+                              )}
+                              onChange={handleCollegeChange}
+                              value={college.college_id}
+                            />
+                          }
+                          label={college.college_name}
+                          sx={{
+                            "& .MuiTypography-root": {
+                              fontSize: {
+                                xs: "0.5rem",
+                                md: "0.75rem",
+                                lg: "0.9rem",
+                              },
+                            },
+                          }}
+                        />
+                      ))}
+                    </Box>
+                    <Typography
+                      variant='body1'
+                      sx={{
+                        color: "#08397C",
+                        fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" },
+                      }}
+                    >
+                      Program:
+                    </Typography>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        height: "50%",
+                        overflowY: "auto",
+                        mb: 2,
+                        "&::-webkit-scrollbar": {
+                          width: "8px",
+                        },
+                        "&::-webkit-scrollbar-track": {
+                          background: "#f1f1f1",
+                          borderRadius: "4px",
+                        },
+                        "&::-webkit-scrollbar-thumb": {
+                          background: "#08397C",
+                          borderRadius: "4px",
+                        },
+                      }}
+                    >
+                      {programs.map((program) => (
+                        <FormControlLabel
+                          key={program.program_id}
+                          control={
+                            <Checkbox
+                              checked={selectedPrograms.includes(
+                                program.program_name
+                              )}
+                              onChange={handleProgramChange}
+                              value={program.program_name}
+                            />
+                          }
+                          label={program.program_name}
+                          sx={{
+                            "& .MuiTypography-root": {
+                              fontSize: {
+                                xs: "0.5rem",
+                                md: "0.75rem",
+                                lg: "0.9rem",
+                              },
+                            },
+                          }}
+                        />
+                      ))}
+                    </Box>
+                    <Typography
+                      variant='body1'
+                      sx={{
+                        color: "#08397C",
+                        fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" },
+                      }}
+                    >
+                      Publication Format:
+                    </Typography>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        height: "50%",
+                        overflowY: "auto",
+                        "&::-webkit-scrollbar": {
+                          width: "8px",
+                        },
+                        "&::-webkit-scrollbar-track": {
+                          background: "#f1f1f1",
+                          borderRadius: "4px",
+                        },
+                        "&::-webkit-scrollbar-thumb": {
+                          background: "#08397C",
+                          borderRadius: "4px",
+                        },
+                      }}
+                    >
+                      {["Journal", "Proceeding", "Unpublished"].map((format) => (
+                        <FormControlLabel
+                          key={format}
+                          control={
+                            <Checkbox
+                              checked={selectedFormats.includes(format)}
+                              onChange={handleFormatChange}
+                              value={format}
+                            />
+                          }
+                          label={format}
+                          sx={{
+                            "& .MuiTypography-root": {
+                              fontSize: {
+                                xs: "0.5rem",
+                                md: "0.75rem",
+                                lg: "0.9rem",
+                              },
+                            },
+                          }}
+                        />
+                      ))}
                     </Box>
                   </Box>
-                  <Typography
-                    variant='body1'
-                    sx={{
-                      color: "#08397C",
-                      fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" },
-                    }}
-                  >
-                    College:
-                  </Typography>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      flexDirection: "column",
-                      height: "50%",
-                      overflowY: "auto",
-                      mb: 2,
-                      "&::-webkit-scrollbar": {
-                        width: "8px",
-                      },
-                      "&::-webkit-scrollbar-track": {
-                        background: "#f1f1f1",
-                        borderRadius: "4px",
-                      },
-                      "&::-webkit-scrollbar-thumb": {
-                        background: "#08397C",
-                        borderRadius: "4px",
-                      },
-                    }}
-                  >
-                    {colleges.map((college) => (
-                      <FormControlLabel
-                        key={college.college_id}
-                        control={
-                          <Checkbox
-                            checked={selectedColleges.includes(
-                              college.college_id
-                            )}
-                            onChange={handleCollegeChange}
-                            value={college.college_id}
-                          />
-                        }
-                        label={college.college_name}
-                        sx={{
-                          "& .MuiTypography-root": {
-                            fontSize: {
-                              xs: "0.5rem",
-                              md: "0.75rem",
-                              lg: "0.9rem",
-                            },
-                          },
-                        }}
-                      />
-                    ))}
-                  </Box>
-                  <Typography
-                    variant='body1'
-                    sx={{
-                      color: "#08397C",
-                      fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" },
-                    }}
-                  >
-                    Program:
-                  </Typography>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      flexDirection: "column",
-                      height: "50%",
-                      overflowY: "auto",
-                      mb: 2,
-                      "&::-webkit-scrollbar": {
-                        width: "8px",
-                      },
-                      "&::-webkit-scrollbar-track": {
-                        background: "#f1f1f1",
-                        borderRadius: "4px",
-                      },
-                      "&::-webkit-scrollbar-thumb": {
-                        background: "#08397C",
-                        borderRadius: "4px",
-                      },
-                    }}
-                  >
-                    {programs.map((program) => (
-                      <FormControlLabel
-                        key={program.program_id}
-                        control={
-                          <Checkbox
-                            checked={selectedPrograms.includes(
-                              program.program_name
-                            )}
-                            onChange={handleProgramChange}
-                            value={program.program_name}
-                          />
-                        }
-                        label={program.program_name}
-                        sx={{
-                          "& .MuiTypography-root": {
-                            fontSize: {
-                              xs: "0.5rem",
-                              md: "0.75rem",
-                              lg: "0.9rem",
-                            },
-                          },
-                        }}
-                      />
-                    ))}
-                  </Box>
-                  <Typography
-                    variant='body1'
-                    sx={{
-                      color: "#08397C",
-                      fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" },
-                    }}
-                  >
-                    Publication Format:
-                  </Typography>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      flexDirection: "column",
-                      height: "50%",
-                      overflowY: "auto",
-                      "&::-webkit-scrollbar": {
-                        width: "8px",
-                      },
-                      "&::-webkit-scrollbar-track": {
-                        background: "#f1f1f1",
-                        borderRadius: "4px",
-                      },
-                      "&::-webkit-scrollbar-thumb": {
-                        background: "#08397C",
-                        borderRadius: "4px",
-                      },
-                    }}
-                  >
-                    {["Journal", "Proceeding", "Unpublished"].map((format) => (
-                      <FormControlLabel
-                        key={format}
-                        control={
-                          <Checkbox
-                            checked={selectedFormats.includes(format)}
-                            onChange={handleFormatChange}
-                            value={format}
-                          />
-                        }
-                        label={format}
-                        sx={{
-                          "& .MuiTypography-root": {
-                            fontSize: {
-                              xs: "0.5rem",
-                              md: "0.75rem",
-                              lg: "0.9rem",
-                            },
-                          },
-                        }}
-                      />
-                    ))}
-                  </Box>
-                </Box>
-              </Grid2>
+                </Grid2>
+              )}
 
               {/* Research List Section */}
-              <Grid2 size={6}>
+              <Grid2 size={otherSectionsVisible ? 6 : 12}> 
                 <Box
                   sx={{
                     height: "100%",
@@ -863,35 +872,37 @@ const Collection = () => {
               </Grid2>
 
               {/* Knowledge Graph Section */}
-              <Grid2 size={3}>
-                <Box
-                  sx={{
-                    height: "100%",
-                    border: "1px solid #ccc",
-                    borderRadius: 3,
-                    overflow: "hidden",
-                  }}
-                >
-                  <Button
-                    onClick={handleNavigateKnowledgeGraph}
+              {!isMobile && (
+                <Grid2 size={3}>
+                  <Box
                     sx={{
-                      width: "100%",
                       height: "100%",
-                      p: 0,
+                      border: "1px solid #ccc",
+                      borderRadius: 3,
+                      overflow: "hidden",
                     }}
                   >
-                    <img
-                      src={DummyKG}
-                      alt='Dummy Knowledge Graph'
-                      style={{
+                    <Button
+                      onClick={handleNavigateKnowledgeGraph}
+                      sx={{
                         width: "100%",
                         height: "100%",
-                        objectFit: "cover",
+                        p: 0,
                       }}
-                    />
-                  </Button>
-                </Box>
-              </Grid2>
+                    >
+                      <img
+                        src={DummyKG}
+                        alt='Dummy Knowledge Graph'
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                        }}
+                      />
+                    </Button>
+                  </Box>
+                </Grid2>
+              )}
             </Grid2>
           </Box>
         </Box>

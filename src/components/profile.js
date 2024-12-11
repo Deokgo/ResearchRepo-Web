@@ -26,10 +26,10 @@ const modalStyle = {
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  width: "40%",
+  width: { xs: "90%", sm: "80%", md: "600px" }, // Responsive width
   bgcolor: "background.paper",
   boxShadow: 24,
-  p: 4,
+  p: { xs: 2, sm: 3, md: 4 }, // Responsive padding
   borderRadius: "10px",
 };
 
@@ -365,15 +365,19 @@ const Profile = () => {
           <Box
             sx={{
               position: "relative",
-              marginBottom: 2,
-              display: "flex",
-              flexDirection: { xs: "column", md: "row" },
-              padding: 4,
-              gap: 4,
+              width: "100%",
+              height: {
+                xs: "clamp(2rem, 3vh, 3rem)",
+                sm: "clamp(3rem, 8vh, 4rem)",
+                md: "clamp(3rem, 14vh, 4rem)",
+                lg: "clamp(4rem, 20vh, 5rem)",
+              },
+              backgroundColor: "#0A438F",
               backgroundSize: "cover",
               backgroundPosition: "center",
-              height: { xs: "5rem", md: "6rem" },
-              backgroundColor: "#0A438F",
+              display: "flex",
+              alignItems: "center",
+              zIndex: 1,
             }}
           >
             <Box
@@ -429,30 +433,48 @@ const Profile = () => {
             <Box
               sx={{
                 display: "flex",
-                justifyContent: "space-between",
-                width: "60%",
+                justifyContent: "space-between", // Pushes buttons to opposite sides
+                alignItems: "center",           // Centers buttons vertically
+                flexWrap: "wrap",               // Ensures wrapping on smaller screens
+                width: "100%",                  // Full width for responsiveness
+                maxWidth: "800px",              // Limit the max width for better layout
                 mb: "1.5rem",
               }}
             >
               <Button
-                variant='outlined'
-                startIcon={<EditIcon />}
-                onClick={handleOpenModal}
-                sx={{ fontWeight: 600 }}
-              >
-                Edit Profile
-              </Button>
-              <Button
-                variant='outlined'
+                variant="outlined"
                 startIcon={<EditIcon />}
                 onClick={handleOpenChangePasswordModal}
-                sx={{ fontWeight: 600 }}
+                sx={{
+                  fontWeight: 600,
+                  flex: "0 1 auto",              // Prevents shrinking too much
+                  minWidth: "120px",             // Ensures a consistent minimum width
+                }}
               >
                 Change Password
               </Button>
+              <Button
+                variant="outlined"
+                startIcon={<EditIcon />}
+                onClick={handleOpenModal}
+                sx={{
+                  fontWeight: 600,
+                  flex: "0 1 auto",              // Same flexibility as the first button
+                  minWidth: "120px",
+                }}
+              >
+                Edit Profile
+              </Button>
             </Box>
 
-            <Grid2 container spacing={2} sx={{ width: "60%" }}>
+            <Grid2
+              container
+              spacing={2}
+              sx={{
+                width: { xs: "100%", sm: "90%", md: "70%", lg: "60%" },
+                margin: "0 auto",
+              }}
+            >
               {userData ? (
                 [
                   {
@@ -492,41 +514,57 @@ const Profile = () => {
                     value: userData.researcher.institution,
                   },
                 ].map((field, index) => (
-                  <Grid2 size={{ xs: 12, sm: 6 }} key={index}>
+                  <Grid2
+                    size={{ xs: 12, sm: 6 }}
+                    key={index}
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                    }}
+                  >
                     <Typography
-                      variant='body1'
+                      variant="body1"
                       sx={{
                         color: "#777",
                         fontWeight: 600,
-                        fontSize: "1rem",
+                        fontSize: { xs: "0.9rem", sm: "1rem" },
                       }}
                     >
                       {field.label}
                     </Typography>
                     <Typography
-                      variant='h6'
+                      variant="h6"
                       sx={{
                         color: "#001C43",
                         fontWeight: 600,
-                        fontSize: "1.25rem",
+                        fontSize: { xs: "1rem", sm: "1.25rem" },
                         mt: "0.25rem",
                       }}
                     >
                       {field.value}
                     </Typography>
                     <Divider
-                      sx={{ mt: "0.75rem", mb: "1.5rem", borderColor: "#ccc" }}
+                      sx={{
+                        mt: "0.75rem",
+                        mb: "1.5rem",
+                        borderColor: "#ccc",
+                      }}
                     />
                   </Grid2>
                 ))
               ) : (
-                <Typography variant='body1'>Loading user data...</Typography>
+                <Typography variant="body1">Loading user data...</Typography>
               )}
             </Grid2>
           </Box>
 
           <Modal open={isModalOpen} onClose={handleCloseModal}>
-            <Box sx={modalStyle}>
+          <Box
+            sx={{
+              ...modalStyle,
+              maxHeight: "90vh", // Limit the modal height to 90% of the viewport height
+              overflowY: "auto", // Enable vertical scrolling when content overflows
+            }}>
               <Typography
                 variant='h4'
                 sx={{ mb: 4, fontWeight: 800, color: "#08397C" }}
@@ -604,8 +642,9 @@ const Profile = () => {
                     }}
                     label='Department'
                     sx={{
-                      width: "280px", // Set a fixed width
-                      minWidth: "200px", // Optional: Set a minimum width for responsiveness
+                      width: "100%", // Full width for the parent container
+                      maxWidth: { xs: "300px", sm: "400px", md: "500px" }, // Dynamic max width for different screen sizes
+                      minWidth: "200px", // Minimum width to ensure usability
                     }}
                     disabled={shouldDisableInputs} // Conditionally disable input based on role
                   >
@@ -635,8 +674,9 @@ const Profile = () => {
                     }}
                     label='Program'
                     sx={{
-                      width: "280px", // Set a fixed width
-                      minWidth: "200px", // Optional: Set a minimum width for responsiveness
+                      width: "100%", // Full width for the parent container
+                      maxWidth: { xs: "300px", sm: "400px", md: "500px" }, // Dynamic max width for different screen sizes
+                      minWidth: "200px", // Minimum width to ensure usability
                     }}
                     disabled={shouldDisableInputs || !formValues.department} // Conditionally disable input based on role and department selection
                   >
@@ -692,7 +732,11 @@ const Profile = () => {
             open={isChangePasswordModalOpen}
             onClose={handleCloseChangePasswordModal}
           >
-            <Box sx={modalStyle}>
+            <Box sx={{
+              ...modalStyle,
+              maxHeight: "90vh", // Limit the modal height to 90% of the viewport height
+              overflowY: "auto", // Enable vertical scrolling when content overflows
+            }}>
               <Typography
                 variant='h4'
                 sx={{ mb: 4, fontWeight: 800, color: "#08397C" }}

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import Navbar from "./navbar";
-import Footer from "./footer";
 import {
   Box,
   Button,
+  Grid,
   Grid2,
   Paper,
   Typography,
@@ -19,86 +19,9 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import navLogo from "../assets/MMCL_Logo_Horizontal.png";
 
-const modalStyle = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: 600,
-  bgcolor: "background.paper",
-  boxShadow: 24,
-  p: 4,
-  borderRadius: "10px",
-};
 
 const ReadMore = () => {
-  const [userData, setUserData] = useState(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
-  // Retrieve user_id from cookie/localStorage
-  const getUserId = () => {
-    const userId = localStorage.getItem("user_id");
-    return userId;
-  };
-  const [formValues, setFormValues] = useState({
-    firstName: "",
-    middleName: "",
-    lastName: "",
-    suffix: "",
-    department: "",
-    program: "",
-    email: "",
-    role: "",
-  });
-
-  const departments = [
-    {
-      id: 1,
-      name: "Mapúa Institute of Technology at Laguna",
-      description: "Leading the future of engineering and technology.",
-      image: placeholderImage, // Placeholder for image path
-    },
-    {
-      id: 2,
-      name: "College of Computer and Information Science",
-      description: "Innovating through computer science and IT.",
-      image: placeholderImage, // Placeholder for image path
-    },
-    {
-      id: 3,
-      name: "College of Arts and Science",
-      description: "Fostering creativity and scientific knowledge.",
-      image: placeholderImage, // Placeholder for image path
-    },
-    {
-      id: 4,
-      name: "E.T. Yuchengco College of Business",
-      description:
-        "Amplifying student voices; nurturing student leaders — for success in today's business world.",
-      image: placeholderImage,
-    }, // Placeholder for image path
-    {
-      id: 5,
-      name: "College of Health Sciences",
-      description:
-        "Amplifying student voices; nurturing student leaders — for success in today's business world.",
-      image: placeholderImage,
-    }, // Placeholder for image path
-  ];
-
-  const handleSearchChange = (e) => {
-    const query = e.target.value.toLowerCase();
-    setSearchQuery(query);
-  };
-
-  const handleOpenModal = () => {
-    setIsModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-  };
 
   return (
     <>
@@ -195,39 +118,41 @@ const ReadMore = () => {
           </Box>
 
           {/* Content Section */}
-          <Box sx={{ display:'flex', p: 10 }}>
-            <Grid2 spacing={10} container>
-              <Grid2
-                display='flex'
-                flexDirection='column'
-                size={6}
-              >
+          <Box sx={{ flexGrow: 1, p: { xs: 2, md: 10 } }}>
+            <Grid container spacing={4}>
+              {/* Left Column */}
+              <Grid item
+                xs={12}
+                md={6}
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  textAlign: "center",
+                }}>
                 <Typography
-                  variant='h3'
+                  variant="h4"
                   sx={{
-                    fontFamily: "Montserrat, sans-serif",
                     fontWeight: 600,
-                    fontSize: { xs: "2rem", md: "3rem", lg: "4rem" },
+                    fontSize: { xs: "1.5rem", sm: "2rem", md: "3rem" },
                     color: "#001C43",
-                    lineHeight: 1.25,
-                    maxWidth: "100%",
                   }}
                 >
                   A centralized hub for all your
                   <Box
                     sx={{
                       backgroundColor: "#DF031D",
-                      width: { xs: "17rem", md: "25rem", lg: "33rem" },
+                      mt: 1,
+                      display: "inline-block",
+                      px: 2,
                     }}
                   >
                     <Typography
-                      align='center'
+                      component="span"
                       sx={{
-                        fontFamily: "Montserrat, sans-serif",
                         fontWeight: 600,
-                        fontSize: { xs: "2rem", md: "3rem", lg: "4rem" },
-                        color: "#FFF",
-                        lineHeight: 1.25,
+                        color: "#fff",
+                        fontSize: { xs: "1.5rem", sm: "2rem", md: "3rem" },
                       }}
                     >
                       research needs
@@ -235,50 +160,50 @@ const ReadMore = () => {
                   </Box>
                 </Typography>
                 <Typography
-                  variant='body1'
+                  variant="body1"
                   sx={{
-                    fontFamily: "Montserrat, sans-serif",
-                    fontWeight: 500,
-                    fontSize: { xs: "0.75rem", md: "0.75rem", lg: "1.2em" },
+                    mt: 2,
+                    fontSize: { xs: "0.9rem", sm: "1rem", md: "1.2rem" },
                     color: "#001C43",
-                    width: "80%",
-                    mt: 4,
                   }}
                 >
-                  A platform for researches by the Mapúa MCL researchers
+                  A platform for researches by the Mapúa MCL researchers.
                 </Typography>
-              </Grid2>
-              <Grid2
-                display='flex'
-                flexDirection='column'
-                align='center'
-                size={6}
+              </Grid>
+
+              {/* Right Column */}
+              <Grid
+                item
+                xs={12}
+                md={6}
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  textAlign: "center",
+                }}
               >
                 <img
                   src={navLogo}
-                  alt='Logo'
+                  alt="Logo"
                   style={{
-                    width: { xs: "40%", md: "80%", lg: "60%" },
-                    height: { xs: "40%", md: "80%", lg: "60%" },
-                    objectFit: "contain",
+                    width: "60%",
+                    height: "auto",
                   }}
                 />
                 <Typography
-                  variant='body1'
+                  variant="body1"
                   sx={{
-                    fontFamily: "Montserrat, sans-serif",
-                    fontWeight: 300,
-                    fontSize: { xs: "0.75rem", md: "0.75rem", lg: "1.2em" },
+                    mt: 2,
+                    fontSize: { xs: "0.9rem", sm: "1rem", md: "1.2rem" },
                     color: "#001C43",
-                    width: "80%",
-                    mt: 6,
                   }}
                 >
-                  Our research repository offers seamless platform to gather,
+                  Our research repository offers a seamless platform to gather,
                   store, analyze, and share valuable data and insights.
                 </Typography>
-              </Grid2>
-            </Grid2>
+              </Grid>
+            </Grid>
           </Box>
         </Box>
       </Box>

@@ -140,6 +140,10 @@ const Navbar = () => {
     navigate("/home");
   };
 
+  const handleKnowledgeGraph = () => {
+    navigate("/knowledgegraph");
+  };
+
   const handleLogout = async () => {
     try {
       // Call the logout API
@@ -171,10 +175,11 @@ const Navbar = () => {
 
   const mobileMenuItems = user
     ? [
-        { label: "Home", onClick: handleNavigateHome },
+        //{ label: "Home", onClick: handleNavigateHome },
+        { label: "Collections", onClick: handleCollection },
+        { label: "Knowledge Graph", onClick: handleKnowledgeGraph },
         { label: "Research Thrusts", onClick: handleResearchThrust },
         { label: "Profile", onClick: handleProfile },
-        { label: "Manage Users", onClick: handleManageUsers },
       ]
     : [
         { label: "Home", onClick: handleNavigateHome },
@@ -454,9 +459,9 @@ const Navbar = () => {
 
             <Divider sx={{ borderColor: "#FFF" }} />
             <MenuItem
-              key='Log in'
+              key='Log out'
               onClick={() => {
-                handleLogin();
+                handleLogout();
                 handleCloseNavMenu();
               }}
             >

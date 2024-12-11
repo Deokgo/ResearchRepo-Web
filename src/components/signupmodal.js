@@ -70,11 +70,11 @@ const SignUpModal = () => {
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    width: "auto",
+    width: { xs: "90%", sm: "80%", md: "600px" }, // Responsive width
     height: "auto",
     bgcolor: "background.paper",
     boxShadow: 24,
-    p: 2,
+    p: { xs: 2, sm: 3, md: 4 }, // Responsive padding
     borderRadius: "10px",
   };
   const togglePasswordVisibility = () => {
@@ -232,7 +232,11 @@ const SignUpModal = () => {
   return (
     <>
       <Modal open={isSignupModalOpen} onClose={handleModalClose}>
-        <Box sx={modalStyle}>
+        <Box sx={{
+              ...modalStyle,
+              maxHeight: "90vh", // Limit the modal height to 90% of the viewport height
+              overflowY: "auto", // Enable vertical scrolling when content overflows
+            }}>
           <Typography
             variant='h6'
             color='#0A438F'
@@ -281,27 +285,34 @@ const SignUpModal = () => {
                     value={formData.firstName}
                     onChange={handleChange}
                     variant='outlined'
-                    sx={{ 
+                    sx={{
                       flex: 2,
-                      // Responsive font size
+                      // Adjust styles for input
                       '& .MuiInputBase-input': {
-                        fontSize: { 
-                          xs: '0.75rem',   // Mobile
-                          sm: '0.85rem',   // Small devices
-                          md: '0.9rem',    // Medium devices
-                          lg: '1rem'        // Large devices
+                        fontSize: {
+                          xs: '0.75rem', // Mobile
+                          sm: '0.85rem', // Small devices
+                          md: '0.9rem',  // Medium devices
+                          lg: '1rem',    // Large devices
                         },
-                        // Adjust input height
-                        padding: { 
-                          xs: '8px 12px',   // Mobile
-                          md: '12px 14px'   // Larger screens
+                        padding: {
+                          xs: '8px 12px', // Mobile
+                          md: '12px 14px', // Larger screens
                         },
-                        // Optional: adjust overall height
-                        height: { 
-                          xs: '15px',   // Mobile
-                          md: '25px'    // Larger screens
-                        }
-                      }
+                        height: {
+                          xs: '15px', // Mobile
+                          md: '25px', // Larger screens
+                        },
+                      },
+                      // Adjust styles for the label
+                      '& .MuiInputLabel-root': {
+                        fontSize: {
+                          xs: '0.7rem', // Mobile
+                          sm: '0.8rem', // Small devices
+                          md: '0.9rem', // Medium devices
+                          lg: '1rem',   // Large devices
+                        },
+                      },
                     }}
                   ></TextField>
                 </Grid2>
@@ -313,27 +324,34 @@ const SignUpModal = () => {
                     value={formData.middleName}
                     onChange={handleChange}
                     variant='outlined'
-                    sx={{ 
+                    sx={{
                       flex: 2,
-                      // Responsive font size
+                      // Adjust styles for input
                       '& .MuiInputBase-input': {
-                        fontSize: { 
-                          xs: '0.75rem',   // Mobile
-                          sm: '0.85rem',   // Small devices
-                          md: '0.9rem',    // Medium devices
-                          lg: '1rem'        // Large devices
+                        fontSize: {
+                          xs: '0.75rem', // Mobile
+                          sm: '0.85rem', // Small devices
+                          md: '0.9rem',  // Medium devices
+                          lg: '1rem',    // Large devices
                         },
-                        // Adjust input height
-                        padding: { 
-                          xs: '8px 12px',   // Mobile
-                          md: '12px 14px'   // Larger screens
+                        padding: {
+                          xs: '8px 12px', // Mobile
+                          md: '12px 14px', // Larger screens
                         },
-                        // Optional: adjust overall height
-                        height: { 
-                          xs: '15px',   // Mobile
-                          md: '25px'    // Larger screens
-                        }
-                      }
+                        height: {
+                          xs: '15px', // Mobile
+                          md: '25px', // Larger screens
+                        },
+                      },
+                      // Adjust styles for the label
+                      '& .MuiInputLabel-root': {
+                        fontSize: {
+                          xs: '0.7rem', // Mobile
+                          sm: '0.8rem', // Small devices
+                          md: '0.9rem', // Medium devices
+                          lg: '1rem',   // Large devices
+                        },
+                      },
                     }}
                   />
                 </Grid2>
@@ -345,27 +363,34 @@ const SignUpModal = () => {
                     value={formData.lastName}
                     onChange={handleChange}
                     variant='outlined'
-                    sx={{ 
+                    sx={{
                       flex: 2,
-                      // Responsive font size
+                      // Adjust styles for input
                       '& .MuiInputBase-input': {
-                        fontSize: { 
-                          xs: '0.75rem',   // Mobile
-                          sm: '0.85rem',   // Small devices
-                          md: '0.9rem',    // Medium devices
-                          lg: '1rem'        // Large devices
+                        fontSize: {
+                          xs: '0.75rem', // Mobile
+                          sm: '0.85rem', // Small devices
+                          md: '0.9rem',  // Medium devices
+                          lg: '1rem',    // Large devices
                         },
-                        // Adjust input height
-                        padding: { 
-                          xs: '8px 12px',   // Mobile
-                          md: '12px 14px'   // Larger screens
+                        padding: {
+                          xs: '8px 12px', // Mobile
+                          md: '12px 14px', // Larger screens
                         },
-                        // Optional: adjust overall height
-                        height: { 
-                          xs: '15px',   // Mobile
-                          md: '25px'    // Larger screens
-                        }
-                      }
+                        height: {
+                          xs: '15px', // Mobile
+                          md: '25px', // Larger screens
+                        },
+                      },
+                      // Adjust styles for the label
+                      '& .MuiInputLabel-root': {
+                        fontSize: {
+                          xs: '0.7rem', // Mobile
+                          sm: '0.8rem', // Small devices
+                          md: '0.9rem', // Medium devices
+                          lg: '1rem',   // Large devices
+                        },
+                      },
                     }}
                   ></TextField>
                 </Grid2>
@@ -377,27 +402,34 @@ const SignUpModal = () => {
                     value={formData.suffix}
                     onChange={handleChange}
                     variant='outlined'
-                    sx={{ 
+                    sx={{
                       flex: 2,
-                      // Responsive font size
+                      // Adjust styles for input
                       '& .MuiInputBase-input': {
-                        fontSize: { 
-                          xs: '0.75rem',   // Mobile
-                          sm: '0.85rem',   // Small devices
-                          md: '0.9rem',    // Medium devices
-                          lg: '1rem'        // Large devices
+                        fontSize: {
+                          xs: '0.75rem', // Mobile
+                          sm: '0.85rem', // Small devices
+                          md: '0.9rem',  // Medium devices
+                          lg: '1rem',    // Large devices
                         },
-                        // Adjust input height
-                        padding: { 
-                          xs: '8px 12px',   // Mobile
-                          md: '12px 14px'   // Larger screens
+                        padding: {
+                          xs: '8px 12px', // Mobile
+                          md: '12px 14px', // Larger screens
                         },
-                        // Optional: adjust overall height
-                        height: { 
-                          xs: '15px',   // Mobile
-                          md: '25px'    // Larger screens
-                        }
-                      }
+                        height: {
+                          xs: '15px', // Mobile
+                          md: '25px', // Larger screens
+                        },
+                      },
+                      // Adjust styles for the label
+                      '& .MuiInputLabel-root': {
+                        fontSize: {
+                          xs: '0.7rem', // Mobile
+                          sm: '0.8rem', // Small devices
+                          md: '0.9rem', // Medium devices
+                          lg: '1rem',   // Large devices
+                        },
+                      },
                     }}
                   ></TextField>
                 </Grid2>
@@ -410,27 +442,34 @@ const SignUpModal = () => {
                     value={formData.email}
                     onChange={handleChange}
                     variant='outlined'
-                    sx={{ 
+                    sx={{
                       flex: 2,
-                      // Responsive font size
+                      // Adjust styles for input
                       '& .MuiInputBase-input': {
-                        fontSize: { 
-                          xs: '0.75rem',   // Mobile
-                          sm: '0.85rem',   // Small devices
-                          md: '0.9rem',    // Medium devices
-                          lg: '1rem'        // Large devices
+                        fontSize: {
+                          xs: '0.75rem', // Mobile
+                          sm: '0.85rem', // Small devices
+                          md: '0.9rem',  // Medium devices
+                          lg: '1rem',    // Large devices
                         },
-                        // Adjust input height
-                        padding: { 
-                          xs: '8px 12px',   // Mobile
-                          md: '12px 14px'   // Larger screens
+                        padding: {
+                          xs: '8px 12px', // Mobile
+                          md: '12px 14px', // Larger screens
                         },
-                        // Optional: adjust overall height
-                        height: { 
-                          xs: '15px',   // Mobile
-                          md: '25px'    // Larger screens
-                        }
-                      }
+                        height: {
+                          xs: '15px', // Mobile
+                          md: '25px', // Larger screens
+                        },
+                      },
+                      // Adjust styles for the label
+                      '& .MuiInputLabel-root': {
+                        fontSize: {
+                          xs: '0.7rem', // Mobile
+                          sm: '0.8rem', // Small devices
+                          md: '0.9rem', // Medium devices
+                          lg: '1rem',   // Large devices
+                        },
+                      },
                     }}
                   ></TextField>
                 </Grid2>
@@ -445,27 +484,34 @@ const SignUpModal = () => {
                 onChange={handleChange}
                 margin='normal'
                 variant='outlined'
-                sx={{ 
+                sx={{
                   flex: 2,
-                  // Responsive font size
+                  // Adjust styles for input
                   '& .MuiInputBase-input': {
-                    fontSize: { 
-                      xs: '0.75rem',   // Mobile
-                      sm: '0.85rem',   // Small devices
-                      md: '0.9rem',    // Medium devices
-                      lg: '1rem'        // Large devices
+                    fontSize: {
+                      xs: '0.75rem', // Mobile
+                      sm: '0.85rem', // Small devices
+                      md: '0.9rem',  // Medium devices
+                      lg: '1rem',    // Large devices
                     },
-                    // Adjust input height
-                    padding: { 
-                      xs: '8px 12px',   // Mobile
-                      md: '12px 14px'   // Larger screens
+                    padding: {
+                      xs: '8px 12px', // Mobile
+                      md: '12px 14px', // Larger screens
                     },
-                    // Optional: adjust overall height
-                    height: { 
-                      xs: '15px',   // Mobile
-                      md: '25px'    // Larger screens
-                    }
-                  }
+                    height: {
+                      xs: '15px', // Mobile
+                      md: '25px', // Larger screens
+                    },
+                  },
+                  // Adjust styles for the label
+                  '& .MuiInputLabel-root': {
+                    fontSize: {
+                      xs: '0.7rem', // Mobile
+                      sm: '0.8rem', // Small devices
+                      md: '0.9rem', // Medium devices
+                      lg: '1rem',   // Large devices
+                    },
+                  },
                 }}
                 required
                 error={Boolean(institutionError)}
