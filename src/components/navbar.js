@@ -3,6 +3,7 @@
 import MenuIcon from "@mui/icons-material/Menu";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import { isMobile } from 'react-device-detect';
 import {
   AppBar,
   Box,
@@ -27,6 +28,7 @@ const Navbar = () => {
   const { user, logout } = useAuth();
   const theme = useTheme();
   const isLoggedIn = !!user;
+  const isSizeMobile = useMediaQuery('(max-width:600px)'); 
 
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
@@ -47,8 +49,6 @@ const Navbar = () => {
     openPassresetModal,
     closePassresetModal,
   } = useModalContext();
-
-  const isMobile = useMediaQuery("(max-width:600px)");
 
   {
     /*****************Event Handlers******************/
@@ -217,6 +217,11 @@ const Navbar = () => {
       { label: "Collections", onClick: handleCollection },
       { label: "Research Thrusts", onClick: handleResearchThrust },
     ];
+
+    if (isMobile || isSizeMobile) {
+      // On mobile, only return common items
+      return commonItems;
+    }
 
     // Role-specific items
     const roleSpecificItems = {
@@ -502,26 +507,27 @@ const Navbar = () => {
         </Menu>
 
         {/*Dashboard Menu*/}
-        {(user?.role === "02" ||
-          user?.role === "03" ||
-          user?.role === "04") && (
-          <Menu
-            anchorEl={anchorElDash}
-            open={Boolean(anchorElDash)}
-            onClose={handleCloseDashMenu}
-            sx={{ "& .MuiPaper-root": { backgroundColor: "#CA031B" } }}
-          >
-            <MenuItem onClick={handleReports}>
-              <Typography color='common.white'>Reports</Typography>
-            </MenuItem>
-            <MenuItem onClick={handleMainDash}>
-              <Typography color='common.white'>Analytics</Typography>
-            </MenuItem>
-          </Menu>
-        )}
+        {/* Render Menus Conditionally */}
+        {(!isMobile || !isSizeMobile) &&
+          (user?.role === "02" ||
+            user?.role === "03" ||
+            user?.role === "04") && (
+            <Menu
+              anchorEl={anchorElDash}
+              open={Boolean(anchorElDash)}
+              onClose={handleCloseDashMenu}
+              sx={{ "& .MuiPaper-root": { backgroundColor: "#CA031B" } }}
+            >
+              <MenuItem onClick={handleReports}>
+                <Typography color='common.white'>Reports</Typography>
+              </MenuItem>
+              <MenuItem onClick={handleMainDash}>
+                <Typography color='common.white'>Analytics</Typography>
+              </MenuItem>
+            </Menu>
+          )}
 
-        {/*System Management Menu*/}
-        {user?.role === "01" && (
+        {(!isMobile || !isSizeMobile) && user?.role === "01" && (
           <Menu
             anchorEl={anchorElSyma}
             open={Boolean(anchorElSyma)}

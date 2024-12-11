@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Box, Button, TextField, Typography, Modal } from "@mui/material";
+import { Box, Button, TextField, Typography, Modal, useMediaQuery } from "@mui/material";
 import { useModalContext } from "./modalcontext";
 import { useAuth } from "../context/AuthContext";
 import axios from "axios";
+import { isMobile } from 'react-device-detect';
 
 const LoginModal = () => {
   const {
@@ -14,6 +15,7 @@ const LoginModal = () => {
   } = useModalContext();
   const navigate = useNavigate();
   const { login } = useAuth();
+  const isSizeMobile = useMediaQuery('(max-width:600px)'); 
 
   const [formValues, setFormValues] = useState({
     email: "",
@@ -65,6 +67,12 @@ const LoginModal = () => {
       handleModalClose();
 
       alert(`Login Successfully`);
+
+      // If the user is on a mobile device, navigate to collections immediately
+      if (isMobile || isSizeMobile) {
+        navigate("/collection");
+        return; // Prevent further navigation logic for mobile users
+      }
 
       switch (userRole) {
         case "01":

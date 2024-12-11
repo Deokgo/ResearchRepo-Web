@@ -737,7 +737,7 @@ const Collection = () => {
                           ),
                         }}
                       />
-                      {user?.role === "05" && (
+                      {(!isMobile && user?.role === "05") && (
                         <Button
                           variant='contained'
                           color='primary'
