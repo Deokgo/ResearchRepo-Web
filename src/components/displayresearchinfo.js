@@ -991,44 +991,46 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                               >
                                 <strong>SDG:</strong> {item.sdg}
                               </Typography>
-                              <Button
-                                variant='contained'
-                                color='primary'
-                                startIcon={
-                                  <VisibilityIcon
-                                    sx={{
-                                      fontSize: {
-                                        xs: "0.65rem",
-                                        md: "0.75rem",
-                                        lg: "1rem",
-                                      },
-                                    }}
-                                  />
-                                }
-                                sx={{
-                                  backgroundColor: "#08397C",
-                                  color: "#FFF",
-                                  fontFamily: "Montserrat, sans-serif",
-                                  fontWeight: 400,
-                                  textTransform: "none",
-                                  fontSize: {
-                                    xs: "0.5rem",
-                                    md: "0.65rem",
-                                    lg: "0.8rem",
-                                  },
-                                  marginTop: "2rem",
-                                  width: "inherit",
-                                  alignSelf: "center",
-                                  borderRadius: "100px",
-                                  maxHeight: "3rem",
-                                  "&:hover": {
-                                    backgroundColor: "#072d61",
-                                  },
-                                }}
-                                onClick={() => handleViewManuscript(item)}
-                              >
-                                Full Manuscript
-                              </Button>
+                              {user?.role !== "06" && (
+                                <Button
+                                  variant='contained'
+                                  color='primary'
+                                  startIcon={
+                                    <VisibilityIcon
+                                      sx={{
+                                        fontSize: {
+                                          xs: "0.65rem",
+                                          md: "0.75rem",
+                                          lg: "1rem",
+                                        },
+                                      }}
+                                    />
+                                  }
+                                  sx={{
+                                    backgroundColor: "#08397C",
+                                    color: "#FFF",
+                                    fontFamily: "Montserrat, sans-serif",
+                                    fontWeight: 400,
+                                    textTransform: "none",
+                                    fontSize: {
+                                      xs: "0.5rem",
+                                      md: "0.65rem",
+                                      lg: "0.8rem",
+                                    },
+                                    marginTop: "2rem",
+                                    width: "inherit",
+                                    alignSelf: "center",
+                                    borderRadius: "100px",
+                                    maxHeight: "3rem",
+                                    "&:hover": {
+                                      backgroundColor: "#072d61",
+                                    },
+                                  }}
+                                  onClick={() => handleViewManuscript(item)}
+                                >
+                                  Full Manuscript
+                                </Button>
+                              )}
                               <Button
                                 variant='contained'
                                 color='primary'

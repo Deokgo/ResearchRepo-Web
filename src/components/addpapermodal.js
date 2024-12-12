@@ -17,6 +17,7 @@ import axios from "axios";
 import { useModalContext } from "./modalcontext";
 import FileUploader from "./FileUploader";
 import sdgGoalsData from "../data/sdgGoals.json";
+import { useAuth } from "../context/AuthContext";
 
 const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
   const [colleges, setColleges] = useState([]);
@@ -43,6 +44,15 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
   const [file, setFile] = useState(null);
   const [extendedAbstract, setExtendedAbstract] = useState(null);
   const [selectedSDGs, setSelectedSDGs] = useState([]);
+  const { user } = useAuth();
+
+  // Add console logs to debug user data
+  useEffect(() => {
+    console.log("Current user:", user);
+    console.log("Is modal open:", isAddPaperModalOpen);
+    console.log("User role:", user?.role);
+    console.log("User researcher data:", user?.researcher);
+  }, [user, isAddPaperModalOpen]);
 
   // Fetch all colleges when the modal opens
   useEffect(() => {
@@ -68,6 +78,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
         const response = await axios.get(`/deptprogs/programs/${collegeId}`, {
           params: { department: collegeId },
         });
+        console.log("Fetched programs:", response.data.programs);
         setPrograms(response.data.programs);
       } catch (error) {
         console.error("Error fetching programs by college:", error);
@@ -270,6 +281,60 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
     setResearchType("Integrative");
   }, []); // Run once when component mounts
 
+  // Modify the program admin initialization effect
+  useEffect(() => {
+    const initializeProgramAdminDetails = async () => {
+      if (isAddPaperModalOpen && user?.role === "05") {
+        try {
+          // First fetch colleges to ensure they're loaded
+          await fetchColleges();
+
+          // Set the college/department
+          const collegeId = user.researcher?.college_id;
+          setSelectedCollege(collegeId);
+
+          // Fetch and set the programs for this college
+          if (collegeId) {
+            const response = await axios.get(
+              `/deptprogs/programs/${collegeId}`,
+              {
+                params: { department: collegeId },
+              }
+            );
+            setPrograms(response.data.programs);
+
+            // Set the program
+            const programId = user.researcher?.program_id;
+            setSelectedProgram(programId);
+          }
+        } catch (error) {
+          console.error("Error initializing program admin details:", error);
+        }
+      }
+    };
+
+    initializeProgramAdminDetails();
+  }, [isAddPaperModalOpen, user]);
+
+  // Style for disabled Select components
+  const disabledSelectStyle = {
+    backgroundColor: "#f5f5f5",
+    "& .MuiSelect-select": {
+      color: "#666",
+      fontStyle: "italic",
+    },
+    "& .MuiOutlinedInput-notchedOutline": {
+      borderColor: "#ccc",
+    },
+    "&:hover .MuiOutlinedInput-notchedOutline": {
+      borderColor: "#ccc",
+    },
+    "&.Mui-disabled": {
+      backgroundColor: "#f5f5f5",
+      cursor: "not-allowed",
+    },
+  };
+
   // Utility function to create responsive TextField styles
   const createTextFieldStyles = (customFlex = 2) => ({
     flex: customFlex,
@@ -368,7 +433,8 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
             <FormControl fullWidth variant='outlined'>
               <InputLabel
                 sx={{
-                  fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" },
+                  color: user?.role === "05" ? "#666" : "inherit",
+                  "&.Mui-disabled": { color: "#666" },
                 }}
               >
                 Department
@@ -377,6 +443,11 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
                 value={selectedCollege}
                 onChange={handleCollegeChange}
                 label='Department'
+                disabled={user?.role === "05"}
+                sx={{
+                  ...disabledSelectStyle,
+                  fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" },
+                }}
               >
                 {colleges.map((college) => (
                   <MenuItem
@@ -393,14 +464,11 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
             </FormControl>
           </Grid2>
           <Grid2 size={3}>
-            <FormControl
-              fullWidth
-              variant='outlined'
-              sx={createTextFieldStyles()}
-            >
+            <FormControl fullWidth variant='outlined'>
               <InputLabel
                 sx={{
-                  fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" },
+                  color: user?.role === "05" ? "#666" : "inherit",
+                  "&.Mui-disabled": { color: "#666" },
                 }}
               >
                 Program
@@ -409,7 +477,11 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
                 value={selectedProgram}
                 onChange={(e) => setSelectedProgram(e.target.value)}
                 label='Program'
-                disabled={!selectedCollege} // Disable if no college is selected
+                disabled={user?.role === "05"}
+                sx={{
+                  ...disabledSelectStyle,
+                  fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" },
+                }}
               >
                 {programs.map((program) => (
                   <MenuItem
@@ -513,8 +585,18 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
                   {...params}
                   label='Adviser'
                   variant='outlined'
-                  helperText='Type at least 3 characters to search for an adviser'
-                  sx={createTextFieldStyles()}
+                  helperText={
+                    researchType === "College-Driven" ||
+                    researchType === "Extramural"
+                      ? null
+                      : "Type at least 3 characters to search for an adviser"
+                  }
+                  sx={
+                    researchType === "College-Driven" ||
+                    researchType === "Extramural"
+                      ? disabledSelectStyle
+                      : null
+                  }
                   InputLabelProps={createInputLabelProps()}
                 />
               )}
@@ -559,8 +641,18 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
                   {...params}
                   label='Panels'
                   variant='outlined'
-                  helperText='Type at least 3 characters to search and select multiple panel members'
-                  sx={createTextFieldStyles()}
+                  helperText={
+                    researchType === "College-Driven" ||
+                    researchType === "Extramural"
+                      ? null
+                      : "Type at least 3 characters to search and select multiple panel members"
+                  }
+                  sx={
+                    researchType === "College-Driven" ||
+                    researchType === "Extramural"
+                      ? disabledSelectStyle
+                      : null
+                  }
                   InputLabelProps={createInputLabelProps()}
                 />
               )}
