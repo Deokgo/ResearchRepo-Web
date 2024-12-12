@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "./navbar";
+import { isMobile } from 'react-device-detect';
 import DynamicTimeline from "./Timeline";
 import StatusUpdateButton from "./StatusUpdateButton";
 import { CircularProgress } from "@mui/material";
@@ -17,6 +18,7 @@ import {
   InputLabel,
   FormControl,
   Autocomplete,
+  useMediaQuery,
 } from "@mui/material";
 import Stack from "@mui/material/Stack";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
@@ -35,6 +37,7 @@ const DisplayResearchInfo = ({ route, navigate }) => {
   const [users, setUsers] = useState([]);
   const navpage = useNavigate();
   const location = useLocation();
+  const isSizeMobile = useMediaQuery('(max-width:600px)');
   const [openModal, setOpenModal] = useState(false);
   const { id } = location.state || {}; // Default to an empty object if state is undefined
   const [data, setData] = useState(null); // Start with null to represent no data
@@ -799,13 +802,14 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                         />
                         <Grid2
                           container
-                          display='flex'
+                          display="flex"
+                          direction={isMobile || isSizeMobile ? "column" : "row"}
                           paddingLeft={2}
                           paddingRight={2}
                         >
                           <Grid2
-                            size={8}
-                            paddingRight={10}
+                            size={isMobile || isSizeMobile ? 12 : 8}
+                            paddingRight={isMobile || isSizeMobile ? 0 : 10}
                             sx={{ flexGrow: 1 }}
                           >
                             <Typography
@@ -865,9 +869,12 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                             </Typography>
                           </Grid2>
                           <Grid2
-                            size={4}
-                            justifyContent='flex-end'
-                            sx={{ flexGrow: 1 }}
+                            size={isMobile || isSizeMobile ? 12 : 4}
+                            justifyContent="flex-end"
+                            sx={{
+                              flexGrow: 1,
+                              marginTop: isMobile || isSizeMobile ? "2rem" : 0,
+                            }}
                           >
                             <Box
                               sx={{
