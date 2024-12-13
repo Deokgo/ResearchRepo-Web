@@ -284,28 +284,26 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
   // Modify the program admin initialization effect
   useEffect(() => {
     const initializeProgramAdminDetails = async () => {
-      if (isAddPaperModalOpen && user?.role === "05") {
+      if (isAddPaperModalOpen && user?.role === "05" && user?.college) {
         try {
           // First fetch colleges to ensure they're loaded
           await fetchColleges();
 
-          // Set the college/department
-          const collegeId = user.researcher?.college_id;
-          setSelectedCollege(collegeId);
+          // Set the college/department (using the correct ID from user data)
+          setSelectedCollege(user.college || "");
 
           // Fetch and set the programs for this college
-          if (collegeId) {
+          if (user.college) {
             const response = await axios.get(
-              `/deptprogs/programs/${collegeId}`,
+              `/deptprogs/programs/${user.college}`,
               {
-                params: { department: collegeId },
+                params: { department: user.college },
               }
             );
             setPrograms(response.data.programs);
 
-            // Set the program
-            const programId = user.researcher?.program_id;
-            setSelectedProgram(programId);
+            // Set the program (using the correct ID from user data)
+            setSelectedProgram(user.program || "");
           }
         } catch (error) {
           console.error("Error initializing program admin details:", error);
@@ -440,7 +438,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
                 Department
               </InputLabel>
               <Select
-                value={selectedCollege}
+                value={selectedCollege || ""}
                 onChange={handleCollegeChange}
                 label='Department'
                 disabled={user?.role === "05"}
@@ -474,7 +472,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
                 Program
               </InputLabel>
               <Select
-                value={selectedProgram}
+                value={selectedProgram || ""}
                 onChange={(e) => setSelectedProgram(e.target.value)}
                 label='Program'
                 disabled={user?.role === "05"}
