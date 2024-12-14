@@ -23,15 +23,38 @@ import { Search, Update } from "@mui/icons-material";
 import { Virtuoso } from "react-virtuoso";
 import axios from "axios";
 
+// First, define the useDebounce hook
+const useDebounce = (value, delay) => {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+};
 
 const ResearchTracking = () => {
+  // Add navigate hook at the top with other hooks
+  const navigate = useNavigate();
+
+  // Define rowsPerPage constant
+  const rowsPerPage = 5; // or whatever number you want to use
+
+  // Then declare all state variables
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
-  const rowsPerPage = 10; // Changed to a constant
-  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
+  const [selectedColleges, setSelectedColleges] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [newRole, setNewRole] = useState("");
@@ -39,7 +62,6 @@ const ResearchTracking = () => {
   const [userDepartment, setUserDepartment] = useState(null);
   const [colleges, setColleges] = useState([]);
   const [allPrograms, setAllPrograms] = useState([]);
-  const [selectedColleges, setSelectedColleges] = useState([]);
   const [department, setDepartment] = useState(null);
   const [research, setResearch] = useState([]);
   const [programs, setPrograms] = useState([]);
@@ -48,7 +70,6 @@ const ResearchTracking = () => {
   const [dateRange, setDateRange] = useState([2010, 2025]); // Default min and max year
   const [sliderValue, setSliderValue] = useState([2010, 2025]); // Initial slider value
   const [selectedPrograms, setSelectedPrograms] = useState([]);
-  const itemsPerPage = 5;
   const [selectedStatus, setSelectedStatus] = useState([]);
 
   const [badgeValues, setBadgeValues] = useState({
@@ -57,6 +78,9 @@ const ResearchTracking = () => {
     total_accepted: 0,
     total_published: 0,
   });
+
+  // Use the debounced value after the state declarations
+  const debouncedColleges = useDebounce(selectedColleges, 300);
 
   const steps = [
     {
@@ -73,7 +97,7 @@ const ResearchTracking = () => {
       label: "SUBMITTED",
       icon: "fa-paper-plane",
       badge: badgeValues.total_submitted,
-      activeColor: "#F44336"
+      activeColor: "#F44336",
     },
     {
       color: "#2196F3",
@@ -81,7 +105,7 @@ const ResearchTracking = () => {
       label: "ACCEPTED",
       icon: "fa-thumbs-up",
       badge: badgeValues.total_accepted,
-      activeColor: "#F44336"
+      activeColor: "#F44336",
     },
     {
       color: "#4CAF50",
@@ -89,7 +113,7 @@ const ResearchTracking = () => {
       label: "PUBLISHED",
       icon: "fa-file-arrow-up",
       badge: badgeValues.total_published,
-      activeColor: "#F44336"
+      activeColor: "#F44336",
     },
   ];
 
@@ -132,22 +156,30 @@ const ResearchTracking = () => {
   };
 
   const fetchProgramsByCollege = async (collegeIds) => {
+    setIsLoading(true);
     try {
       if (collegeIds.length > 0) {
         const promises = collegeIds.map((collegeId) =>
-          axios.get(`/deptprogs/programs`, {
-            params: { department: collegeId },
-          })
+          axios.get(`/deptprogs/programs/${collegeId}`)
         );
 
         const results = await Promise.all(promises);
-        const allPrograms = results.flatMap((result) => result.data.programs);
-        setPrograms(allPrograms);
+        const newPrograms = results.flatMap((result) => result.data.programs);
+
+        // Batch state updates
+        setPrograms(newPrograms);
+        setSelectedPrograms([]); // Clear selected programs
       } else {
+        // Reset to initial state
         setPrograms(allPrograms);
+        setSelectedPrograms([]);
       }
     } catch (error) {
       console.error("Error fetching programs by college:", error);
+      setPrograms(allPrograms);
+      setSelectedPrograms([]);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -191,75 +223,94 @@ const ResearchTracking = () => {
   }, []);
 
   useEffect(() => {
-    fetchProgramsByCollege(selectedColleges);
-  }, [selectedColleges]);
+    if (!isLoading) {
+      fetchProgramsByCollege(debouncedColleges);
+    }
+  }, [debouncedColleges]); // Only depend on debounced value
 
   useEffect(() => {
-    let filtered = research;
+    const applyFilters = () => {
+      let filtered = [...research]; // Create a new array to avoid mutations
 
-    // Filter by Date Range
-    filtered = filtered.filter(
-      (item) => item.year >= sliderValue[0] && item.year <= sliderValue[1]
-    );
+      // Apply filters in order of most restrictive first
+      if (selectedColleges.length > 0) {
+        filtered = filtered.filter((item) =>
+          selectedColleges.includes(String(item.college_id))
+        );
+      }
 
-    // Filter by College
-    if (selectedColleges.length > 0) {
-      filtered = filtered.filter((item) =>
-        selectedColleges.includes(item.college_id)
-      );
-    }
+      if (selectedPrograms.length > 0) {
+        filtered = filtered.filter((item) =>
+          selectedPrograms.includes(item.program_name)
+        );
+      }
 
-    // Filter by Selected Programs
-    if (selectedPrograms.length > 0) {
-      filtered = filtered.filter((item) =>
-        selectedPrograms.includes(item.program_name)
-      );
-    }
+      if (sliderValue[0] !== dateRange[0] || sliderValue[1] !== dateRange[1]) {
+        filtered = filtered.filter(
+          (item) => item.year >= sliderValue[0] && item.year <= sliderValue[1]
+        );
+      }
 
-    // Filter by Selected Formats (statuses)
-    if (selectedStatus.length > 0) {
-      filtered = filtered.filter((item) =>
-        selectedStatus.some(
-          (format) => format.toLowerCase() === item.status.toLowerCase()
-        )
-      );
-    }
+      // Filter by Selected Status
+      if (selectedStatus.length > 0) {
+        filtered = filtered.filter((item) =>
+          selectedStatus.some(
+            (status) => status.toLowerCase() === item.status.toLowerCase()
+          )
+        );
+      }
 
-    // Filter by Search Query
-    if (searchQuery) {
-      filtered = filtered.filter(
-        (item) =>
-          item.title.toLowerCase().includes(searchQuery) ||
-          item.research_id.toLowerCase().includes(searchQuery)
-      );
-    }
+      if (searchQuery) {
+        filtered = filtered.filter(
+          (item) =>
+            item.title.toLowerCase().includes(searchQuery) ||
+            item.research_id.toLowerCase().includes(searchQuery)
+        );
+      }
 
-    setFilteredResearch(filtered);
-    setCurrentPage(1); // Reset to the first page on filter change
+      setFilteredResearch(filtered);
+      setCurrentPage(1);
 
-    //update badge counts based on the filtered data
-    const updatedBadgeValues = {
-      total_ready: filtered.filter(item => item.status.toLowerCase() === 'ready').length,
-      total_submitted: filtered.filter(item => item.status.toLowerCase() === 'submitted').length,
-      total_accepted: filtered.filter(item => item.status.toLowerCase() === 'accepted').length,
-      total_published: filtered.filter(item => item.status.toLowerCase() === 'published').length,
+      // Update badge counts based on the filtered data
+      const updatedBadgeValues = {
+        total_ready: filtered.filter(
+          (item) => item.status.toLowerCase() === "ready"
+        ).length,
+        total_submitted: filtered.filter(
+          (item) => item.status.toLowerCase() === "submitted"
+        ).length,
+        total_accepted: filtered.filter(
+          (item) => item.status.toLowerCase() === "accepted"
+        ).length,
+        total_published: filtered.filter(
+          (item) => item.status.toLowerCase() === "published"
+        ).length,
+      };
+
+      setBadgeValues(updatedBadgeValues);
     };
 
-    setBadgeValues(updatedBadgeValues);
+    // Debounce the filter application
+    const timeoutId = setTimeout(applyFilters, 300);
+    return () => clearTimeout(timeoutId);
   }, [
-    sliderValue,
+    research,
     selectedColleges,
     selectedPrograms,
+    sliderValue,
     selectedStatus,
     searchQuery,
-    research,
+    dateRange,
   ]);
 
   const handleCollegeChange = (event) => {
     const { value, checked } = event.target;
-    setSelectedColleges((prev) =>
-      checked ? [...prev, value] : prev.filter((item) => item !== value)
-    );
+    setSelectedColleges((prev) => {
+      const newSelection = checked
+        ? [...prev, value]
+        : prev.filter((item) => item !== value);
+      return newSelection;
+    });
   };
 
   const handleProgramChange = (event) => {
@@ -296,7 +347,7 @@ const ResearchTracking = () => {
   };
 
   const handleKey = (key) => {
-    navigate(`/updatetrackinginfo/`,{state:{id:key}});
+    navigate(`/updatetrackinginfo/`, { state: { id: key } });
   };
 
   const handleChangePage = (event, newPage) => {
@@ -344,14 +395,14 @@ const ResearchTracking = () => {
                 xs: "clamp(2rem, 3vh, 3rem)",
                 sm: "clamp(3rem, 8vh, 4rem)",
                 md: "clamp(3rem, 14vh, 4rem)",
-                lg: "clamp(4rem, 20vh, 5rem)"
+                lg: "clamp(4rem, 20vh, 5rem)",
               },
               backgroundColor: "#0A438F",
               backgroundSize: "cover",
               backgroundPosition: "center",
               display: "flex",
               alignItems: "center",
-              zIndex: 1
+              zIndex: 1,
             }}
           >
             <Box
@@ -375,10 +426,9 @@ const ResearchTracking = () => {
                   transform: {
                     xs: "scale(0.5)",
                     sm: "scale(0.75)",
-                    md: "scale(0.75)"
-                  }
+                    md: "scale(0.75)",
+                  },
                 }}
-                
               >
                 <ArrowBackIosIcon />
               </IconButton>
@@ -396,7 +446,7 @@ const ResearchTracking = () => {
                   color: "#FFF",
                   lineHeight: 1.25,
                   alignSelf: "center",
-                  zIndex: 2
+                  zIndex: 2,
                 }}
               >
                 Research Publication Tracking
@@ -413,7 +463,11 @@ const ResearchTracking = () => {
               height: "calc(100% - 48px)",
             }}
           >
-            <Grid2 container spacing={4} sx={{ height: "100%", flexWrap: "nowrap", }}>
+            <Grid2
+              container
+              spacing={4}
+              sx={{ height: "100%", flexWrap: "nowrap" }}
+            >
               {/* Filter Section (Left) */}
               <Grid2 size={3}>
                 <Box
@@ -434,19 +488,26 @@ const ResearchTracking = () => {
                     Filters
                   </Typography>
                   <Box sx={{ mb: 2 }}>
-                      <Typography variant='body1' sx={{ mb: 1, color: "#08397C", fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" }, }}>
+                    <Typography
+                      variant='body1'
+                      sx={{
+                        mb: 1,
+                        color: "#08397C",
+                        fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" },
+                      }}
+                    >
                       Year Range:
                     </Typography>
                     <Box
-                        sx={{
-                          display: "flex",
-                          flexDirection: "column",
-                          alignItems: "center",
-                          width: "100%",
-                          mt: 4,
-                        }}
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        width: "100%",
+                        mt: 4,
+                      }}
                     >
-                        <Slider
+                      <Slider
                         value={sliderValue}
                         onChange={handleDateRangeChange}
                         valueLabelDisplay='on'
@@ -470,8 +531,15 @@ const ResearchTracking = () => {
                       />
                     </Box>
                   </Box>
-                  
-                  <Typography variant='body1' sx={{ mb: 1, color: "#08397C", fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" } }}>
+
+                  <Typography
+                    variant='body1'
+                    sx={{
+                      mb: 1,
+                      color: "#08397C",
+                      fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" },
+                    }}
+                  >
                     College:
                   </Typography>
                   <Box
@@ -519,7 +587,14 @@ const ResearchTracking = () => {
                       />
                     ))}
                   </Box>
-                  <Typography variant='body1' sx={{ mb: 1, color: "#08397C", fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" }, }}>
+                  <Typography
+                    variant='body1'
+                    sx={{
+                      mb: 1,
+                      color: "#08397C",
+                      fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" },
+                    }}
+                  >
                     Program:
                   </Typography>
                   <Box
@@ -569,21 +644,28 @@ const ResearchTracking = () => {
                   </Box>
                 </Box>
               </Grid2>
-              
-              <Grid2 display='flex' flexDirection='column' justifyContent='flex-start' size={9}>
-                                
+
+              <Grid2
+                display='flex'
+                flexDirection='column'
+                justifyContent='flex-start'
+                size={9}
+              >
                 {/* Stats Section */}
-                <div className="App" style={{ 
-                  width: '100%',  // Full width
-                  transform: 'scale(0.8)', // Reduce size
-                  transformOrigin: 'center' // Keep alignment
-                }} >
+                <div
+                  className='App'
+                  style={{
+                    width: "100%", // Full width
+                    transform: "scale(0.8)", // Reduce size
+                    transformOrigin: "center", // Keep alignment
+                  }}
+                >
                   <ArrowSteps steps={steps} onStepClick={handleStepClick} />
                 </div>
-            
+
                 {/* Search Bar */}
-                <Box 
-                  sx={{ 
+                <Box
+                  sx={{
                     width: "100%", // Center search bar and button
                     display: "flex",
                     justifyContent: "space-between",
@@ -595,62 +677,70 @@ const ResearchTracking = () => {
                     placeholder='Search by Title or Code'
                     value={searchQuery}
                     onChange={handleSearchChange}
-                    sx={{ 
+                    sx={{
                       flex: 2,
                       // Responsive font size
-                      '& .MuiInputBase-input': {
-                        fontSize: { 
-                          xs: '0.75rem',   // Mobile
-                          sm: '0.85rem',   // Small devices
-                          md: '0.9rem',    // Medium devices
-                          lg: '1rem'        // Large devices
+                      "& .MuiInputBase-input": {
+                        fontSize: {
+                          xs: "0.75rem", // Mobile
+                          sm: "0.85rem", // Small devices
+                          md: "0.9rem", // Medium devices
+                          lg: "1rem", // Large devices
                         },
                         // Adjust input height
-                        padding: { 
-                          xs: '8px 12px',   // Mobile
-                          md: '12px 14px'   // Larger screens
+                        padding: {
+                          xs: "8px 12px", // Mobile
+                          md: "12px 14px", // Larger screens
                         },
                         // Optional: adjust overall height
-                        height: { 
-                          xs: '15px',   // Mobile
-                          md: '25px'    // Larger screens
-                        }
-                      }
+                        height: {
+                          xs: "15px", // Mobile
+                          md: "25px", // Larger screens
+                        },
+                      },
                     }}
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position='start'>
-                          <Search 
+                          <Search
                             sx={{
-                              fontSize: { 
-                                xs: '1rem',   // Mobile
-                                md: '1.25rem' // Larger screens
-                              }
-                            }} 
+                              fontSize: {
+                                xs: "1rem", // Mobile
+                                md: "1.25rem", // Larger screens
+                              },
+                            }}
                           />
                         </InputAdornment>
                       ),
                     }}
                   />
-                  
-                  <Box 
-                    sx={{ 
-                      display: "flex", 
+
+                  <Box
+                    sx={{
+                      display: "flex",
                     }}
                   >
-                      <Typography padding={5} variant='h6' sx={{ justifyContent: "center", color: "#8B8B8B", fontSize: { xs: "0.75rem", md: "0.75rem", lg: "1rem" },}}>
+                    <Typography
+                      padding={5}
+                      variant='h6'
+                      sx={{
+                        justifyContent: "center",
+                        color: "#8B8B8B",
+                        fontSize: { xs: "0.75rem", md: "0.75rem", lg: "1rem" },
+                      }}
+                    >
                       {filteredResearch.length} results found
-                      </Typography>
-                  </Box>       
+                    </Typography>
+                  </Box>
                 </Box>
-                <Box 
-                  sx={{ 
+                <Box
+                  sx={{
                     backgroundColor: "#F7F9FC",
                     borderRadius: 1,
                     overflow: "hidden",
                     display: "flex",
-                    height: '100%',
-                    flexDirection: "column"
+                    height: "100%",
+                    flexDirection: "column",
                   }}
                 >
                   <Box sx={{ flex: 1, overflow: "hidden" }}>
@@ -672,7 +762,9 @@ const ResearchTracking = () => {
                               }}
                               onClick={() => handleKey(paper.research_id)}
                             >
-                              <Typography variant="h6" sx={{
+                              <Typography
+                                variant='h6'
+                                sx={{
                                   mb: 1,
                                   fontSize: {
                                     xs: "0.5rem",
@@ -681,8 +773,13 @@ const ResearchTracking = () => {
                                   },
                                   fontWeight: 500,
                                 }}
-                                >{paper.title}</Typography>
-                              <Typography variant="body2" color="textSecondary" sx={{
+                              >
+                                {paper.title}
+                              </Typography>
+                              <Typography
+                                variant='body2'
+                                color='textSecondary'
+                                sx={{
                                   mb: 0.5,
                                   color: "#666",
                                   fontSize: {
@@ -690,8 +787,10 @@ const ResearchTracking = () => {
                                     md: "0.5rem",
                                     lg: "0.75rem",
                                   },
-                                }}>
-                                Status: {paper.status} | Last Updated: {paper.timestamp}
+                                }}
+                              >
+                                Status: {paper.status} | Last Updated:{" "}
+                                {paper.timestamp}
                               </Typography>
                             </Box>
                           )}
@@ -700,7 +799,9 @@ const ResearchTracking = () => {
                     )}
                   </Box>
                   {/* Centered Pagination */}
-                  <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
+                  <Box
+                    sx={{ display: "flex", justifyContent: "center", mt: 2 }}
+                  >
                     <Pagination
                       count={Math.ceil(filteredResearch.length / rowsPerPage)}
                       page={page}

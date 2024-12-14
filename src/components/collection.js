@@ -31,9 +31,26 @@ import { useModalContext } from "./modalcontext";
 import AddPaperModal from "./addpapermodal";
 import { useAuth } from "../context/AuthContext";
 
+// Debounce function to limit rapid state updates
+const useDebounce = (value, delay) => {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+};
+
 const Collection = () => {
   const navigate = useNavigate();
-  const isMobile = useMediaQuery('(max-width:600px)'); // Checks if the screen is 600px or smaller (mobile)
+  const isMobile = useMediaQuery("(max-width:600px)"); // Checks if the screen is 600px or smaller (mobile)
   const [userDepartment, setUserDepartment] = useState(null);
   const [research, setResearch] = useState([]);
   const [colleges, setColleges] = useState([]);
@@ -55,6 +72,8 @@ const Collection = () => {
     useModalContext();
   const { user } = useAuth();
   const [otherSectionsVisible, setOtherSectionsVisible] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const debouncedColleges = useDebounce(selectedColleges, 300);
   const handleNavigateKnowledgeGraph = () => {
     navigate("/knowledgegraph");
   };
@@ -135,23 +154,30 @@ const Collection = () => {
 
   // Fetch programs based on selected colleges
   const fetchProgramsByCollege = async (collegeIds) => {
+    setIsLoading(true);
     try {
       if (collegeIds.length > 0) {
         const promises = collegeIds.map((collegeId) =>
-          axios.get(`/deptprogs/programs`, {
-            params: { department: collegeId },
-          })
+          axios.get(`/deptprogs/programs/${collegeId}`)
         );
 
         const results = await Promise.all(promises);
-        const allPrograms = results.flatMap((result) => result.data.programs);
-        setPrograms(allPrograms);
+        const newPrograms = results.flatMap((result) => result.data.programs);
+
+        // Batch state updates
+        setPrograms(newPrograms);
+        setSelectedPrograms([]); // Clear selected programs
       } else {
-        // If no college is selected, fetch all programs
+        // Reset to initial state
         setPrograms(allPrograms);
+        setSelectedPrograms([]);
       }
     } catch (error) {
       console.error("Error fetching programs by college:", error);
+      setPrograms(allPrograms);
+      setSelectedPrograms([]);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -192,61 +218,70 @@ const Collection = () => {
   }, []);
 
   useEffect(() => {
-    fetchProgramsByCollege(selectedColleges);
-  }, [selectedColleges]);
+    if (!isLoading) {
+      fetchProgramsByCollege(debouncedColleges);
+    }
+  }, [debouncedColleges]); // Only depend on debounced value
 
   useEffect(() => {
-    let filtered = research;
+    const applyFilters = () => {
+      let filtered = [...research]; // Create a new array to avoid mutations
 
-    // Filter by Date Range
-    filtered = filtered.filter(
-      (item) => item.year >= sliderValue[0] && item.year <= sliderValue[1]
-    );
-    if (selectedColleges.length > 0) {
-      filtered = filtered.filter((item) =>
-        selectedColleges.includes(String(item.college_id))
-      );
-    }
-    // Filter by Selected Programs
-    if (selectedPrograms.length > 0) {
-      filtered = filtered.filter((item) =>
-        selectedPrograms.includes(item.program_name)
-      );
-    }
-
-    // Filter by Selected Formats
-    if (selectedFormats.length > 0) {
-      filtered = filtered.filter((item) =>
-        selectedFormats.some(
-          (format) => format.toLowerCase() === item.journal.toLowerCase()
-        )
-      );
-    }
-
-    // Filter by Search Query
-    if (searchQuery) {
-      filtered = filtered.filter((item) => {
-        const titleMatch = item.title
-          .toLowerCase()
-          .includes(searchQuery.toLowerCase());
-        const authorMatch = item.authors.some(
-          (author) =>
-            author.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            author.email.toLowerCase().includes(searchQuery.toLowerCase())
+      // Apply filters in order of most restrictive first
+      if (selectedColleges.length > 0) {
+        filtered = filtered.filter((item) =>
+          selectedColleges.includes(String(item.college_id))
         );
-        return titleMatch || authorMatch;
-      });
-    }
+      }
 
-    setFilteredResearch(filtered);
-    setCurrentPage(1); // Reset to the first page on filter change
+      if (selectedPrograms.length > 0) {
+        filtered = filtered.filter((item) =>
+          selectedPrograms.includes(item.program_name)
+        );
+      }
+
+      if (sliderValue[0] !== dateRange[0] || sliderValue[1] !== dateRange[1]) {
+        filtered = filtered.filter(
+          (item) => item.year >= sliderValue[0] && item.year <= sliderValue[1]
+        );
+      }
+
+      if (selectedFormats.length > 0) {
+        filtered = filtered.filter((item) =>
+          selectedFormats.some(
+            (format) => format.toLowerCase() === item.journal.toLowerCase()
+          )
+        );
+      }
+
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase();
+        filtered = filtered.filter((item) => {
+          const titleMatch = item.title.toLowerCase().includes(query);
+          const authorMatch = item.authors.some(
+            (author) =>
+              author.name.toLowerCase().includes(query) ||
+              author.email.toLowerCase().includes(query)
+          );
+          return titleMatch || authorMatch;
+        });
+      }
+
+      setFilteredResearch(filtered);
+      setCurrentPage(1);
+    };
+
+    // Debounce the filter application
+    const timeoutId = setTimeout(applyFilters, 300);
+    return () => clearTimeout(timeoutId);
   }, [
-    sliderValue,
+    research,
     selectedColleges,
     selectedPrograms,
+    sliderValue,
     selectedFormats,
     searchQuery,
-    research,
+    dateRange,
   ]);
 
   // Handle change in search query
@@ -278,9 +313,12 @@ const Collection = () => {
   };
   const handleCollegeChange = (event) => {
     const { value, checked } = event.target;
-    setSelectedColleges((prev) =>
-      checked ? [...prev, value] : prev.filter((item) => item !== value)
-    );
+    setSelectedColleges((prev) => {
+      const newSelection = checked
+        ? [...prev, value]
+        : prev.filter((item) => item !== value);
+      return newSelection;
+    });
   };
   // Handle change in selected programs filter
   const handleProgramChange = (event) => {
@@ -499,7 +537,11 @@ const Collection = () => {
                           color: "#08397C",
                           position: "relative",
                           zIndex: 2,
-                          fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" },
+                          fontSize: {
+                            xs: "0.5rem",
+                            md: "0.5rem",
+                            lg: "0.9rem",
+                          },
                         }}
                       >
                         Year Range:
@@ -673,35 +715,37 @@ const Collection = () => {
                         },
                       }}
                     >
-                      {["Journal", "Proceeding", "Unpublished"].map((format) => (
-                        <FormControlLabel
-                          key={format}
-                          control={
-                            <Checkbox
-                              checked={selectedFormats.includes(format)}
-                              onChange={handleFormatChange}
-                              value={format}
-                            />
-                          }
-                          label={format}
-                          sx={{
-                            "& .MuiTypography-root": {
-                              fontSize: {
-                                xs: "0.5rem",
-                                md: "0.75rem",
-                                lg: "0.9rem",
+                      {["Journal", "Proceeding", "Unpublished"].map(
+                        (format) => (
+                          <FormControlLabel
+                            key={format}
+                            control={
+                              <Checkbox
+                                checked={selectedFormats.includes(format)}
+                                onChange={handleFormatChange}
+                                value={format}
+                              />
+                            }
+                            label={format}
+                            sx={{
+                              "& .MuiTypography-root": {
+                                fontSize: {
+                                  xs: "0.5rem",
+                                  md: "0.75rem",
+                                  lg: "0.9rem",
+                                },
                               },
-                            },
-                          }}
-                        />
-                      ))}
+                            }}
+                          />
+                        )
+                      )}
                     </Box>
                   </Box>
                 </Grid2>
               )}
 
               {/* Research List Section */}
-              <Grid2 size={otherSectionsVisible ? 6 : 12}> 
+              <Grid2 size={otherSectionsVisible ? 6 : 12}>
                 <Box
                   sx={{
                     height: "100%",
@@ -737,7 +781,7 @@ const Collection = () => {
                           ),
                         }}
                       />
-                      {(!isMobile && user?.role === "05") && (
+                      {!isMobile && user?.role === "05" && (
                         <Button
                           variant='contained'
                           color='primary'
