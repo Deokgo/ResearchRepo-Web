@@ -1689,7 +1689,7 @@ useEffect(() => {
                   </Box>
                   <Box display='flex' flexDirection='column' alignItems= "center">
                     <Typography sx={{ py: 2, fontSize: { xs: "0.7rem", md: "0.8rem", lg: "0.9rem"} }}>
-                      Didn’t found the conference your looking for?{" "}
+                      Didn’t find the conference you’re looking for?{" "}
                       <a
                         href='#'
                         onClick={(e) => {
@@ -1698,7 +1698,7 @@ useEffect(() => {
                         }}
                         style={{ color: "#CA031B" }}
                       >
-                        Add Conference
+                        Add a Conference
                       </a>
                     </Typography>
                     <Button

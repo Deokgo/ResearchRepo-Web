@@ -160,7 +160,13 @@ const DashEmbed = () => {
             overflowY: "hidden",
           }}
         >
-          <div style={{ height: "100vh", width: "100%" }}>
+          <div style={{ 
+            height: "100vh", 
+            width: "100%", 
+            paddingTop: "20px", 
+            paddingLeft: "20px", 
+            backgroundColor: "white" // Set the background color to white
+          }}>
             <iframe
               src={dashUrl}
               style={{
