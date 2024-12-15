@@ -916,7 +916,7 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                                 <strong>Program:</strong> {item.program_name}
                               </Typography>
                               <Typography
-                                variant='body1'
+                                variant="body1"
                                 sx={{
                                   mb: "1rem",
                                   fontSize: {
@@ -927,9 +927,9 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                                 }}
                               >
                                 <strong>Adviser:</strong>{" "}
-                                {item.adviser
-                                  ? `${item.adviser.name}`
-                                  : "No adviser available"}
+                                {item.adviser && item.adviser.name 
+                                  ? `${item.adviser.name}` 
+                                  : "No adviser"}
                               </Typography>
                               <Typography
                                 variant='body1'
@@ -948,7 +948,7 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                                   ? item.panels
                                       .map((panel) => `${panel.name}`)
                                       .join("; ")
-                                  : "No panel members available"}
+                                  : "No panel members"}
                               </Typography>
                               <Divider variant='middle' sx={{ mb: "1rem" }} />
                               <Typography
@@ -1167,8 +1167,31 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                             </FormControl>
                           </Grid2>
                           <Grid2 size={2}>
-                            <FormControl fullWidth variant='outlined'>
-                              <InputLabel
+                          <FormControl fullWidth variant="outlined">
+                            <InputLabel
+                              sx={{
+                                fontSize: {
+                                  xs: "0.75rem",
+                                  md: "0.75rem",
+                                  lg: "0.8rem",
+                                },
+                              }}
+                            >
+                              Research Type
+                            </InputLabel>
+                            <Select
+                              label="Research Type"
+                              sx={createTextFieldStyles()}
+                              value={editableData.research_type || ''} // Default to an empty string if undefined
+                              onChange={(e) =>
+                                setEditableData((prev) => ({
+                                  ...prev,
+                                  research_type: e.target.value,
+                                }))
+                              }
+                            >
+                              <MenuItem
+                                value="EXTRAMURAL"
                                 sx={{
                                   fontSize: {
                                     xs: "0.75rem",
@@ -1177,57 +1200,34 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                                   },
                                 }}
                               >
-                                Research Type
-                              </InputLabel>
-                              <Select
-                                label='Research Type'
-                                sx={createTextFieldStyles()}
-                                value={editableData.research_type}
-                                onChange={(e) =>
-                                  setEditableData((prev) => ({
-                                    ...prev,
-                                    research_type: e.target.value,
-                                  }))
-                                }
+                                EXTRAMURAL
+                              </MenuItem>
+                              <MenuItem
+                                value="COLLEGE-DRIVEN"
+                                sx={{
+                                  fontSize: {
+                                    xs: "0.75rem",
+                                    md: "0.75rem",
+                                    lg: "0.8rem",
+                                  },
+                                }}
                               >
-                                <MenuItem
-                                  value='EXTRAMURAL'
-                                  sx={{
-                                    fontSize: {
-                                      xs: "0.75rem",
-                                      md: "0.75rem",
-                                      lg: "0.8rem",
-                                    },
-                                  }}
-                                >
-                                  EXTRAMURAL
-                                </MenuItem>
-                                <MenuItem
-                                  value='COLLEGE-DRIVEN'
-                                  sx={{
-                                    fontSize: {
-                                      xs: "0.75rem",
-                                      md: "0.75rem",
-                                      lg: "0.8rem",
-                                    },
-                                  }}
-                                >
-                                  COLLEGE-DRIVEN
-                                </MenuItem>
-                                <MenuItem
-                                  value='INTEGRATIVE'
-                                  sx={{
-                                    fontSize: {
-                                      xs: "0.75rem",
-                                      md: "0.75rem",
-                                      lg: "0.8rem",
-                                    },
-                                  }}
-                                >
-                                  INTEGRATIVE
-                                </MenuItem>
-                              </Select>
-                            </FormControl>
+                                COLLEGE-DRIVEN
+                              </MenuItem>
+                              <MenuItem
+                                value="INTEGRATIVE"
+                                sx={{
+                                  fontSize: {
+                                    xs: "0.75rem",
+                                    md: "0.75rem",
+                                    lg: "0.8rem",
+                                  },
+                                }}
+                              >
+                                INTEGRATIVE
+                              </MenuItem>
+                            </Select>
+                          </FormControl>
                           </Grid2>
                           <Grid2 size={2}>
                             <TextField
