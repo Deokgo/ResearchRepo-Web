@@ -166,14 +166,18 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
         "Date Approved": dateApproved,
         Title: title,
         Abstract: abstract,
-        Adviser: adviser,
         "SDG Goals": selectedSDGs,
         Keywords: keywords,
-        Panels: panels,
         Authors: authors,
         "Full Manuscript": file,
       };
-
+      
+      // Conditionally include Adviser and Panels if researchType is "Integrative"
+      if (researchType === "Integrative") {
+        requiredFields.Adviser = adviser;
+        requiredFields.Panels = panels;
+      }
+      
       const missingFields = Object.entries(requiredFields)
         .filter(([_, value]) => {
           if (Array.isArray(value)) {
@@ -182,13 +186,11 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
           return !value;
         })
         .map(([key]) => key);
-
+      
       if (missingFields.length > 0) {
-        alert(
-          `Please fill in all required fields: ${missingFields.join(", ")}`
-        );
+        alert(`Please fill in all required fields: ${missingFields.join(", ")}`);
         return;
-      }
+      }      
 
       console.log("File:", file);
       console.log("Extended Abstract:", extendedAbstract);
@@ -400,21 +402,30 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
           Add New Paper
         </Typography>
         <Grid2 container spacing={2}>
-          <Grid2 size={2}>
-            <FormControl fullWidth sx={{ mb: 2 }}>
-              <InputLabel>Research Type</InputLabel>
-              <Select
-                value={researchType}
-                onChange={handleResearchTypeChange}
-                label='Research Type'
-                defaultValue='Integrative'
-              >
-                <MenuItem value='Integrative'>Integrative</MenuItem>
-                <MenuItem value='College-Driven'>College-Driven</MenuItem>
-                <MenuItem value='Extramural'>Extramural</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid2>
+        <Grid2 size={2}>
+          <FormControl fullWidth sx={{ mb: 2 }}>
+            <InputLabel>Research Type</InputLabel>
+            <Select
+              value={researchType}
+              onChange={(event) => {
+                const newResearchType = event.target.value;
+                handleResearchTypeChange(event);
+                if (newResearchType === "College-Driven" || newResearchType === "Extramural") {
+                  setAdviser(""); // Clear adviser selection
+                  setAdviserInputValue(""); // Clear adviser input field
+                  setPanels([]); // Clear panels selection
+                  setPanelInputValue(""); // Clear panel input field
+                }
+              }}
+              label="Research Type"
+              defaultValue="Integrative"
+            >
+              <MenuItem value="Integrative">Integrative</MenuItem>
+              <MenuItem value="College-Driven">College-Driven</MenuItem>
+              <MenuItem value="Extramural">Extramural</MenuItem>
+            </Select>
+          </FormControl>
+        </Grid2>
           <Grid2 size={2}>
             <TextField
               fullWidth
@@ -549,9 +560,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
               freeSolo
               options={adviserOptions}
               getOptionLabel={(option) =>
-                `${option.first_name || ""} ${option.last_name || ""} (${
-                  option.email || ""
-                })`
+                `${option.first_name || ""} ${option.last_name || ""} (${option.email || ""})`
               }
               componentsProps={{
                 popper: {
@@ -566,32 +575,28 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
               onChange={(event, newValue) => setAdviser(newValue)}
               inputValue={adviserInputValue}
               onInputChange={(event, newInputValue) => {
-                if (
-                  researchType !== "College-Driven" &&
-                  researchType !== "Extramural"
-                ) {
-                  setAdviserInputValue(newInputValue);
-                  handleAdviserSearch(newInputValue);
+                if (researchType !== "College-Driven" && researchType !== "Extramural") {
+                  setAdviserInputValue(newInputValue); // Update input normally
+                  handleAdviserSearch(newInputValue); // Perform search
+                } else {
+                  setAdviserInputValue(""); // Ensure input is cleared for specific research types
                 }
               }}
               disabled={
-                researchType === "College-Driven" ||
-                researchType === "Extramural"
+                researchType === "College-Driven" || researchType === "Extramural"
               }
               renderInput={(params) => (
                 <TextField
                   {...params}
-                  label='Adviser'
-                  variant='outlined'
+                  label="Adviser"
+                  variant="outlined"
                   helperText={
-                    researchType === "College-Driven" ||
-                    researchType === "Extramural"
+                    researchType === "College-Driven" || researchType === "Extramural"
                       ? null
                       : "Type at least 3 characters to search for an adviser"
                   }
                   sx={
-                    researchType === "College-Driven" ||
-                    researchType === "Extramural"
+                    researchType === "College-Driven" || researchType === "Extramural"
                       ? disabledSelectStyle
                       : null
                   }
@@ -605,9 +610,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
               multiple
               options={panelOptions}
               getOptionLabel={(option) =>
-                `${option.first_name || ""} ${option.last_name || ""} (${
-                  option.email || ""
-                })`
+                `${option.first_name || ""} ${option.last_name || ""} (${option.email || ""})`
               }
               componentsProps={{
                 popper: {
@@ -622,32 +625,26 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
               onChange={(event, newValue) => setPanels(newValue)}
               inputValue={panelInputValue}
               onInputChange={(event, newInputValue) => {
-                if (
-                  researchType !== "College-Driven" &&
-                  researchType !== "Extramural"
-                ) {
-                  setPanelInputValue(newInputValue);
-                  handlePanelSearch(newInputValue);
+                if (researchType !== "College-Driven" && researchType !== "Extramural") {
+                  setPanelInputValue(newInputValue); // Update input field
+                  handlePanelSearch(newInputValue); // Perform panel search
+                } else {
+                  setPanelInputValue(""); // Clear input field
                 }
               }}
-              disabled={
-                researchType === "College-Driven" ||
-                researchType === "Extramural"
-              }
+              disabled={researchType === "College-Driven" || researchType === "Extramural"}
               renderInput={(params) => (
                 <TextField
                   {...params}
-                  label='Panels'
-                  variant='outlined'
+                  label="Panels"
+                  variant="outlined"
                   helperText={
-                    researchType === "College-Driven" ||
-                    researchType === "Extramural"
+                    researchType === "College-Driven" || researchType === "Extramural"
                       ? null
                       : "Type at least 3 characters to search and select multiple panel members"
                   }
                   sx={
-                    researchType === "College-Driven" ||
-                    researchType === "Extramural"
+                    researchType === "College-Driven" || researchType === "Extramural"
                       ? disabledSelectStyle
                       : null
                   }
