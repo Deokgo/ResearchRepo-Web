@@ -1088,7 +1088,7 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                             />
                           </Grid2>
                           <Grid2 size={4}>
-                            <FormControl fullWidth variant='outlined'>
+                            <FormControl fullWidth variant='outlined' disabled>
                               <InputLabel
                                 sx={{
                                   fontSize: {
@@ -1125,7 +1125,7 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                             </FormControl>
                           </Grid2>
                           <Grid2 size={2}>
-                            <FormControl fullWidth variant='outlined'>
+                            <FormControl fullWidth variant='outlined' disabled={user.role !== "05"}>
                               <InputLabel
                                 sx={{
                                   fontSize: {
@@ -1305,6 +1305,7 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                           <Grid2 size={4}>
                             <Autocomplete
                               value={editableData.adviser}
+                              disabled={editableData.research_type === "COLLEGE-DRIVEN" || editableData.research_type === "EXTRAMURAL"}
                               onChange={(event, newValue) => {
                                 const formattedAdviser = newValue
                                   ? {
@@ -1362,6 +1363,7 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                             <Autocomplete
                               multiple
                               value={editableData.panels}
+                              disabled={editableData.research_type === "COLLEGE-DRIVEN" || editableData.research_type === "EXTRAMURAL"}
                               onChange={(event, newValue) => {
                                 const formattedPanels = newValue.map(
                                   (panel) => ({
