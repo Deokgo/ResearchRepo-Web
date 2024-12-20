@@ -619,11 +619,11 @@ const UpdateResearchInfo = () => {
                         value={researchType}
                         onChange={(e) => setResearchType(e.target.value)}
                       >
-                        <MenuItem value='EXTRAMURAL'>EXTRAMURAL</MenuItem>
-                        <MenuItem value='COLLEGE-DRIVEN'>
-                          COLLEGE-DRIVEN
+                        <MenuItem value='Extramural'>Extramural</MenuItem>
+                        <MenuItem value='College-Driven'>
+                          College-Driven
                         </MenuItem>
-                        <MenuItem value='INTEGRATIVE'>INTEGRATIVE</MenuItem>
+                        <MenuItem value='Integrative'>Integrative</MenuItem>
                       </Select>
                     </FormControl>
                   </Box>
