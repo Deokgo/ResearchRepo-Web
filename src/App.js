@@ -23,6 +23,7 @@ import DisplayResearchInfo from "./components/displayresearchinfo";
 import DisplayAuditLog from "./components/auditlog";
 import RoleBasedRoute from "./components/rolebasedroute";
 import DashEmbed from "./components/DashEmbed";
+import SDGdashEmbed from "./components/SDGdashEmbed";
 
 function App() {
   const [data, setData] = useState([{}]);
@@ -40,6 +41,7 @@ function App() {
             <Route path='/readmore' element={<ReadMore />} />
             <Route path='/researchthrust' element={<ResearchThrust />} />
             <Route path='/dash' element={<DashEmbed />} />
+            <Route path='/dash/analytics' element={<SDGdashEmbed />} />
 
             {/* Common routes (available to all authenticated users) */}
             <Route
