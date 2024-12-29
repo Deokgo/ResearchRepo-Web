@@ -147,7 +147,7 @@ const DashEmbed = () => {
                 zIndex: 2,
               }}
             >
-              Reports
+              Institutional Performance Dashboard
             </Typography>
           </Box>
         </Box>

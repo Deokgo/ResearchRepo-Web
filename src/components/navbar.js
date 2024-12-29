@@ -249,7 +249,7 @@ const Navbar = () => {
       ],
       "05": [
         // Program Administrator
-        { label: "Reports", onClick: handleReports },
+        { label: "Institutional Performance Dashboard", onClick: handleReports },
         { label: "Research Tracking", onClick: handleResesearchTrack },
         ...commonItems,
       ],
@@ -519,7 +519,7 @@ const Navbar = () => {
               sx={{ "& .MuiPaper-root": { backgroundColor: "#CA031B" } }}
             >
               <MenuItem onClick={handleReports}>
-                <Typography color='common.white'>Reports</Typography>
+                <Typography color='common.white'>Institutional Performance Dashboard</Typography>
               </MenuItem>
               <MenuItem onClick={handleMainDash}>
                 <Typography color='common.white'>Analytics</Typography>
