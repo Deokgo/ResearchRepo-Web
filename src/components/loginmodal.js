@@ -5,7 +5,9 @@ import { useModalContext } from "./modalcontext";
 import { useAuth } from "../context/AuthContext";
 import axios from "axios";
 import { isMobile } from 'react-device-detect';
-
+axios.defaults.baseURL = 'http://localhost:5000';
+axios.defaults.headers.post['Content-Type'] = 'application/json';
+axios.defaults.withCredentials = true;
 const LoginModal = () => {
   const {
     isLoginModalOpen,
@@ -95,6 +97,7 @@ const LoginModal = () => {
           break;
       }
     } catch (error) {
+      console.error('Login error details:', error.response || error);  // Detailed error log
       alert(`Login failed: ${error.response?.data?.message || error.message}`);
     }
   };

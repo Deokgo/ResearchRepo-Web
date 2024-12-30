@@ -23,6 +23,7 @@ import navLogo from "../assets/MMCL_Logo_Nav.png";
 import LoginModal from "./loginmodal";
 import { useAuth } from "../context/AuthContext";
 import { useModalContext } from "./modalcontext";
+import axios from 'axios';
 
 const Navbar = () => {
   const { user, logout } = useAuth();
@@ -146,16 +147,17 @@ const Navbar = () => {
 
   const handleLogout = async () => {
     try {
-      // Call the logout API
-      const response = await fetch("/auth/logout", {
-        method: "POST",
+      const response = await axios({
+        method: 'post',
+        url: 'http://localhost:5000/auth/logout',
         headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem("token")}`
         },
+        withCredentials: true
       });
 
-      if (response.ok) {
+      if (response.status === 200) {
         // Clear the token from storage
         localStorage.removeItem("token");
         // Update auth context state
@@ -164,12 +166,14 @@ const Navbar = () => {
         handleCloseUserMenu();
         // Navigate to home
         navigate("/home", { replace: true });
-      } else {
-        const errorData = await response.json();
-        console.error("Logout failed:", errorData.message);
       }
     } catch (error) {
-      console.error("An error occurred during logout:", error);
+      console.error('Logout error:', error);
+      // Still perform logout actions even if the server request fails
+      localStorage.removeItem("token");
+      logout();
+      handleCloseUserMenu();
+      navigate("/home", { replace: true });
     }
   };
 
