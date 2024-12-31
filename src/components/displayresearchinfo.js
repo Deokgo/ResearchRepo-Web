@@ -66,6 +66,7 @@ const DisplayResearchInfo = ({ route, navigate }) => {
   const [programs, setPrograms] = useState([]);
   const [file, setFile] = useState(null);
   const [extendedAbstract, setExtendedAbstract] = useState(null);
+  const [researchAreas, setResearchAreas] = useState([]);
 
   const { user } = useAuth();
 
@@ -233,57 +234,77 @@ const DisplayResearchInfo = ({ route, navigate }) => {
     }
   };
 
-  const handleEdit = (item) => {
-    setEditableData({
-      research_id: item.research_id,
-      title: item.title,
-      college_id: item.college_id,
-      program_id: item.program_id,
-      abstract: item.abstract,
-      research_type: item.research_type,
-      date_approved: item.date_approved
-        ? new Date(item.date_approved).toISOString().split("T")[0]
-        : "",
-      sdgs: item.sdg
-        ? item.sdg.split(";").map((sdgId) => ({
-            id: sdgId,
-            title:
-              sdgGoalsData.sdgGoals.find((goal) => goal.id === sdgId)?.title ||
-              "",
-          }))
-        : [],
-      keywords: item.keywords || [],
-      authors: item.authors || [],
-      adviser: item.adviser || null,
-      panels: item.panels || [],
-      file: item.full_manuscript || null,
-    });
-    setSelectedSDGs(
-      item.sdg
-        ? item.sdg.split(";").map((sdgId) => ({
-            id: sdgId,
-            title:
-              sdgGoalsData.sdgGoals.find((goal) => goal.id === sdgId)?.title ||
-              "",
-          }))
-        : []
-    );
-    setKeywords(item.keywords || []);
-    setIsEditMode(true);
-    fetchColleges();
+  const fetchResearchAreas = async () => {
+    try {
+      const response = await axios.get('/paper/research_areas');
+      if (response.data.research_areas) {
+        // Transform the data to match the expected format
+        const formattedAreas = response.data.research_areas.map(area => ({
+          research_area_id: area.id,
+          research_area_name: area.name
+        }));
+        console.log('Fetched research areas:', formattedAreas); // Debug log
+        setResearchAreas(formattedAreas);
+      }
+    } catch (error) {
+      console.error('Error fetching research areas:', error);
+    }
+  };
 
-    // Fetch programs for the selected college
-    if (item.college_id) {
-      axios
-        .get(`/deptprogs/programs/${item.college_id}`, {
+  const handleEdit = async (item) => {
+    try {
+      // Fetch research areas first
+      await fetchResearchAreas();
+      
+      setEditableData({
+        research_id: item.research_id,
+        title: item.title,
+        college_id: item.college_id,
+        program_id: item.program_id,
+        abstract: item.abstract,
+        research_type: item.research_type || '',
+        date_approved: item.date_approved
+          ? new Date(item.date_approved).toISOString().split("T")[0]
+          : "",
+        sdgs: item.sdg
+          ? item.sdg.split(";").map((sdgId) => ({
+              id: sdgId,
+              title:
+                sdgGoalsData.sdgGoals.find((goal) => goal.id === sdgId)?.title ||
+                "",
+            }))
+          : [],
+        keywords: item.keywords || [],
+        authors: item.authors || [],
+        adviser: item.adviser || null,
+        panels: item.panels || [],
+        file: item.full_manuscript || null,
+        research_areas: item.research_areas || [], // This should now match the fetched format
+      });
+      
+      setSelectedSDGs(
+        item.sdg
+          ? item.sdg.split(";").map((sdgId) => ({
+              id: sdgId,
+              title:
+                sdgGoalsData.sdgGoals.find((goal) => goal.id === sdgId)?.title ||
+                "",
+            }))
+          : []
+      );
+      setKeywords(item.keywords || []);
+      setIsEditMode(true);
+      fetchColleges();
+
+      // Fetch programs for the selected college
+      if (item.college_id) {
+        const response = await axios.get(`/deptprogs/programs/${item.college_id}`, {
           params: { department: item.college_id },
-        })
-        .then((response) => {
-          setPrograms(response.data.programs);
-        })
-        .catch((error) => {
-          console.error("Error fetching programs:", error);
         });
+        setPrograms(response.data.programs);
+      }
+    } catch (error) {
+      console.error("Error setting up edit mode:", error);
     }
   };
 
@@ -312,7 +333,7 @@ const DisplayResearchInfo = ({ route, navigate }) => {
         originalData.program_id !== editableData.program_id ||
         originalData.abstract !== editableData.abstract ||
         originalData.research_type !== editableData.research_type ||
-        originalDate !== editableDate || // Compare formatted dates
+        originalDate !== editableDate ||
         originalData.adviser?.user_id !== editableData.adviser?.user_id ||
         JSON.stringify(originalData.keywords.sort()) !==
           JSON.stringify(keywords.sort()) ||
@@ -321,31 +342,10 @@ const DisplayResearchInfo = ({ route, navigate }) => {
           JSON.stringify(editableData.authors.map((a) => a.user_id).sort()) ||
         JSON.stringify(originalData.panels.map((p) => p.user_id).sort()) !==
           JSON.stringify(editableData.panels.map((p) => p.user_id).sort()) ||
-        file !== null || // Check if new file was uploaded
-        extendedAbstract !== null; // Check if new extended abstract was uploaded
-
-      console.log("Changes detected:", {
-        title: originalData.title !== editableData.title,
-        college: originalData.college_id !== editableData.college_id,
-        program: originalData.program_id !== editableData.program_id,
-        abstract: originalData.abstract !== editableData.abstract,
-        type: originalData.research_type !== editableData.research_type,
-        date: originalDate !== editableDate,
-        adviser:
-          originalData.adviser?.user_id !== editableData.adviser?.user_id,
-        keywords:
-          JSON.stringify(originalData.keywords.sort()) !==
-          JSON.stringify(keywords.sort()),
-        sdg: originalData.sdg !== selectedSDGs.map((sdg) => sdg.id).join(";"),
-        authors:
-          JSON.stringify(originalData.authors.map((a) => a.user_id).sort()) !==
-          JSON.stringify(editableData.authors.map((a) => a.user_id).sort()),
-        panels:
-          JSON.stringify(originalData.panels.map((p) => p.user_id).sort()) !==
-          JSON.stringify(editableData.panels.map((p) => p.user_id).sort()),
-        newFile: file !== null,
-        newEA: extendedAbstract !== null,
-      });
+        JSON.stringify(originalData.research_areas.map(ra => ra.research_area_id).sort()) !==
+          JSON.stringify(editableData.research_areas.map(ra => ra.research_area_id).sort()) ||
+        file !== null ||
+        extendedAbstract !== null;
 
       if (!hasChanges) {
         alert("No changes were made to save.");
@@ -354,7 +354,6 @@ const DisplayResearchInfo = ({ route, navigate }) => {
         return;
       }
 
-      // Proceed with existing save logic if changes were detected
       const formData = new FormData();
       const userId = localStorage.getItem("user_id");
 
@@ -364,12 +363,15 @@ const DisplayResearchInfo = ({ route, navigate }) => {
       formData.append("program_id", editableData.program_id);
       formData.append("title", editableData.title);
       formData.append("abstract", editableData.abstract);
-
       formData.append("date_approved", editableData.date_approved);
-
       formData.append("research_type", editableData.research_type);
       formData.append("adviser_id", editableData.adviser?.user_id || "");
       formData.append("sdg", selectedSDGs.map((sdg) => sdg.id).join(";"));
+
+      // Add research areas
+      editableData.research_areas.forEach(area => {
+        formData.append("research_area_ids", area.research_area_id);
+      });
 
       // Handle file upload
       if (file) {
@@ -406,8 +408,8 @@ const DisplayResearchInfo = ({ route, navigate }) => {
       alert("Paper updated successfully!");
       setIsEditMode(false);
       setEditableData(null);
-      setFile(null); // Reset file state after successful upload
-      setExtendedAbstract(null); // Add this line
+      setFile(null);
+      setExtendedAbstract(null);
 
       // Refresh the data
       const refreshResponse = await axios.get(
@@ -824,6 +826,35 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                                 },
                               }}
                             >
+                              Research Areas:
+                            </Typography>
+                            <Typography
+                              variant='body1'
+                              sx={{
+                                fontSize: {
+                                  xs: "0.6rem",
+                                  md: "0.7rem",
+                                  lg: "0.9rem",
+                                },
+                                mb: "2rem"
+                              }}
+                            >
+                              {Array.isArray(item.research_areas) && item.research_areas.length > 0
+                                ? item.research_areas.map(area => area.research_area_name).join("; ")
+                                : "No research areas available"}
+                            </Typography>
+                            <Typography
+                              variant='h6'
+                              fontWeight='700'
+                              sx={{
+                                mb: "1rem",
+                                fontSize: {
+                                  xs: "0.75rem",
+                                  md: "0.75rem",
+                                  lg: "1.1rem",
+                                },
+                              }}
+                            >
                               Keywords:
                             </Typography>
                             <Typography
@@ -1191,7 +1222,7 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                               }
                             >
                               <MenuItem
-                                value="EXTRAMURAL"
+                                value="Extramural"
                                 sx={{
                                   fontSize: {
                                     xs: "0.75rem",
@@ -1200,10 +1231,10 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                                   },
                                 }}
                               >
-                                EXTRAMURAL
+                                Extramural
                               </MenuItem>
                               <MenuItem
-                                value="COLLEGE-DRIVEN"
+                                value="College-Driven"
                                 sx={{
                                   fontSize: {
                                     xs: "0.75rem",
@@ -1212,10 +1243,10 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                                   },
                                 }}
                               >
-                                COLLEGE-DRIVEN
+                                College-Driven
                               </MenuItem>
                               <MenuItem
-                                value="INTEGRATIVE"
+                                value="Integrative"
                                 sx={{
                                   fontSize: {
                                     xs: "0.75rem",
@@ -1224,7 +1255,7 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                                   },
                                 }}
                               >
-                                INTEGRATIVE
+                                Integrative
                               </MenuItem>
                             </Select>
                           </FormControl>
@@ -1494,8 +1525,46 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                               }
                             />
                           </Grid2>
+                          <Grid2 size={6}>
+                            <Autocomplete
+                              multiple
+                              value={editableData.research_areas || []}
+                              onChange={(event, newValue) => {
+                                setEditableData((prev) => ({
+                                  ...prev,
+                                  research_areas: newValue,
+                                }));
+                              }}
+                              options={researchAreas || []}
+                              getOptionLabel={(option) => option.research_area_name || ''}
+                              isOptionEqualToValue={(option, value) => 
+                                option.research_area_id === value.research_area_id
+                              }
+                              renderInput={(params) => (
+                                <TextField
+                                  {...params}
+                                  label='Research Areas'
+                                  variant='outlined'
+                                  helperText='Select one or more research areas'
+                                  sx={createTextFieldStyles()}
+                                  InputLabelProps={createInputLabelProps()}
+                                />
+                              )}
+                              sx={{
+                                '& .MuiAutocomplete-input': {
+                                  fontSize: {
+                                    xs: "0.6rem",
+                                    sm: "0.7rem",
+                                    md: "0.8rem",
+                                    lg: "0.8rem",
+                                  },
+                                }
+                              }}
+                            />
+                          </Grid2>
+
                           <Grid2
-                            size={3}
+                            size={6}
                             display='flex'
                             flexDirection='column'
                             justifyContent='center'
@@ -1569,7 +1638,7 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                             </Button>
                           </Grid2>
                           <Grid2
-                            size={3}
+                            size={6}
                             display='flex'
                             flexDirection='column'
                             justifyContent='center'
