@@ -155,24 +155,25 @@ const DashEmbed = () => {
           sx={{
             flexGrow: 1,
             backgroundColor: "#f5f5f5",
-            padding: 0,
-            boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-            overflowY: "hidden",
+            padding: 0, // Ensure no padding
+            margin: 0,  // Ensure no margin
+            boxShadow: "none", // Remove any shadow to avoid white space
+            overflow: "hidden", // Ensure no scrollbars
           }}
         >
-          <div style={{ 
-            height: "100vh", 
-            width: "100%", 
-            paddingTop: "20px", 
-            paddingLeft: "20px", 
-            backgroundColor: "white" // Set the background color to white
-          }}>
+          <div
+            style={{
+              height: "100%",
+              width: "100%",
+            }}
+          >
             <iframe
+              id="dashboard-iframe"
               src={dashUrl}
               style={{
                 border: "none",
-                width: "100%",
-                height: "100%",
+                width: "100vw", // Ensure it spans the full viewport width
+                height: "100vh", // Ensure it spans the full viewport height
               }}
               title="Dash App"
             />
