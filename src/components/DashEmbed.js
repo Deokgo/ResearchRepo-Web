@@ -157,27 +157,21 @@ const DashEmbed = () => {
             backgroundColor: "#f5f5f5",
             padding: 0, // Ensure no padding
             margin: 0,  // Ensure no margin
-            boxShadow: "none", // Remove any shadow to avoid white space
-            overflow: "hidden", // Ensure no scrollbars
+            height: "100vh", // Occupy full viewport height
+            overflow: "hidden", // Prevent scrollbars
           }}
         >
-          <div
+          <iframe
+            id="dashboard-iframe"
+            src={dashUrl}
             style={{
-              height: "100%",
-              width: "100%",
+              border: "none",
+              width: "100vw", // Occupy full viewport width
+              height: "100vh", // Occupy full viewport height
+              display: "block", // Avoid inline gaps
             }}
-          >
-            <iframe
-              id="dashboard-iframe"
-              src={dashUrl}
-              style={{
-                border: "none",
-                width: "100vw", // Ensure it spans the full viewport width
-                height: "100vh", // Ensure it spans the full viewport height
-              }}
-              title="Dash App"
-            />
-          </div>
+            title="Dash App"
+          />
         </Box>
       </Box>
     </>
