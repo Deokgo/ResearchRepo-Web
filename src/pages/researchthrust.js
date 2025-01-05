@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import Navbar from "./navbar";
-import Footer from "./footer";
+import Navbar from "../components/navbar";
+import Footer from "../components/footer";
 import {
   Box,
   Button,
@@ -13,17 +13,17 @@ import {
   Modal,
   Accordion,
   AccordionDetails,
-  AccordionSummary
+  AccordionSummary,
 } from "@mui/material";
 import placeholderImage from "../assets/placeholder_image.png";
 import homeBg from "../assets/home_bg.png";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
-import InfoIcon from '@mui/icons-material/Info';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import InfoIcon from "@mui/icons-material/Info";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { useModalContext } from "./modalcontext";
+import { useModalContext } from "../context/modalcontext";
 
 const ResearchThrust = () => {
   const [userData, setUserData] = useState(null);
@@ -34,10 +34,7 @@ const ResearchThrust = () => {
   const navigate = useNavigate();
   // Retrieve user_id from cookie/localStorage
 
-  const {
-    openLoginModal,
-    closeLoginModal,
-  } = useModalContext();
+  const { openLoginModal, closeLoginModal } = useModalContext();
 
   const handleLogin = () => {
     openLoginModal();
@@ -47,7 +44,8 @@ const ResearchThrust = () => {
     {
       id: 1,
       name: "Mapúa Institute of Technology at Laguna",
-      description: "The research thrusts of MITL are grouped into eight cluster areas constituting the eight\
+      description:
+        "The research thrusts of MITL are grouped into eight cluster areas constituting the eight\
       departments that make up the college. In each cluster, there are several areas that are\
       structured according to priority. These research thrusts and areas emphasize the\
       importance of innovation on the design of processes and technologies as well as\
@@ -57,7 +55,8 @@ const ResearchThrust = () => {
       programs: [
         {
           name: "BS Architecture",
-          focusAreas: "The research thrusts of the Architecture Department are structured into two tracks or cluster areas namely: \
+          focusAreas:
+            "The research thrusts of the Architecture Department are structured into two tracks or cluster areas namely: \
           Sustainable Design and Design Innovations. Under the umbrella of sustainable design are the following priorities: \
           Green architecture, Green Building, Sustainable Construction, formulation and adoption of sustainable materials in architectural \
           design, resilience architecture and, adaptive re-use of existing buildings, Under the design innovations track are the following \
@@ -66,46 +65,53 @@ const ResearchThrust = () => {
         },
         {
           name: "BS Chemical Engineering",
-          focusAreas: "The Chemical Engineering discipline is devoted towards finding sustainable solutions to existing problems \
+          focusAreas:
+            "The Chemical Engineering discipline is devoted towards finding sustainable solutions to existing problems \
           through innovation and advancement in chemical and environmental processes and materials. The core research engagements are \
           in the following tracks: environmental processes and technology, polymeric materials and catalysis, chemical and biological sensors\
           energy and sustainability, process engineering and design, biotechnology",
         },
         {
           name: "BS Civil Engineering",
-          focusAreas: "The Department of Civil Engineering shall engage in research towards s ustainable material utilization and management.\
+          focusAreas:
+            "The Department of Civil Engineering shall engage in research towards s ustainable material utilization and management.\
           This is briefly subdivided in the following core research priorities: waste material utilization for development of light \
           construction materials, utility design model of structures for economy and sustainability, wastewater treatment, water resources & \
           purification",
         },
         {
           name: "BS Computer Engineering",
-          focusAreas: "The Computer Engineering Department is geared on developing ubiquitous system solution and application towards emerging \
+          focusAreas:
+            "The Computer Engineering Department is geared on developing ubiquitous system solution and application towards emerging \
           computing trends. The focus of research shall be in the following fields: physical computing, human computer interaction, wearable \
           computer, ambient intelligence, sensor grid",
         },
         {
           name: "BS Electrical Engineering",
-          focusAreas: "The Electrical Engineering Department has identified the following research opportunities for generation and delivery \
+          focusAreas:
+            "The Electrical Engineering Department has identified the following research opportunities for generation and delivery \
           of sustainable energy towards efficient utilization: alternative/renewable energy. The focus of research shall be in the following \
           fields: energy conversion, smart grid, power quality, equipment protection, instrumentation, automation & control.",
         },
         {
           name: "BS Electronics Engineering",
-          focusAreas: "The Department of Electronics Engineering is dedicated towards development of innovative solutions through integration \
+          focusAreas:
+            "The Department of Electronics Engineering is dedicated towards development of innovative solutions through integration \
           of emerging electronic technologies. The core priorities for research shall be as follows: semiconductor and electronic design, \
           electronic and information technologies, smart systems, instrumentation and control systems, automated test development,automation \
           and robotics, electronic equipment for medical applications.",
         },
         {
           name: "BS Industrial Engineering",
-          focusAreas: "The Industrial Engineering Department is engaged in research on continuous quality improvement through industrial \
+          focusAreas:
+            "The Industrial Engineering Department is engaged in research on continuous quality improvement through industrial \
           systems development. The fields of principal interest are the following: manufacturing & production systems, product innovation \
           quality & reliability engineering.",
         },
         {
           name: "BS Mechanical Engineering",
-          focusAreas: "The Department of Mechanical Engineering is geared towards development of innovative processes and technologies for a \
+          focusAreas:
+            "The Department of Mechanical Engineering is geared towards development of innovative processes and technologies for a \
           dynamic and efficient utilization of available energy resources. The core research interests are identified as follows: renewable \
           energy technologies, waste heat recovery systems, heating, ventilation & AC systems, bio-based fuel",
         },
@@ -115,7 +121,8 @@ const ResearchThrust = () => {
     {
       id: 2,
       name: "College of Computer and Information Science",
-      description: "“Engineering Software towards Sustainable Quality Systems” - The College of Computer and Information Science (CCIS) identifies various fields of\
+      description:
+        "“Engineering Software towards Sustainable Quality Systems” - The College of Computer and Information Science (CCIS) identifies various fields of\
       specialization related to CS and IT programs that can be used to improve business, governance, learning, health, environment, and internet of things (IoT).\
       In the following areas: Business - development, implementation, application and improvement of business aplications and systems. Government - development \
       and application of emerging technologies to enable transparency, fight corruption, and monitor public service delivery. Learning - utilization, integration, \
@@ -126,12 +133,14 @@ const ResearchThrust = () => {
       programs: [
         {
           name: "BS Computer Science",
-          focusAreas: "The fields of specialization includes Algorithms, Computer Graphics and Animation, Machine Learning and Computer Vision, \
+          focusAreas:
+            "The fields of specialization includes Algorithms, Computer Graphics and Animation, Machine Learning and Computer Vision, \
           Modeling and Simulation, Natural Language Processing, Pattern Recognition & Data Mining, and Software Engineering.",
         },
         {
           name: "BS Information Technology",
-          focusAreas: "The fields of specialization includes Mobile Applications, Web Applications, Networked Systems, Multimedia Systems, and Game Development",
+          focusAreas:
+            "The fields of specialization includes Mobile Applications, Web Applications, Networked Systems, Multimedia Systems, and Game Development",
         },
         // Repeat for other programs...
       ],
@@ -139,7 +148,8 @@ const ResearchThrust = () => {
     {
       id: 3,
       name: "College of Arts and Science",
-      description: "“Media in Social Development and Nation Building” -  \
+      description:
+        "“Media in Social Development and Nation Building” -  \
       The College of Arts and Science (CAS) fosters interdisciplinary research aimed at addressing contemporary challenges in communication, \
       multimedia arts, and human interaction. With a strong focus on the social, cultural, and technological aspects of communication, CAS \
       engages in innovative projects that bridge the gap between theory and practice. Research initiatives are designed to enhance \
@@ -150,14 +160,16 @@ const ResearchThrust = () => {
       programs: [
         {
           name: "BA Multimedia Arts",
-          focusAreas: "The Multimedia Arts program shall be engaged in research on the use of multimedia \
+          focusAreas:
+            "The Multimedia Arts program shall be engaged in research on the use of multimedia \
           technologies for nation building. The fields and issues of interest are the following: visual \
           image studies, animation, multimedia technology, new media, game system, and other \
           industrial and social applications of multimedia.",
         },
         {
           name: "BA Communication",
-          focusAreas: "The research initiatives of the Communication program shall focus on the application of \
+          focusAreas:
+            "The research initiatives of the Communication program shall focus on the application of \
           communication principles and techniques for social transformation. The specific areas of\
           study shall include the following: media and telecommunications, educational\
           communication, gender issues, development communication, and other industrial and\
@@ -165,7 +177,8 @@ const ResearchThrust = () => {
         },
         {
           name: "Science and Mathematics Cluster",
-          focusAreas: "The Science and Mathematics clusters provide the foundational courses that support the\
+          focusAreas:
+            "The Science and Mathematics clusters provide the foundational courses that support the\
           major subjects of the various disciplines. Their research focus would seek to expand the\
           understanding of scientific, mathematical, engineering, and statistical principles and their\
           integrated application to different fields of study. Research areas of interest include, but\
@@ -179,47 +192,52 @@ const ResearchThrust = () => {
     {
       id: 4,
       name: "E.T. Yuchengco College of Business",
-      description: "The E.T. Yuchengco College of Business is committed to fostering cutting-edge research that empowers future business leaders to navigate complex global markets. The research agenda of the college emphasizes innovation, sustainability, and the application of business \
+      description:
+        "The E.T. Yuchengco College of Business is committed to fostering cutting-edge research that empowers future business leaders to navigate complex global markets. The research agenda of the college emphasizes innovation, sustainability, and the application of business \
         intelligence in real-world contexts. The research initiatives are designed to drive advancements in various business sectors, promote ethical practices, and contribute to the sustainable growth of industries.",
       image: placeholderImage,
       programs: [
         {
           name: "BS Accountancy",
-          focusAreas: "“Sustainability Accounting & Reporting” -  \
+          focusAreas:
+            "“Sustainability Accounting & Reporting” -  \
           Sustainability or sometimes referred to as corporate social responsibility is what is\
           commonly known as the “triple bottom line” consideration of 1) economic viability, 2)\
           social responsibility, and 3) environmental responsibility. The research thrust of the\
           college centers on how these aspects are considered by businesses in various parts of the\
           world and how these areas are accounted for, valued, and recognized in financial\
-          statements.\n The areas of research includes Environmental, Social, Economic."
+          statements.\n The areas of research includes Environmental, Social, Economic.",
         },
         {
           name: "BS Business Administration",
-          focusAreas: "In response to the Institutional mission of “producing social wealth from the generation\
+          focusAreas:
+            "In response to the Institutional mission of “producing social wealth from the generation\
           of new knowledge and helping solve society’s problems by the expert application of \
           existing knowledge”, The Bachelor of Business Administration program is committed to\
           address environmental and societal concerns, sustainability, life and community\
           improvement, by providing innovative and technology-based products or services, and\
-          social entrepreneurship thru business planning and research."
+          social entrepreneurship thru business planning and research.",
         },
         {
           name: "BS Hotel & Restaurant Management",
-          focusAreas: "“Sustainable Practices in Hotel, Restaurant and Culinary Operations” -  \
+          focusAreas:
+            "“Sustainable Practices in Hotel, Restaurant and Culinary Operations” -  \
           The research thrust of the Hotel and Restaurant Management program focuses on\
           adopting sustainable practices to reduce the environmental, social, and economic impacts\
-          of the hospitality industry. Areas of study are lodging and foodservice operations."
+          of the hospitality industry. Areas of study are lodging and foodservice operations.",
         },
         {
           name: "BS Tourism Management",
-          focusAreas: "The Tourism Management is geared towards developing a model for “Sustainable\
+          focusAreas:
+            "The Tourism Management is geared towards developing a model for “Sustainable\
           Tourism Development Initiatives”. The research component identified as follows:\
           plan for promoting community participation, plan for developing sustainable marketing,\
           plan for developing sustainable tourism activities, plan for developing amenities, attraction\
-          sites and plan for sustainable resources and environment."
+          sites and plan for sustainable resources and environment.",
         },
         // Repeat for other programs...
       ],
-    }, 
+    },
     {
       id: 5,
       name: "College of Health Sciences",
@@ -231,7 +249,8 @@ const ResearchThrust = () => {
       programs: [
         {
           name: "BS Biology",
-          focusAreas: "The BS Biology program is structured as a generalized framework of study with the end\
+          focusAreas:
+            "The BS Biology program is structured as a generalized framework of study with the end\
         view of grounding students with the fundamental concepts, principles, and theories of the\
         biological, natural, and physical sciences and the conduct of research. The research areas include \
         but not limited to: Environmental and population health, Animal behavior, Cell and molecular biology \
@@ -240,7 +259,8 @@ const ResearchThrust = () => {
         },
         {
           name: "BS Psychology",
-          focusAreas: "The BS Psychology program is dedicated to fostering a dynamic learning environment that\
+          focusAreas:
+            "The BS Psychology program is dedicated to fostering a dynamic learning environment that\
           empowers students and faculty members to engage in meaningful research endeavors.\
           The program has strategically identified a range of research thrust areas that encompass\
           various dimensions of psychological study. These research areas not only align with the\
@@ -257,7 +277,7 @@ const ResearchThrust = () => {
         },
         // Repeat for other programs...
       ],
-    }, 
+    },
   ];
 
   // State to track which accordion is currently expanded
@@ -309,14 +329,14 @@ const ResearchThrust = () => {
                 xs: "clamp(2rem, 3vh, 3rem)",
                 sm: "clamp(3rem, 8vh, 4rem)",
                 md: "clamp(3rem, 14vh, 4rem)",
-                lg: "clamp(4rem, 20vh, 5rem)"
+                lg: "clamp(4rem, 20vh, 5rem)",
               },
               backgroundColor: "#0A438F",
               backgroundSize: "cover",
               backgroundPosition: "center",
               display: "flex",
               alignItems: "center",
-              zIndex: 1
+              zIndex: 1,
             }}
           >
             <Box
@@ -340,8 +360,8 @@ const ResearchThrust = () => {
                   transform: {
                     xs: "scale(0.8)",
                     sm: "scale(1)",
-                    md: "scale(1.2)"
-                  }
+                    md: "scale(1.2)",
+                  },
                 }}
               >
                 <ArrowBackIosIcon />
@@ -360,14 +380,14 @@ const ResearchThrust = () => {
                   color: "#FFF",
                   lineHeight: 1.25,
                   alignSelf: "center",
-                  zIndex: 2
+                  zIndex: 2,
                 }}
               >
                 Research Thrust
               </Typography>
             </Box>
           </Box>
-        
+
           {/* Content Section */}
           <Box
             sx={{
@@ -375,7 +395,7 @@ const ResearchThrust = () => {
               padding: 5,
               marginLeft: 5,
               marginRight: 5,
-              justifyContent: 'space-around',
+              justifyContent: "space-around",
             }}
           >
             <Box
@@ -387,77 +407,119 @@ const ResearchThrust = () => {
               <Box
                 sx={{
                   display: "flex",
-                  flexDirection: 'column',
+                  flexDirection: "column",
                 }}
               >
                 {departments.map((department) => (
-                  <Box key={department.id} sx={{ m: { xs: "0.5rem", md: "0.75rem", lg: "1rem" } }}>
+                  <Box
+                    key={department.id}
+                    sx={{ m: { xs: "0.5rem", md: "0.75rem", lg: "1rem" } }}
+                  >
                     <Accordion
                       expanded={expandedPanel === department.id}
                       onChange={handleAccordionChange(department.id)}
                     >
                       <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                         <Typography
-                          variant="h5"
+                          variant='h5'
                           sx={{
-                            padding: { xs: "0.25rem", md: "0.5rem", lg: "0.75rem" },
+                            padding: {
+                              xs: "0.25rem",
+                              md: "0.5rem",
+                              lg: "0.75rem",
+                            },
                             fontWeight: 700,
-                            fontSize: { xs: "0.75rem", md: "0.95rem", lg: "1.3rem" },
+                            fontSize: {
+                              xs: "0.75rem",
+                              md: "0.95rem",
+                              lg: "1.3rem",
+                            },
                             fontFamily: "Montserrat, sans-serif",
                             color: "#CA031B",
                             "&:hover": {
                               color: "#A30417",
-                        },
+                            },
                           }}
                         >
                           {department.name}
                         </Typography>
                       </AccordionSummary>
                       <AccordionDetails>
-                        <Typography 
-                          sx={{ 
-                            paddingLeft: { xs: "0.5rem", md: "0.75rem", lg: "1rem" },
-                            fontSize: { xs: "0.65rem", md: "0.85rem", lg: "1rem" },
+                        <Typography
+                          sx={{
+                            paddingLeft: {
+                              xs: "0.5rem",
+                              md: "0.75rem",
+                              lg: "1rem",
+                            },
+                            fontSize: {
+                              xs: "0.65rem",
+                              md: "0.85rem",
+                              lg: "1rem",
+                            },
                           }}
                         >
-                          {department.description}</Typography>
-                          {!isLoggedIn ? (
-                            <Button
-                              onClick={handleLogin}
-                              variant='text'
-                              sx={{
-                                mt: 3,
-                                color: "#08397C",
-                                fontFamily: "Montserrat, sans-serif",
-                                fontWeight: 600,
-                                paddingLeft: { xs: "0.5rem", md: "0.75rem", lg: "1rem" },
-                                fontSize: { xs: "0.5rem", md: "0.75rem", lg: "1rem" },
-                                "&:hover": {
-                                  color: "#072d61",
-                                },
-                              }}
-                            >
-                              Learn More <InfoIcon/>
-                            </Button>
-                          ) : (
-                            <Box>
-                              <Divider sx={{ marginY: 2 }} />
-                              {department.programs.map((program, index) => (
+                          {department.description}
+                        </Typography>
+                        {!isLoggedIn ? (
+                          <Button
+                            onClick={handleLogin}
+                            variant='text'
+                            sx={{
+                              mt: 3,
+                              color: "#08397C",
+                              fontFamily: "Montserrat, sans-serif",
+                              fontWeight: 600,
+                              paddingLeft: {
+                                xs: "0.5rem",
+                                md: "0.75rem",
+                                lg: "1rem",
+                              },
+                              fontSize: {
+                                xs: "0.5rem",
+                                md: "0.75rem",
+                                lg: "1rem",
+                              },
+                              "&:hover": {
+                                color: "#072d61",
+                              },
+                            }}
+                          >
+                            Learn More <InfoIcon />
+                          </Button>
+                        ) : (
+                          <Box>
+                            <Divider sx={{ marginY: 2 }} />
+                            {department.programs.map((program, index) => (
                               <Box sx={{ m: 2 }} key={index}>
                                 <Accordion
-                                  expanded={expandedPanelProgram === program.name}
-                                  onChange={handleAccordionChangeProgram(program.name)}
+                                  expanded={
+                                    expandedPanelProgram === program.name
+                                  }
+                                  onChange={handleAccordionChangeProgram(
+                                    program.name
+                                  )}
                                 >
-                                  <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                                  <AccordionSummary
+                                    expandIcon={<ExpandMoreIcon />}
+                                  >
                                     <Typography
-                                      variant="h6"
+                                      variant='h6'
                                       sx={{
                                         fontWeight: 700,
                                         fontFamily: "Montserrat, sans-serif",
                                         color: "#08397C",
                                         ml: 2,
-                                        fontSize: { xs: "0.75rem", md: "0.95rem", lg: "1.3rem" }, // Add responsive font sizes
-                                        padding: { xs: "0.25rem", md: "0.5rem", lg: "0.75rem" }, // Add responsive padding
+                                        fontSize: {
+                                          xs: "0.75rem",
+                                          md: "0.95rem",
+                                          lg: "1.3rem",
+                                        }, // Add responsive font sizes
+                                        padding: {
+                                          xs: "0.25rem",
+                                          md: "0.5rem",
+                                          lg: "0.75rem",
+                                        }, // Add responsive padding
                                       }}
                                     >
                                       {program.name}
@@ -467,8 +529,16 @@ const ResearchThrust = () => {
                                     <Typography
                                       sx={{
                                         color: "#36454F",
-                                        paddingLeft: { xs: "0.5rem", md: "0.75rem", lg: "1rem" },
-                                        fontSize: { xs: "0.65rem", md: "0.85rem", lg: "1rem" },
+                                        paddingLeft: {
+                                          xs: "0.5rem",
+                                          md: "0.75rem",
+                                          lg: "1rem",
+                                        },
+                                        fontSize: {
+                                          xs: "0.65rem",
+                                          md: "0.85rem",
+                                          lg: "1rem",
+                                        },
                                       }}
                                     >
                                       {program.focusAreas}
@@ -477,8 +547,8 @@ const ResearchThrust = () => {
                                 </Accordion>
                               </Box>
                             ))}
-                            </Box>
-                          )}
+                          </Box>
+                        )}
                       </AccordionDetails>
                     </Accordion>
                   </Box>

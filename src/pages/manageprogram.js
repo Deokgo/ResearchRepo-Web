@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import Navbar from "./navbar";
-import Footer from "./footer";
+import Navbar from "../components/navbar";
+import Footer from "../components/footer";
 import {
   Box,
   Button,
@@ -11,18 +11,17 @@ import {
   TextField,
   Typography,
   Grid2,
-  Checkbox, 
+  Checkbox,
   FormControl,
   InputLabel,
   Select,
   MenuItem,
-
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import homeBg from "../assets/home_bg.png";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 import { Search } from "@mui/icons-material";
 import { Virtuoso } from "react-virtuoso";
 import axios from "axios";
@@ -53,39 +52,39 @@ const ManageProgram = () => {
 
   const fetchColleges = async () => {
     try {
-    const response = await axios.get(`/deptprogs/college_depts`);
-    const fetchColleges = response.data.colleges;
-    setColleges(fetchColleges);
-    setFilteredCollege(fetchColleges);
+      const response = await axios.get(`/deptprogs/college_depts`);
+      const fetchColleges = response.data.colleges;
+      setColleges(fetchColleges);
+      setFilteredCollege(fetchColleges);
     } catch (error) {
-    console.error("Error fetching colleges:", error); 
+      console.error("Error fetching colleges:", error);
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
-    };
+  };
 
   const fetchAllPrograms = async () => {
     try {
-        const response = await axios.get(`/deptprogs/fetch_programs`);
-        const fetchedProgram = response.data.programs;
-        setPrograms(fetchedProgram);
-        setFilteredProgram(fetchedProgram);
+      const response = await axios.get(`/deptprogs/fetch_programs`);
+      const fetchedProgram = response.data.programs;
+      setPrograms(fetchedProgram);
+      setFilteredProgram(fetchedProgram);
     } catch (error) {
-        console.error("Error fetching programs:", error);
+      console.error("Error fetching programs:", error);
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
-    };
+  };
 
   useEffect(() => {
     fetchColleges();
     fetchAllPrograms();
-    }, []);
-  
+  }, []);
+
   const handleSearchChange = (e) => {
     const query = e.target.value.toLowerCase();
     setSearchQuery(query);
-    };
+  };
 
   useEffect(() => {
     let filtered = programs;
@@ -93,33 +92,29 @@ const ManageProgram = () => {
     // Filter by College
     if (selectedCollege.length > 0) {
       filtered = filtered.filter((item) =>
-          selectedCollege.includes(String(item.college_id))
+        selectedCollege.includes(String(item.college_id))
       );
     }
 
     // Filter by Search Query
     if (searchQuery) {
       filtered = filtered.filter((program) =>
-          program.program_name.toLowerCase().includes(searchQuery)
+        program.program_name.toLowerCase().includes(searchQuery)
       );
     }
     setFilteredProgram(filtered);
-  }, [
-    selectedCollege,
-    searchQuery,
-    programs,
-  ]);
+  }, [selectedCollege, searchQuery, programs]);
 
   // Modify the handleCollegeChange function to handle initial selection
   const handleCollegeChange = (event) => {
     const { value, checked } = event.target;
     setSelectedCollege((prev) => {
-        // Ensure prev is an array
-        const prevSelected = prev || [];
-        
-        return checked 
-            ? [...prevSelected, value] 
-            : prevSelected.filter((item) => item !== value);
+      // Ensure prev is an array
+      const prevSelected = prev || [];
+
+      return checked
+        ? [...prevSelected, value]
+        : prevSelected.filter((item) => item !== value);
     });
   };
 
@@ -132,14 +127,14 @@ const ManageProgram = () => {
   };
 
   const handleCloseModal = () => {
-    setAddModal(false)
+    setAddModal(false);
     setOpenModal(false);
     setDeleteModal(false);
     setSelectedProgram(null);
 
     handlePostModal();
   };
-  
+
   const handleOpenAddModal = () => {
     setAddModal(true);
   };
@@ -179,7 +174,7 @@ const ManageProgram = () => {
       formData.append("college_id", collegeAbbrv);
       formData.append("program_id", programAbbrv);
       formData.append("program_name", programName);
-      
+
       // Send the conference data
       const response = await axios.post("/data/programs", formData, {
         headers: {
@@ -193,7 +188,6 @@ const ManageProgram = () => {
 
       handleCloseModal();
       window.location.reload();
-      
     } catch (error) {
       console.error("Error adding college:", error);
       if (error.response) {
@@ -210,24 +204,21 @@ const ManageProgram = () => {
   };
 
   const handleOpenModal = (program) => {
-    setSelectedProgram(program)
+    setSelectedProgram(program);
     // Set the initial data
     setInitialData({
       program_name: program.program_name,
-    })
+    });
     setNewName(program.program_name);
 
     setOpenModal(true);
   };
 
   const handleUpdateProgram = () => {
-    const hasChanges =
-      newName !== initialData?.program_name
+    const hasChanges = newName !== initialData?.program_name;
 
     if (!hasChanges) {
-      alert(
-        "No changes detected. Please modify user's details before saving."
-      );
+      alert("No changes detected. Please modify user's details before saving.");
     } else {
       updateProgram();
     }
@@ -236,12 +227,15 @@ const ManageProgram = () => {
   const updateProgram = async () => {
     try {
       // Send the program data
-      const response = await axios.put(`/data/programs/${selectedProgram.program_id}`, 
-        {program_name: newName}, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      const response = await axios.put(
+        `/data/programs/${selectedProgram.program_id}`,
+        { program_name: newName },
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
 
       console.log("Response:", response.data);
       alert("Program updated successfully!");
@@ -252,13 +246,12 @@ const ManageProgram = () => {
           ? { ...program, program_name: newName }
           : program
       );
-  
+
       // Update the state to trigger a re-render
       setPrograms(updatedProgram);
       setFilteredProgram(updatedProgram);
 
       handleCloseModal();
-  
     } catch (error) {
       console.error("Error updating program:", error);
       if (error.response) {
@@ -272,10 +265,10 @@ const ManageProgram = () => {
         alert("Failed to update program. Please try again.");
       }
     }
-  }
+  };
 
   const handleDeleteCollege = (program) => {
-    setSelectedProgram(program)
+    setSelectedProgram(program);
 
     setDeleteModal(true);
   };
@@ -283,26 +276,26 @@ const ManageProgram = () => {
   const deleteCollege = async () => {
     try {
       // Send the college data
-      const response = await axios.delete(`/data/programs/${selectedProgram.program_id}`, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      const response = await axios.delete(
+        `/data/programs/${selectedProgram.program_id}`,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
 
       console.log("Response:", response.data);
       alert("Program deleted successfully!");
-  
+
       handleCloseModal();
       window.location.reload();
-      
     } catch (error) {
       console.error("Error deleting college:", error);
       if (error.response) {
         console.error("Error response:", error.response.data);
         alert(
-          `Failed to delete college: ${
-            "This program is currently used by the institution."
-          }`
+          `Failed to delete college: ${"This program is currently used by the institution."}`
         );
       } else {
         alert("Failed to delete college. Please try again.");
@@ -346,14 +339,14 @@ const ManageProgram = () => {
                 xs: "clamp(2rem, 3vh, 3rem)",
                 sm: "clamp(3rem, 8vh, 4rem)",
                 md: "clamp(3rem, 14vh, 4rem)",
-                lg: "clamp(4rem, 20vh, 5rem)"
+                lg: "clamp(4rem, 20vh, 5rem)",
               },
               backgroundColor: "#0A438F",
               backgroundSize: "cover",
               backgroundPosition: "center",
               display: "flex",
               alignItems: "center",
-              zIndex: 1
+              zIndex: 1,
             }}
           >
             <Box
@@ -377,8 +370,8 @@ const ManageProgram = () => {
                   transform: {
                     xs: "scale(0.8)",
                     sm: "scale(1)",
-                    md: "scale(1.2)"
-                  }
+                    md: "scale(1.2)",
+                  },
                 }}
               >
                 <ArrowBackIosIcon />
@@ -396,7 +389,7 @@ const ManageProgram = () => {
                   color: "#FFF",
                   lineHeight: 1.25,
                   alignSelf: "center",
-                  zIndex: 2
+                  zIndex: 2,
                 }}
               >
                 Manage Programs
@@ -407,7 +400,7 @@ const ManageProgram = () => {
           {/* Main content area */}
           <Box
             ml={5}
-             sx={{
+            sx={{
               flex: 1,
               padding: 3,
               overflow: "hidden",
@@ -441,7 +434,13 @@ const ManageProgram = () => {
                   >
                     Filter
                   </Typography>
-                  <Typography variant='body1' sx={{ color: "#08397C", fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" } }}>
+                  <Typography
+                    variant='body1'
+                    sx={{
+                      color: "#08397C",
+                      fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" },
+                    }}
+                  >
                     College:
                   </Typography>
                   <Box
@@ -468,16 +467,22 @@ const ManageProgram = () => {
                         key={college.college_id}
                         control={
                           <Checkbox
-                            checked={selectedCollege.includes(college.college_id)}
+                            checked={selectedCollege.includes(
+                              college.college_id
+                            )}
                             onChange={handleCollegeChange}
                             value={college.college_id}
                           />
                         }
                         label={college.college_name}
                         sx={{
-                          '& .MuiTypography-root': {
-                            fontSize: { xs: "0.5rem", md: "0.75rem", lg: "0.75rem" }
-                          }
+                          "& .MuiTypography-root": {
+                            fontSize: {
+                              xs: "0.5rem",
+                              md: "0.75rem",
+                              lg: "0.75rem",
+                            },
+                          },
                         }}
                       />
                     ))}
@@ -512,38 +517,38 @@ const ManageProgram = () => {
                         placeholder='Search program...'
                         value={searchQuery}
                         onChange={handleSearchChange}
-                        sx={{ 
+                        sx={{
                           flex: 2,
                           // Responsive font size
-                          '& .MuiInputBase-input': {
-                            fontSize: { 
-                              xs: '0.75rem',   // Mobile
-                              sm: '0.85rem',   // Small devices
-                              md: '0.9rem',    // Medium devices
-                              lg: '1rem'        // Large devices
+                          "& .MuiInputBase-input": {
+                            fontSize: {
+                              xs: "0.75rem", // Mobile
+                              sm: "0.85rem", // Small devices
+                              md: "0.9rem", // Medium devices
+                              lg: "1rem", // Large devices
                             },
                             // Adjust input height
-                            padding: { 
-                              xs: '8px 12px',   // Mobile
-                              md: '12px 14px'   // Larger screens
+                            padding: {
+                              xs: "8px 12px", // Mobile
+                              md: "12px 14px", // Larger screens
                             },
                             // Optional: adjust overall height
-                            height: { 
-                              xs: '15px',   // Mobile
-                              md: '25px'    // Larger screens
-                            }
-                          }
+                            height: {
+                              xs: "15px", // Mobile
+                              md: "25px", // Larger screens
+                            },
+                          },
                         }}
                         InputProps={{
                           startAdornment: (
                             <InputAdornment position='start'>
-                              <Search 
+                              <Search
                                 sx={{
-                                  fontSize: { 
-                                    xs: '1rem',   // Mobile
-                                    md: '1.25rem' // Larger screens
-                                  }
-                                }} 
+                                  fontSize: {
+                                    xs: "1rem", // Mobile
+                                    md: "1.25rem", // Larger screens
+                                  },
+                                }}
                               />
                             </InputAdornment>
                           ),
@@ -566,8 +571,8 @@ const ManageProgram = () => {
                           "&:hover": {
                             backgroundColor: "#A30417",
                             color: "#FFF",
-                          },        
-                        }}    
+                          },
+                        }}
                         onClick={handleOpenAddModal}
                       >
                         + Add New Program
@@ -575,88 +580,104 @@ const ManageProgram = () => {
                     </Box>
 
                     {/* Virtuoso Table */}
-                    <Box sx={{ 
-                      flex: 1,
-                      backgroundColor: "#F7F9FC",
-                      borderRadius: 1,
-                      overflow: "hidden",
-                      display: "flex",
-                      flexDirection: "column",
+                    <Box
+                      sx={{
+                        flex: 1,
+                        backgroundColor: "#F7F9FC",
+                        borderRadius: 1,
+                        overflow: "hidden",
+                        display: "flex",
+                        flexDirection: "column",
                       }}
                     >
                       {loading ? (
                         <Typography>Loading users...</Typography>
                       ) : (
                         <Box sx={{ flex: 1, overflow: "hidden" }}>
-                        <Virtuoso
-                          style={{ height: "400px" }}
-                          totalCount={filteredProgram.length}
-                          components={{
-                          Header: () => (
-                          <Box
-                              sx={{
-                              display: "flex",
-                              justifyContent: "space-between",
-                              backgroundColor: "#0A438F",
-                              color: "#FFF",
-                              padding: "10px",
-                              fontSize: { xs: "0.5rem", md: "0.75rem", lg: "0.9rem" },
-                              fontWeight: 700,
-                              position: "sticky",
-                              top: 0,
-                              zIndex: 1000,
-                              }}
-                          >
-                              <Box sx={{ flex: 1 }}>College ID</Box>
-                              <Box sx={{ flex: 1 }}>Program ID</Box>
-                              <Box sx={{ flex: 4 }}>Name</Box>
-                              <Box sx={{ flex: 1 }}>Modify</Box>
-                              <Box sx={{ flex: 1 }}>Delete</Box>
-                          </Box>
-                          ),
-                        }}
-                        itemContent={(index) => {
-                          const program = filteredProgram[index];
-                          return (
-                            <Box
-                              sx={{
-                              display: "flex",
-                              justifyContent: "space-between",
-                              padding: "0.5rem",
-                              borderBottom: "1px solid #ccc",
-                              fontSize: { xs: "0.5rem", md: "0.65rem", lg: "0.9rem" },
-                              }}
-                            >
-                              <Box sx={{ flex: 1 }}>{program.college_id}</Box>
-                              <Box sx={{ flex: 1 }}>{program.program_id}</Box>
-                              <Box sx={{ flex: 4 }}>{program.program_name}</Box>
-                              <Box sx={{ flex: 1 }}>
-                                <Button
-                                    onClick={() => handleOpenModal(program)}
+                          <Virtuoso
+                            style={{ height: "400px" }}
+                            totalCount={filteredProgram.length}
+                            components={{
+                              Header: () => (
+                                <Box
+                                  sx={{
+                                    display: "flex",
+                                    justifyContent: "space-between",
+                                    backgroundColor: "#0A438F",
+                                    color: "#FFF",
+                                    padding: "10px",
+                                    fontSize: {
+                                      xs: "0.5rem",
+                                      md: "0.75rem",
+                                      lg: "0.9rem",
+                                    },
+                                    fontWeight: 700,
+                                    position: "sticky",
+                                    top: 0,
+                                    zIndex: 1000,
+                                  }}
                                 >
-                                    <EditIcon color='primary'/>
-                                </Button>
-                              </Box>
-                              <Box sx={{ flex: 1 }}>
-                                <Button
-                                    onClick={() => handleDeleteCollege(program)}
+                                  <Box sx={{ flex: 1 }}>College ID</Box>
+                                  <Box sx={{ flex: 1 }}>Program ID</Box>
+                                  <Box sx={{ flex: 4 }}>Name</Box>
+                                  <Box sx={{ flex: 1 }}>Modify</Box>
+                                  <Box sx={{ flex: 1 }}>Delete</Box>
+                                </Box>
+                              ),
+                            }}
+                            itemContent={(index) => {
+                              const program = filteredProgram[index];
+                              return (
+                                <Box
+                                  sx={{
+                                    display: "flex",
+                                    justifyContent: "space-between",
+                                    padding: "0.5rem",
+                                    borderBottom: "1px solid #ccc",
+                                    fontSize: {
+                                      xs: "0.5rem",
+                                      md: "0.65rem",
+                                      lg: "0.9rem",
+                                    },
+                                  }}
                                 >
-                                    <DeleteIcon color='primary'/>
-                                </Button>
-                              </Box>
-                            </Box>
-                          );
-                        }}
-                        />
+                                  <Box sx={{ flex: 1 }}>
+                                    {program.college_id}
+                                  </Box>
+                                  <Box sx={{ flex: 1 }}>
+                                    {program.program_id}
+                                  </Box>
+                                  <Box sx={{ flex: 4 }}>
+                                    {program.program_name}
+                                  </Box>
+                                  <Box sx={{ flex: 1 }}>
+                                    <Button
+                                      onClick={() => handleOpenModal(program)}
+                                    >
+                                      <EditIcon color='primary' />
+                                    </Button>
+                                  </Box>
+                                  <Box sx={{ flex: 1 }}>
+                                    <Button
+                                      onClick={() =>
+                                        handleDeleteCollege(program)
+                                      }
+                                    >
+                                      <DeleteIcon color='primary' />
+                                    </Button>
+                                  </Box>
+                                </Box>
+                              );
+                            }}
+                          />
                         </Box>
-                        
                       )}
                     </Box>
                   </Box>
                 </Box>
               </Grid2>
             </Grid2>
-      
+
             {/* Add Program Modal */}
             <Modal open={addModal} onClose={handleCloseModal}>
               <Box
@@ -696,7 +717,10 @@ const ManageProgram = () => {
                     label='College'
                   >
                     {colleges.map((college) => (
-                      <MenuItem key={college.college_id} value={college.college_id}>
+                      <MenuItem
+                        key={college.college_id}
+                        value={college.college_id}
+                      >
                         {college.college_id} - {college.college_name}
                       </MenuItem>
                     ))}
@@ -715,7 +739,7 @@ const ManageProgram = () => {
                   fullWidth
                   onChange={(e) => setProgramName(e.target.value)}
                   margin='normal'
-                />    
+                />
                 <Box
                   sx={{
                     display: "flex",
@@ -771,109 +795,109 @@ const ManageProgram = () => {
 
             {/* Update College Modal */}
             {selectedProgram && (
-            <Modal open={openModal} onClose={handleCloseModal}>
-              <Box
-                sx={{
-                  position: "absolute",
-                  top: "50%",
-                  left: "50%",
-                  transform: "translate(-50%, -50%)",
-                  width: "40rem",
-                  bgcolor: "background.paper",
-                  boxShadow: 24,
-                  p: 5,
-                  borderRadius: "8px",
-                }}
-              >
-                <Typography
-                  variant='h3'
-                  color='#08397C'
-                  fontWeight='1000'
-                  mb={4}
-                  sx={{
-                    textAlign: { xs: "left", md: "bottom" },
-                    fontSize: {
-                      xs: "clamp(1rem, 2vw, 1rem)",
-                      sm: "clamp(1.5rem, 3.5vw, 1.5rem)",
-                      md: "clamp(2rem, 4vw, 2.25rem)",
-                    },
-                  }}
-                >
-                  Edit Program
-                </Typography>
-                <TextField
-                  label='College ID'
-                  value={selectedProgram.college_id}
-                  fullWidth
-                  disabled
-                  margin='normal'
-                />
-                <TextField
-                  label='Program ID'
-                  value={selectedProgram.program_id}
-                  fullWidth
-                  disabled
-                  margin='normal'
-                />
-                <TextField
-                  label='Name'
-                  value={newName}
-                  fullWidth
-                  onChange={(e) => setNewName(e.target.value)}
-                  margin='normal'
-                />  
+              <Modal open={openModal} onClose={handleCloseModal}>
                 <Box
                   sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    mt: 5,
+                    position: "absolute",
+                    top: "50%",
+                    left: "50%",
+                    transform: "translate(-50%, -50%)",
+                    width: "40rem",
+                    bgcolor: "background.paper",
+                    boxShadow: 24,
+                    p: 5,
+                    borderRadius: "8px",
                   }}
                 >
-                  <Button
-                    onClick={handleCloseModal}
+                  <Typography
+                    variant='h3'
+                    color='#08397C'
+                    fontWeight='1000'
+                    mb={4}
                     sx={{
-                      backgroundColor: "#08397C",
-                      color: "#FFF",
-                      fontFamily: "Montserrat, sans-serif",
-                      fontWeight: 600,
-                      fontSize: { xs: "0.875rem", md: "1rem" },
-                      padding: { xs: "0.5rem 1rem", md: "1.25rem" },
-                      borderRadius: "100px",
-                      maxHeight: "3rem",
-                      textTransform: "none",
-                      "&:hover": {
-                        backgroundColor: "#072d61",
+                      textAlign: { xs: "left", md: "bottom" },
+                      fontSize: {
+                        xs: "clamp(1rem, 2vw, 1rem)",
+                        sm: "clamp(1.5rem, 3.5vw, 1.5rem)",
+                        md: "clamp(2rem, 4vw, 2.25rem)",
                       },
                     }}
                   >
-                    Cancel
-                  </Button>
-                  <Button
-                    variant='contained'
-                    color='primary'
-                    onClick={handleUpdateProgram}
+                    Edit Program
+                  </Typography>
+                  <TextField
+                    label='College ID'
+                    value={selectedProgram.college_id}
+                    fullWidth
+                    disabled
+                    margin='normal'
+                  />
+                  <TextField
+                    label='Program ID'
+                    value={selectedProgram.program_id}
+                    fullWidth
+                    disabled
+                    margin='normal'
+                  />
+                  <TextField
+                    label='Name'
+                    value={newName}
+                    fullWidth
+                    onChange={(e) => setNewName(e.target.value)}
+                    margin='normal'
+                  />
+                  <Box
                     sx={{
-                      backgroundColor: "#CA031B",
-                      color: "#FFF",
-                      fontFamily: "Montserrat, sans-serif",
-                      fontWeight: 600,
-                      textTransform: "none",
-                      fontSize: { xs: "0.875rem", md: "1rem" },
-                      padding: { xs: "0.5rem 1rem", md: "1.25rem" },
-                      marginLeft: "2rem",
-                      borderRadius: "100px",
-                      maxHeight: "3rem",
-                      "&:hover": {
-                        backgroundColor: "#A30417",
+                      display: "flex",
+                      justifyContent: "space-between",
+                      mt: 5,
+                    }}
+                  >
+                    <Button
+                      onClick={handleCloseModal}
+                      sx={{
+                        backgroundColor: "#08397C",
                         color: "#FFF",
-                      },
-                    }}
-                  >
-                    Update
-                  </Button>
+                        fontFamily: "Montserrat, sans-serif",
+                        fontWeight: 600,
+                        fontSize: { xs: "0.875rem", md: "1rem" },
+                        padding: { xs: "0.5rem 1rem", md: "1.25rem" },
+                        borderRadius: "100px",
+                        maxHeight: "3rem",
+                        textTransform: "none",
+                        "&:hover": {
+                          backgroundColor: "#072d61",
+                        },
+                      }}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      variant='contained'
+                      color='primary'
+                      onClick={handleUpdateProgram}
+                      sx={{
+                        backgroundColor: "#CA031B",
+                        color: "#FFF",
+                        fontFamily: "Montserrat, sans-serif",
+                        fontWeight: 600,
+                        textTransform: "none",
+                        fontSize: { xs: "0.875rem", md: "1rem" },
+                        padding: { xs: "0.5rem 1rem", md: "1.25rem" },
+                        marginLeft: "2rem",
+                        borderRadius: "100px",
+                        maxHeight: "3rem",
+                        "&:hover": {
+                          backgroundColor: "#A30417",
+                          color: "#FFF",
+                        },
+                      }}
+                    >
+                      Update
+                    </Button>
+                  </Box>
                 </Box>
-              </Box>
-            </Modal>       
+              </Modal>
             )}
 
             {/* Delete Program Modal */}
@@ -908,17 +932,20 @@ const ManageProgram = () => {
                   >
                     Delete Program
                   </Typography>
-                  <Box display="flex" flexDirection="column">
-                    <Typography variant="h7" sx={{ mb: '1rem' }}>
-                      <strong>College ID:</strong> {selectedProgram.college_id || 'None'}
+                  <Box display='flex' flexDirection='column'>
+                    <Typography variant='h7' sx={{ mb: "1rem" }}>
+                      <strong>College ID:</strong>{" "}
+                      {selectedProgram.college_id || "None"}
                     </Typography>
-                    <Typography variant="h7" sx={{ mb: '1rem' }}>
-                      <strong>Program ID:</strong> {selectedProgram.program_id || 'None'}
+                    <Typography variant='h7' sx={{ mb: "1rem" }}>
+                      <strong>Program ID:</strong>{" "}
+                      {selectedProgram.program_id || "None"}
                     </Typography>
-                    <Typography variant="h7" sx={{ mb: '1rem' }}>
-                      <strong>Program Name:</strong> {selectedProgram.program_name || 'None'}
+                    <Typography variant='h7' sx={{ mb: "1rem" }}>
+                      <strong>Program Name:</strong>{" "}
+                      {selectedProgram.program_name || "None"}
                     </Typography>
-                  </Box>    
+                  </Box>
                   <Box
                     sx={{
                       display: "flex",
@@ -970,7 +997,7 @@ const ManageProgram = () => {
                     </Button>
                   </Box>
                 </Box>
-              </Modal>       
+              </Modal>
             )}
           </Box>
         </Box>

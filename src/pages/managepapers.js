@@ -12,16 +12,16 @@ import {
   Typography,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import Navbar from "./navbar";
-import Footer from "./footer";
+import Navbar from "../components/navbar";
+import Footer from "../components/footer";
 import homeBg from "../assets/home_bg.png";
 import { Search } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import axios from "axios";
 import { Virtuoso } from "react-virtuoso";
-import AddPaperModal from "./addpapermodal";
-import { useModalContext } from "./modalcontext";
+import AddPaperModal from "../components/addpapermodal";
+import { useModalContext } from "../context/modalcontext";
 
 const ManagePapers = () => {
   const navigate = useNavigate();
@@ -359,24 +359,24 @@ const ManagePapers = () => {
                   </Typography>
                   <Box sx={{ mb: 4 }}>
                     <Typography
-                    variant='body1'
-                    sx={{
-                      mb: 2,
-                      color: "#08397C",
-                      position: "relative",
-                      zIndex: 2,
-                    }}
-                  >
-                    Year Range:
-                  </Typography>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                      width: "100%",
-                      mt: 4,
-                    }}
+                      variant='body1'
+                      sx={{
+                        mb: 2,
+                        color: "#08397C",
+                        position: "relative",
+                        zIndex: 2,
+                      }}
+                    >
+                      Year Range:
+                    </Typography>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        width: "100%",
+                        mt: 4,
+                      }}
                     >
                       <Slider
                         value={dateRange}
@@ -401,7 +401,7 @@ const ManagePapers = () => {
                         }}
                       />
                     </Box>
-                  </Box>               
+                  </Box>
                   <Typography variant='body1' sx={{ mb: 1, color: "#08397C" }}>
                     College:
                   </Typography>

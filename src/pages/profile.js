@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import Navbar from "./navbar";
-import Footer from "./footer";
+import Navbar from "../components/navbar";
+import Footer from "../components/footer";
 import {
   Box,
   Button,
@@ -434,32 +434,32 @@ const Profile = () => {
               sx={{
                 display: "flex",
                 justifyContent: "space-between", // Pushes buttons to opposite sides
-                alignItems: "center",           // Centers buttons vertically
-                flexWrap: "wrap",               // Ensures wrapping on smaller screens
-                width: "100%",                  // Full width for responsiveness
-                maxWidth: "800px",              // Limit the max width for better layout
+                alignItems: "center", // Centers buttons vertically
+                flexWrap: "wrap", // Ensures wrapping on smaller screens
+                width: "100%", // Full width for responsiveness
+                maxWidth: "800px", // Limit the max width for better layout
                 mb: "1.5rem",
               }}
             >
               <Button
-                variant="outlined"
+                variant='outlined'
                 startIcon={<EditIcon />}
                 onClick={handleOpenChangePasswordModal}
                 sx={{
                   fontWeight: 600,
-                  flex: "0 1 auto",              // Prevents shrinking too much
-                  minWidth: "120px",             // Ensures a consistent minimum width
+                  flex: "0 1 auto", // Prevents shrinking too much
+                  minWidth: "120px", // Ensures a consistent minimum width
                 }}
               >
                 Change Password
               </Button>
               <Button
-                variant="outlined"
+                variant='outlined'
                 startIcon={<EditIcon />}
                 onClick={handleOpenModal}
                 sx={{
                   fontWeight: 600,
-                  flex: "0 1 auto",              // Same flexibility as the first button
+                  flex: "0 1 auto", // Same flexibility as the first button
                   minWidth: "120px",
                 }}
               >
@@ -523,7 +523,7 @@ const Profile = () => {
                     }}
                   >
                     <Typography
-                      variant="body1"
+                      variant='body1'
                       sx={{
                         color: "#777",
                         fontWeight: 600,
@@ -533,7 +533,7 @@ const Profile = () => {
                       {field.label}
                     </Typography>
                     <Typography
-                      variant="h6"
+                      variant='h6'
                       sx={{
                         color: "#001C43",
                         fontWeight: 600,
@@ -553,18 +553,19 @@ const Profile = () => {
                   </Grid2>
                 ))
               ) : (
-                <Typography variant="body1">Loading user data...</Typography>
+                <Typography variant='body1'>Loading user data...</Typography>
               )}
             </Grid2>
           </Box>
 
           <Modal open={isModalOpen} onClose={handleCloseModal}>
-          <Box
-            sx={{
-              ...modalStyle,
-              maxHeight: "90vh", // Limit the modal height to 90% of the viewport height
-              overflowY: "auto", // Enable vertical scrolling when content overflows
-            }}>
+            <Box
+              sx={{
+                ...modalStyle,
+                maxHeight: "90vh", // Limit the modal height to 90% of the viewport height
+                overflowY: "auto", // Enable vertical scrolling when content overflows
+              }}
+            >
               <Typography
                 variant='h4'
                 sx={{ mb: 4, fontWeight: 800, color: "#08397C" }}
@@ -732,11 +733,13 @@ const Profile = () => {
             open={isChangePasswordModalOpen}
             onClose={handleCloseChangePasswordModal}
           >
-            <Box sx={{
-              ...modalStyle,
-              maxHeight: "90vh", // Limit the modal height to 90% of the viewport height
-              overflowY: "auto", // Enable vertical scrolling when content overflows
-            }}>
+            <Box
+              sx={{
+                ...modalStyle,
+                maxHeight: "90vh", // Limit the modal height to 90% of the viewport height
+                overflowY: "auto", // Enable vertical scrolling when content overflows
+              }}
+            >
               <Typography
                 variant='h4'
                 sx={{ mb: 4, fontWeight: 800, color: "#08397C" }}

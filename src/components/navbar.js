@@ -3,7 +3,7 @@
 import MenuIcon from "@mui/icons-material/Menu";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import { isMobile } from 'react-device-detect';
+import { isMobile } from "react-device-detect";
 import {
   AppBar,
   Box,
@@ -22,14 +22,14 @@ import { useNavigate } from "react-router-dom";
 import navLogo from "../assets/MMCL_Logo_Nav.png";
 import LoginModal from "./loginmodal";
 import { useAuth } from "../context/AuthContext";
-import { useModalContext } from "./modalcontext";
-import axios from 'axios';
+import { useModalContext } from "../context/modalcontext";
+import axios from "axios";
 
 const Navbar = () => {
   const { user, logout } = useAuth();
   const theme = useTheme();
   const isLoggedIn = !!user;
-  const isSizeMobile = useMediaQuery('(max-width:600px)'); 
+  const isSizeMobile = useMediaQuery("(max-width:600px)");
 
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
@@ -148,13 +148,13 @@ const Navbar = () => {
   const handleLogout = async () => {
     try {
       const response = await axios({
-        method: 'post',
-        url: 'http://localhost:5000/auth/logout',
+        method: "post",
+        url: "http://localhost:5000/auth/logout",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem("token")}`
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
-        withCredentials: true
+        withCredentials: true,
       });
 
       if (response.status === 200) {
@@ -168,7 +168,7 @@ const Navbar = () => {
         navigate("/home", { replace: true });
       }
     } catch (error) {
-      console.error('Logout error:', error);
+      console.error("Logout error:", error);
       // Still perform logout actions even if the server request fails
       localStorage.removeItem("token");
       logout();
@@ -253,7 +253,10 @@ const Navbar = () => {
       ],
       "05": [
         // Program Administrator
-        { label: "Institutional Performance Dashboard", onClick: handleReports },
+        {
+          label: "Institutional Performance Dashboard",
+          onClick: handleReports,
+        },
         { label: "Research Tracking", onClick: handleResesearchTrack },
         ...commonItems,
       ],
@@ -523,7 +526,9 @@ const Navbar = () => {
               sx={{ "& .MuiPaper-root": { backgroundColor: "#CA031B" } }}
             >
               <MenuItem onClick={handleReports}>
-                <Typography color='common.white'>Institutional Performance Dashboard</Typography>
+                <Typography color='common.white'>
+                  Institutional Performance Dashboard
+                </Typography>
               </MenuItem>
               <MenuItem onClick={handleMainDash}>
                 <Typography color='common.white'>Analytics</Typography>

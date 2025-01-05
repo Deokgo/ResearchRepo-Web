@@ -12,7 +12,7 @@ import {
   Typography,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import Navbar from "./navbar";
+import Navbar from "../components/navbar";
 import homeBg from "../assets/home_bg.png";
 import { Search } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
@@ -243,14 +243,14 @@ const DisplayAuditLog = () => {
                 xs: "clamp(2rem, 3vh, 3rem)",
                 sm: "clamp(3rem, 8vh, 4rem)",
                 md: "clamp(3rem, 14vh, 4rem)",
-                lg: "clamp(4rem, 20vh, 5rem)"
+                lg: "clamp(4rem, 20vh, 5rem)",
               },
               backgroundColor: "#0A438F",
               backgroundSize: "cover",
               backgroundPosition: "center",
               display: "flex",
               alignItems: "center",
-              zIndex: 1
+              zIndex: 1,
             }}
           >
             <Box
@@ -274,8 +274,8 @@ const DisplayAuditLog = () => {
                   transform: {
                     xs: "scale(0.8)",
                     sm: "scale(1)",
-                    md: "scale(1.2)"
-                  }
+                    md: "scale(1.2)",
+                  },
                 }}
               >
                 <ArrowBackIosIcon />
@@ -293,7 +293,7 @@ const DisplayAuditLog = () => {
                   color: "#FFF",
                   lineHeight: 1.25,
                   alignSelf: "center",
-                  zIndex: 2
+                  zIndex: 2,
                 }}
               >
                 Audit Logs
@@ -340,7 +340,11 @@ const DisplayAuditLog = () => {
                   <Box sx={{ mb: 2 }}>
                     <Typography
                       variant='body1'
-                      sx={{ mb: 1, color: "#08397C", fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" }, }}
+                      sx={{
+                        mb: 1,
+                        color: "#08397C",
+                        fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" },
+                      }}
                     >
                       Date Range:
                     </Typography>
@@ -361,7 +365,7 @@ const DisplayAuditLog = () => {
                               : null,
                           }));
                         }}
-                        InputLabelProps={{ shrink: true}}
+                        InputLabelProps={{ shrink: true }}
                         fullWidth
                         size='small'
                       />
@@ -389,7 +393,10 @@ const DisplayAuditLog = () => {
                   </Box>
                   <Typography
                     variant='body1'
-                    sx={{ color: "#08397C", fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" },}}
+                    sx={{
+                      color: "#08397C",
+                      fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" },
+                    }}
                   >
                     Operations:
                   </Typography>
@@ -428,9 +435,13 @@ const DisplayAuditLog = () => {
                           }
                           label={operation}
                           sx={{
-                            '& .MuiTypography-root': {
-                              fontSize: { xs: "0.5rem", md: "0.75rem", lg: "0.75rem" }
-                            }
+                            "& .MuiTypography-root": {
+                              fontSize: {
+                                xs: "0.5rem",
+                                md: "0.75rem",
+                                lg: "0.75rem",
+                              },
+                            },
                           }}
                         />
                       ))
@@ -442,7 +453,10 @@ const DisplayAuditLog = () => {
                   </Box>
                   <Typography
                     variant='body1'
-                    sx={{ color: "#08397C", fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" }, }}
+                    sx={{
+                      color: "#08397C",
+                      fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" },
+                    }}
                   >
                     Roles:
                   </Typography>
@@ -476,10 +490,15 @@ const DisplayAuditLog = () => {
                               value={role}
                             />
                           }
-                          label={role}sx={{
-                            '& .MuiTypography-root': {
-                              fontSize: { xs: "0.5rem", md: "0.75rem", lg: "0.75rem" }
-                            }
+                          label={role}
+                          sx={{
+                            "& .MuiTypography-root": {
+                              fontSize: {
+                                xs: "0.5rem",
+                                md: "0.75rem",
+                                lg: "0.75rem",
+                              },
+                            },
                           }}
                         />
                       ))
@@ -520,38 +539,38 @@ const DisplayAuditLog = () => {
                         placeholder='Search by Log ID or Email User'
                         value={searchQuery}
                         onChange={handleSearchChange}
-                        sx={{ 
+                        sx={{
                           flex: 2,
                           // Responsive font size
-                          '& .MuiInputBase-input': {
-                            fontSize: { 
-                              xs: '0.75rem',   // Mobile
-                              sm: '0.85rem',   // Small devices
-                              md: '0.9rem',    // Medium devices
-                              lg: '1rem'        // Large devices
+                          "& .MuiInputBase-input": {
+                            fontSize: {
+                              xs: "0.75rem", // Mobile
+                              sm: "0.85rem", // Small devices
+                              md: "0.9rem", // Medium devices
+                              lg: "1rem", // Large devices
                             },
                             // Adjust input height
-                            padding: { 
-                              xs: '8px 12px',   // Mobile
-                              md: '12px 14px'   // Larger screens
+                            padding: {
+                              xs: "8px 12px", // Mobile
+                              md: "12px 14px", // Larger screens
                             },
                             // Optional: adjust overall height
-                            height: { 
-                              xs: '15px',   // Mobile
-                              md: '25px'    // Larger screens
-                            }
-                          }
+                            height: {
+                              xs: "15px", // Mobile
+                              md: "25px", // Larger screens
+                            },
+                          },
                         }}
                         InputProps={{
                           startAdornment: (
                             <InputAdornment position='start'>
-                              <Search 
+                              <Search
                                 sx={{
-                                  fontSize: { 
-                                    xs: '1rem',   // Mobile
-                                    md: '1.25rem' // Larger screens
-                                  }
-                                }} 
+                                  fontSize: {
+                                    xs: "1rem", // Mobile
+                                    md: "1.25rem", // Larger screens
+                                  },
+                                }}
                               />
                             </InputAdornment>
                           ),
@@ -568,11 +587,12 @@ const DisplayAuditLog = () => {
                         flexDirection: "column",
                       }}
                     >
-                      <Box sx={{ 
-                        display: "flex",
-                        flexDirection: "column",
-                        height: "100%",
-                        overflowY: "auto",
+                      <Box
+                        sx={{
+                          display: "flex",
+                          flexDirection: "column",
+                          height: "100%",
+                          overflowY: "auto",
                         }}
                       >
                         {loading ? (
@@ -584,8 +604,12 @@ const DisplayAuditLog = () => {
                               sx={{
                                 display: "flex",
                                 padding: "10px",
-                                justifyContent: 'space-between',
-                                fontSize: { xs: "0.5rem", md: "0.75rem", lg: "0.9rem" },
+                                justifyContent: "space-between",
+                                fontSize: {
+                                  xs: "0.5rem",
+                                  md: "0.75rem",
+                                  lg: "0.9rem",
+                                },
                                 backgroundColor: "#0A438F",
                                 color: "#FFF",
                                 borderBottom: "1px solid #ccc",
@@ -627,10 +651,14 @@ const DisplayAuditLog = () => {
                                     sx={{
                                       display: "flex",
                                       padding: "10px",
-                                      justifyContent: 'space-between',
-                                      fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.75rem" },
+                                      justifyContent: "space-between",
+                                      fontSize: {
+                                        xs: "0.5rem",
+                                        md: "0.5rem",
+                                        lg: "0.75rem",
+                                      },
                                       borderBottom: "1px solid #ccc",
-                                      gap: 2
+                                      gap: 2,
                                     }}
                                   >
                                     <Box sx={{ flex: 1 }}>{log.audit_log}</Box>

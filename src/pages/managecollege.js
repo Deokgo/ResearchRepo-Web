@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Navbar from "./navbar";
+import Navbar from "../components/navbar";
 import {
   Box,
   Button,
@@ -13,15 +13,15 @@ import {
   TextField,
   Typography,
   Grid2,
-  InputProps
+  InputProps,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import homeBg from "../assets/home_bg.png";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import { Circle, Search } from "@mui/icons-material";
-import EditIcon from '@mui/icons-material/Edit';
-import CircleIcon from '@mui/icons-material/Circle';
-import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from "@mui/icons-material/Edit";
+import CircleIcon from "@mui/icons-material/Circle";
+import DeleteIcon from "@mui/icons-material/Delete";
 import { Virtuoso } from "react-virtuoso";
 import axios from "axios";
 
@@ -46,20 +46,20 @@ const ManageCollege = () => {
 
   useEffect(() => {
     const fetchColleges = async () => {
-        try {
+      try {
         const response = await axios.get(`/deptprogs/college_depts`);
         const fetchColleges = response.data.colleges;
         setColleges(fetchColleges);
         setFilteredCollege(fetchColleges);
 
-        console.log(colleges)
-        } catch (error) {
-        console.error("Error fetching colleges:", error); 
-        } finally {
-            setLoading(false);
-        }
+        console.log(colleges);
+      } catch (error) {
+        console.error("Error fetching colleges:", error);
+      } finally {
+        setLoading(false);
+      }
     };
-    
+
     fetchColleges();
   }, []);
 
@@ -81,14 +81,14 @@ const ManageCollege = () => {
     setColorAttrb("#000000");
     setNewName("");
     setNewColor("");
-  }
+  };
 
   const handleOpenAddModal = () => {
     setAddModal(true);
-  }
+  };
 
   const handleCloseModal = () => {
-    setAddModal(false)
+    setAddModal(false);
     setOpenModal(false);
     setDeleteModal(false);
     setSelectedCollege(null);
@@ -130,10 +130,10 @@ const ManageCollege = () => {
       formData.append("college_id", collegeAbbrv);
       formData.append("college_name", collegeName);
 
-      if (colorAttrb !== '#000000'){
+      if (colorAttrb !== "#000000") {
         formData.append("college_color", colorAttrb);
       }
-      
+
       // Send the conference data
       const response = await axios.post("/data/colleges", formData, {
         headers: {
@@ -147,7 +147,6 @@ const ManageCollege = () => {
 
       handleCloseModal();
       window.location.reload();
-      
     } catch (error) {
       console.error("Error adding college:", error);
       if (error.response) {
@@ -161,15 +160,15 @@ const ManageCollege = () => {
         alert("Failed to add college. Please try again.");
       }
     }
-  }
+  };
 
   const handleOpenModal = (college) => {
-    setSelectedCollege(college)
+    setSelectedCollege(college);
     // Set the initial data
     setInitialData({
       college_name: college.college_name,
-      color_code: college.color_code
-    })
+      color_code: college.color_code,
+    });
     setNewName(college.college_name);
     setNewColor(college.color_code);
 
@@ -182,9 +181,7 @@ const ManageCollege = () => {
       newColor !== initialData?.color_code;
 
     if (!hasChanges) {
-      alert(
-        "No changes detected. Please modify user's details before saving."
-      );
+      alert("No changes detected. Please modify user's details before saving.");
     } else {
       updateCollege();
     }
@@ -193,13 +190,15 @@ const ManageCollege = () => {
   const updateCollege = async () => {
     try {
       // Send the college data
-      const response = await axios.put(`/data/colleges/${selectedCollege.college_id}`, 
-        {college_name: newName,
-        color_code: newColor}, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      const response = await axios.put(
+        `/data/colleges/${selectedCollege.college_id}`,
+        { college_name: newName, color_code: newColor },
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
 
       console.log("Response:", response.data);
       alert("College updated successfully!");
@@ -210,13 +209,12 @@ const ManageCollege = () => {
           ? { ...college, college_name: newName, color_code: newColor }
           : college
       );
-  
+
       // Update the state to trigger a re-render
       setColleges(updatedCollege);
       setFilteredCollege(updatedCollege);
 
       handleCloseModal();
-    
     } catch (error) {
       console.error("Error updating college:", error);
       if (error.response) {
@@ -230,10 +228,10 @@ const ManageCollege = () => {
         alert("Failed to update college. Please try again.");
       }
     }
-  }
+  };
 
   const handleDeleteCollege = (college) => {
-    setSelectedCollege(college)
+    setSelectedCollege(college);
 
     setDeleteModal(true);
   };
@@ -241,26 +239,26 @@ const ManageCollege = () => {
   const deleteCollege = async () => {
     try {
       // Send the college data
-      const response = await axios.delete(`/data/colleges/${selectedCollege.college_id}`, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      const response = await axios.delete(
+        `/data/colleges/${selectedCollege.college_id}`,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
 
       console.log("Response:", response.data);
       alert("College deleted successfully!");
-  
+
       handleCloseModal();
       window.location.reload();
-      
     } catch (error) {
       console.error("Error deleting college:", error);
       if (error.response) {
         console.error("Error response:", error.response.data);
         alert(
-          `Failed to delete college: ${
-            "This college department is currently used by the institution."
-          }`
+          `Failed to delete college: ${"This college department is currently used by the institution."}`
         );
       } else {
         alert("Failed to delete college. Please try again.");
@@ -304,14 +302,14 @@ const ManageCollege = () => {
                 xs: "clamp(2rem, 3vh, 3rem)",
                 sm: "clamp(3rem, 8vh, 4rem)",
                 md: "clamp(3rem, 14vh, 4rem)",
-                lg: "clamp(4rem, 20vh, 5rem)"
+                lg: "clamp(4rem, 20vh, 5rem)",
               },
               backgroundColor: "#0A438F",
               backgroundSize: "cover",
               backgroundPosition: "center",
               display: "flex",
               alignItems: "center",
-              zIndex: 1
+              zIndex: 1,
             }}
           >
             <Box
@@ -335,8 +333,8 @@ const ManageCollege = () => {
                   transform: {
                     xs: "scale(0.8)",
                     sm: "scale(1)",
-                    md: "scale(1.2)"
-                  }
+                    md: "scale(1.2)",
+                  },
                 }}
               >
                 <ArrowBackIosIcon />
@@ -355,7 +353,7 @@ const ManageCollege = () => {
                   color: "#FFF",
                   lineHeight: 1.25,
                   alignSelf: "center",
-                  zIndex: 2
+                  zIndex: 2,
                 }}
               >
                 Manage Colleges
@@ -387,38 +385,38 @@ const ManageCollege = () => {
                 placeholder='Search College...'
                 value={searchQuery}
                 onChange={handleSearchChange}
-                sx={{ 
+                sx={{
                   flex: 2,
                   // Responsive font size
-                  '& .MuiInputBase-input': {
-                    fontSize: { 
-                      xs: '0.75rem',   // Mobile
-                      sm: '0.85rem',   // Small devices
-                      md: '0.9rem',    // Medium devices
-                      lg: '1rem'        // Large devices
+                  "& .MuiInputBase-input": {
+                    fontSize: {
+                      xs: "0.75rem", // Mobile
+                      sm: "0.85rem", // Small devices
+                      md: "0.9rem", // Medium devices
+                      lg: "1rem", // Large devices
                     },
                     // Adjust input height
-                    padding: { 
-                      xs: '8px 12px',   // Mobile
-                      md: '12px 14px'   // Larger screens
+                    padding: {
+                      xs: "8px 12px", // Mobile
+                      md: "12px 14px", // Larger screens
                     },
                     // Optional: adjust overall height
-                    height: { 
-                      xs: '15px',   // Mobile
-                      md: '25px'    // Larger screens
-                    }
-                  }
+                    height: {
+                      xs: "15px", // Mobile
+                      md: "25px", // Larger screens
+                    },
+                  },
                 }}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position='start'>
-                      <Search 
+                      <Search
                         sx={{
-                          fontSize: { 
-                            xs: '1rem',   // Mobile
-                            md: '1.25rem' // Larger screens
-                          }
-                        }} 
+                          fontSize: {
+                            xs: "1rem", // Mobile
+                            md: "1.25rem", // Larger screens
+                          },
+                        }}
                       />
                     </InputAdornment>
                   ),
@@ -442,7 +440,7 @@ const ManageCollege = () => {
                     backgroundColor: "#A30417",
                     color: "#FFF",
                   },
-                }}    
+                }}
                 onClick={handleOpenAddModal}
               >
                 + Add New College
@@ -450,15 +448,15 @@ const ManageCollege = () => {
             </Box>
 
             {/* Virtuoso Table */}
-            <Box 
-              sx={{ 
+            <Box
+              sx={{
                 lex: 1,
                 backgroundColor: "#F7F9FC",
                 borderRadius: 1,
                 overflow: "hidden",
                 display: "flex",
-                flexDirection: "column", 
-                width: "80%" 
+                flexDirection: "column",
+                width: "80%",
               }}
             >
               {loading ? (
@@ -466,67 +464,75 @@ const ManageCollege = () => {
               ) : (
                 <Box sx={{ flex: 1, overflow: "hidden" }}>
                   <Virtuoso
-                  style={{ height: "400px" }}
-                  totalCount={filteredCollege.length}
-                  components={{
-                    Header: () => (
-                      <Box
-                        sx={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          backgroundColor: "#0A438F",
-                          fontSize: { xs: "0.5rem", md: "0.75rem", lg: "0.9rem" },
-                          color: "#FFF",
-                          padding: "10px",
-                          fontWeight: 700,
-                          position: "sticky",
-                          top: 0,
-                          zIndex: 1000,
-                        }}
-                      >
-                        <Box sx={{ flex: 1 }}>College ID</Box>
-                        <Box sx={{ flex: 2 }}>Name</Box>
-                        <Box sx={{ flex: 2 }}>Color Code</Box>
-                        <Box sx={{ flex: 1 }}>Modify</Box>
-                        <Box sx={{ flex: 1 }}>Delete</Box>
-                      </Box>
-                    ),
-                  }}
-                  itemContent={(index) => {
-                    const college = filteredCollege[index];
-                    return (
-                      <Box
-                        sx={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          padding: "0.5rem",
-                          borderBottom: "1px solid #ccc",
-                          fontSize: { xs: "0.5rem", md: "0.65rem", lg: "0.9rem" },
-                        }}
-                      >
-                        <Box sx={{ flex: 1 }}>{college.college_id}</Box>
-                        <Box sx={{ flex: 2 }}>{college.college_name}</Box>
-                        <Box sx={{ flex: 2, ml: "3rem" }}>
-                            <CircleIcon style={{ color: college.color_code }}/>
+                    style={{ height: "400px" }}
+                    totalCount={filteredCollege.length}
+                    components={{
+                      Header: () => (
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            backgroundColor: "#0A438F",
+                            fontSize: {
+                              xs: "0.5rem",
+                              md: "0.75rem",
+                              lg: "0.9rem",
+                            },
+                            color: "#FFF",
+                            padding: "10px",
+                            fontWeight: 700,
+                            position: "sticky",
+                            top: 0,
+                            zIndex: 1000,
+                          }}
+                        >
+                          <Box sx={{ flex: 1 }}>College ID</Box>
+                          <Box sx={{ flex: 2 }}>Name</Box>
+                          <Box sx={{ flex: 2 }}>Color Code</Box>
+                          <Box sx={{ flex: 1 }}>Modify</Box>
+                          <Box sx={{ flex: 1 }}>Delete</Box>
                         </Box>
-                        <Box sx={{ flex: 1 }}>
-                          <IconButton
-                            onClick={() => handleOpenModal(college)}
-                          >
-                            <EditIcon color='primary'/>
-                          </IconButton>
+                      ),
+                    }}
+                    itemContent={(index) => {
+                      const college = filteredCollege[index];
+                      return (
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            padding: "0.5rem",
+                            borderBottom: "1px solid #ccc",
+                            fontSize: {
+                              xs: "0.5rem",
+                              md: "0.65rem",
+                              lg: "0.9rem",
+                            },
+                          }}
+                        >
+                          <Box sx={{ flex: 1 }}>{college.college_id}</Box>
+                          <Box sx={{ flex: 2 }}>{college.college_name}</Box>
+                          <Box sx={{ flex: 2, ml: "3rem" }}>
+                            <CircleIcon style={{ color: college.color_code }} />
+                          </Box>
+                          <Box sx={{ flex: 1 }}>
+                            <IconButton
+                              onClick={() => handleOpenModal(college)}
+                            >
+                              <EditIcon color='primary' />
+                            </IconButton>
+                          </Box>
+                          <Box sx={{ flex: 1 }}>
+                            <IconButton
+                              onClick={() => handleDeleteCollege(college)}
+                            >
+                              <DeleteIcon color='primary' />
+                            </IconButton>
+                          </Box>
                         </Box>
-                        <Box sx={{ flex: 1 }}>
-                          <IconButton
-                            onClick={() => handleDeleteCollege(college)}
-                          >
-                            <DeleteIcon color='primary'/>
-                          </IconButton>
-                        </Box>
-                      </Box>
-                    );
-                  }}
-                />
+                      );
+                    }}
+                  />
                 </Box>
               )}
             </Box>
@@ -590,14 +596,14 @@ const ManageCollege = () => {
                   <Grid2 paddingTop='2rem' size={6}>
                     <Typography
                       variant='h6'
-                      sx={{ display:'flex', width: '50%' }}
+                      sx={{ display: "flex", width: "50%" }}
                       color='#08397C'
                       ml={4}
                     >
                       {colorAttrb}
                     </Typography>
                   </Grid2>
-                </Grid2>      
+                </Grid2>
                 <Box
                   sx={{
                     display: "flex",
@@ -711,14 +717,14 @@ const ManageCollege = () => {
                     <Grid2 paddingTop='2rem' size={6}>
                       <Typography
                         variant='h6'
-                        sx={{ display:'flex', width: '50%' }}
+                        sx={{ display: "flex", width: "50%" }}
                         color='#08397C'
                         ml={4}
                       >
                         {newColor}
                       </Typography>
                     </Grid2>
-                  </Grid2>      
+                  </Grid2>
                   <Box
                     sx={{
                       display: "flex",
@@ -770,7 +776,7 @@ const ManageCollege = () => {
                     </Button>
                   </Box>
                 </Box>
-              </Modal>       
+              </Modal>
             )}
 
             {/* Delete College Modal */}
@@ -805,32 +811,43 @@ const ManageCollege = () => {
                   >
                     Delete College
                   </Typography>
-                  <Box display="flex" flexDirection="column">
-                    <Typography variant="h7" sx={{ mb: '1rem' }}>
-                      <strong>College ID:</strong> {selectedCollege.college_id || 'None'}
+                  <Box display='flex' flexDirection='column'>
+                    <Typography variant='h7' sx={{ mb: "1rem" }}>
+                      <strong>College ID:</strong>{" "}
+                      {selectedCollege.college_id || "None"}
                     </Typography>
-                    <Typography variant="h7" sx={{ mb: '1rem' }}>
-                      <strong>College Name:</strong> {selectedCollege.college_name || 'None'}
+                    <Typography variant='h7' sx={{ mb: "1rem" }}>
+                      <strong>College Name:</strong>{" "}
+                      {selectedCollege.college_name || "None"}
                     </Typography>
-                    <Typography variant="h7" sx={{ mb: '1rem' }}>
-                      <strong>Color Code:</strong> 
-                      <Grid2 display='flex' flexDirection='row' paddingTop='1rem'>
+                    <Typography variant='h7' sx={{ mb: "1rem" }}>
+                      <strong>Color Code:</strong>
+                      <Grid2
+                        display='flex'
+                        flexDirection='row'
+                        paddingTop='1rem'
+                      >
                         <Grid2 size={6}>
-                          <CircleIcon style={{ color: selectedCollege.color_code, paddingTop: '0.35rem' }}/>
+                          <CircleIcon
+                            style={{
+                              color: selectedCollege.color_code,
+                              paddingTop: "0.35rem",
+                            }}
+                          />
                         </Grid2>
                         <Grid2 size={6}>
                           <Typography
                             variant='h6'
-                            sx={{ display:'flex', width: '50%' }}
+                            sx={{ display: "flex", width: "50%" }}
                             color='#08397C'
                             ml={4}
                           >
-                            {selectedCollege.color_code || '#000000'}
+                            {selectedCollege.color_code || "#000000"}
                           </Typography>
                         </Grid2>
                       </Grid2>
                     </Typography>
-                  </Box>    
+                  </Box>
                   <Box
                     sx={{
                       display: "flex",
@@ -882,7 +899,7 @@ const ManageCollege = () => {
                     </Button>
                   </Box>
                 </Box>
-              </Modal>       
+              </Modal>
             )}
           </Box>
         </Box>

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import Navbar from "./navbar";
-import DynamicTimeline from "./Timeline";
-import StatusUpdateButton from "./StatusUpdateButton";
+import Navbar from "../components/navbar";
+import DynamicTimeline from "../components/Timeline";
+import StatusUpdateButton from "../components/StatusUpdateButton";
 import { CircularProgress } from "@mui/material";
 import { Link } from "react-router-dom";
 import {
@@ -18,7 +18,7 @@ import {
   Modal,
   MenuItem,
   Pagination,
-  InputAdornment
+  InputAdornment,
 } from "@mui/material";
 import { Search } from "@mui/icons-material";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
@@ -28,7 +28,6 @@ import homeBg from "../assets/home_bg.png";
 import axios from "axios";
 import { Virtuoso } from "react-virtuoso";
 import { Snackbar, Alert } from "@mui/material"; // Import Snackbar and Alert from Material UI
-
 
 const UpdateTrackingInfo = ({ route, navigate }) => {
   const navpage = useNavigate();
@@ -69,28 +68,29 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
 
   const itemsPerPage = 5;
 
-///////////////////// PUBLICATION DATA RETRIEVAL //////////////////////
+  ///////////////////// PUBLICATION DATA RETRIEVAL //////////////////////
 
   // Retrives publication data from the database
   useEffect(() => {
     const fetchPublication = async () => {
       try {
         const response = await axios.get(`/track/publication/${id}`);
-        
+
         if (response.data.dataset && response.data.dataset.length > 0) {
           const fetched_data = response.data.dataset;
           console.log("Fetched publication data:", fetched_data);
 
           const initialData = {
-            publication_name : fetched_data[0].publication_name || "",
-            journal : fetched_data[0].journal || "",
-            date_published : fetched_data[0].date_published,
-            scopus : fetched_data[0].scopus || "",
-            conference_title : fetched_data[0].conference_title || "",
-            conference_venue : `${fetched_data[0].city}, ${fetched_data[0].country}` || "",
-            conference_date : fetched_data[0].conference_date || "",
+            publication_name: fetched_data[0].publication_name || "",
+            journal: fetched_data[0].journal || "",
+            date_published: fetched_data[0].date_published,
+            scopus: fetched_data[0].scopus || "",
+            conference_title: fetched_data[0].conference_title || "",
+            conference_venue:
+              `${fetched_data[0].city}, ${fetched_data[0].country}` || "",
+            conference_date: fetched_data[0].conference_date || "",
           };
-          
+
           setInitialValues(initialData);
           console.log(initialData);
 
@@ -120,9 +120,9 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
   const fetchConferenceTitles = async () => {
     try {
       const response = await axios.get(`/data/conferences`);
-      const fetchConferences = response.data.conferences
+      const fetchConferences = response.data.conferences;
       setConferences(fetchConferences);
-      setFilteredConferences(fetchConferences)
+      setFilteredConferences(fetchConferences);
     } catch (error) {
       console.error("Error fetching conference titles:", error);
     }
@@ -133,7 +133,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
     fetchConferenceTitles();
   }, []);
 
-///////////////////// RESEARCH DATA RETRIEVAL //////////////////////
+  ///////////////////// RESEARCH DATA RETRIEVAL //////////////////////
   useEffect(() => {
     if (id) {
       const fetchData = async () => {
@@ -158,7 +158,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
     }
   }, [id]);
 
-///////////////////// COUNTRY AND CITY API RETRIEVAL //////////////////////
+  ///////////////////// COUNTRY AND CITY API RETRIEVAL //////////////////////
   const fetchCountries = async () => {
     let country = await axios.get(
       "https://countriesnow.space/api/v0.1/countries"
@@ -180,8 +180,8 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
     fetchCountries();
   }, []);
 
-///////////////////// SELECTING AND ADDING CONFERENCE //////////////////////
-useEffect(() => {
+  ///////////////////// SELECTING AND ADDING CONFERENCE //////////////////////
+  useEffect(() => {
     let filtered = conferences;
 
     // Filter by Search Query
@@ -199,10 +199,7 @@ useEffect(() => {
     }
     setFilteredConferences(filtered);
     setCurrentPage(1); // Reset to the first page on filter change
-  }, [
-    searchQuery,
-    conferences,
-  ]);
+  }, [searchQuery, conferences]);
 
   // Handle change in search query
   const handleSearchChange = (e) => {
@@ -225,12 +222,12 @@ useEffect(() => {
     const venueParts = selectedVenue?.split(",") || []; // Ensure safe splitting
     const city = venueParts[0]?.trim(); // First part as city (if exists)
     const country = venueParts[1]?.trim() || venueParts[0]?.trim(); // Second part as country, fallback to the first part
-    
-    setSingleCountry(country);                                
+
+    setSingleCountry(country);
     setSingleCity(venueParts.length > 1 ? city : ""); // Set city only if it exists
 
     handleCloseModal();
-  }
+  };
 
   const handleAddConference = async () => {
     try {
@@ -239,7 +236,7 @@ useEffect(() => {
         "Conference Title": conferenceTitle,
         Country: singleCountry,
         City: singleCity,
-        "Conference Date": dateApproved
+        "Conference Date": dateApproved,
       };
 
       const missingFields = Object.entries(requiredFields)
@@ -255,9 +252,7 @@ useEffect(() => {
       const today = new Date();
       const approvedDate = new Date(dateApproved);
       if (dateApproved && approvedDate <= today) {
-        alert(
-          "Conference Date must be in the future"
-        );
+        alert("Conference Date must be in the future");
         return;
       }
 
@@ -281,20 +276,23 @@ useEffect(() => {
       formData.append("conference_date", dateApproved);
 
       // Send the conference data
-      const response = await axios.post("/conference/add_conference", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      const response = await axios.post(
+        "/conference/add_conference",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
 
       console.log("Response:", response.data);
       alert("Conference added successfully!");
       handleCloseModal();
 
       setSelectedTitle(conferenceTitle);
-      setSelectedVenue(`${singleCity}, ${singleCountry}`)
-      setSelectedDate(dateApproved)
-      
+      setSelectedVenue(`${singleCity}, ${singleCountry}`);
+      setSelectedDate(dateApproved);
     } catch (error) {
       console.error("Error adding conference:", error);
       if (error.response) {
@@ -310,11 +308,10 @@ useEffect(() => {
     }
   };
 
-///////////////////// ADD AND EDIT PUBLICATION //////////////////////
+  ///////////////////// ADD AND EDIT PUBLICATION //////////////////////
   const handleSavePublication = async () => {
-
     if (selectedVenue) {
-      const venue = selectedVenue.split(",").map(item => item.trim());
+      const venue = selectedVenue.split(",").map((item) => item.trim());
       setSingleCity(venue.length > 1 ? venue[0] : "");
       setSingleCountry(venue[1]);
     }
@@ -340,7 +337,9 @@ useEffect(() => {
           "Conference Date": selectedDate,
         };
       } else {
-        alert("Invalid indexing status. Please select either 'journal' or 'proceeding'.");
+        alert(
+          "Invalid indexing status. Please select either 'journal' or 'proceeding'."
+        );
         return;
       }
 
@@ -353,14 +352,12 @@ useEffect(() => {
         })
         .map(([key]) => key);
 
-        const approvedDate = new Date(datePublished);
-        const today = new Date();
+      const approvedDate = new Date(datePublished);
+      const today = new Date();
 
-        // Normalize both dates to midnight
-        approvedDate.setHours(0, 0, 0, 0);
-        today.setHours(0, 0, 0, 0);
-
-        
+      // Normalize both dates to midnight
+      approvedDate.setHours(0, 0, 0, 0);
+      today.setHours(0, 0, 0, 0);
 
       if (missingFields.length > 0) {
         alert(
@@ -397,7 +394,6 @@ useEffect(() => {
       handleFormCleanup();
 
       window.location.reload();
-      
     } catch (error) {
       console.error("Error adding publication:", error);
       if (error.response) {
@@ -422,12 +418,14 @@ useEffect(() => {
       indexingStatus != initialValues?.scopus ||
       selectedTitle != initialValues?.conference_title ||
       selectedDate != initialValues?.conference_date ||
-      selectedVenue != initialValues?. conference_venue;
+      selectedVenue != initialValues?.conference_venue;
 
     console.log("Initial Data:", initialValues);
 
     if (!hasChanges) {
-      alert("No changes are made. Please modify publication data before saving.");
+      alert(
+        "No changes are made. Please modify publication data before saving."
+      );
     } else {
       handleEditPublication();
     }
@@ -455,7 +453,9 @@ useEffect(() => {
           "Conference Date": selectedDate,
         };
       } else {
-        alert("Invalid indexing status. Please select either 'journal' or 'proceeding'.");
+        alert(
+          "Invalid indexing status. Please select either 'journal' or 'proceeding'."
+        );
         return;
       }
 
@@ -468,14 +468,12 @@ useEffect(() => {
         })
         .map(([key]) => key);
 
-        const approvedDate = new Date(datePublished);
-        const today = new Date();
+      const approvedDate = new Date(datePublished);
+      const today = new Date();
 
-        // Normalize both dates to midnight
-        approvedDate.setHours(0, 0, 0, 0);
-        today.setHours(0, 0, 0, 0);
-
-        
+      // Normalize both dates to midnight
+      approvedDate.setHours(0, 0, 0, 0);
+      today.setHours(0, 0, 0, 0);
 
       if (missingFields.length > 0) {
         alert(
@@ -512,7 +510,6 @@ useEffect(() => {
       handleFormCleanup();
 
       window.location.reload();
-      
     } catch (error) {
       console.error("Error updating publication:", error);
       if (error.response) {
@@ -526,12 +523,12 @@ useEffect(() => {
         alert("Failed to update publication. Please try again.");
       }
     }
-  }
+  };
 
   // Revert variables to initial values if editing cancelled
-  const toggleEdit = () =>{
-    if (isEditing){
-      setPublicationName(initialValues.publication_name)
+  const toggleEdit = () => {
+    if (isEditing) {
+      setPublicationName(initialValues.publication_name);
       setPublicationFormat(initialValues.journal);
       setDatePublished(initialValues.date_published);
       setIndexingStatus(initialValues.scopus);
@@ -542,7 +539,7 @@ useEffect(() => {
     setIsEditing(!isEditing); // Switch view state from view to edit; vice versa
   };
 
-///////////////////// TRACKING PART //////////////////////
+  ///////////////////// TRACKING PART //////////////////////
   const [status, setStatus] = useState(null);
   const [error, setError] = useState(null);
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
@@ -613,12 +610,12 @@ useEffect(() => {
     }
   };
 
-///////////////////// PRE-POST MODAL HANDLING //////////////////////
+  ///////////////////// PRE-POST MODAL HANDLING //////////////////////
   const handleResetCon = () => {
     setSelectedTitle("");
     setSelectedVenue("");
     setSelectedDate("");
-  }
+  };
 
   const handleOpenModal = () => {
     setOpenModal(true);
@@ -633,21 +630,20 @@ useEffect(() => {
   };
 
   const handleCloseModal = () => {
-    
     setSearchQuery("");
-    
-    if (!openModal){
+
+    if (!openModal) {
       setOpenModalCon(false);
     }
-    if (openModalCon){
+    if (openModalCon) {
       setOpenModal(false);
     }
 
-    if (openModalPub){
+    if (openModalPub) {
       setOpenModalPub(false);
     }
   };
-  
+
   const handleFormCleanup = () => {
     setPublicationName("");
     setPublicationFormat("");
@@ -662,31 +658,31 @@ useEffect(() => {
     setSelectedTitle("");
     setSelectedVenue("");
     setSelectedDate("");
-  }
+  };
 
   // Utility function to create responsive TextField styles
   const createTextFieldStyles = (customFlex = 2) => ({
     flex: customFlex,
-    '& .MuiInputBase-input': {
-      fontSize: { 
-        xs: '0.6em',   // Mobile
-        sm: '0.7rem',   // Small devices
-        md: '0.8rem',    // Medium devices
-        lg: '0.9rem'        // Large devices
+    "& .MuiInputBase-input": {
+      fontSize: {
+        xs: "0.6em", // Mobile
+        sm: "0.7rem", // Small devices
+        md: "0.8rem", // Medium devices
+        lg: "0.9rem", // Large devices
       },
-    }
+    },
   });
 
   // Utility function to create responsive label styles
   const createInputLabelProps = () => ({
     sx: {
-      fontSize: { 
-        xs: '0.55rem',   // Mobile
-        sm: '0.65rem',   // Small devices
-        md: '0.75rem',    // Medium devices
-        lg: '0.85rem'     // Large devices
-      }
-    }
+      fontSize: {
+        xs: "0.55rem", // Mobile
+        sm: "0.65rem", // Small devices
+        md: "0.75rem", // Medium devices
+        lg: "0.85rem", // Large devices
+      },
+    },
   });
 
   const [hasError, setHasError] = useState(false);
@@ -763,14 +759,14 @@ useEffect(() => {
                 xs: "clamp(2rem, 3vh, 3rem)",
                 sm: "clamp(3rem, 8vh, 4rem)",
                 md: "clamp(3rem, 14vh, 4rem)",
-                lg: "clamp(4rem, 20vh, 5rem)"
+                lg: "clamp(4rem, 20vh, 5rem)",
               },
               backgroundColor: "#0A438F",
               backgroundSize: "cover",
               backgroundPosition: "center",
               display: "flex",
               alignItems: "center",
-              zIndex: 1
+              zIndex: 1,
             }}
           >
             <Box
@@ -794,8 +790,8 @@ useEffect(() => {
                   transform: {
                     xs: "scale(0.8)",
                     sm: "scale(1)",
-                    md: "scale(1.2)"
-                  }
+                    md: "scale(1.2)",
+                  },
                 }}
               >
                 <ArrowBackIosIcon />
@@ -814,14 +810,13 @@ useEffect(() => {
                   color: "#FFF",
                   lineHeight: 1.25,
                   alignSelf: "center",
-                  zIndex: 2
+                  zIndex: 2,
                 }}
               >
                 Update Tracking Info
               </Typography>
             </Box>
           </Box>
-
 
           {/*Main Content */}
           <Box
@@ -865,9 +860,7 @@ useEffect(() => {
                         justifyContent: "center",
                       }}
                     >
-                      <Grid2
-                        container
-                      >
+                      <Grid2 container>
                         {data && data.dataset && data.dataset.length > 0 ? (
                           data.dataset.map((item, index) => (
                             <Box
@@ -878,55 +871,75 @@ useEffect(() => {
                                 width: "100%",
                               }}
                             >
-                              <Grid2 container display='flex' flexDirection='column' sx={{padding: 1}}>
-                              <Typography
-                                  variant="h3"
-                                  textAlign="left"
-                                  fontWeight="700"
-                                  sx={{ mb: "0.5rem", color: "#08397C", width: "90%", fontSize: {
-                                    xs: "clamp(1rem, 2vw, 1rem)",
-                                    sm: "clamp(1.5rem, 3.5vw, 1.5rem)",
-                                    md: "clamp(2rem, 4vw, 2rem)",
-                                  } }}
+                              <Grid2
+                                container
+                                display='flex'
+                                flexDirection='column'
+                                sx={{ padding: 1 }}
+                              >
+                                <Typography
+                                  variant='h3'
+                                  textAlign='left'
+                                  fontWeight='700'
+                                  sx={{
+                                    mb: "0.5rem",
+                                    color: "#08397C",
+                                    width: "90%",
+                                    fontSize: {
+                                      xs: "clamp(1rem, 2vw, 1rem)",
+                                      sm: "clamp(1.5rem, 3.5vw, 1.5rem)",
+                                      md: "clamp(2rem, 4vw, 2rem)",
+                                    },
+                                  }}
                                 >
                                   <Link
                                     to={`/displayresearchinfo/${id}`}
                                     state={{ id }}
-                                    style={{ textDecoration: "none", color: "inherit" }}
+                                    style={{
+                                      textDecoration: "none",
+                                      color: "inherit",
+                                    }}
                                   >
                                     {item.title}
-                                    </Link>
+                                  </Link>
                                 </Typography>
-                                <Typography 
-                                  variant='h7' 
-                                  sx={{ mb: "0.5rem", fontSize: {
-                                    xs: "clamp(0.7rem, 2vw, 0.7rem)",
-                                    sm: "clamp(0.8rem, 3.5vw, 0.8rem)",
-                                    md: "clamp(1rem, 4vw, 1rem)",
-                                  }, }} 
+                                <Typography
+                                  variant='h7'
+                                  sx={{
+                                    mb: "0.5rem",
+                                    fontSize: {
+                                      xs: "clamp(0.7rem, 2vw, 0.7rem)",
+                                      sm: "clamp(0.8rem, 3.5vw, 0.8rem)",
+                                      md: "clamp(1rem, 4vw, 1rem)",
+                                    },
+                                  }}
                                   alignSelf='left'
                                   fontWeight='700'
                                 >
                                   {Array.isArray(item.authors)
                                     ? item.authors
-                                        .map((author) => `${(author.name)}`)
+                                        .map((author) => `${author.name}`)
                                         .join(", ")
                                     : "No authors available"}
                                 </Typography>
                                 <Typography
-                                  variant='h7' 
-                                  sx={{ mb: "1rem", color:"#8B8B8B", fontSize: {
-                                    xs: "clamp(0.7rem, 2vw, 0.7rem)",
-                                    sm: "clamp(0.7rem, 3.5vw, 0.7rem)",
-                                    md: "clamp(0.8rem, 4vw, 0.8rem)",
-                                  }}} 
+                                  variant='h7'
+                                  sx={{
+                                    mb: "1rem",
+                                    color: "#8B8B8B",
+                                    fontSize: {
+                                      xs: "clamp(0.7rem, 2vw, 0.7rem)",
+                                      sm: "clamp(0.7rem, 3.5vw, 0.7rem)",
+                                      md: "clamp(0.8rem, 4vw, 0.8rem)",
+                                    },
+                                  }}
                                   alignSelf='left'
                                   fontWeight='500'
                                 >
                                   {item.year}
                                 </Typography>
-                              </Grid2>                              
-                              <Divider variant="left" sx={{ mb: "0.5rem"}}/>
+                              </Grid2>
+                              <Divider variant='left' sx={{ mb: "0.5rem" }} />
                             </Box>
                           ))
                         ) : (
@@ -943,27 +956,25 @@ useEffect(() => {
                         >
                           <Alert
                             onClose={dismissAlert}
-                            severity="error" // "error" severity gives a red background for the alert
+                            severity='error' // "error" severity gives a red background for the alert
                             sx={{ width: "100%" }}
                           >
                             {errorMessage}
                           </Alert>
                         </Snackbar>
                       </div>
-                      {/* Publication Part */} 
-                      <Box padding={1}>                 
-                          
+                      {/* Publication Part */}
+                      <Box padding={1}>
                         {isPaperEmpty ? (
-                          <Typography
-                            variant='h6'
-                            sx={{ color: "#d40821" }}
-                          >
+                          <Typography variant='h6' sx={{ color: "#d40821" }}>
                             No Publication Available
                           </Typography>
                         ) : (
                           <Box>
                             <Box>
-                              {pubData && pubData.dataset && pubData.dataset.length > 0 ? (
+                              {pubData &&
+                              pubData.dataset &&
+                              pubData.dataset.length > 0 ? (
                                 <Box
                                   sx={{
                                     display: "flex",
@@ -976,21 +987,48 @@ useEffect(() => {
                                 >
                                   <Grid2 display='flex' flexDirection='row'>
                                     <Grid2 size={6}>
-                                        <Typography variant="h6" color='#d40821' fontWeight="700" sx={{ mb: "1rem", fontSize: { xs: "0.8rem", md: "1rem", lg: "1.1rem" } }}>
-                                            Publication:
-                                        </Typography>
+                                      <Typography
+                                        variant='h6'
+                                        color='#d40821'
+                                        fontWeight='700'
+                                        sx={{
+                                          mb: "1rem",
+                                          fontSize: {
+                                            xs: "0.8rem",
+                                            md: "1rem",
+                                            lg: "1.1rem",
+                                          },
+                                        }}
+                                      >
+                                        Publication:
+                                      </Typography>
                                     </Grid2>
                                     <Grid2 size={6}>
-                                      {publicationFormat !== 'journal' && (
-                                        <Typography variant="h6" color='#d40821' fontWeight="700" sx={{ mb: "1rem", fontSize: { xs: "0.8rem", md: "1rem", lg: "1.1rem" } }}>
-                                            Conference:
+                                      {publicationFormat !== "journal" && (
+                                        <Typography
+                                          variant='h6'
+                                          color='#d40821'
+                                          fontWeight='700'
+                                          sx={{
+                                            mb: "1rem",
+                                            fontSize: {
+                                              xs: "0.8rem",
+                                              md: "1rem",
+                                              lg: "1.1rem",
+                                            },
+                                          }}
+                                        >
+                                          Conference:
                                         </Typography>
                                       )}
                                     </Grid2>
                                   </Grid2>
                                   <Grid2 display='flex' flexDirection='row'>
                                     <Grid2 size={6}>
-                                      <Grid2 item sx={{ mb: "1rem", mr: "3rem"}}>
+                                      <Grid2
+                                        item
+                                        sx={{ mb: "1rem", mr: "3rem" }}
+                                      >
                                         {isEditing ? (
                                           <TextField
                                             fullWidth
@@ -998,126 +1036,282 @@ useEffect(() => {
                                             name='publicationName'
                                             value={publicationName || "None"}
                                             variant='outlined'
-                                            onChange={(e) => setPublicationName(e.target.value)}
+                                            onChange={(e) =>
+                                              setPublicationName(e.target.value)
+                                            }
                                             sx={createTextFieldStyles()}
                                             InputLabelProps={createInputLabelProps()}
-                                            />
-                                          ) : (
-                                            <Typography variant="h7" sx={{ mb: "1rem", fontSize: { xs: "0.7rem", md: "0.8rem", lg: "0.9rem" } }}>
-                                                <strong>Publication Name:</strong> {publicationName || "None"}
-                                            </Typography>
-                                          )}
+                                          />
+                                        ) : (
+                                          <Typography
+                                            variant='h7'
+                                            sx={{
+                                              mb: "1rem",
+                                              fontSize: {
+                                                xs: "0.7rem",
+                                                md: "0.8rem",
+                                                lg: "0.9rem",
+                                              },
+                                            }}
+                                          >
+                                            <strong>Publication Name:</strong>{" "}
+                                            {publicationName || "None"}
+                                          </Typography>
+                                        )}
                                       </Grid2>
-                                      <Grid2 item sx={{ mb: "1rem", mr: "3rem"}}>
+                                      <Grid2
+                                        item
+                                        sx={{ mb: "1rem", mr: "3rem" }}
+                                      >
                                         {isEditing ? (
                                           <TextField
                                             fullWidth
                                             label='Date Published'
                                             name='date_published'
-                                            type="date"
-                                            value={datePublished ? new Date(datePublished).toLocaleDateString('en-CA') : ''}
+                                            type='date'
+                                            value={
+                                              datePublished
+                                                ? new Date(
+                                                    datePublished
+                                                  ).toLocaleDateString("en-CA")
+                                                : ""
+                                            }
                                             variant='outlined'
                                             sx={createTextFieldStyles()}
                                             InputLabelProps={{
                                               ...createInputLabelProps(),
-                                              shrink: true
+                                              shrink: true,
                                             }}
-                                            onChange={(e) => setDatePublished(e.target.value)}
-                                            />
-                                          ) : (
-                                            <Typography variant="h7" sx={{ mb: "1rem", fontSize: { xs: "0.7rem", md: "0.8rem", lg: "0.9rem" } }}>
-                                                <strong>Date Published:</strong> {datePublished || "None"}
-                                            </Typography>
-                                          )}
+                                            onChange={(e) =>
+                                              setDatePublished(e.target.value)
+                                            }
+                                          />
+                                        ) : (
+                                          <Typography
+                                            variant='h7'
+                                            sx={{
+                                              mb: "1rem",
+                                              fontSize: {
+                                                xs: "0.7rem",
+                                                md: "0.8rem",
+                                                lg: "0.9rem",
+                                              },
+                                            }}
+                                          >
+                                            <strong>Date Published:</strong>{" "}
+                                            {datePublished || "None"}
+                                          </Typography>
+                                        )}
                                       </Grid2>
-                                      <Grid2 item sx={{ mb: "1rem", mr: "3rem" }}>
+                                      <Grid2
+                                        item
+                                        sx={{ mb: "1rem", mr: "3rem" }}
+                                      >
                                         {isEditing ? (
-                                          <FormControl fullWidth variant='outlined'>
-                                            <InputLabel sx={{fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }}}>Format</InputLabel>
-                                              <Select
-                                                label='Format'
-                                                sx={createTextFieldStyles()}
-                                                value={publicationFormat || ''}
-                                                onChange={(e) => setPublicationFormat(e.target.value)}
-                                              >
-                                                <MenuItem value='journal'>Journal</MenuItem>
-                                                <MenuItem value='proceeding'>Proceeding</MenuItem>
-                                              </Select>
+                                          <FormControl
+                                            fullWidth
+                                            variant='outlined'
+                                          >
+                                            <InputLabel
+                                              sx={{
+                                                fontSize: {
+                                                  xs: "0.75rem",
+                                                  md: "0.75rem",
+                                                  lg: "0.8rem",
+                                                },
+                                              }}
+                                            >
+                                              Format
+                                            </InputLabel>
+                                            <Select
+                                              label='Format'
+                                              sx={createTextFieldStyles()}
+                                              value={publicationFormat || ""}
+                                              onChange={(e) =>
+                                                setPublicationFormat(
+                                                  e.target.value
+                                                )
+                                              }
+                                            >
+                                              <MenuItem value='journal'>
+                                                Journal
+                                              </MenuItem>
+                                              <MenuItem value='proceeding'>
+                                                Proceeding
+                                              </MenuItem>
+                                            </Select>
                                           </FormControl>
                                         ) : (
-                                          <Typography variant="h7" sx={{ mb: "1rem", fontSize: { xs: "0.7rem", md: "0.8rem", lg: "0.9rem" } }}>
+                                          <Typography
+                                            variant='h7'
+                                            sx={{
+                                              mb: "1rem",
+                                              fontSize: {
+                                                xs: "0.7rem",
+                                                md: "0.8rem",
+                                                lg: "0.9rem",
+                                              },
+                                            }}
+                                          >
                                             <strong>Format:</strong>{" "}
-                                            {publicationFormat 
-                                              ? publicationFormat.charAt(0).toUpperCase() + publicationFormat.slice(1).toLowerCase() 
+                                            {publicationFormat
+                                              ? publicationFormat
+                                                  .charAt(0)
+                                                  .toUpperCase() +
+                                                publicationFormat
+                                                  .slice(1)
+                                                  .toLowerCase()
                                               : "None"}
                                           </Typography>
                                         )}
-                                        
                                       </Grid2>
-                                      <Grid2 item sx={{ mb: "1rem", mr: "3rem" }}>
-                                      {isEditing ? (
-                                        <FormControl fullWidth variant='outlined' >
-                                          <InputLabel sx={{fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }}}>Indexing Status</InputLabel>
+                                      <Grid2
+                                        item
+                                        sx={{ mb: "1rem", mr: "3rem" }}
+                                      >
+                                        {isEditing ? (
+                                          <FormControl
+                                            fullWidth
+                                            variant='outlined'
+                                          >
+                                            <InputLabel
+                                              sx={{
+                                                fontSize: {
+                                                  xs: "0.75rem",
+                                                  md: "0.75rem",
+                                                  lg: "0.8rem",
+                                                },
+                                              }}
+                                            >
+                                              Indexing Status
+                                            </InputLabel>
                                             <Select
                                               label='Indexing Status'
                                               sx={createTextFieldStyles()}
-                                              value={indexingStatus || ''}
-                                              onChange={(e) => setIndexingStatus(e.target.value)}
+                                              value={indexingStatus || ""}
+                                              onChange={(e) =>
+                                                setIndexingStatus(
+                                                  e.target.value
+                                                )
+                                              }
                                             >
-                                              <MenuItem value='SCOPUS'>Scopus</MenuItem>
-                                              <MenuItem value='NON-SCOPUS'>Non-Scopus</MenuItem>
+                                              <MenuItem value='SCOPUS'>
+                                                Scopus
+                                              </MenuItem>
+                                              <MenuItem value='NON-SCOPUS'>
+                                                Non-Scopus
+                                              </MenuItem>
                                             </Select>
-                                        </FormControl>
+                                          </FormControl>
                                         ) : (
-                                          <Typography variant="h7" sx={{ mb: "1rem", fontSize: { xs: "0.7rem", md: "0.8rem", lg: "0.9rem" } }}>
+                                          <Typography
+                                            variant='h7'
+                                            sx={{
+                                              mb: "1rem",
+                                              fontSize: {
+                                                xs: "0.7rem",
+                                                md: "0.8rem",
+                                                lg: "0.9rem",
+                                              },
+                                            }}
+                                          >
                                             <strong>Indexing Status:</strong>{" "}
-                                            {indexingStatus 
-                                              ? indexingStatus.charAt(0).toUpperCase() + indexingStatus.slice(1).toLowerCase() 
+                                            {indexingStatus
+                                              ? indexingStatus
+                                                  .charAt(0)
+                                                  .toUpperCase() +
+                                                indexingStatus
+                                                  .slice(1)
+                                                  .toLowerCase()
                                               : "None"}
                                           </Typography>
-                                        )} 
+                                        )}
                                       </Grid2>
                                     </Grid2>
 
-                                    {publicationFormat !== 'journal' && (
+                                    {publicationFormat !== "journal" && (
                                       <Grid2 size={6}>
-                                        <Grid2 item sx={{ mb: '1rem', mr: '2rem' }}>
+                                        <Grid2
+                                          item
+                                          sx={{ mb: "1rem", mr: "2rem" }}
+                                        >
                                           {isEditing ? (
-                                            <Box display="flex" flexDirection="column">
-                                              <Typography variant="h7" sx={{ mb: '1rem', fontSize: { xs: "0.7rem", md: "0.8rem", lg: "0.9rem" } }}>
-                                                <strong>Title:</strong> {selectedTitle || 'None'}
+                                            <Box
+                                              display='flex'
+                                              flexDirection='column'
+                                            >
+                                              <Typography
+                                                variant='h7'
+                                                sx={{
+                                                  mb: "1rem",
+                                                  fontSize: {
+                                                    xs: "0.7rem",
+                                                    md: "0.8rem",
+                                                    lg: "0.9rem",
+                                                  },
+                                                }}
+                                              >
+                                                <strong>Title:</strong>{" "}
+                                                {selectedTitle || "None"}
                                               </Typography>
-                                              <Typography variant="h7" sx={{ mb: '1rem', fontSize: { xs: "0.7rem", md: "0.8rem", lg: "0.9rem" } }}>
-                                                <strong>Date:</strong> {selectedDate || 'None'}
+                                              <Typography
+                                                variant='h7'
+                                                sx={{
+                                                  mb: "1rem",
+                                                  fontSize: {
+                                                    xs: "0.7rem",
+                                                    md: "0.8rem",
+                                                    lg: "0.9rem",
+                                                  },
+                                                }}
+                                              >
+                                                <strong>Date:</strong>{" "}
+                                                {selectedDate || "None"}
                                               </Typography>
-                                              <Typography variant="h7" sx={{ mb: '1rem', fontSize: { xs: "0.7rem", md: "0.8rem", lg: "0.9rem" } }}>
-                                                <strong>Venue:</strong> {selectedVenue || 'None'}
+                                              <Typography
+                                                variant='h7'
+                                                sx={{
+                                                  mb: "1rem",
+                                                  fontSize: {
+                                                    xs: "0.7rem",
+                                                    md: "0.8rem",
+                                                    lg: "0.9rem",
+                                                  },
+                                                }}
+                                              >
+                                                <strong>Venue:</strong>{" "}
+                                                {selectedVenue || "None"}
                                               </Typography>
                                               <Box
                                                 sx={{
-                                                  display: 'flex',
-                                                  alignItems: 'center',
-                                                  border: '1px dashed #0A438F',
+                                                  display: "flex",
+                                                  alignItems: "center",
+                                                  border: "1px dashed #0A438F",
                                                   borderRadius: 1,
                                                   m: 0.5,
-                                                  cursor: 'pointer',
-                                                  justifyContent: 'center',
+                                                  cursor: "pointer",
+                                                  justifyContent: "center",
                                                   gap: 2,
                                                 }}
                                               >
                                                 <Button
-                                                  variant="text"
-                                                  color="primary"
+                                                  variant='text'
+                                                  color='primary'
                                                   sx={{
-                                                    color: '#08397C',
-                                                    fontFamily: 'Montserrat, sans-serif',
+                                                    color: "#08397C",
+                                                    fontFamily:
+                                                      "Montserrat, sans-serif",
                                                     fontWeight: 600,
-                                                    textTransform: 'none',
-                                                    fontSize: { xs: "0.5rem", md: "0.65rem", lg: "0.8rem" },
-                                                    alignSelf: 'center',
-                                                    maxHeight: '2rem',
-                                                    '&:hover': {
-                                                      color: '#052045',
+                                                    textTransform: "none",
+                                                    fontSize: {
+                                                      xs: "0.5rem",
+                                                      md: "0.65rem",
+                                                      lg: "0.8rem",
+                                                    },
+                                                    alignSelf: "center",
+                                                    maxHeight: "2rem",
+                                                    "&:hover": {
+                                                      color: "#052045",
                                                     },
                                                   }}
                                                   onClick={handleOpenModalCon}
@@ -1127,30 +1321,35 @@ useEffect(() => {
                                               </Box>
                                               <Box
                                                 sx={{
-                                                  display: 'flex',
-                                                  alignItems: 'center',
-                                                  border: '1px dashed #0A438F',
+                                                  display: "flex",
+                                                  alignItems: "center",
+                                                  border: "1px dashed #0A438F",
                                                   borderRadius: 1,
                                                   m: 0.5,
-                                                  cursor: 'pointer',
-                                                  justifyContent: 'center',
+                                                  cursor: "pointer",
+                                                  justifyContent: "center",
                                                   gap: 2,
                                                 }}
                                               >
                                                 <Button
-                                                  variant="text"
-                                                  color="primary"
+                                                  variant='text'
+                                                  color='primary'
                                                   sx={{
-                                                    width: '100%',
-                                                    color: '#08397C',
-                                                    fontFamily: 'Montserrat, sans-serif',
+                                                    width: "100%",
+                                                    color: "#08397C",
+                                                    fontFamily:
+                                                      "Montserrat, sans-serif",
                                                     fontWeight: 600,
-                                                    textTransform: 'none',
-                                                    fontSize: { xs: "0.5rem", md: "0.65rem", lg: "0.8rem" },
-                                                    alignSelf: 'center',
-                                                    maxHeight: '2rem',
-                                                    '&:hover': {
-                                                      color: '#052045',
+                                                    textTransform: "none",
+                                                    fontSize: {
+                                                      xs: "0.5rem",
+                                                      md: "0.65rem",
+                                                      lg: "0.8rem",
+                                                    },
+                                                    alignSelf: "center",
+                                                    maxHeight: "2rem",
+                                                    "&:hover": {
+                                                      color: "#052045",
                                                     },
                                                   }}
                                                   onClick={handleOpenModal}
@@ -1160,30 +1359,35 @@ useEffect(() => {
                                               </Box>
                                               <Box
                                                 sx={{
-                                                  display: 'flex',
-                                                  alignItems: 'center',
-                                                  border: '1px dashed #CA031B',
+                                                  display: "flex",
+                                                  alignItems: "center",
+                                                  border: "1px dashed #CA031B",
                                                   borderRadius: 1,
                                                   m: 0.5,
-                                                  cursor: 'pointer',
-                                                  justifyContent: 'center',
+                                                  cursor: "pointer",
+                                                  justifyContent: "center",
                                                   gap: 2,
                                                 }}
                                               >
                                                 <Button
-                                                  variant="text"
-                                                  color="primary"
+                                                  variant='text'
+                                                  color='primary'
                                                   sx={{
-                                                    width: '100%',
-                                                    color: '#CA031B',
-                                                    fontFamily: 'Montserrat, sans-serif',
+                                                    width: "100%",
+                                                    color: "#CA031B",
+                                                    fontFamily:
+                                                      "Montserrat, sans-serif",
                                                     fontWeight: 600,
-                                                    textTransform: 'none',
-                                                    fontSize: { xs: "0.5rem", md: "0.65rem", lg: "0.8rem" },
-                                                    alignSelf: 'center',
-                                                    maxHeight: '2rem',
-                                                    '&:hover': {
-                                                      color: '#A30417',
+                                                    textTransform: "none",
+                                                    fontSize: {
+                                                      xs: "0.5rem",
+                                                      md: "0.65rem",
+                                                      lg: "0.8rem",
+                                                    },
+                                                    alignSelf: "center",
+                                                    maxHeight: "2rem",
+                                                    "&:hover": {
+                                                      color: "#A30417",
                                                     },
                                                   }}
                                                   onClick={handleResetCon}
@@ -1193,15 +1397,51 @@ useEffect(() => {
                                               </Box>
                                             </Box>
                                           ) : (
-                                            <Box display="flex" flexDirection="column">
-                                              <Typography variant="h7" sx={{ mb: '1rem', fontSize: { xs: "0.7rem", md: "0.8rem", lg: "0.9rem" } }}>
-                                                <strong>Title:</strong> {selectedTitle || 'None'}
+                                            <Box
+                                              display='flex'
+                                              flexDirection='column'
+                                            >
+                                              <Typography
+                                                variant='h7'
+                                                sx={{
+                                                  mb: "1rem",
+                                                  fontSize: {
+                                                    xs: "0.7rem",
+                                                    md: "0.8rem",
+                                                    lg: "0.9rem",
+                                                  },
+                                                }}
+                                              >
+                                                <strong>Title:</strong>{" "}
+                                                {selectedTitle || "None"}
                                               </Typography>
-                                              <Typography variant="h7" sx={{ mb: '1rem', fontSize: { xs: "0.7rem", md: "0.8rem", lg: "0.9rem" } }}>
-                                                <strong>Date:</strong> {selectedDate || 'None'}
+                                              <Typography
+                                                variant='h7'
+                                                sx={{
+                                                  mb: "1rem",
+                                                  fontSize: {
+                                                    xs: "0.7rem",
+                                                    md: "0.8rem",
+                                                    lg: "0.9rem",
+                                                  },
+                                                }}
+                                              >
+                                                <strong>Date:</strong>{" "}
+                                                {selectedDate || "None"}
                                               </Typography>
-                                              <Typography variant="h7" sx={{ mb: '1rem', fontSize: { xs: "0.7rem", md: "0.8rem", lg: "0.9rem" } }}>
-                                                <strong>Venue:</strong> {selectedVenue || 'None'}
+                                              <Typography
+                                                variant='h7'
+                                                sx={{
+                                                  mb: "1rem",
+                                                  fontSize: {
+                                                    xs: "0.7rem",
+                                                    md: "0.8rem",
+                                                    lg: "0.9rem",
+                                                  },
+                                                }}
+                                              >
+                                                <strong>Venue:</strong>{" "}
+                                                {selectedVenue || "None"}
                                               </Typography>
                                             </Box>
                                           )}
@@ -1213,7 +1453,7 @@ useEffect(() => {
                                     sx={{
                                       display: "flex",
                                       alignItems: "flex-start",
-                                      gap: 3
+                                      gap: 3,
                                     }}
                                   >
                                     <Button
@@ -1225,10 +1465,14 @@ useEffect(() => {
                                         fontFamily: "Montserrat, sans-serif",
                                         fontWeight: 600,
                                         textTransform: "none",
-                                        fontSize: { xs: "0.55rem", md: "0.75rem", lg: "0.9rem" },
-                                        marginTop: '1rem',
-                                        paddingLeft: '1.5rem',
-                                        paddingRight: '1.5rem',
+                                        fontSize: {
+                                          xs: "0.55rem",
+                                          md: "0.75rem",
+                                          lg: "0.9rem",
+                                        },
+                                        marginTop: "1rem",
+                                        paddingLeft: "1.5rem",
+                                        paddingRight: "1.5rem",
                                         borderRadius: "100px",
                                         maxHeight: "3rem",
                                         "&:hover": {
@@ -1251,10 +1495,14 @@ useEffect(() => {
                                           fontFamily: "Montserrat, sans-serif",
                                           fontWeight: 600,
                                           textTransform: "none",
-                                          fontSize: { xs: "0.55rem", md: "0.75rem", lg: "0.9rem" },
-                                          marginTop: '1rem',
-                                          paddingLeft: '1.5rem',
-                                          paddingRight: '1.5rem',
+                                          fontSize: {
+                                            xs: "0.55rem",
+                                            md: "0.75rem",
+                                            lg: "0.9rem",
+                                          },
+                                          marginTop: "1rem",
+                                          paddingLeft: "1.5rem",
+                                          paddingRight: "1.5rem",
                                           borderRadius: "100px",
                                           maxHeight: "3rem",
                                           "&:hover": {
@@ -1267,105 +1515,238 @@ useEffect(() => {
                                       </Button>
                                     )}
                                   </Box>
-                                </Box>                       
+                                </Box>
                               ) : (
-                                <Box display='flex' flexDirection='column' justifyContent='center'>
-                                  <Typography variant="h6" color='#d40821' fontWeight="700" sx={{fontSize: { xs: "0.8rem", md: "1rem", lg: "1.1rem" }}}>
-                                      Publication:
+                                <Box
+                                  display='flex'
+                                  flexDirection='column'
+                                  justifyContent='center'
+                                >
+                                  <Typography
+                                    variant='h6'
+                                    color='#d40821'
+                                    fontWeight='700'
+                                    sx={{
+                                      fontSize: {
+                                        xs: "0.8rem",
+                                        md: "1rem",
+                                        lg: "1.1rem",
+                                      },
+                                    }}
+                                  >
+                                    Publication:
                                   </Typography>
-                                  <Grid2 display='flex' flexDirection='column' padding='1rem'>
-                                    <Typography variant="h7" sx={{ mb: "1rem", fontSize: { xs: "0.7rem", md: "0.8rem", lg: "0.9rem" } }}>
-                                        <strong>Name:</strong> {publicationName || "None"}
+                                  <Grid2
+                                    display='flex'
+                                    flexDirection='column'
+                                    padding='1rem'
+                                  >
+                                    <Typography
+                                      variant='h7'
+                                      sx={{
+                                        mb: "1rem",
+                                        fontSize: {
+                                          xs: "0.7rem",
+                                          md: "0.8rem",
+                                          lg: "0.9rem",
+                                        },
+                                      }}
+                                    >
+                                      <strong>Name:</strong>{" "}
+                                      {publicationName || "None"}
                                     </Typography>
-                                    <Typography variant="h7" sx={{ mb: "1rem", fontSize: { xs: "0.7rem", md: "0.8rem", lg: "0.9rem" }  }}>
-                                        <strong>Format:</strong> {publicationFormat || "None"}
+                                    <Typography
+                                      variant='h7'
+                                      sx={{
+                                        mb: "1rem",
+                                        fontSize: {
+                                          xs: "0.7rem",
+                                          md: "0.8rem",
+                                          lg: "0.9rem",
+                                        },
+                                      }}
+                                    >
+                                      <strong>Format:</strong>{" "}
+                                      {publicationFormat || "None"}
                                     </Typography>
-                                    <Typography variant="h7" sx={{ mb: "1rem", fontSize: { xs: "0.7rem", md: "0.8rem", lg: "0.9rem" }  }}>
-                                        <strong>Date:</strong> {datePublished || "None"}
+                                    <Typography
+                                      variant='h7'
+                                      sx={{
+                                        mb: "1rem",
+                                        fontSize: {
+                                          xs: "0.7rem",
+                                          md: "0.8rem",
+                                          lg: "0.9rem",
+                                        },
+                                      }}
+                                    >
+                                      <strong>Date:</strong>{" "}
+                                      {datePublished || "None"}
                                     </Typography>
-                                    <Typography variant="h7" sx={{fontSize: { xs: "0.7rem", md: "0.8rem", lg: "0.9rem" } }}>
-                                        <strong>Indexing Status:</strong> {indexingStatus || "None"}
+                                    <Typography
+                                      variant='h7'
+                                      sx={{
+                                        fontSize: {
+                                          xs: "0.7rem",
+                                          md: "0.8rem",
+                                          lg: "0.9rem",
+                                        },
+                                      }}
+                                    >
+                                      <strong>Indexing Status:</strong>{" "}
+                                      {indexingStatus || "None"}
                                     </Typography>
                                   </Grid2>
-                                  <Grid2 container size={4} justifyContent='flex-start' margin="1rem">
-                                      <Box
+                                  <Grid2
+                                    container
+                                    size={4}
+                                    justifyContent='flex-start'
+                                    margin='1rem'
+                                  >
+                                    <Box
+                                      sx={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        border: "1px dashed #0A438F",
+                                        borderRadius: 1,
+                                        cursor: "pointer",
+                                        justifyContent: "center",
+                                        gap: 2,
+                                      }}
+                                    >
+                                      <Button
+                                        variant='text'
+                                        color='primary'
                                         sx={{
-                                          display: 'flex',
-                                          alignItems: 'center',
-                                          border: '1px dashed #0A438F',
-                                          borderRadius: 1,
-                                          cursor: 'pointer',
-                                          justifyContent: 'center',
-                                          gap: 2,
+                                          width: "100%",
+                                          color: "#08397C",
+                                          fontFamily: "Montserrat, sans-serif",
+                                          fontWeight: 600,
+                                          textTransform: "none",
+                                          fontSize: {
+                                            xs: "0.7rem",
+                                            md: "0.8rem",
+                                            lg: "0.9rem",
+                                          },
+                                          padding: "1rem",
+                                          alignSelf: "center",
+                                          maxHeight: "2rem",
+                                          "&:hover": {
+                                            color: "#052045",
+                                          },
                                         }}
+                                        onClick={handleOpenModalPub}
                                       >
-                                        <Button
-                                          variant="text"
-                                          color="primary"
-                                          sx={{
-                                            width: '100%',
-                                            color: '#08397C',
-                                            fontFamily: 'Montserrat, sans-serif',
-                                            fontWeight: 600,
-                                            textTransform: 'none',
-                                            fontSize: { xs: "0.7rem", md: "0.8rem", lg: "0.9rem" },
-                                            padding: '1rem',
-                                            alignSelf: 'center',
-                                            maxHeight: '2rem',
-                                            '&:hover': {
-                                              color: '#052045',
-                                            },
-                                          }}
-                                          onClick={handleOpenModalPub}
-                                        >
-                                          + Add Publication
+                                        + Add Publication
                                       </Button>
                                     </Box>
                                   </Grid2>
-                                  <Divider orientation='horizontal' flexItem  sx={{mt: "1rem", mb: "1rem"}}/>
+                                  <Divider
+                                    orientation='horizontal'
+                                    flexItem
+                                    sx={{ mt: "1rem", mb: "1rem" }}
+                                  />
                                   {publicationFormat === "proceeding" && ( // Render only if the selected type is not "Journal"
                                     <>
-                                      <Typography variant="h6" color='#d40821' fontWeight="700" sx={{fontSize: { xs: "0.8rem", md: "1rem", lg: "1.1rem" }}}>
+                                      <Typography
+                                        variant='h6'
+                                        color='#d40821'
+                                        fontWeight='700'
+                                        sx={{
+                                          fontSize: {
+                                            xs: "0.8rem",
+                                            md: "1rem",
+                                            lg: "1.1rem",
+                                          },
+                                        }}
+                                      >
                                         Conference:
                                       </Typography>
-                                      <Grid2 display='flex' flexDirection='column' padding='1rem'>
-                                        <Typography variant="h7" sx={{ mb: "1rem", fontSize: { xs: "0.7rem", md: "0.8rem", lg: "0.9rem" } }}>
-                                          <strong>Title:</strong> {selectedTitle || "None"}
+                                      <Grid2
+                                        display='flex'
+                                        flexDirection='column'
+                                        padding='1rem'
+                                      >
+                                        <Typography
+                                          variant='h7'
+                                          sx={{
+                                            mb: "1rem",
+                                            fontSize: {
+                                              xs: "0.7rem",
+                                              md: "0.8rem",
+                                              lg: "0.9rem",
+                                            },
+                                          }}
+                                        >
+                                          <strong>Title:</strong>{" "}
+                                          {selectedTitle || "None"}
                                         </Typography>
-                                        <Typography variant="h7" sx={{ mb: "1rem", fontSize: { xs: "0.7rem", md: "0.8rem", lg: "0.9rem" } }}>
-                                          <strong>Venue:</strong> {selectedVenue || "None"}
+                                        <Typography
+                                          variant='h7'
+                                          sx={{
+                                            mb: "1rem",
+                                            fontSize: {
+                                              xs: "0.7rem",
+                                              md: "0.8rem",
+                                              lg: "0.9rem",
+                                            },
+                                          }}
+                                        >
+                                          <strong>Venue:</strong>{" "}
+                                          {selectedVenue || "None"}
                                         </Typography>
-                                        <Typography variant="h7" sx={{ mb: "1rem", fontSize: { xs: "0.7rem", md: "0.8rem", lg: "0.9rem" } }}>
-                                          <strong>Date:</strong> {selectedDate || "None"}
+                                        <Typography
+                                          variant='h7'
+                                          sx={{
+                                            mb: "1rem",
+                                            fontSize: {
+                                              xs: "0.7rem",
+                                              md: "0.8rem",
+                                              lg: "0.9rem",
+                                            },
+                                          }}
+                                        >
+                                          <strong>Date:</strong>{" "}
+                                          {selectedDate || "None"}
                                         </Typography>
                                       </Grid2>
-                                      <Grid2 display='flex' paddingLeft='1rem' justifyContent='flex-start' gap={3}>
+                                      <Grid2
+                                        display='flex'
+                                        paddingLeft='1rem'
+                                        justifyContent='flex-start'
+                                        gap={3}
+                                      >
                                         <Box
                                           sx={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            border: '1px dashed #0A438F',
+                                            display: "flex",
+                                            alignItems: "center",
+                                            border: "1px dashed #0A438F",
                                             borderRadius: 1,
-                                            cursor: 'pointer',
-                                            justifyContent: 'center',
+                                            cursor: "pointer",
+                                            justifyContent: "center",
                                             gap: 2,
                                           }}
                                         >
                                           <Button
-                                            variant="text"
-                                            color="primary"
+                                            variant='text'
+                                            color='primary'
                                             sx={{
-                                              width: '100%',
-                                              color: '#08397C',
-                                              fontFamily: 'Montserrat, sans-serif',
+                                              width: "100%",
+                                              color: "#08397C",
+                                              fontFamily:
+                                                "Montserrat, sans-serif",
                                               fontWeight: 600,
-                                              textTransform: 'none',
-                                              fontSize: { xs: "0.6rem", md: "0.7rem", lg: "0.9rem" },
-                                              padding: '1rem',
-                                              alignSelf: 'center',
-                                              maxHeight: '2rem',
-                                              '&:hover': {
-                                                color: '#052045',
+                                              textTransform: "none",
+                                              fontSize: {
+                                                xs: "0.6rem",
+                                                md: "0.7rem",
+                                                lg: "0.9rem",
+                                              },
+                                              padding: "1rem",
+                                              alignSelf: "center",
+                                              maxHeight: "2rem",
+                                              "&:hover": {
+                                                color: "#052045",
                                               },
                                             }}
                                             onClick={handleOpenModalCon}
@@ -1381,25 +1762,28 @@ useEffect(() => {
                                           alignItems: "flex-end",
                                           marginTop: 3,
                                         }}
-                                      >
-                                      </Box>
+                                      ></Box>
                                     </>
                                   )}
                                   <Button
                                     variant='contained'
                                     color='primary'
                                     sx={{
-                                      display: 'flex',
+                                      display: "flex",
                                       backgroundColor: "#08397C",
                                       color: "#FFF",
                                       fontFamily: "Montserrat, sans-serif",
                                       fontWeight: 600,
                                       textTransform: "none",
-                                      fontSize: { xs: "0.65rem", md: "0.8rem", lg: "1rem" },
-                                      marginTop: '1rem',
-                                      alignSelf: 'center',
-                                      paddingLeft: '3rem',
-                                      paddingRight: '3rem',
+                                      fontSize: {
+                                        xs: "0.65rem",
+                                        md: "0.8rem",
+                                        lg: "1rem",
+                                      },
+                                      marginTop: "1rem",
+                                      alignSelf: "center",
+                                      paddingLeft: "3rem",
+                                      paddingRight: "3rem",
                                       borderRadius: "100px",
                                       maxHeight: "3rem",
                                       "&:hover": {
@@ -1414,12 +1798,13 @@ useEffect(() => {
                                 </Box>
                               )}
                             </Box>
-                          </Box>)}                         
-                    </Box>                     
-                  </Box>
-                </form>
-              </Box>
-            </Grid2>
+                          </Box>
+                        )}
+                      </Box>
+                    </Box>
+                  </form>
+                </Box>
+              </Grid2>
 
               {/* Add Publication Modal */}
               <Modal open={openModalPub}>
@@ -1462,16 +1847,48 @@ useEffect(() => {
                     InputLabelProps={createInputLabelProps()}
                   />
                   <FormControl fullWidth variant='outlined' margin='normal'>
-                    <InputLabel sx={{fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }}}>Format</InputLabel>
-                      <Select
-                        label='Format'
-                        sx={createTextFieldStyles()}
-                        value={publicationFormat}
-                        onChange={(e) => setPublicationFormat(e.target.value)}
+                    <InputLabel
+                      sx={{
+                        fontSize: {
+                          xs: "0.75rem",
+                          md: "0.75rem",
+                          lg: "0.8rem",
+                        },
+                      }}
+                    >
+                      Format
+                    </InputLabel>
+                    <Select
+                      label='Format'
+                      sx={createTextFieldStyles()}
+                      value={publicationFormat}
+                      onChange={(e) => setPublicationFormat(e.target.value)}
+                    >
+                      <MenuItem
+                        value='journal'
+                        sx={{
+                          fontSize: {
+                            xs: "0.75rem",
+                            md: "0.75rem",
+                            lg: "0.8rem",
+                          },
+                        }}
                       >
-                        <MenuItem value='journal' sx={{fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }}}>Journal</MenuItem>
-                        <MenuItem value='proceeding' sx={{fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }}}>Proceeding</MenuItem>
-                      </Select>
+                        Journal
+                      </MenuItem>
+                      <MenuItem
+                        value='proceeding'
+                        sx={{
+                          fontSize: {
+                            xs: "0.75rem",
+                            md: "0.75rem",
+                            lg: "0.8rem",
+                          },
+                        }}
+                      >
+                        Proceeding
+                      </MenuItem>
+                    </Select>
                   </FormControl>
                   <TextField
                     fullWidth
@@ -1482,25 +1899,60 @@ useEffect(() => {
                     value={datePublished}
                     onChange={(e) => setDatePublished(e.target.value)}
                     sx={createTextFieldStyles()}
-                    InputLabelProps={{ ...createInputLabelProps(), shrink: true }}
+                    InputLabelProps={{
+                      ...createInputLabelProps(),
+                      shrink: true,
+                    }}
                   />
                   <FormControl fullWidth variant='outlined' margin='normal'>
-                    <InputLabel sx={{fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }}}>Indexing Status</InputLabel>
-                      <Select
-                        label='Indexing Status'
-                        sx={createTextFieldStyles()}
-                        value={indexingStatus}
-                        onChange={(e) => setIndexingStatus(e.target.value)}
+                    <InputLabel
+                      sx={{
+                        fontSize: {
+                          xs: "0.75rem",
+                          md: "0.75rem",
+                          lg: "0.8rem",
+                        },
+                      }}
+                    >
+                      Indexing Status
+                    </InputLabel>
+                    <Select
+                      label='Indexing Status'
+                      sx={createTextFieldStyles()}
+                      value={indexingStatus}
+                      onChange={(e) => setIndexingStatus(e.target.value)}
+                    >
+                      <MenuItem
+                        value='SCOPUS'
+                        sx={{
+                          fontSize: {
+                            xs: "0.75rem",
+                            md: "0.75rem",
+                            lg: "0.8rem",
+                          },
+                        }}
                       >
-                        <MenuItem value='SCOPUS' sx={{fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }}}>Scopus</MenuItem>
-                        <MenuItem value='NON-SCOPUS' sx={{fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }}}>Non-Scopus</MenuItem>
-                      </Select>
+                        Scopus
+                      </MenuItem>
+                      <MenuItem
+                        value='NON-SCOPUS'
+                        sx={{
+                          fontSize: {
+                            xs: "0.75rem",
+                            md: "0.75rem",
+                            lg: "0.8rem",
+                          },
+                        }}
+                      >
+                        Non-Scopus
+                      </MenuItem>
+                    </Select>
                   </FormControl>
                   <Box
                     sx={{
                       display: "flex",
                       mt: 3,
-                      gap: 2
+                      gap: 2,
                     }}
                   >
                     <Button
@@ -1509,7 +1961,8 @@ useEffect(() => {
                         setPublicationFormat("");
                         setDatePublished("");
                         setIndexingStatus("");
-                        setOpenModalPub(false);}}
+                        setOpenModalPub(false);
+                      }}
                       sx={{
                         backgroundColor: "#08397C",
                         color: "#FFF",
@@ -1552,7 +2005,7 @@ useEffect(() => {
                   </Box>
                 </Box>
               </Modal>
-              
+
               {/* Select Conference Modal */}
               <Modal open={openModalCon}>
                 <Box
@@ -1592,7 +2045,7 @@ useEffect(() => {
                       overflow: "hidden",
                       display: "flex",
                       flexDirection: "column",
-                      height: "auto"
+                      height: "auto",
                     }}
                   >
                     <Box sx={{ height: "25em", overflow: "hidden" }}>
@@ -1648,7 +2101,7 @@ useEffect(() => {
                                   },
                                 }}
                               >
-                                {conference.conference_date} 
+                                {conference.conference_date}
                               </Typography>
                               <Typography
                                 variant='caption'
@@ -1687,8 +2140,17 @@ useEffect(() => {
                       />
                     </Box>
                   </Box>
-                  <Box display='flex' flexDirection='column' alignItems= "center">
-                    <Typography sx={{ py: 2, fontSize: { xs: "0.7rem", md: "0.8rem", lg: "0.9rem"} }}>
+                  <Box
+                    display='flex'
+                    flexDirection='column'
+                    alignItems='center'
+                  >
+                    <Typography
+                      sx={{
+                        py: 2,
+                        fontSize: { xs: "0.7rem", md: "0.8rem", lg: "0.9rem" },
+                      }}
+                    >
                       Didn’t find the conference you’re looking for?{" "}
                       <a
                         href='#'
@@ -1777,11 +2239,31 @@ useEffect(() => {
                     sx={createTextFieldStyles()}
                     InputLabelProps={createInputLabelProps()}
                   >
-                    <MenuItem value='' disabled sx={{fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }}}>
+                    <MenuItem
+                      value=''
+                      disabled
+                      sx={{
+                        fontSize: {
+                          xs: "0.75rem",
+                          md: "0.75rem",
+                          lg: "0.8rem",
+                        },
+                      }}
+                    >
                       Select your country
                     </MenuItem>
                     {countries.map((country) => (
-                      <MenuItem key={country.country} value={country.country} sx={{fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }}}>
+                      <MenuItem
+                        key={country.country}
+                        value={country.country}
+                        sx={{
+                          fontSize: {
+                            xs: "0.75rem",
+                            md: "0.75rem",
+                            lg: "0.8rem",
+                          },
+                        }}
+                      >
                         {country.country}
                       </MenuItem>
                     ))}
@@ -1798,11 +2280,31 @@ useEffect(() => {
                     sx={createTextFieldStyles()}
                     InputLabelProps={createInputLabelProps()}
                   >
-                    <MenuItem value='' disabled sx={{fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }}}>
+                    <MenuItem
+                      value=''
+                      disabled
+                      sx={{
+                        fontSize: {
+                          xs: "0.75rem",
+                          md: "0.75rem",
+                          lg: "0.8rem",
+                        },
+                      }}
+                    >
                       Select your city
                     </MenuItem>
                     {Cities.map((city) => (
-                      <MenuItem key={city} value={city} sx={{fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" }}}>
+                      <MenuItem
+                        key={city}
+                        value={city}
+                        sx={{
+                          fontSize: {
+                            xs: "0.75rem",
+                            md: "0.75rem",
+                            lg: "0.8rem",
+                          },
+                        }}
+                      >
                         {city}
                       </MenuItem>
                     ))}
@@ -1816,13 +2318,16 @@ useEffect(() => {
                     value={dateApproved}
                     onChange={(e) => setDateApproved(e.target.value)}
                     sx={createTextFieldStyles()}
-                    InputLabelProps={{ ...createInputLabelProps(), shrink: true }}
+                    InputLabelProps={{
+                      ...createInputLabelProps(),
+                      shrink: true,
+                    }}
                   />
                   <Box
                     sx={{
                       display: "flex",
                       mt: 3,
-                      gap: 2
+                      gap: 2,
                     }}
                   >
                     <Button
@@ -1927,7 +2432,7 @@ useEffect(() => {
                     fontWeight: 600,
                     textTransform: "none",
                     fontSize: { xs: "0.65rem", md: "0.8rem", lg: "1rem" },
-                    marginTop: '1rem',
+                    marginTop: "1rem",
                     borderRadius: "100px",
                     maxHeight: "3rem",
                     "&:hover": {

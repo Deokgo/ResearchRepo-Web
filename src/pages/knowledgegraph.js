@@ -1,56 +1,52 @@
 import React, { useEffect, useState } from "react";
-import Navbar from "./navbar";
-import Footer from "./footer";
+import Navbar from "../components/navbar";
+import Footer from "../components/footer";
+import { Box, Typography, IconButton } from "@mui/material";
 import axios from "axios";
-import {
-  Box,
-  IconButton,
-  Typography,
-  CircularProgress
-} from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import homeBg from "../assets/home_bg.png";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
+// import Select from '@mui/material/Select';
 
-const MainDash = () => {
-  const [loading, setLoading] = useState(true);
+const KnowledgeGraph = () => {
+  const [selectedYears, setSelectedYears] = useState([2015, 2023]);
+  const [colleges, setColleges] = useState([]);
   const navigate = useNavigate();
+  const [selectedColleges, setSelectedColleges] = useState([]);
 
-  // Handle iframe load event to set loading state
-  const handleIframeLoad = () => {
-    setLoading(false);
-  };
-
-  // Update iframe height on resize
-  const updateIframeSize = () => {
-    const iframe = document.getElementById('dashboard-iframe');
-    if (iframe) {
-      iframe.style.height = `${window.innerHeight - 100}px`; // Adjust this value based on your layout
-    }
-  };
-
-  const getUserCollege = async () => {
-    try {
-        const response = await axios.get(`/data/college`);
-        console.log('Full Response:', response.data.college_id);
-    } catch (error) {
-        console.error('Error fetching college:', error);
-    }
-  };
-
+  const yearRange = [2000, 2023];
   useEffect(() => {
-    window.addEventListener('resize', updateIframeSize);
-    updateIframeSize(); // Call initially to set the size
-    getUserCollege();
-
-    return () => {
-      window.removeEventListener('resize', updateIframeSize);
+    const fetchColleges = async () => {
+      try {
+        const response = await axios.get("/deptprogs/college_depts");
+        const data = response.data;
+        setColleges(data.colleges);
+      } catch (error) {
+        console.error("Error fetching college data:", error);
+      }
     };
+    fetchColleges();
   }, []);
+
+  const handleCollegeChange = (event) => {
+    const {
+      target: { value },
+    } = event;
+    setSelectedColleges(typeof value === "string" ? value.split(",") : value);
+  };
+
+  const handleYearChange = (event, newValue) => {
+    setSelectedYears(newValue);
+  };
+
+  const handleApplyFilters = () => {
+    console.log("Selected Colleges:", selectedColleges);
+    console.log("Selected Years:", selectedYears);
+  };
 
   return (
     <>
-      <Box sx={{ margin: 0, padding: 0, height: "85vh" }}>
+      <Box sx={{ margin: 0, padding: 0 }}>
         <Navbar />
         <Box
           sx={{
@@ -74,14 +70,14 @@ const MainDash = () => {
                 xs: "clamp(2rem, 3vh, 3rem)",
                 sm: "clamp(3rem, 8vh, 4rem)",
                 md: "clamp(3rem, 14vh, 4rem)",
-                lg: "clamp(4rem, 20vh, 5rem)"
+                lg: "clamp(4rem, 20vh, 5rem)",
               },
               backgroundColor: "#0A438F",
               backgroundSize: "cover",
               backgroundPosition: "center",
               display: "flex",
               alignItems: "center",
-              zIndex: 1
+              zIndex: 1,
             }}
           >
             <Box
@@ -105,10 +101,9 @@ const MainDash = () => {
                   transform: {
                     xs: "scale(0.8)",
                     sm: "scale(1)",
-                    md: "scale(1.2)"
-                  }
+                    md: "scale(1.2)",
+                  },
                 }}
-                
               >
                 <ArrowBackIosIcon />
               </IconButton>
@@ -125,44 +120,27 @@ const MainDash = () => {
                   color: "#FFF",
                   lineHeight: 1.25,
                   alignSelf: "center",
-                  zIndex: 2
+                  zIndex: 2,
                 }}
               >
-                Reports
+                Knowledge Graph
               </Typography>
             </Box>
           </Box>
           <Box
             sx={{
               flexGrow: 1,
-              backgroundColor: "#f5f5f5",
-              padding: 0,
-              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-              overflowY: "hidden", // Prevent scrollbar in parent
+              height: "100%",
+              overflow: "hidden",
             }}
           >
-            {loading && (
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  height: "100%",
-                }}
-              >
-                <CircularProgress />
-              </Box>
-            )}
             <iframe
-              id="dashboard-iframe" // Add an id to the iframe for easy access
-              src="http://localhost:5000/dashboard/overview"
+              src='http://localhost:5000/knowledgegraph'
               style={{
                 width: "100%",
-                height: "100%", // Ensure it takes full height of parent
+                height: "100%",
                 border: "none",
-                display: loading ? "none" : "block",
               }}
-              onLoad={handleIframeLoad}
             />
           </Box>
         </Box>
@@ -171,4 +149,4 @@ const MainDash = () => {
   );
 };
 
-export default MainDash;
+export default KnowledgeGraph;

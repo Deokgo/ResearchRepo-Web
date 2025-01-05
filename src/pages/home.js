@@ -12,10 +12,10 @@ import MITL from "../assets/MITL.jpg";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import Navbar from "./navbar";
-import LoginModal from "./loginmodal";
-import SignupModal from "./signupmodal";
-import PasswordResetModal from "./passresetmodal";
+import Navbar from "../components/navbar";
+import LoginModal from "../components/loginmodal";
+import SignupModal from "../components/signupmodal";
+import PasswordResetModal from "../components/passresetmodal";
 import DummyKG from "../assets/dummy_kg.png";
 import {
   Box,
@@ -24,9 +24,9 @@ import {
   Paper,
   Typography,
   useMediaQuery,
-  Grid2
+  Grid2,
 } from "@mui/material";
-import { useModalContext } from "./modalcontext";
+import { useModalContext } from "../context/modalcontext";
 
 const Home = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -114,19 +114,19 @@ const Home = () => {
   };
 
   const buttonStyles = {
-    fontSize: 'clamp(0.8rem, 3vw, 1.2rem)', // Responsive font size
-    padding: '0.5rem 1.5rem', // Consistent padding
-    minWidth: '100px', // Minimum width
-    borderRadius: '50px', // Rounded corners
-    transition: 'transform 0.2s ease', // Smooth interaction
-    
-    '&:hover': {
-      transform: 'scale(1.05)' // Slight grow on hover
+    fontSize: "clamp(0.8rem, 3vw, 1.2rem)", // Responsive font size
+    padding: "0.5rem 1.5rem", // Consistent padding
+    minWidth: "100px", // Minimum width
+    borderRadius: "50px", // Rounded corners
+    transition: "transform 0.2s ease", // Smooth interaction
+
+    "&:hover": {
+      transform: "scale(1.05)", // Slight grow on hover
     },
-    
-    '&:active': {
-      transform: 'scale(0.95)' // Slight shrink when pressed
-    }
+
+    "&:active": {
+      transform: "scale(0.95)", // Slight shrink when pressed
+    },
   };
 
   const togglePasswordVisibility = () => {
@@ -165,7 +165,6 @@ const Home = () => {
             backgroundPosition: "center",
             height: { xs: "100%", md: "calc(100vh - 6rem)" },
             backgroundColor: "#0A438F",
-            
           }}
         >
           <Box
@@ -183,13 +182,13 @@ const Home = () => {
           />
           <Box
             sx={{
-              position: 'relative',
+              position: "relative",
               width: "100%",
               zIndex: 2,
               padding: { xs: 2, md: 4 },
             }}
           >
-            <Grid2 
+            <Grid2
               container
               spacing={5}
               sx={{
@@ -216,10 +215,7 @@ const Home = () => {
                     },
                   }}
                 >
-                  <Slider
-                    {...settings}
-                    style={{ width:"100%" }}
-                  >
+                  <Slider {...settings} style={{ width: "100%" }}>
                     {departments.map((department) => (
                       <Box key={department.id} sx={{ px: 2 }}>
                         <Paper
@@ -240,14 +236,14 @@ const Home = () => {
                         >
                           <Box
                             sx={{
-                              position: 'absolute',
+                              position: "absolute",
                               bottom: 0,
                               left: 0,
                               right: 0,
-                              backgroundColor: 'rgba(256,256,256,0.1)', // Semi-transparent background for text
+                              backgroundColor: "rgba(256,256,256,0.1)", // Semi-transparent background for text
                               padding: 2,
                             }}
-                            >
+                          >
                             <Typography
                               variant='h5'
                               sx={{
@@ -255,12 +251,12 @@ const Home = () => {
                                 fontFamily: "Montserrat, sans-serif",
                                 color: "#FFF",
                                 lineHeight: 1.2,
-                                textShadow: '1px 1px 2px rgba(0,0,0,0.5)', // Add text shadow for better readability
+                                textShadow: "1px 1px 2px rgba(0,0,0,0.5)", // Add text shadow for better readability
                               }}
                             >
                               {department.name}
                             </Typography>
-                            </Box>
+                          </Box>
                         </Paper>
                       </Box>
                     ))}
@@ -271,7 +267,6 @@ const Home = () => {
                     display: "flex",
                     gap: 7,
                     justifyContent: { xs: "center" },
-                    
                   }}
                 >
                   <Button
@@ -343,7 +338,7 @@ const Home = () => {
                       fontSize: { xs: "1rem", md: "1rem" },
                       color: "#F0F0F0",
                       maxWidth: { xs: "100%", md: "80%" },
-                      py: 15
+                      py: 15,
                     }}
                   >
                     A research platform for researchers, built by Mapúa MCL

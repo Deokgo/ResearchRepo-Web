@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import Navbar from "./navbar";
+import Navbar from "../components/navbar";
 import { Box, IconButton, Typography } from "@mui/material";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import { useNavigate } from "react-router-dom";
@@ -13,7 +13,7 @@ const SDGdashEmbed = () => {
 
   // Update iframe height on resize
   const updateIframeSize = () => {
-    const iframe = document.getElementById('dashboard-iframe');
+    const iframe = document.getElementById("dashboard-iframe");
     if (iframe) {
       iframe.style.height = `${window.innerHeight - 100}px`; // Adjust this value based on your layout
     }
@@ -42,9 +42,7 @@ const SDGdashEmbed = () => {
         }
       } catch (err) {
         setError(
-          err.response?.data?.error ||
-            err.message ||
-            "Failed to load Dash app."
+          err.response?.data?.error || err.message || "Failed to load Dash app."
         );
       }
     };
@@ -53,11 +51,11 @@ const SDGdashEmbed = () => {
   }, []);
 
   useEffect(() => {
-    window.addEventListener('resize', updateIframeSize);
+    window.addEventListener("resize", updateIframeSize);
     updateIframeSize(); // Call initially to set the size
 
     return () => {
-      window.removeEventListener('resize', updateIframeSize);
+      window.removeEventListener("resize", updateIframeSize);
     };
   }, []);
 
@@ -132,7 +130,7 @@ const SDGdashEmbed = () => {
               <ArrowBackIosIcon />
             </IconButton>
             <Typography
-              variant="h3"
+              variant='h3'
               sx={{
                 fontFamily: "Montserrat, sans-serif",
                 fontWeight: 800,
@@ -160,13 +158,15 @@ const SDGdashEmbed = () => {
             overflowY: "hidden",
           }}
         >
-          <div style={{ 
-            height: "100vh", 
-            width: "100%", 
-            paddingTop: "20px", 
-            paddingLeft: "20px", 
-            backgroundColor: "white" // Set the background color to white
-          }}>
+          <div
+            style={{
+              height: "100vh",
+              width: "100%",
+              paddingTop: "20px",
+              paddingLeft: "20px",
+              backgroundColor: "white", // Set the background color to white
+            }}
+          >
             <iframe
               src={dashUrl}
               style={{
@@ -174,7 +174,7 @@ const SDGdashEmbed = () => {
                 width: "100%",
                 height: "100%",
               }}
-              title="Dash App"
+              title='Dash App'
             />
           </div>
         </Box>

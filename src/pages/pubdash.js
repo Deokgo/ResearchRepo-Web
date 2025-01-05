@@ -1,12 +1,7 @@
 import React, { useEffect, useState } from "react";
-import Navbar from "./navbar";
-import Footer from "./footer";
-import {
-  Box,
-  IconButton,
-  Typography,
-  CircularProgress
-} from "@mui/material";
+import Navbar from "../components/navbar";
+import Footer from "../components/footer";
+import { Box, IconButton, Typography, CircularProgress } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import homeBg from "../assets/home_bg.png";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
@@ -14,7 +9,7 @@ import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 const PubDash = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  
+
   // Handle iframe load event to set loading state
   const handleIframeLoad = () => {
     setLoading(false);
@@ -22,18 +17,18 @@ const PubDash = () => {
 
   // Update iframe height on resize
   const updateIframeSize = () => {
-    const iframe = document.getElementById('dashboard-iframe');
+    const iframe = document.getElementById("dashboard-iframe");
     if (iframe) {
       iframe.style.height = `${window.innerHeight - 100}px`; // Adjust this value based on your layout
     }
   };
 
   useEffect(() => {
-    window.addEventListener('resize', updateIframeSize);
+    window.addEventListener("resize", updateIframeSize);
     updateIframeSize(); // Call initially to set the size
 
     return () => {
-      window.removeEventListener('resize', updateIframeSize);
+      window.removeEventListener("resize", updateIframeSize);
     };
   }, []);
 
@@ -63,14 +58,14 @@ const PubDash = () => {
                 xs: "clamp(2rem, 3vh, 3rem)",
                 sm: "clamp(3rem, 8vh, 4rem)",
                 md: "clamp(3rem, 14vh, 4rem)",
-                lg: "clamp(4rem, 20vh, 5rem)"
+                lg: "clamp(4rem, 20vh, 5rem)",
               },
               backgroundColor: "#0A438F",
               backgroundSize: "cover",
               backgroundPosition: "center",
               display: "flex",
               alignItems: "center",
-              zIndex: 1
+              zIndex: 1,
             }}
           >
             <Box
@@ -94,10 +89,9 @@ const PubDash = () => {
                   transform: {
                     xs: "scale(0.8)",
                     sm: "scale(1)",
-                    md: "scale(1.2)"
-                  }
+                    md: "scale(1.2)",
+                  },
                 }}
-                
               >
                 <ArrowBackIosIcon />
               </IconButton>
@@ -114,7 +108,7 @@ const PubDash = () => {
                   color: "#FFF",
                   lineHeight: 1.25,
                   alignSelf: "center",
-                  zIndex: 2
+                  zIndex: 2,
                 }}
               >
                 SDG Analytics Dashboard
@@ -143,8 +137,8 @@ const PubDash = () => {
               </Box>
             )}
             <iframe
-              id="dashboard1-iframe" // Add an id to the iframe for easy access
-              src="http://localhost:5000/dashboard/publication"
+              id='dashboard1-iframe' // Add an id to the iframe for easy access
+              src='http://localhost:5000/dashboard/publication'
               style={{
                 width: "100%",
                 height: "100%", // Initial height

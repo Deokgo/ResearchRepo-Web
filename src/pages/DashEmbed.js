@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import Navbar from "./navbar";
+import Navbar from "../components/navbar";
 import { Box, IconButton, Typography } from "@mui/material";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import { useNavigate } from "react-router-dom";
@@ -13,7 +13,7 @@ const DashEmbed = () => {
 
   // Update iframe height on resize
   const updateIframeSize = () => {
-    const iframe = document.getElementById('dashboard-iframe');
+    const iframe = document.getElementById("dashboard-iframe");
     if (iframe) {
       iframe.style.height = `${window.innerHeight - 100}px`; // Adjust this value based on your layout
     }
@@ -42,9 +42,7 @@ const DashEmbed = () => {
         }
       } catch (err) {
         setError(
-          err.response?.data?.error ||
-            err.message ||
-            "Failed to load Dash app."
+          err.response?.data?.error || err.message || "Failed to load Dash app."
         );
       }
     };
@@ -53,11 +51,11 @@ const DashEmbed = () => {
   }, []);
 
   useEffect(() => {
-    window.addEventListener('resize', updateIframeSize);
+    window.addEventListener("resize", updateIframeSize);
     updateIframeSize(); // Call initially to set the size
 
     return () => {
-      window.removeEventListener('resize', updateIframeSize);
+      window.removeEventListener("resize", updateIframeSize);
     };
   }, []);
 
@@ -132,7 +130,7 @@ const DashEmbed = () => {
               <ArrowBackIosIcon />
             </IconButton>
             <Typography
-              variant="h3"
+              variant='h3'
               sx={{
                 fontFamily: "Montserrat, sans-serif",
                 fontWeight: 800,
@@ -156,13 +154,13 @@ const DashEmbed = () => {
             flexGrow: 1,
             backgroundColor: "#f5f5f5",
             padding: 0, // Ensure no padding
-            margin: 0,  // Ensure no margin
+            margin: 0, // Ensure no margin
             height: "100vh", // Occupy full viewport height
             overflow: "hidden", // Prevent scrollbars
           }}
         >
           <iframe
-            id="dashboard-iframe"
+            id='dashboard-iframe'
             src={dashUrl}
             style={{
               border: "none",
@@ -170,7 +168,7 @@ const DashEmbed = () => {
               height: "100vh", // Occupy full viewport height
               display: "block", // Avoid inline gaps
             }}
-            title="Dash App"
+            title='Dash App'
           />
         </Box>
       </Box>

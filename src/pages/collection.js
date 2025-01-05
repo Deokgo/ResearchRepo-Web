@@ -13,8 +13,8 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import Navbar from "./navbar";
-import Footer from "./footer";
+import Navbar from "../components/navbar";
+import Footer from "../components/footer";
 import homeBg from "../assets/home_bg.png";
 import { Search } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
@@ -27,8 +27,8 @@ import axios from "axios";
 import { Virtuoso } from "react-virtuoso";
 import DummyKG from "../assets/dummy_kg_keyword.png";
 import Modal from "@mui/material/Modal";
-import { useModalContext } from "./modalcontext";
-import AddPaperModal from "./addpapermodal";
+import { useModalContext } from "../context/modalcontext";
+import AddPaperModal from "../components/addpapermodal";
 import { useAuth } from "../context/AuthContext";
 
 // Debounce function to limit rapid state updates

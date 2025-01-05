@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import ArrowSteps from "./arrowsteps";
-import Navbar from "./navbar";
-import Footer from "./footer";
+import ArrowSteps from "../components/arrowsteps";
+import Navbar from "../components/navbar";
+import Footer from "../components/footer";
 import {
   Box,
   TextField,

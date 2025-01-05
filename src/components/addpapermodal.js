@@ -15,12 +15,11 @@ import {
   Tooltip,
 } from "@mui/material";
 import axios from "axios";
-import { useModalContext } from "./modalcontext";
+import { useModalContext } from "../context/modalcontext";
 import FileUploader from "./FileUploader";
 import sdgGoalsData from "../data/sdgGoals.json";
 import { useAuth } from "../context/AuthContext";
-import AutorenewIcon from '@mui/icons-material/Autorenew';
-
+import AutorenewIcon from "@mui/icons-material/Autorenew";
 
 const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
   const [colleges, setColleges] = useState([]);
@@ -178,13 +177,13 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
         "Full Manuscript": file,
         "Research Areas": selectedResearchAreas,
       };
-      
+
       // Conditionally include Adviser and Panels if researchType is "Integrative"
       if (researchType === "Integrative") {
         requiredFields.Adviser = adviser;
         requiredFields.Panels = panels;
       }
-      
+
       const missingFields = Object.entries(requiredFields)
         .filter(([_, value]) => {
           if (Array.isArray(value)) {
@@ -193,11 +192,13 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
           return !value;
         })
         .map(([key]) => key);
-      
+
       if (missingFields.length > 0) {
-        alert(`Please fill in all required fields: ${missingFields.join(", ")}`);
+        alert(
+          `Please fill in all required fields: ${missingFields.join(", ")}`
+        );
         return;
-      }      
+      }
 
       console.log("File:", file);
       console.log("Extended Abstract:", extendedAbstract);
@@ -236,8 +237,8 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
 
       // Add research areas
       formData.append(
-        "research_areas", 
-        selectedResearchAreas.map(area => area.research_area_id).join(';')
+        "research_areas",
+        selectedResearchAreas.map((area) => area.research_area_id).join(";")
       );
 
       // Send the paper data
@@ -380,52 +381,56 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
 
   const fetchResearchAreas = async () => {
     try {
-      const response = await axios.get('/paper/research_areas');
+      const response = await axios.get("/paper/research_areas");
       if (response.data.research_areas) {
         // Transform the data to match the expected format
-        const formattedAreas = response.data.research_areas.map(area => ({
+        const formattedAreas = response.data.research_areas.map((area) => ({
           research_area_id: area.id,
-          research_area_name: area.name
+          research_area_name: area.name,
         }));
-        console.log('Fetched research areas:', formattedAreas); // Debug log
+        console.log("Fetched research areas:", formattedAreas); // Debug log
         setResearchAreas(formattedAreas);
       }
     } catch (error) {
-      console.error('Error fetching research areas:', error);
+      console.error("Error fetching research areas:", error);
     }
   };
 
   const predictResearchAreas = async () => {
     if (!title || !abstract || !keywords.length) {
-      alert("Please fill in title, abstract, and keywords before predicting research areas");
+      alert(
+        "Please fill in title, abstract, and keywords before predicting research areas"
+      );
       return;
     }
 
     setIsModelPredicting(true);
     try {
-      const response = await axios.post('/paper/predict_research_areas', {
+      const response = await axios.post("/paper/predict_research_areas", {
         title,
         abstract,
-        keywords: keywords.join(', ')
+        keywords: keywords.join(", "),
       });
 
       if (response.data.predicted_areas) {
         // Find matching research areas from the full list
         const predictedAreas = response.data.predicted_areas
-          .map(prediction => {
+          .map((prediction) => {
             const matchingArea = researchAreas.find(
-              area => area.research_area_name === prediction.name
+              (area) => area.research_area_name === prediction.name
             );
             return matchingArea;
           })
-          .filter(area => area !== undefined); // Remove any unmatched areas
+          .filter((area) => area !== undefined); // Remove any unmatched areas
 
-        console.log('Predicted areas:', predictedAreas); // Debug log
+        console.log("Predicted areas:", predictedAreas); // Debug log
         setSelectedResearchAreas(predictedAreas);
       }
     } catch (error) {
-      console.error('Error predicting research areas:', error);
-      alert('Failed to predict research areas. Please try again or select manually.');
+      console.error("Error predicting research areas:", error);
+      alert(
+        "Failed to predict research areas. Please try again or select manually."
+      );
     } finally {
       setIsModelPredicting(false);
     }
@@ -438,10 +443,10 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
 
   // Add this CSS for the spinner animation
   const spinnerStyles = {
-    '@keyframes spin': {
-      '0%': { transform: 'rotate(0deg)' },
-      '100%': { transform: 'rotate(360deg)' }
-    }
+    "@keyframes spin": {
+      "0%": { transform: "rotate(0deg)" },
+      "100%": { transform: "rotate(360deg)" },
+    },
   };
 
   return (
@@ -467,8 +472,8 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
           overflowY: "auto",
           position: "relative",
           "&:focus": {
-            outline: "none"
-          }
+            outline: "none",
+          },
         }}
       >
         <Typography
@@ -488,30 +493,33 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
           Add New Paper
         </Typography>
         <Grid2 container spacing={2}>
-        <Grid2 size={2}>
-          <FormControl fullWidth sx={{ mb: 2 }}>
-            <InputLabel>Research Type</InputLabel>
-            <Select
-              value={researchType}
-              onChange={(event) => {
-                const newResearchType = event.target.value;
-                handleResearchTypeChange(event);
-                if (newResearchType === "College-Driven" || newResearchType === "Extramural") {
-                  setAdviser(""); // Clear adviser selection
-                  setAdviserInputValue(""); // Clear adviser input field
-                  setPanels([]); // Clear panels selection
-                  setPanelInputValue(""); // Clear panel input field
-                }
-              }}
-              label="Research Type"
-              defaultValue="Integrative"
-            >
-              <MenuItem value="Integrative">Integrative</MenuItem>
-              <MenuItem value="College-Driven">College-Driven</MenuItem>
-              <MenuItem value="Extramural">Extramural</MenuItem>
-            </Select>
-          </FormControl>
-        </Grid2>
+          <Grid2 size={2}>
+            <FormControl fullWidth sx={{ mb: 2 }}>
+              <InputLabel>Research Type</InputLabel>
+              <Select
+                value={researchType}
+                onChange={(event) => {
+                  const newResearchType = event.target.value;
+                  handleResearchTypeChange(event);
+                  if (
+                    newResearchType === "College-Driven" ||
+                    newResearchType === "Extramural"
+                  ) {
+                    setAdviser(""); // Clear adviser selection
+                    setAdviserInputValue(""); // Clear adviser input field
+                    setPanels([]); // Clear panels selection
+                    setPanelInputValue(""); // Clear panel input field
+                  }
+                }}
+                label='Research Type'
+                defaultValue='Integrative'
+              >
+                <MenuItem value='Integrative'>Integrative</MenuItem>
+                <MenuItem value='College-Driven'>College-Driven</MenuItem>
+                <MenuItem value='Extramural'>Extramural</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid2>
           <Grid2 size={2}>
             <TextField
               fullWidth
@@ -646,7 +654,9 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
               freeSolo
               options={adviserOptions}
               getOptionLabel={(option) =>
-                `${option.first_name || ""} ${option.last_name || ""} (${option.email || ""})`
+                `${option.first_name || ""} ${option.last_name || ""} (${
+                  option.email || ""
+                })`
               }
               componentsProps={{
                 popper: {
@@ -661,7 +671,10 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
               onChange={(event, newValue) => setAdviser(newValue)}
               inputValue={adviserInputValue}
               onInputChange={(event, newInputValue) => {
-                if (researchType !== "College-Driven" && researchType !== "Extramural") {
+                if (
+                  researchType !== "College-Driven" &&
+                  researchType !== "Extramural"
+                ) {
                   setAdviserInputValue(newInputValue); // Update input normally
                   handleAdviserSearch(newInputValue); // Perform search
                 } else {
@@ -669,20 +682,23 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
                 }
               }}
               disabled={
-                researchType === "College-Driven" || researchType === "Extramural"
+                researchType === "College-Driven" ||
+                researchType === "Extramural"
               }
               renderInput={(params) => (
                 <TextField
                   {...params}
-                  label="Adviser"
-                  variant="outlined"
+                  label='Adviser'
+                  variant='outlined'
                   helperText={
-                    researchType === "College-Driven" || researchType === "Extramural"
+                    researchType === "College-Driven" ||
+                    researchType === "Extramural"
                       ? null
                       : "Type at least 3 characters to search for an adviser"
                   }
                   sx={
-                    researchType === "College-Driven" || researchType === "Extramural"
+                    researchType === "College-Driven" ||
+                    researchType === "Extramural"
                       ? disabledSelectStyle
                       : null
                   }
@@ -696,7 +712,9 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
               multiple
               options={panelOptions}
               getOptionLabel={(option) =>
-                `${option.first_name || ""} ${option.last_name || ""} (${option.email || ""})`
+                `${option.first_name || ""} ${option.last_name || ""} (${
+                  option.email || ""
+                })`
               }
               componentsProps={{
                 popper: {
@@ -711,26 +729,34 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
               onChange={(event, newValue) => setPanels(newValue)}
               inputValue={panelInputValue}
               onInputChange={(event, newInputValue) => {
-                if (researchType !== "College-Driven" && researchType !== "Extramural") {
+                if (
+                  researchType !== "College-Driven" &&
+                  researchType !== "Extramural"
+                ) {
                   setPanelInputValue(newInputValue); // Update input field
                   handlePanelSearch(newInputValue); // Perform panel search
                 } else {
                   setPanelInputValue(""); // Clear input field
                 }
               }}
-              disabled={researchType === "College-Driven" || researchType === "Extramural"}
+              disabled={
+                researchType === "College-Driven" ||
+                researchType === "Extramural"
+              }
               renderInput={(params) => (
                 <TextField
                   {...params}
-                  label="Panels"
-                  variant="outlined"
+                  label='Panels'
+                  variant='outlined'
                   helperText={
-                    researchType === "College-Driven" || researchType === "Extramural"
+                    researchType === "College-Driven" ||
+                    researchType === "Extramural"
                       ? null
                       : "Type at least 3 characters to search and select multiple panel members"
                   }
                   sx={
-                    researchType === "College-Driven" || researchType === "Extramural"
+                    researchType === "College-Driven" ||
+                    researchType === "Extramural"
                       ? disabledSelectStyle
                       : null
                   }
@@ -812,61 +838,78 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
             <FormControl fullWidth sx={{ mb: 2 }}>
               <Autocomplete
                 multiple
-                id="research-areas"
+                id='research-areas'
                 options={researchAreas}
                 getOptionLabel={(option) => option.research_area_name}
                 value={selectedResearchAreas}
-                onChange={(event, newValue) => setSelectedResearchAreas(newValue)}
+                onChange={(event, newValue) =>
+                  setSelectedResearchAreas(newValue)
+                }
                 renderInput={(params) => (
                   <TextField
                     {...params}
-                    label="Research Areas"
-                    variant="outlined"
-                    helperText="Select or predict research areas"
+                    label='Research Areas'
+                    variant='outlined'
+                    helperText='Select or predict research areas'
                     sx={createTextFieldStyles()}
                     InputLabelProps={createInputLabelProps()}
                   />
                 )}
               />
-              <Box sx={{ mt: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Tooltip title="Predict research areas using AI">
+              <Box
+                sx={{ mt: 1, display: "flex", alignItems: "center", gap: 1 }}
+              >
+                <Tooltip title='Predict research areas using AI'>
                   <span>
-                    <IconButton 
+                    <IconButton
                       onClick={predictResearchAreas}
-                      disabled={isModelPredicting || !title || !abstract || !keywords.length}
-                      color="primary"
+                      disabled={
+                        isModelPredicting ||
+                        !title ||
+                        !abstract ||
+                        !keywords.length
+                      }
+                      color='primary'
                     >
-                      <AutorenewIcon 
-                        sx={{ 
-                          animation: isModelPredicting ? 'spin 1s linear infinite' : 'none',
-                          '@keyframes spin': {
-                            '0%': { transform: 'rotate(0deg)' },
-                            '100%': { transform: 'rotate(360deg)' }
-                          }
-                        }} 
+                      <AutorenewIcon
+                        sx={{
+                          animation: isModelPredicting
+                            ? "spin 1s linear infinite"
+                            : "none",
+                          "@keyframes spin": {
+                            "0%": { transform: "rotate(0deg)" },
+                            "100%": { transform: "rotate(360deg)" },
+                          },
+                        }}
                       />
                     </IconButton>
                   </span>
                 </Tooltip>
-                <Typography variant="caption" color="textSecondary">
-                  {isModelPredicting ? 'Predicting...' : 'Click to predict research areas'}
+                <Typography variant='caption' color='textSecondary'>
+                  {isModelPredicting
+                    ? "Predicting..."
+                    : "Click to predict research areas"}
                 </Typography>
               </Box>
             </FormControl>
           </Grid2>
           <Grid2 size={6}>
-            <Typography variant="body2" sx={{ mb: 1 }}>Upload Full Manuscript</Typography>
+            <Typography variant='body2' sx={{ mb: 1 }}>
+              Upload Full Manuscript
+            </Typography>
             <FileUploader
-              label="Upload Full Manuscript"
+              label='Upload Full Manuscript'
               onSelectFile={onSelectFileHandler}
               onDeleteFile={onDeleteFileHandler}
               file={file}
             />
           </Grid2>
           <Grid2 size={6}>
-            <Typography variant="body2" sx={{ mb: 1 }}>Upload Extended Abstract</Typography>
+            <Typography variant='body2' sx={{ mb: 1 }}>
+              Upload Extended Abstract
+            </Typography>
             <FileUploader
-              label="Upload Extended Abstract"
+              label='Upload Extended Abstract'
               onSelectFile={onSelectFileHandlerEA}
               onDeleteFile={onDeleteFileHandlerEA}
               file={extendedAbstract}

@@ -11,11 +11,11 @@ import {
   IconButton,
   Autocomplete,
 } from "@mui/material";
-import FileUploader from "./FileUploader";
+import FileUploader from "../components/FileUploader";
 import sdgGoalsData from "../data/sdgGoals.json";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import Navbar from "./navbar";
+import Navbar from "../components/navbar";
 import homeBg from "../assets/home_bg.png";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import axios from "axios";
@@ -276,7 +276,9 @@ const UpdateResearchInfo = () => {
       file.join(";") !== initialData?.full_manuscript;
 
     if (!hasChanges) {
-      alert("No changes are made. Please modify research output data before saving.");
+      alert(
+        "No changes are made. Please modify research output data before saving."
+      );
     } else {
       updateResearchDetails();
     }

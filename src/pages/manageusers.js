@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import Navbar from "./navbar";
-import Footer from "./footer";
+import Navbar from "../components/navbar";
+import Footer from "../components/footer";
 import {
   Box,
   Button,
@@ -574,14 +574,14 @@ const ManageUsers = () => {
                 xs: "clamp(2rem, 3vh, 3rem)",
                 sm: "clamp(3rem, 8vh, 4rem)",
                 md: "clamp(3rem, 14vh, 4rem)",
-                lg: "clamp(4rem, 20vh, 5rem)"
+                lg: "clamp(4rem, 20vh, 5rem)",
               },
               backgroundColor: "#0A438F",
               backgroundSize: "cover",
               backgroundPosition: "center",
               display: "flex",
               alignItems: "center",
-              zIndex: 1
+              zIndex: 1,
             }}
           >
             <Box
@@ -605,8 +605,8 @@ const ManageUsers = () => {
                   transform: {
                     xs: "scale(0.8)",
                     sm: "scale(1)",
-                    md: "scale(1.2)"
-                  }
+                    md: "scale(1.2)",
+                  },
                 }}
               >
                 <ArrowBackIosIcon />
@@ -625,7 +625,7 @@ const ManageUsers = () => {
                   color: "#FFF",
                   lineHeight: 1.25,
                   alignSelf: "center",
-                  zIndex: 2
+                  zIndex: 2,
                 }}
               >
                 Manage Users
@@ -657,38 +657,38 @@ const ManageUsers = () => {
                 placeholder='Search by User ID or Email'
                 value={searchQuery}
                 onChange={handleSearchChange}
-                sx={{ 
+                sx={{
                   flex: 2,
                   // Responsive font size
-                  '& .MuiInputBase-input': {
-                    fontSize: { 
-                      xs: '0.75rem',   // Mobile
-                      sm: '0.85rem',   // Small devices
-                      md: '0.9rem',    // Medium devices
-                      lg: '1rem'        // Large devices
+                  "& .MuiInputBase-input": {
+                    fontSize: {
+                      xs: "0.75rem", // Mobile
+                      sm: "0.85rem", // Small devices
+                      md: "0.9rem", // Medium devices
+                      lg: "1rem", // Large devices
                     },
                     // Adjust input height
-                    padding: { 
-                      xs: '8px 12px',   // Mobile
-                      md: '12px 14px'   // Larger screens
+                    padding: {
+                      xs: "8px 12px", // Mobile
+                      md: "12px 14px", // Larger screens
                     },
                     // Optional: adjust overall height
-                    height: { 
-                      xs: '15px',   // Mobile
-                      md: '25px'    // Larger screens
-                    }
-                  }
+                    height: {
+                      xs: "15px", // Mobile
+                      md: "25px", // Larger screens
+                    },
+                  },
                 }}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position='start'>
-                      <Search 
+                      <Search
                         sx={{
-                          fontSize: { 
-                            xs: '1rem',   // Mobile
-                            md: '1.25rem' // Larger screens
-                          }
-                        }} 
+                          fontSize: {
+                            xs: "1rem", // Mobile
+                            md: "1.25rem", // Larger screens
+                          },
+                        }}
                       />
                     </InputAdornment>
                   ),
@@ -720,16 +720,17 @@ const ManageUsers = () => {
             </Box>
 
             {/* Virtuoso Table */}
-            <Box sx={{ 
+            <Box
+              sx={{
                 lex: 1,
                 backgroundColor: "#F7F9FC",
                 borderRadius: 1,
                 overflow: "hidden",
                 display: "flex",
-                flexDirection: "column", 
-                width: "80%"  
-                }}
-              >
+                flexDirection: "column",
+                width: "80%",
+              }}
+            >
               {loading ? (
                 <Box sx={{ display: "flex", justifyContent: "center" }}>
                   <Typography>Loading users...</Typography>
@@ -737,55 +738,63 @@ const ManageUsers = () => {
               ) : (
                 <Box sx={{ flex: 1, overflow: "hidden" }}>
                   <Virtuoso
-                  style={{ height: "400px" }}
-                  totalCount={filteredUsers.length}
-                  components={{
-                    Header: () => (
-                      <Box
-                        sx={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          backgroundColor: "#0A438F",
-                          fontSize: { xs: "0.5rem", md: "0.75rem", lg: "0.9rem" },
-                          color: "#FFF",
-                          padding: "10px",
-                          fontWeight: 700,
-                          position: "sticky",
-                          top: 0,
-                          zIndex: 1000,
-                        }}
-                      >
-                        <Box sx={{ flex: 1 }}>User ID</Box>
-                        <Box sx={{ flex: 2 }}>Email</Box>
-                        <Box sx={{ flex: 2 }}>Role</Box>
-                        <Box sx={{ flex: 1 }}>Modify</Box>
-                      </Box>
-                    ),
-                  }}
-                  itemContent={(index) => {
-                    const user = filteredUsers[index];
-                    return (
-                      <Box
-                        sx={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          padding: "0.5rem",
-                          borderBottom: "1px solid #ccc",
-                          fontSize: { xs: "0.5rem", md: "0.65rem", lg: "0.9rem" },
-                        }}
-                      >
-                        <Box sx={{ flex: 1 }}>{user.researcher_id}</Box>
-                        <Box sx={{ flex: 2 }}>{user.email}</Box>
-                        <Box sx={{ flex: 2 }}>{user.role_name || "N/A"}</Box>
-                        <Box sx={{ flex: 1 }}>
-                          <IconButton onClick={() => handleOpenModal(user)}>
-                            <EditIcon color='primary' />
-                          </IconButton>
+                    style={{ height: "400px" }}
+                    totalCount={filteredUsers.length}
+                    components={{
+                      Header: () => (
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            backgroundColor: "#0A438F",
+                            fontSize: {
+                              xs: "0.5rem",
+                              md: "0.75rem",
+                              lg: "0.9rem",
+                            },
+                            color: "#FFF",
+                            padding: "10px",
+                            fontWeight: 700,
+                            position: "sticky",
+                            top: 0,
+                            zIndex: 1000,
+                          }}
+                        >
+                          <Box sx={{ flex: 1 }}>User ID</Box>
+                          <Box sx={{ flex: 2 }}>Email</Box>
+                          <Box sx={{ flex: 2 }}>Role</Box>
+                          <Box sx={{ flex: 1 }}>Modify</Box>
                         </Box>
-                      </Box>
-                    );
-                  }}
-                />
+                      ),
+                    }}
+                    itemContent={(index) => {
+                      const user = filteredUsers[index];
+                      return (
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            padding: "0.5rem",
+                            borderBottom: "1px solid #ccc",
+                            fontSize: {
+                              xs: "0.5rem",
+                              md: "0.65rem",
+                              lg: "0.9rem",
+                            },
+                          }}
+                        >
+                          <Box sx={{ flex: 1 }}>{user.researcher_id}</Box>
+                          <Box sx={{ flex: 2 }}>{user.email}</Box>
+                          <Box sx={{ flex: 2 }}>{user.role_name || "N/A"}</Box>
+                          <Box sx={{ flex: 1 }}>
+                            <IconButton onClick={() => handleOpenModal(user)}>
+                              <EditIcon color='primary' />
+                            </IconButton>
+                          </Box>
+                        </Box>
+                      );
+                    }}
+                  />
                 </Box>
               )}
             </Box>
@@ -864,7 +873,11 @@ const ManageUsers = () => {
                       component='legend'
                       variant='h6'
                       fontWeight='700'
-                      sx={{ mb: "0.5rem", color: "#d40821", fontSize: { xs: "0.5rem", md: "0.75rem", lg: "0.9rem" }, }}
+                      sx={{
+                        mb: "0.5rem",
+                        color: "#d40821",
+                        fontSize: { xs: "0.5rem", md: "0.75rem", lg: "0.9rem" },
+                      }}
                     >
                       Account Status
                     </FormLabel>

@@ -1,12 +1,19 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Box, Button, TextField, Typography, Modal, useMediaQuery } from "@mui/material";
-import { useModalContext } from "./modalcontext";
+import {
+  Box,
+  Button,
+  TextField,
+  Typography,
+  Modal,
+  useMediaQuery,
+} from "@mui/material";
+import { useModalContext } from "../context/modalcontext";
 import { useAuth } from "../context/AuthContext";
 import axios from "axios";
-import { isMobile } from 'react-device-detect';
-axios.defaults.baseURL = 'http://localhost:5000';
-axios.defaults.headers.post['Content-Type'] = 'application/json';
+import { isMobile } from "react-device-detect";
+axios.defaults.baseURL = "http://localhost:5000";
+axios.defaults.headers.post["Content-Type"] = "application/json";
 axios.defaults.withCredentials = true;
 const LoginModal = () => {
   const {
@@ -17,7 +24,7 @@ const LoginModal = () => {
   } = useModalContext();
   const navigate = useNavigate();
   const { login } = useAuth();
-  const isSizeMobile = useMediaQuery('(max-width:600px)'); 
+  const isSizeMobile = useMediaQuery("(max-width:600px)");
 
   const [formValues, setFormValues] = useState({
     email: "",
@@ -97,7 +104,7 @@ const LoginModal = () => {
           break;
       }
     } catch (error) {
-      console.error('Login error details:', error.response || error);  // Detailed error log
+      console.error("Login error details:", error.response || error); // Detailed error log
       alert(`Login failed: ${error.response?.data?.message || error.message}`);
     }
   };
@@ -115,42 +122,44 @@ const LoginModal = () => {
   // Utility function to create responsive TextField styles
   const createTextFieldStyles = (customFlex = 2) => ({
     flex: customFlex,
-    '& .MuiInputBase-input': {
-      fontSize: { 
-        xs: '0.75rem',   // Mobile
-        sm: '0.75rem',   // Small devices
-        md: '0.8rem',    // Medium devices
-        lg: '1rem'     // Large devices
+    "& .MuiInputBase-input": {
+      fontSize: {
+        xs: "0.75rem", // Mobile
+        sm: "0.75rem", // Small devices
+        md: "0.8rem", // Medium devices
+        lg: "1rem", // Large devices
       },
       // Adjust input height
-      padding: { 
-        xs: '8px 12px',   // Mobile
-        md: '12px 14px'   // Larger screens
+      padding: {
+        xs: "8px 12px", // Mobile
+        md: "12px 14px", // Larger screens
       },
-    }
+    },
   });
 
   // Utility function to create responsive label styles
   const createInputLabelProps = () => ({
     sx: {
-      fontSize: { 
-        xs: '0.75rem',   // Mobile
-        sm: '0.75rem',   // Small devices
-        md: '0.8rem',    // Medium devices
-        lg: '0.9rem'     // Large devices
-      }
-    }
+      fontSize: {
+        xs: "0.75rem", // Mobile
+        sm: "0.75rem", // Small devices
+        md: "0.8rem", // Medium devices
+        lg: "0.9rem", // Large devices
+      },
+    },
   });
 
   return (
     <>
       {/*Log In Modal*/}
       <Modal open={isLoginModalOpen} onClose={handleModalClose}>
-        <Box sx={{
-          ...modalStyle,
-          maxHeight: "90vh", // Limit the modal height to 90% of the viewport height
-          overflowY: "auto", // Enable vertical scrolling when content overflows
-        }}>
+        <Box
+          sx={{
+            ...modalStyle,
+            maxHeight: "90vh", // Limit the modal height to 90% of the viewport height
+            overflowY: "auto", // Enable vertical scrolling when content overflows
+          }}
+        >
           <Typography
             variant='h6'
             color='#0A438F'
@@ -203,7 +212,6 @@ const LoginModal = () => {
                 variant='outlined'
                 sx={createTextFieldStyles()}
                 InputLabelProps={createInputLabelProps()}
-                
               />
               <TextField
                 label='Password'
@@ -249,25 +257,37 @@ const LoginModal = () => {
                 </Button>
 
                 <Button
-                onClick={handleForgotPassword}
-                color="primary"
-                sx={{
-                  textTransform: "none",
-                  fontSize: { xs: "10px", sm: "12px", md: "14px", lg: "16px" }, // Small base font size
-                  padding: { xs: "4px 6px", sm: "6px 8px", md: "8px 10px", lg: "10px 12px" }, // Smaller base padding
-                }}
-              >
-                Forgot Password?
-              </Button>
-                         
-                <Typography sx={{
-                  textAlign: { xs: "center", md: "bottom" },
-                  fontSize: {
-                    xs: "clamp(0.5rem, 2vw, 0.5rem)",
-                    sm: "clamp(0.75rem, 3.5vw, 0.75rem)",
-                    md: "clamp(1rem, 4vw, 1rem)",
-                  },
-                }}>
+                  onClick={handleForgotPassword}
+                  color='primary'
+                  sx={{
+                    textTransform: "none",
+                    fontSize: {
+                      xs: "10px",
+                      sm: "12px",
+                      md: "14px",
+                      lg: "16px",
+                    }, // Small base font size
+                    padding: {
+                      xs: "4px 6px",
+                      sm: "6px 8px",
+                      md: "8px 10px",
+                      lg: "10px 12px",
+                    }, // Smaller base padding
+                  }}
+                >
+                  Forgot Password?
+                </Button>
+
+                <Typography
+                  sx={{
+                    textAlign: { xs: "center", md: "bottom" },
+                    fontSize: {
+                      xs: "clamp(0.5rem, 2vw, 0.5rem)",
+                      sm: "clamp(0.75rem, 3.5vw, 0.75rem)",
+                      md: "clamp(1rem, 4vw, 1rem)",
+                    },
+                  }}
+                >
                   Don’t have an account?{" "}
                   <a
                     href='#'

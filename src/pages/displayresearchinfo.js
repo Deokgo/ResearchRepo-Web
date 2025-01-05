@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import Navbar from "./navbar";
-import { isMobile } from 'react-device-detect';
-import DynamicTimeline from "./Timeline";
-import StatusUpdateButton from "./StatusUpdateButton";
+import Navbar from "../components/navbar";
+import { isMobile } from "react-device-detect";
+import DynamicTimeline from "../components/Timeline";
+import StatusUpdateButton from "../components/StatusUpdateButton";
 import { CircularProgress } from "@mui/material";
 import {
   Box,
@@ -28,7 +28,7 @@ import { useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import homeBg from "../assets/home_bg.png";
 import axios from "axios";
-import FileUploader from "./FileUploader";
+import FileUploader from "../components/FileUploader";
 import EditIcon from "@mui/icons-material/Edit";
 import sdgGoalsData from "../data/sdgGoals.json";
 import { useAuth } from "../context/AuthContext";
@@ -37,7 +37,7 @@ const DisplayResearchInfo = ({ route, navigate }) => {
   const [users, setUsers] = useState([]);
   const navpage = useNavigate();
   const location = useLocation();
-  const isSizeMobile = useMediaQuery('(max-width:600px)');
+  const isSizeMobile = useMediaQuery("(max-width:600px)");
   const [openModal, setOpenModal] = useState(false);
   const { id } = location.state || {}; // Default to an empty object if state is undefined
   const [data, setData] = useState(null); // Start with null to represent no data
@@ -236,18 +236,18 @@ const DisplayResearchInfo = ({ route, navigate }) => {
 
   const fetchResearchAreas = async () => {
     try {
-      const response = await axios.get('/paper/research_areas');
+      const response = await axios.get("/paper/research_areas");
       if (response.data.research_areas) {
         // Transform the data to match the expected format
-        const formattedAreas = response.data.research_areas.map(area => ({
+        const formattedAreas = response.data.research_areas.map((area) => ({
           research_area_id: area.id,
-          research_area_name: area.name
+          research_area_name: area.name,
         }));
-        console.log('Fetched research areas:', formattedAreas); // Debug log
+        console.log("Fetched research areas:", formattedAreas); // Debug log
         setResearchAreas(formattedAreas);
       }
     } catch (error) {
-      console.error('Error fetching research areas:', error);
+      console.error("Error fetching research areas:", error);
     }
   };
 
@@ -255,14 +255,14 @@ const DisplayResearchInfo = ({ route, navigate }) => {
     try {
       // Fetch research areas first
       await fetchResearchAreas();
-      
+
       setEditableData({
         research_id: item.research_id,
         title: item.title,
         college_id: item.college_id,
         program_id: item.program_id,
         abstract: item.abstract,
-        research_type: item.research_type || '',
+        research_type: item.research_type || "",
         date_approved: item.date_approved
           ? new Date(item.date_approved).toISOString().split("T")[0]
           : "",
@@ -270,8 +270,8 @@ const DisplayResearchInfo = ({ route, navigate }) => {
           ? item.sdg.split(";").map((sdgId) => ({
               id: sdgId,
               title:
-                sdgGoalsData.sdgGoals.find((goal) => goal.id === sdgId)?.title ||
-                "",
+                sdgGoalsData.sdgGoals.find((goal) => goal.id === sdgId)
+                  ?.title || "",
             }))
           : [],
         keywords: item.keywords || [],
@@ -281,14 +281,14 @@ const DisplayResearchInfo = ({ route, navigate }) => {
         file: item.full_manuscript || null,
         research_areas: item.research_areas || [], // This should now match the fetched format
       });
-      
+
       setSelectedSDGs(
         item.sdg
           ? item.sdg.split(";").map((sdgId) => ({
               id: sdgId,
               title:
-                sdgGoalsData.sdgGoals.find((goal) => goal.id === sdgId)?.title ||
-                "",
+                sdgGoalsData.sdgGoals.find((goal) => goal.id === sdgId)
+                  ?.title || "",
             }))
           : []
       );
@@ -298,9 +298,12 @@ const DisplayResearchInfo = ({ route, navigate }) => {
 
       // Fetch programs for the selected college
       if (item.college_id) {
-        const response = await axios.get(`/deptprogs/programs/${item.college_id}`, {
-          params: { department: item.college_id },
-        });
+        const response = await axios.get(
+          `/deptprogs/programs/${item.college_id}`,
+          {
+            params: { department: item.college_id },
+          }
+        );
         setPrograms(response.data.programs);
       }
     } catch (error) {
@@ -342,8 +345,12 @@ const DisplayResearchInfo = ({ route, navigate }) => {
           JSON.stringify(editableData.authors.map((a) => a.user_id).sort()) ||
         JSON.stringify(originalData.panels.map((p) => p.user_id).sort()) !==
           JSON.stringify(editableData.panels.map((p) => p.user_id).sort()) ||
-        JSON.stringify(originalData.research_areas.map(ra => ra.research_area_id).sort()) !==
-          JSON.stringify(editableData.research_areas.map(ra => ra.research_area_id).sort()) ||
+        JSON.stringify(
+          originalData.research_areas.map((ra) => ra.research_area_id).sort()
+        ) !==
+          JSON.stringify(
+            editableData.research_areas.map((ra) => ra.research_area_id).sort()
+          ) ||
         file !== null ||
         extendedAbstract !== null;
 
@@ -369,7 +376,7 @@ const DisplayResearchInfo = ({ route, navigate }) => {
       formData.append("sdg", selectedSDGs.map((sdg) => sdg.id).join(";"));
 
       // Add research areas
-      editableData.research_areas.forEach(area => {
+      editableData.research_areas.forEach((area) => {
         formData.append("research_area_ids", area.research_area_id);
       });
 
@@ -804,8 +811,10 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                         />
                         <Grid2
                           container
-                          display="flex"
-                          direction={isMobile || isSizeMobile ? "column" : "row"}
+                          display='flex'
+                          direction={
+                            isMobile || isSizeMobile ? "column" : "row"
+                          }
                           paddingLeft={2}
                           paddingRight={2}
                         >
@@ -836,11 +845,14 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                                   md: "0.7rem",
                                   lg: "0.9rem",
                                 },
-                                mb: "2rem"
+                                mb: "2rem",
                               }}
                             >
-                              {Array.isArray(item.research_areas) && item.research_areas.length > 0
-                                ? item.research_areas.map(area => area.research_area_name).join("; ")
+                              {Array.isArray(item.research_areas) &&
+                              item.research_areas.length > 0
+                                ? item.research_areas
+                                    .map((area) => area.research_area_name)
+                                    .join("; ")
                                 : "No research areas available"}
                             </Typography>
                             <Typography
@@ -901,7 +913,7 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                           </Grid2>
                           <Grid2
                             size={isMobile || isSizeMobile ? 12 : 4}
-                            justifyContent="flex-end"
+                            justifyContent='flex-end'
                             sx={{
                               flexGrow: 1,
                               marginTop: isMobile || isSizeMobile ? "2rem" : 0,
@@ -947,7 +959,7 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                                 <strong>Program:</strong> {item.program_name}
                               </Typography>
                               <Typography
-                                variant="body1"
+                                variant='body1'
                                 sx={{
                                   mb: "1rem",
                                   fontSize: {
@@ -958,8 +970,8 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                                 }}
                               >
                                 <strong>Adviser:</strong>{" "}
-                                {item.adviser && item.adviser.name 
-                                  ? `${item.adviser.name}` 
+                                {item.adviser && item.adviser.name
+                                  ? `${item.adviser.name}`
                                   : "No adviser"}
                               </Typography>
                               <Typography
@@ -1156,7 +1168,11 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                             </FormControl>
                           </Grid2>
                           <Grid2 size={2}>
-                            <FormControl fullWidth variant='outlined' disabled={user.role !== "05"}>
+                            <FormControl
+                              fullWidth
+                              variant='outlined'
+                              disabled={user.role !== "05"}
+                            >
                               <InputLabel
                                 sx={{
                                   fontSize: {
@@ -1198,31 +1214,8 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                             </FormControl>
                           </Grid2>
                           <Grid2 size={2}>
-                          <FormControl fullWidth variant="outlined">
-                            <InputLabel
-                              sx={{
-                                fontSize: {
-                                  xs: "0.75rem",
-                                  md: "0.75rem",
-                                  lg: "0.8rem",
-                                },
-                              }}
-                            >
-                              Research Type
-                            </InputLabel>
-                            <Select
-                              label="Research Type"
-                              sx={createTextFieldStyles()}
-                              value={editableData.research_type || ''} // Default to an empty string if undefined
-                              onChange={(e) =>
-                                setEditableData((prev) => ({
-                                  ...prev,
-                                  research_type: e.target.value,
-                                }))
-                              }
-                            >
-                              <MenuItem
-                                value="Extramural"
+                            <FormControl fullWidth variant='outlined'>
+                              <InputLabel
                                 sx={{
                                   fontSize: {
                                     xs: "0.75rem",
@@ -1231,34 +1224,57 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                                   },
                                 }}
                               >
-                                Extramural
-                              </MenuItem>
-                              <MenuItem
-                                value="College-Driven"
-                                sx={{
-                                  fontSize: {
-                                    xs: "0.75rem",
-                                    md: "0.75rem",
-                                    lg: "0.8rem",
-                                  },
-                                }}
+                                Research Type
+                              </InputLabel>
+                              <Select
+                                label='Research Type'
+                                sx={createTextFieldStyles()}
+                                value={editableData.research_type || ""} // Default to an empty string if undefined
+                                onChange={(e) =>
+                                  setEditableData((prev) => ({
+                                    ...prev,
+                                    research_type: e.target.value,
+                                  }))
+                                }
                               >
-                                College-Driven
-                              </MenuItem>
-                              <MenuItem
-                                value="Integrative"
-                                sx={{
-                                  fontSize: {
-                                    xs: "0.75rem",
-                                    md: "0.75rem",
-                                    lg: "0.8rem",
-                                  },
-                                }}
-                              >
-                                Integrative
-                              </MenuItem>
-                            </Select>
-                          </FormControl>
+                                <MenuItem
+                                  value='Extramural'
+                                  sx={{
+                                    fontSize: {
+                                      xs: "0.75rem",
+                                      md: "0.75rem",
+                                      lg: "0.8rem",
+                                    },
+                                  }}
+                                >
+                                  Extramural
+                                </MenuItem>
+                                <MenuItem
+                                  value='College-Driven'
+                                  sx={{
+                                    fontSize: {
+                                      xs: "0.75rem",
+                                      md: "0.75rem",
+                                      lg: "0.8rem",
+                                    },
+                                  }}
+                                >
+                                  College-Driven
+                                </MenuItem>
+                                <MenuItem
+                                  value='Integrative'
+                                  sx={{
+                                    fontSize: {
+                                      xs: "0.75rem",
+                                      md: "0.75rem",
+                                      lg: "0.8rem",
+                                    },
+                                  }}
+                                >
+                                  Integrative
+                                </MenuItem>
+                              </Select>
+                            </FormControl>
                           </Grid2>
                           <Grid2 size={2}>
                             <TextField
@@ -1336,7 +1352,11 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                           <Grid2 size={4}>
                             <Autocomplete
                               value={editableData.adviser}
-                              disabled={editableData.research_type === "COLLEGE-DRIVEN" || editableData.research_type === "EXTRAMURAL"}
+                              disabled={
+                                editableData.research_type ===
+                                  "COLLEGE-DRIVEN" ||
+                                editableData.research_type === "EXTRAMURAL"
+                              }
                               onChange={(event, newValue) => {
                                 const formattedAdviser = newValue
                                   ? {
@@ -1394,7 +1414,11 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                             <Autocomplete
                               multiple
                               value={editableData.panels}
-                              disabled={editableData.research_type === "COLLEGE-DRIVEN" || editableData.research_type === "EXTRAMURAL"}
+                              disabled={
+                                editableData.research_type ===
+                                  "COLLEGE-DRIVEN" ||
+                                editableData.research_type === "EXTRAMURAL"
+                              }
                               onChange={(event, newValue) => {
                                 const formattedPanels = newValue.map(
                                   (panel) => ({
@@ -1536,9 +1560,12 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                                 }));
                               }}
                               options={researchAreas || []}
-                              getOptionLabel={(option) => option.research_area_name || ''}
-                              isOptionEqualToValue={(option, value) => 
-                                option.research_area_id === value.research_area_id
+                              getOptionLabel={(option) =>
+                                option.research_area_name || ""
+                              }
+                              isOptionEqualToValue={(option, value) =>
+                                option.research_area_id ===
+                                value.research_area_id
                               }
                               renderInput={(params) => (
                                 <TextField
@@ -1551,14 +1578,14 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                                 />
                               )}
                               sx={{
-                                '& .MuiAutocomplete-input': {
+                                "& .MuiAutocomplete-input": {
                                   fontSize: {
                                     xs: "0.6rem",
                                     sm: "0.7rem",
                                     md: "0.8rem",
                                     lg: "0.8rem",
                                   },
-                                }
+                                },
                               }}
                             />
                           </Grid2>

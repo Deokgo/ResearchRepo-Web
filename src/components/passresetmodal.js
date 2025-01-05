@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import OtpModal from "./otpmodal";
-import { useModalContext } from "./modalcontext";
+import { useModalContext } from "../context/modalcontext";
 
 const PasswordResetModal = () => {
   const { isPassresetModalOpen, closePassresetModal } = useModalContext();
@@ -119,13 +119,13 @@ const PasswordResetModal = () => {
     });
     setError("");
   };
-  
+
   return (
     <>
       <Modal open={isPassresetModalOpen} onClose={closePassresetModal}>
         <Box sx={modalStyle}>
           <Typography
-            variant="h6"
+            variant='h6'
             sx={{
               color: "#0A438F",
               fontWeight: "500",
@@ -135,7 +135,7 @@ const PasswordResetModal = () => {
             Mapúa MCL Research Repository
           </Typography>
           <Typography
-            variant="h3"
+            variant='h3'
             sx={{
               color: "#F40824",
               fontWeight: "700",
@@ -146,7 +146,7 @@ const PasswordResetModal = () => {
           >
             Password Reset
           </Typography>
-  
+
           {!isOtpVerified ? (
             <form onSubmit={handleEmailSubmit}>
               <Box
@@ -158,14 +158,14 @@ const PasswordResetModal = () => {
                 }}
               >
                 <TextField
-                  label="Email"
+                  label='Email'
                   fullWidth
-                  name="email"
-                  type="email"
+                  name='email'
+                  type='email'
                   value={formValues.email}
                   onChange={handleChange}
-                  margin="normal"
-                  variant="outlined"
+                  margin='normal'
+                  variant='outlined'
                   error={Boolean(error)}
                   helperText={error}
                   sx={{
@@ -174,9 +174,9 @@ const PasswordResetModal = () => {
                   }}
                 />
                 <Button
-                  type="submit"
+                  type='submit'
                   fullWidth
-                  variant="contained"
+                  variant='contained'
                   disabled={loading}
                   sx={{
                     maxWidth: { xs: "150px", sm: "200px" }, // Responsive max width
@@ -201,17 +201,17 @@ const PasswordResetModal = () => {
                 }}
               >
                 <TextField
-                  label="New Password"
+                  label='New Password'
                   fullWidth
-                  name="newPassword"
+                  name='newPassword'
                   type={showPassword ? "text" : "password"}
                   value={formValues.newPassword}
                   onChange={handleChange}
-                  margin="normal"
-                  variant="outlined"
+                  margin='normal'
+                  variant='outlined'
                   InputProps={{
                     endAdornment: (
-                      <InputAdornment position="end">
+                      <InputAdornment position='end'>
                         <IconButton
                           onClick={() => setShowPassword(!showPassword)}
                         >
@@ -222,19 +222,19 @@ const PasswordResetModal = () => {
                   }}
                 />
                 <TextField
-                  label="Confirm Password"
+                  label='Confirm Password'
                   fullWidth
-                  name="confirmPassword"
+                  name='confirmPassword'
                   type={showConfirmPassword ? "text" : "password"}
                   value={formValues.confirmPassword}
                   onChange={handleChange}
-                  margin="normal"
-                  variant="outlined"
+                  margin='normal'
+                  variant='outlined'
                   error={Boolean(error)}
                   helperText={error}
                   InputProps={{
                     endAdornment: (
-                      <InputAdornment position="end">
+                      <InputAdornment position='end'>
                         <IconButton
                           onClick={() =>
                             setShowConfirmPassword(!showConfirmPassword)
@@ -251,9 +251,9 @@ const PasswordResetModal = () => {
                   }}
                 />
                 <Button
-                  type="submit"
+                  type='submit'
                   fullWidth
-                  variant="contained"
+                  variant='contained'
                   disabled={loading}
                   sx={{
                     maxWidth: { xs: "150px", sm: "200px" }, // Responsive max width
@@ -269,7 +269,7 @@ const PasswordResetModal = () => {
           )}
         </Box>
       </Modal>
-  
+
       <OtpModal
         open={showOtpModal}
         onClose={() => setShowOtpModal(false)}
@@ -278,7 +278,7 @@ const PasswordResetModal = () => {
         isPasswordReset={true}
       />
     </>
-  );  
+  );
 };
 
 export default PasswordResetModal;

@@ -1,7 +1,7 @@
 // signupmodal.js
 import React, { useState } from "react";
 import OtpModal from "./otpmodal";
-import { useModalContext } from "./modalcontext"; // Import the ModalContext
+import { useModalContext } from "../context/modalcontext"; // Import the ModalContext
 import {
   Box,
   Button,
@@ -232,11 +232,13 @@ const SignUpModal = () => {
   return (
     <>
       <Modal open={isSignupModalOpen} onClose={handleModalClose}>
-        <Box sx={{
-              ...modalStyle,
-              maxHeight: "90vh", // Limit the modal height to 90% of the viewport height
-              overflowY: "auto", // Enable vertical scrolling when content overflows
-            }}>
+        <Box
+          sx={{
+            ...modalStyle,
+            maxHeight: "90vh", // Limit the modal height to 90% of the viewport height
+            overflowY: "auto", // Enable vertical scrolling when content overflows
+          }}
+        >
           <Typography
             variant='h6'
             color='#0A438F'
@@ -288,29 +290,29 @@ const SignUpModal = () => {
                     sx={{
                       flex: 2,
                       // Adjust styles for input
-                      '& .MuiInputBase-input': {
+                      "& .MuiInputBase-input": {
                         fontSize: {
-                          xs: '0.75rem', // Mobile
-                          sm: '0.85rem', // Small devices
-                          md: '0.9rem',  // Medium devices
-                          lg: '1rem',    // Large devices
+                          xs: "0.75rem", // Mobile
+                          sm: "0.85rem", // Small devices
+                          md: "0.9rem", // Medium devices
+                          lg: "1rem", // Large devices
                         },
                         padding: {
-                          xs: '8px 12px', // Mobile
-                          md: '12px 14px', // Larger screens
+                          xs: "8px 12px", // Mobile
+                          md: "12px 14px", // Larger screens
                         },
                         height: {
-                          xs: '15px', // Mobile
-                          md: '25px', // Larger screens
+                          xs: "15px", // Mobile
+                          md: "25px", // Larger screens
                         },
                       },
                       // Adjust styles for the label
-                      '& .MuiInputLabel-root': {
+                      "& .MuiInputLabel-root": {
                         fontSize: {
-                          xs: '0.7rem', // Mobile
-                          sm: '0.8rem', // Small devices
-                          md: '0.9rem', // Medium devices
-                          lg: '1rem',   // Large devices
+                          xs: "0.7rem", // Mobile
+                          sm: "0.8rem", // Small devices
+                          md: "0.9rem", // Medium devices
+                          lg: "1rem", // Large devices
                         },
                       },
                     }}
@@ -327,29 +329,29 @@ const SignUpModal = () => {
                     sx={{
                       flex: 2,
                       // Adjust styles for input
-                      '& .MuiInputBase-input': {
+                      "& .MuiInputBase-input": {
                         fontSize: {
-                          xs: '0.75rem', // Mobile
-                          sm: '0.85rem', // Small devices
-                          md: '0.9rem',  // Medium devices
-                          lg: '1rem',    // Large devices
+                          xs: "0.75rem", // Mobile
+                          sm: "0.85rem", // Small devices
+                          md: "0.9rem", // Medium devices
+                          lg: "1rem", // Large devices
                         },
                         padding: {
-                          xs: '8px 12px', // Mobile
-                          md: '12px 14px', // Larger screens
+                          xs: "8px 12px", // Mobile
+                          md: "12px 14px", // Larger screens
                         },
                         height: {
-                          xs: '15px', // Mobile
-                          md: '25px', // Larger screens
+                          xs: "15px", // Mobile
+                          md: "25px", // Larger screens
                         },
                       },
                       // Adjust styles for the label
-                      '& .MuiInputLabel-root': {
+                      "& .MuiInputLabel-root": {
                         fontSize: {
-                          xs: '0.7rem', // Mobile
-                          sm: '0.8rem', // Small devices
-                          md: '0.9rem', // Medium devices
-                          lg: '1rem',   // Large devices
+                          xs: "0.7rem", // Mobile
+                          sm: "0.8rem", // Small devices
+                          md: "0.9rem", // Medium devices
+                          lg: "1rem", // Large devices
                         },
                       },
                     }}
@@ -366,29 +368,29 @@ const SignUpModal = () => {
                     sx={{
                       flex: 2,
                       // Adjust styles for input
-                      '& .MuiInputBase-input': {
+                      "& .MuiInputBase-input": {
                         fontSize: {
-                          xs: '0.75rem', // Mobile
-                          sm: '0.85rem', // Small devices
-                          md: '0.9rem',  // Medium devices
-                          lg: '1rem',    // Large devices
+                          xs: "0.75rem", // Mobile
+                          sm: "0.85rem", // Small devices
+                          md: "0.9rem", // Medium devices
+                          lg: "1rem", // Large devices
                         },
                         padding: {
-                          xs: '8px 12px', // Mobile
-                          md: '12px 14px', // Larger screens
+                          xs: "8px 12px", // Mobile
+                          md: "12px 14px", // Larger screens
                         },
                         height: {
-                          xs: '15px', // Mobile
-                          md: '25px', // Larger screens
+                          xs: "15px", // Mobile
+                          md: "25px", // Larger screens
                         },
                       },
                       // Adjust styles for the label
-                      '& .MuiInputLabel-root': {
+                      "& .MuiInputLabel-root": {
                         fontSize: {
-                          xs: '0.7rem', // Mobile
-                          sm: '0.8rem', // Small devices
-                          md: '0.9rem', // Medium devices
-                          lg: '1rem',   // Large devices
+                          xs: "0.7rem", // Mobile
+                          sm: "0.8rem", // Small devices
+                          md: "0.9rem", // Medium devices
+                          lg: "1rem", // Large devices
                         },
                       },
                     }}
@@ -405,29 +407,29 @@ const SignUpModal = () => {
                     sx={{
                       flex: 2,
                       // Adjust styles for input
-                      '& .MuiInputBase-input': {
+                      "& .MuiInputBase-input": {
                         fontSize: {
-                          xs: '0.75rem', // Mobile
-                          sm: '0.85rem', // Small devices
-                          md: '0.9rem',  // Medium devices
-                          lg: '1rem',    // Large devices
+                          xs: "0.75rem", // Mobile
+                          sm: "0.85rem", // Small devices
+                          md: "0.9rem", // Medium devices
+                          lg: "1rem", // Large devices
                         },
                         padding: {
-                          xs: '8px 12px', // Mobile
-                          md: '12px 14px', // Larger screens
+                          xs: "8px 12px", // Mobile
+                          md: "12px 14px", // Larger screens
                         },
                         height: {
-                          xs: '15px', // Mobile
-                          md: '25px', // Larger screens
+                          xs: "15px", // Mobile
+                          md: "25px", // Larger screens
                         },
                       },
                       // Adjust styles for the label
-                      '& .MuiInputLabel-root': {
+                      "& .MuiInputLabel-root": {
                         fontSize: {
-                          xs: '0.7rem', // Mobile
-                          sm: '0.8rem', // Small devices
-                          md: '0.9rem', // Medium devices
-                          lg: '1rem',   // Large devices
+                          xs: "0.7rem", // Mobile
+                          sm: "0.8rem", // Small devices
+                          md: "0.9rem", // Medium devices
+                          lg: "1rem", // Large devices
                         },
                       },
                     }}
@@ -445,29 +447,29 @@ const SignUpModal = () => {
                     sx={{
                       flex: 2,
                       // Adjust styles for input
-                      '& .MuiInputBase-input': {
+                      "& .MuiInputBase-input": {
                         fontSize: {
-                          xs: '0.75rem', // Mobile
-                          sm: '0.85rem', // Small devices
-                          md: '0.9rem',  // Medium devices
-                          lg: '1rem',    // Large devices
+                          xs: "0.75rem", // Mobile
+                          sm: "0.85rem", // Small devices
+                          md: "0.9rem", // Medium devices
+                          lg: "1rem", // Large devices
                         },
                         padding: {
-                          xs: '8px 12px', // Mobile
-                          md: '12px 14px', // Larger screens
+                          xs: "8px 12px", // Mobile
+                          md: "12px 14px", // Larger screens
                         },
                         height: {
-                          xs: '15px', // Mobile
-                          md: '25px', // Larger screens
+                          xs: "15px", // Mobile
+                          md: "25px", // Larger screens
                         },
                       },
                       // Adjust styles for the label
-                      '& .MuiInputLabel-root': {
+                      "& .MuiInputLabel-root": {
                         fontSize: {
-                          xs: '0.7rem', // Mobile
-                          sm: '0.8rem', // Small devices
-                          md: '0.9rem', // Medium devices
-                          lg: '1rem',   // Large devices
+                          xs: "0.7rem", // Mobile
+                          sm: "0.8rem", // Small devices
+                          md: "0.9rem", // Medium devices
+                          lg: "1rem", // Large devices
                         },
                       },
                     }}
@@ -487,29 +489,29 @@ const SignUpModal = () => {
                 sx={{
                   flex: 2,
                   // Adjust styles for input
-                  '& .MuiInputBase-input': {
+                  "& .MuiInputBase-input": {
                     fontSize: {
-                      xs: '0.75rem', // Mobile
-                      sm: '0.85rem', // Small devices
-                      md: '0.9rem',  // Medium devices
-                      lg: '1rem',    // Large devices
+                      xs: "0.75rem", // Mobile
+                      sm: "0.85rem", // Small devices
+                      md: "0.9rem", // Medium devices
+                      lg: "1rem", // Large devices
                     },
                     padding: {
-                      xs: '8px 12px', // Mobile
-                      md: '12px 14px', // Larger screens
+                      xs: "8px 12px", // Mobile
+                      md: "12px 14px", // Larger screens
                     },
                     height: {
-                      xs: '15px', // Mobile
-                      md: '25px', // Larger screens
+                      xs: "15px", // Mobile
+                      md: "25px", // Larger screens
                     },
                   },
                   // Adjust styles for the label
-                  '& .MuiInputLabel-root': {
+                  "& .MuiInputLabel-root": {
                     fontSize: {
-                      xs: '0.7rem', // Mobile
-                      sm: '0.8rem', // Small devices
-                      md: '0.9rem', // Medium devices
-                      lg: '1rem',   // Large devices
+                      xs: "0.7rem", // Mobile
+                      sm: "0.8rem", // Small devices
+                      md: "0.9rem", // Medium devices
+                      lg: "1rem", // Large devices
                     },
                   },
                 }}
