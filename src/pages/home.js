@@ -113,29 +113,6 @@ const Home = () => {
     prevArrow: <PrevArrow />,
   };
 
-  const buttonStyles = {
-    fontSize: "clamp(0.8rem, 3vw, 1.2rem)", // Responsive font size
-    padding: "0.5rem 1.5rem", // Consistent padding
-    minWidth: "100px", // Minimum width
-    borderRadius: "50px", // Rounded corners
-    transition: "transform 0.2s ease", // Smooth interaction
-
-    "&:hover": {
-      transform: "scale(1.05)", // Slight grow on hover
-    },
-
-    "&:active": {
-      transform: "scale(0.95)", // Slight shrink when pressed
-    },
-  };
-
-  const togglePasswordVisibility = () => {
-    setShowPassword((prev) => !prev);
-  };
-  const toggleConfirmPasswordVisibility = () => {
-    setShowConfirmPassword((prev) => !prev);
-  };
-
   const handleReadMore = () => {
     navigate("/readmore");
   };
@@ -149,21 +126,18 @@ const Home = () => {
           height: "100vh",
           display: "flex",
           flexDirection: "column",
-          overflow: "hidden",
         }}
       >
         <Navbar />
         <Box
           sx={{
             position: "relative",
-            marginTop: { xs: "3.5rem", sm: "4rem", md: "5rem" },
             display: "flex",
             flexDirection: { xs: "column", md: "row" },
             gap: 4,
             flexGrow: 1,
-            backgroundSize: "cover",
             backgroundPosition: "center",
-            height: { xs: "100%", md: "calc(100vh - 6rem)" },
+            height: { xs: "100%", md: "calc(100vh - 5rem)" },
             backgroundColor: "#0A438F",
           }}
         >
@@ -192,8 +166,9 @@ const Home = () => {
               container
               spacing={5}
               sx={{
+                overflow: 'hidden',
                 height: "100%",
-                flexWrap: "nowrap",
+                alignItems: 'center'
               }}
             >
               <Grid2 size={9}>
@@ -203,7 +178,6 @@ const Home = () => {
                     justifyContent: "center",
                     alignContent: "center",
                     alignItems: "center",
-                    mt: "1rem",
                     mb: "3rem",
                     paddingLeft: "1rem",
                     width: "100%", // Ensure full width
@@ -327,7 +301,7 @@ const Home = () => {
                       width: "100%",
                       height: "auto",
                       objectFit: "contain",
-                      paddingTop: "8rem",
+                      paddingTop: "10rem",
                     }}
                   />
                   <Typography

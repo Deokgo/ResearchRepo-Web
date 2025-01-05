@@ -924,28 +924,32 @@ const Collection = () => {
                       border: "1px solid #ccc",
                       borderRadius: 3,
                       overflow: "hidden",
+                      position: "relative", // Ensures child elements can be positioned
                     }}
                   >
-                    <Button
-                      onClick={handleNavigateKnowledgeGraph}
-                      sx={{
+                    <iframe
+                      src="http://localhost:5000/collectionkg"
+                      style={{
                         width: "100%",
                         height: "100%",
-                        p: 0,
+                        border: "none",
+                        overflow: "hidden",
                       }}
-                    >
-                      <img
-                        src={DummyKG}
-                        alt='Dummy Knowledge Graph'
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "cover",
-                        }}
-                      />
-                    </Button>
+                    />
+                    <Box
+                      onClick={handleNavigateKnowledgeGraph}
+                      sx={{
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        width: "100%",
+                        height: "100%",
+                        cursor: "pointer",
+                        backgroundColor: "transparent", // Ensures no visual interference
+                      }}
+                    />
                   </Box>
-                </Grid2>
+                </Grid2>              
               )}
             </Grid2>
           </Box>

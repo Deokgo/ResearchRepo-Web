@@ -132,6 +132,7 @@ const DashEmbed = () => {
             <Typography
               variant='h3'
               sx={{
+                py: 15,
                 fontFamily: "Montserrat, sans-serif",
                 fontWeight: 800,
                 fontSize: {

@@ -117,7 +117,7 @@ const ReadMore = () => {
           </Box>
 
           {/* Content Section */}
-          <Box sx={{ flexGrow: 1, p: { xs: 2, md: 10 } }}>
+          <Box sx={{ flexGrow: 1, p: { xs: 5, md: 10 } }}>
             <Grid container spacing={4}>
               {/* Left Column */}
               <Grid
@@ -135,7 +135,7 @@ const ReadMore = () => {
                   variant='h4'
                   sx={{
                     fontWeight: 600,
-                    fontSize: { xs: "1.5rem", sm: "2rem", md: "3rem" },
+                    fontSize: { xs: "1.375rem", sm: "2.375rem", md: "4.25rem" },
                     color: "#001C43",
                   }}
                 >
@@ -144,8 +144,9 @@ const ReadMore = () => {
                     sx={{
                       backgroundColor: "#DF031D",
                       mt: 1,
+                      ml: 1,
                       display: "inline-block",
-                      px: 2,
+                      px: 1.5,
                     }}
                   >
                     <Typography
@@ -153,7 +154,7 @@ const ReadMore = () => {
                       sx={{
                         fontWeight: 600,
                         color: "#fff",
-                        fontSize: { xs: "1.5rem", sm: "2rem", md: "3rem" },
+                        fontSize: { xs: "1rem", sm: "2rem", md: "3.375rem" },
                       }}
                     >
                       research needs
@@ -163,7 +164,7 @@ const ReadMore = () => {
                 <Typography
                   variant='body1'
                   sx={{
-                    mt: 2,
+                    mt: 5,
                     fontSize: { xs: "0.9rem", sm: "1rem", md: "1.2rem" },
                     color: "#001C43",
                   }}
@@ -181,6 +182,7 @@ const ReadMore = () => {
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "center",
+                  alignSelf: "center",
                   textAlign: "center",
                 }}
               >
@@ -188,14 +190,14 @@ const ReadMore = () => {
                   src={navLogo}
                   alt='Logo'
                   style={{
-                    width: "60%",
+                    width: "75%",
                     height: "auto",
                   }}
                 />
                 <Typography
                   variant='body1'
                   sx={{
-                    mt: 2,
+                    mt: 5,
                     fontSize: { xs: "0.9rem", sm: "1rem", md: "1.2rem" },
                     color: "#001C43",
                   }}
