@@ -66,6 +66,7 @@ const Collection = () => {
   const [selectedColleges, setSelectedColleges] = useState([]);
   const [selectedPrograms, setSelectedPrograms] = useState([]);
   const [selectedFormats, setSelectedFormats] = useState([]);
+  const [publicationFormats, setPublicationFormats] = useState([]);
   const [selectedResearchItem, setSelectedResearchItem] = useState(null);
   const [response, setReponse] = useState(null);
   const itemsPerPage = 5;
@@ -78,6 +79,20 @@ const Collection = () => {
   const handleNavigateKnowledgeGraph = () => {
     navigate("/knowledgegraph");
   };
+
+  // Fetch publication formats from the API
+  useEffect(() => {
+    const fetchPublicationFormats = async () => {
+      try {
+        const response = await axios.get("/paper/publication_format");
+        setPublicationFormats(response.data.publication_formats);
+      } catch (error) {
+        console.error("Error fetching publication formats:", error);
+      }
+    };
+
+    fetchPublicationFormats();
+  }, []);
 
   const handleResearchItemClick = async (item) => {
     try {
@@ -698,30 +713,28 @@ const Collection = () => {
                         },
                       }}
                     >
-                      {["Journal", "Proceeding", "Unpublished"].map(
-                        (format) => (
-                          <FormControlLabel
-                            key={format}
-                            control={
-                              <Checkbox
-                                checked={selectedFormats.includes(format)}
-                                onChange={handleFormatChange}
-                                value={format}
-                              />
-                            }
-                            label={format}
-                            sx={{
-                              "& .MuiTypography-root": {
-                                fontSize: {
-                                  xs: "0.5rem",
-                                  md: "0.75rem",
-                                  lg: "0.9rem",
-                                },
+                      {publicationFormats.map((format) => (
+                        <FormControlLabel
+                          key={format.id}
+                          control={
+                            <Checkbox
+                              checked={selectedFormats.includes(format.name)}
+                              onChange={handleFormatChange}
+                              value={format.name} // Use format.name for the value
+                            />
+                          }
+                          label={format.name}
+                          sx={{
+                            "& .MuiTypography-root": {
+                              fontSize: {
+                                xs: "0.5rem",
+                                md: "0.75rem",
+                                lg: "0.9rem",
                               },
-                            }}
-                          />
-                        )
-                      )}
+                            },
+                          }}
+                        />
+                      ))}
                     </Box>
                   </Box>
                 </Grid2>
