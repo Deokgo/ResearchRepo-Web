@@ -161,7 +161,8 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
   ///////////////////// COUNTRY AND CITY API RETRIEVAL //////////////////////
   const fetchCountries = async () => {
     let country = await axios.get(
-      "https://countriesnow.space/api/v0.1/countries"
+      "https://countriesnow.space/api/v0.1/countries",
+      { withCredentials: false }
     );
     console.log(country);
 

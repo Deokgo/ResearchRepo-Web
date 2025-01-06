@@ -145,7 +145,7 @@ const SDGdashEmbed = () => {
                 zIndex: 2,
               }}
             >
-              SDG Analytics
+              SDG Impact Dashboard
             </Typography>
           </Box>
         </Box>
@@ -153,30 +153,23 @@ const SDGdashEmbed = () => {
           sx={{
             flexGrow: 1,
             backgroundColor: "#f5f5f5",
-            padding: 0,
-            boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-            overflowY: "hidden",
+            padding: 0, // Ensure no padding
+            margin: 0, // Ensure no margin
+            height: "100vh", // Occupy full viewport height
+            overflow: "hidden", // Prevent scrollbars
           }}
         >
-          <div
+          <iframe
+            id='dashboard-iframe'
+            src={dashUrl}
             style={{
-              height: "100vh",
-              width: "100%",
-              paddingTop: "20px",
-              paddingLeft: "20px",
-              backgroundColor: "white", // Set the background color to white
+              border: "none",
+              width: "100vw", // Occupy full viewport width
+              height: "100vh", // Occupy full viewport height
+              display: "block", // Avoid inline gaps
             }}
-          >
-            <iframe
-              src={dashUrl}
-              style={{
-                border: "none",
-                width: "100%",
-                height: "100%",
-              }}
-              title='Dash App'
-            />
-          </div>
+            title='SDG Dash App'
+          />
         </Box>
       </Box>
     </>
