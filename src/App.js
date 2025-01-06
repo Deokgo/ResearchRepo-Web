@@ -6,7 +6,6 @@ import PrivateRoute from "./components/privateroute";
 import ManageUsers from "./pages/manageusers";
 import ResearchThrust from "./pages/researchthrust";
 import ResearchTracking from "./pages/researchtracking";
-import UpdateResearchInfo from "./pages/updateresearchinfo";
 import UpdateTrackingInfo from "./pages/updatetrackinginfo";
 import Collection from "./pages/collection";
 import ManagePapers from "./pages/managepapers";

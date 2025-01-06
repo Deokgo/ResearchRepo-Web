@@ -22,6 +22,7 @@ import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import { Search, Update } from "@mui/icons-material";
 import { Virtuoso } from "react-virtuoso";
 import axios from "axios";
+import { filterCache, fetchAndCacheFilterData } from "../utils/filterCache";
 
 // First, define the useDebounce hook
 const useDebounce = (value, delay) => {
@@ -136,22 +137,20 @@ const ResearchTracking = () => {
     }
   };
 
-  const fetchColleges = async () => {
+  const fetchDeptProg = async () => {
     try {
-      const response = await axios.get(`/deptprogs/college_depts`);
-      setColleges(response.data.colleges);
+      const cached = filterCache.get();
+      if (cached) {
+        setColleges(cached.colleges);
+        setPrograms(cached.programs);
+        setAllPrograms(cached.programs);
+        return;
+      }
+      const data = await fetchAndCacheFilterData();
+      setColleges(data.colleges);
+      setPrograms(data.programs);
     } catch (error) {
       console.error("Error fetching colleges:", error);
-    }
-  };
-
-  const fetchAllPrograms = async () => {
-    try {
-      const response = await axios.get(`/deptprogs/fetch_programs`);
-      setPrograms(response.data.programs);
-      setAllPrograms(response.data.programs);
-    } catch (error) {
-      console.error("Error fetching all programs:", error);
     }
   };
 
@@ -159,20 +158,16 @@ const ResearchTracking = () => {
     setIsLoading(true);
     try {
       if (collegeIds.length > 0) {
-        const promises = collegeIds.map((collegeId) =>
-          axios.get(`/deptprogs/programs/${collegeId}`)
-        );
-
-        const results = await Promise.all(promises);
-        const newPrograms = results.flatMap((result) => result.data.programs);
-
-        // Batch state updates
-        setPrograms(newPrograms);
-        setSelectedPrograms([]); // Clear selected programs
+        const cached = filterCache.get();
+        if (cached) {
+          const filteredPrograms = cached.programs.filter((program) =>
+            collegeIds.includes(String(program.college_id))
+          );
+          setPrograms(filteredPrograms);
+        }
       } else {
-        // Reset to initial state
-        setPrograms(allPrograms);
-        setSelectedPrograms([]);
+        const cached = filterCache.get();
+        setPrograms(cached.programs);
       }
     } catch (error) {
       console.error("Error fetching programs by college:", error);
@@ -217,8 +212,7 @@ const ResearchTracking = () => {
 
   useEffect(() => {
     fetchUserData();
-    fetchColleges();
-    fetchAllPrograms();
+    fetchDeptProg();
     fetchAllResearchData();
   }, []);
 

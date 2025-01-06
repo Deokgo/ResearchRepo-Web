@@ -20,6 +20,7 @@ import FileUploader from "./FileUploader";
 import sdgGoalsData from "../data/sdgGoals.json";
 import { useAuth } from "../context/AuthContext";
 import AutorenewIcon from "@mui/icons-material/Autorenew";
+import { filterCache, fetchAndCacheFilterData } from "../utils/filterCache";
 
 const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
   const [colleges, setColleges] = useState([]);
@@ -59,31 +60,57 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
     console.log("User researcher data:", user?.researcher);
   }, [user, isAddPaperModalOpen]);
 
-  // Fetch all colleges when the modal opens
+  // Fetch colleges when modal opens
   useEffect(() => {
     if (isAddPaperModalOpen) {
-      fetchColleges();
+      const loadFilterData = async () => {
+        try {
+          // Try to get from cache first
+          const cached = filterCache.get();
+          if (cached) {
+            setColleges(cached.colleges);
+            setPrograms(cached.programs);
+            return;
+          }
+
+          // If not in cache, fetch and cache
+          const data = await fetchAndCacheFilterData();
+          setColleges(data.colleges);
+          setPrograms(data.programs);
+        } catch (error) {
+          console.error("Error loading filter data:", error);
+        }
+      };
+
+      loadFilterData();
     }
   }, [isAddPaperModalOpen]);
 
-  // Fetch all colleges
-  const fetchColleges = async () => {
-    try {
-      const response = await axios.get(`/deptprogs/college_depts`);
-      setColleges(response.data.colleges);
-    } catch (error) {
-      console.error("Error fetching colleges:", error);
+  // Update your handleCollegeChange to use cached programs
+  const handleCollegeChange = (event) => {
+    const selectedCollegeId = event.target.value;
+    setSelectedCollege(selectedCollegeId);
+
+    // Filter programs from cache instead of fetching
+    const cached = filterCache.get();
+    if (cached) {
+      const filteredPrograms = cached.programs.filter(
+        (program) => program.college_id === selectedCollegeId
+      );
+      setPrograms(filteredPrograms);
+    } else {
+      // Fallback to API call if cache is missing
+      fetchProgramsByCollege(selectedCollegeId);
     }
+
+    setSelectedProgram(""); // Reset selected program
   };
 
-  // Fetch programs based on selected college
+  // Keep fetchProgramsByCollege as fallback
   const fetchProgramsByCollege = async (collegeId) => {
     if (collegeId) {
       try {
-        const response = await axios.get(`/deptprogs/programs/${collegeId}`, {
-          params: { department: collegeId },
-        });
-        console.log("Fetched programs:", response.data.programs);
+        const response = await axios.get(`/deptprogs/programs/${collegeId}`);
         setPrograms(response.data.programs);
       } catch (error) {
         console.error("Error fetching programs by college:", error);
@@ -92,6 +119,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
       setPrograms([]);
     }
   };
+
   const handleAuthorSearch = async (query) => {
     if (query.length > 2) {
       try {
@@ -132,12 +160,6 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
     } else {
       setPanelOptions([]);
     }
-  };
-  const handleCollegeChange = (event) => {
-    const selectedCollegeId = event.target.value;
-    setSelectedCollege(selectedCollegeId);
-    fetchProgramsByCollege(selectedCollegeId);
-    setSelectedProgram(""); // Reset selected program when college changes
   };
 
   const onSelectFileHandler = (e) => {
@@ -302,24 +324,32 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
     const initializeProgramAdminDetails = async () => {
       if (isAddPaperModalOpen && user?.role === "05" && user?.college) {
         try {
-          // First fetch colleges to ensure they're loaded
-          await fetchColleges();
+          // Try to get from cache first
+          const cached = filterCache.get();
+          if (cached) {
+            setColleges(cached.colleges);
+            setPrograms(
+              cached.programs.filter(
+                (program) => program.college_id === user.college
+              )
+            );
+          } else {
+            // If not in cache, fetch and cache the data
+            const data = await fetchAndCacheFilterData();
+            setColleges(data.colleges);
+            setPrograms(
+              data.programs.filter(
+                (program) => program.college_id === user.college
+              )
+            );
+          }
 
-          // Set the college/department (using the correct ID from user data)
+          // Set the college/department
           setSelectedCollege(user.college || "");
 
-          // Fetch and set the programs for this college
-          if (user.college) {
-            const response = await axios.get(
-              `/deptprogs/programs/${user.college}`,
-              {
-                params: { department: user.college },
-              }
-            );
-            setPrograms(response.data.programs);
-
-            // Set the program (using the correct ID from user data)
-            setSelectedProgram(user.program || "");
+          // Set the program
+          if (user.program) {
+            setSelectedProgram(user.program);
           }
         } catch (error) {
           console.error("Error initializing program admin details:", error);
@@ -381,14 +411,12 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
 
   const fetchResearchAreas = async () => {
     try {
-      const response = await axios.get("/paper/research_areas");
-      if (response.data.research_areas) {
-        // Transform the data to match the expected format
-        const formattedAreas = response.data.research_areas.map((area) => ({
+      const cached = filterCache.get();
+      if (cached.researchAreas) {
+        const formattedAreas = cached.researchAreas.map((area) => ({
           research_area_id: area.id,
           research_area_name: area.name,
         }));
-        console.log("Fetched research areas:", formattedAreas); // Debug log
         setResearchAreas(formattedAreas);
       }
     } catch (error) {

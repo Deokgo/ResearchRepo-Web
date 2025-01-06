@@ -32,6 +32,7 @@ import FileUploader from "../components/FileUploader";
 import EditIcon from "@mui/icons-material/Edit";
 import sdgGoalsData from "../data/sdgGoals.json";
 import { useAuth } from "../context/AuthContext";
+import { filterCache, fetchAndCacheFilterData } from "../utils/filterCache";
 
 const DisplayResearchInfo = ({ route, navigate }) => {
   const [users, setUsers] = useState([]);
@@ -236,14 +237,12 @@ const DisplayResearchInfo = ({ route, navigate }) => {
 
   const fetchResearchAreas = async () => {
     try {
-      const response = await axios.get("/paper/research_areas");
-      if (response.data.research_areas) {
-        // Transform the data to match the expected format
-        const formattedAreas = response.data.research_areas.map((area) => ({
+      const cached = filterCache.get();
+      if (cached.researchAreas) {
+        const formattedAreas = cached.researchAreas.map((area) => ({
           research_area_id: area.id,
           research_area_name: area.name,
         }));
-        console.log("Fetched research areas:", formattedAreas); // Debug log
         setResearchAreas(formattedAreas);
       }
     } catch (error) {
@@ -253,7 +252,6 @@ const DisplayResearchInfo = ({ route, navigate }) => {
 
   const handleEdit = async (item) => {
     try {
-      // Fetch research areas first
       await fetchResearchAreas();
 
       setEditableData({
@@ -294,17 +292,24 @@ const DisplayResearchInfo = ({ route, navigate }) => {
       );
       setKeywords(item.keywords || []);
       setIsEditMode(true);
-      fetchColleges();
 
-      // Fetch programs for the selected college
-      if (item.college_id) {
-        const response = await axios.get(
-          `/deptprogs/programs/${item.college_id}`,
-          {
-            params: { department: item.college_id },
-          }
+      // Use cached data for colleges and programs
+      const cached = filterCache.get();
+      if (cached) {
+        setColleges(cached.colleges);
+        const filteredPrograms = cached.programs.filter(
+          (program) => program.college_id === item.college_id
         );
-        setPrograms(response.data.programs);
+        setPrograms(filteredPrograms);
+      } else {
+        // Fallback to API calls if cache is missing
+        await fetchDeptProg();
+        if (item.college_id) {
+          const response = await axios.get(
+            `/deptprogs/programs/${item.college_id}`
+          );
+          setPrograms(response.data.programs);
+        }
       }
     } catch (error) {
       console.error("Error setting up edit mode:", error);
@@ -429,10 +434,20 @@ const DisplayResearchInfo = ({ route, navigate }) => {
     }
   };
 
-  const fetchColleges = async () => {
+  const fetchDeptProg = async () => {
     try {
-      const response = await axios.get(`/deptprogs/college_depts`);
-      setColleges(response.data.colleges);
+      // Try to get from cache first
+      const cached = filterCache.get();
+      if (cached) {
+        setColleges(cached.colleges);
+        setPrograms(cached.programs);
+        return;
+      }
+
+      // If not in cache, fetch and cache the data
+      const data = await fetchAndCacheFilterData();
+      setColleges(data.colleges);
+      setPrograms(data.programs);
     } catch (error) {
       console.error("Error fetching colleges:", error);
     }
@@ -442,16 +457,23 @@ const DisplayResearchInfo = ({ route, navigate }) => {
     const selectedCollegeId = event.target.value;
     setEditableData((prev) => ({ ...prev, college_id: selectedCollegeId }));
 
-    try {
-      const response = await axios.get(
-        `/deptprogs/programs/${selectedCollegeId}`,
-        {
-          params: { department: selectedCollegeId },
-        }
+    // Get programs from cache instead of making API call
+    const cached = filterCache.get();
+    if (cached) {
+      const filteredPrograms = cached.programs.filter(
+        (program) => program.college_id === selectedCollegeId
       );
-      setPrograms(response.data.programs);
-    } catch (error) {
-      console.error("Error fetching programs:", error);
+      setPrograms(filteredPrograms);
+    } else {
+      // Fallback to API call if cache is missing
+      try {
+        const response = await axios.get(
+          `/deptprogs/programs/${selectedCollegeId}`
+        );
+        setPrograms(response.data.programs);
+      } catch (error) {
+        console.error("Error fetching programs:", error);
+      }
     }
   };
 

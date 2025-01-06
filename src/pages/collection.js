@@ -30,6 +30,7 @@ import Modal from "@mui/material/Modal";
 import { useModalContext } from "../context/modalcontext";
 import AddPaperModal from "../components/addpapermodal";
 import { useAuth } from "../context/AuthContext";
+import { filterCache } from "../utils/filterCache";
 
 // Debounce function to limit rapid state updates
 const useDebounce = (value, delay) => {
@@ -134,58 +135,11 @@ const Collection = () => {
   const handleCloseModal = () => {
     setSelectedResearchItem(null);
   };
-  const fetchColleges = async () => {
-    try {
-      const response = await axios.get(`/deptprogs/college_depts`);
-      setColleges(response.data.colleges);
-    } catch (error) {
-      console.error("Error fetching colleges:", error);
-    }
-  };
-  const fetchAllPrograms = async () => {
-    try {
-      const response = await axios.get(`/deptprogs/fetch_programs`);
-      setPrograms(response.data.programs);
-      setAllPrograms(response.data.programs);
-    } catch (error) {
-      console.error("Error fetching all programs:", error);
-    }
-  };
-
-  // Fetch programs based on selected colleges
-  const fetchProgramsByCollege = async (collegeIds) => {
-    setIsLoading(true);
-    try {
-      if (collegeIds.length > 0) {
-        const promises = collegeIds.map((collegeId) =>
-          axios.get(`/deptprogs/programs/${collegeId}`)
-        );
-
-        const results = await Promise.all(promises);
-        const newPrograms = results.flatMap((result) => result.data.programs);
-
-        // Batch state updates
-        setPrograms(newPrograms);
-        setSelectedPrograms([]); // Clear selected programs
-      } else {
-        // Reset to initial state
-        setPrograms(allPrograms);
-        setSelectedPrograms([]);
-      }
-    } catch (error) {
-      console.error("Error fetching programs by college:", error);
-      setPrograms(allPrograms);
-      setSelectedPrograms([]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const getUserId = () => {
     const userId = localStorage.getItem("user_id");
     return userId;
   };
-
   const fetchUserData = async () => {
     const userId = getUserId();
     if (userId) {
@@ -198,6 +152,7 @@ const Collection = () => {
       }
     }
   };
+
   const fetchAllResearchData = async () => {
     try {
       const response = await axios.get(`/dataset/fetch_ordered_dataset`);
@@ -210,18 +165,46 @@ const Collection = () => {
       setLoading(false);
     }
   };
+
   useEffect(() => {
-    fetchUserData();
-    fetchColleges();
-    fetchAllPrograms();
-    fetchAllResearchData();
+    const initializeData = async () => {
+      try {
+        // Only read from cache, don't fetch
+        const cached = filterCache.get();
+        if (cached) {
+          console.log("[Collection] Using cached filter data");
+          setColleges(cached.colleges);
+          setPrograms(cached.programs);
+          setAllPrograms(cached.programs);
+        }
+
+        // Fetch other data specific to collection page
+        await fetchUserData();
+        await fetchAllResearchData();
+      } catch (error) {
+        console.error("Error initializing data:", error);
+      }
+    };
+
+    initializeData();
   }, []);
 
   useEffect(() => {
-    if (!isLoading) {
-      fetchProgramsByCollege(debouncedColleges);
+    if (!isLoading && debouncedColleges.length > 0) {
+      const cached = filterCache.get();
+      if (cached) {
+        const filteredPrograms = cached.programs.filter((program) =>
+          debouncedColleges.includes(String(program.college_id))
+        );
+        setPrograms(filteredPrograms);
+      }
+    } else {
+      const cached = filterCache.get();
+      if (cached) {
+        setPrograms(cached.programs);
+      }
     }
-  }, [debouncedColleges]); // Only depend on debounced value
+  }, [debouncedColleges, isLoading]);
 
   useEffect(() => {
     const applyFilters = () => {

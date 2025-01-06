@@ -12,6 +12,7 @@ import { useModalContext } from "../context/modalcontext";
 import { useAuth } from "../context/AuthContext";
 import axios from "axios";
 import { isMobile } from "react-device-detect";
+import { filterCache, fetchAndCacheFilterData } from "../utils/filterCache";
 axios.defaults.baseURL = "http://localhost:5000";
 axios.defaults.headers.post["Content-Type"] = "application/json";
 axios.defaults.withCredentials = true;
@@ -70,11 +71,13 @@ const LoginModal = () => {
 
       await login(token);
 
+      console.log("[LoginModal] Fetching and caching filter data");
+      await fetchAndCacheFilterData();
+
       const userResponse = await axios.get("/auth/me");
       const userRole = userResponse.data.role;
 
       handleModalClose();
-
       alert(`Login Successfully`);
 
       // If the user is on a mobile device, navigate to collections immediately
@@ -104,7 +107,7 @@ const LoginModal = () => {
           break;
       }
     } catch (error) {
-      console.error("Login error details:", error.response || error); // Detailed error log
+      console.error("Login error details:", error);
       alert(`Login failed: ${error.response?.data?.message || error.message}`);
     }
   };
