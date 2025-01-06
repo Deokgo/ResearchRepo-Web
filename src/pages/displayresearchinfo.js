@@ -68,6 +68,7 @@ const DisplayResearchInfo = ({ route, navigate }) => {
   const [file, setFile] = useState(null);
   const [extendedAbstract, setExtendedAbstract] = useState(null);
   const [researchAreas, setResearchAreas] = useState([]);
+  const [researchTypes, setResearchTypes] = useState([]);
 
   const { user } = useAuth();
 
@@ -253,6 +254,14 @@ const DisplayResearchInfo = ({ route, navigate }) => {
   const handleEdit = async (item) => {
     try {
       await fetchResearchAreas();
+      // Find the matching research type ID from the name
+      const matchingResearchType = researchTypes.find(
+        (type) =>
+          type.name === item.research_type ||
+          type.research_type_name === item.research_type
+      );
+
+      console.log("Matching research type:", matchingResearchType);
 
       setEditableData({
         research_id: item.research_id,
@@ -260,7 +269,8 @@ const DisplayResearchInfo = ({ route, navigate }) => {
         college_id: item.college_id,
         program_id: item.program_id,
         abstract: item.abstract,
-        research_type: item.research_type || "",
+        // Use the ID from the matched research type
+        research_type: matchingResearchType ? matchingResearchType.id : "FD",
         date_approved: item.date_approved
           ? new Date(item.date_approved).toISOString().split("T")[0]
           : "",
@@ -277,7 +287,7 @@ const DisplayResearchInfo = ({ route, navigate }) => {
         adviser: item.adviser || null,
         panels: item.panels || [],
         file: item.full_manuscript || null,
-        research_areas: item.research_areas || [], // This should now match the fetched format
+        research_areas: item.research_areas || [],
       });
 
       setSelectedSDGs(
@@ -562,6 +572,17 @@ const DisplayResearchInfo = ({ route, navigate }) => {
       },
     },
   });
+
+  useEffect(() => {
+    const fetchResearchTypes = async () => {
+      const cached = filterCache.get();
+      if (cached && cached.researchTypes) {
+        setResearchTypes(cached.researchTypes);
+      }
+    };
+
+    fetchResearchTypes();
+  }, []);
 
   return (
     <>
@@ -1251,50 +1272,33 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                               <Select
                                 label='Research Type'
                                 sx={createTextFieldStyles()}
-                                value={editableData.research_type || ""} // Default to an empty string if undefined
-                                onChange={(e) =>
+                                value={editableData.research_type || ""}
+                                onChange={(e) => {
+                                  console.log(
+                                    "Selected research type:",
+                                    e.target.value
+                                  ); // Debug log
                                   setEditableData((prev) => ({
                                     ...prev,
                                     research_type: e.target.value,
-                                  }))
-                                }
+                                  }));
+                                }}
                               >
-                                <MenuItem
-                                  value='Extramural'
-                                  sx={{
-                                    fontSize: {
-                                      xs: "0.75rem",
-                                      md: "0.75rem",
-                                      lg: "0.8rem",
-                                    },
-                                  }}
-                                >
-                                  Extramural
-                                </MenuItem>
-                                <MenuItem
-                                  value='College-Driven'
-                                  sx={{
-                                    fontSize: {
-                                      xs: "0.75rem",
-                                      md: "0.75rem",
-                                      lg: "0.8rem",
-                                    },
-                                  }}
-                                >
-                                  College-Driven
-                                </MenuItem>
-                                <MenuItem
-                                  value='Integrative'
-                                  sx={{
-                                    fontSize: {
-                                      xs: "0.75rem",
-                                      md: "0.75rem",
-                                      lg: "0.8rem",
-                                    },
-                                  }}
-                                >
-                                  Integrative
-                                </MenuItem>
+                                {researchTypes.map((type) => (
+                                  <MenuItem
+                                    key={type.id}
+                                    value={type.id}
+                                    sx={{
+                                      fontSize: {
+                                        xs: "0.75rem",
+                                        md: "0.75rem",
+                                        lg: "0.8rem",
+                                      },
+                                    }}
+                                  >
+                                    {type.name}
+                                  </MenuItem>
+                                ))}
                               </Select>
                             </FormControl>
                           </Grid2>

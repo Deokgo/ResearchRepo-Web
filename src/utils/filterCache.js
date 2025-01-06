@@ -50,16 +50,19 @@ export const filterCache = {
 
 export const fetchAndCacheFilterData = async () => {
   try {
-    const [collegesRes, programsRes, researchAreasRes] = await Promise.all([
-      axios.get("/deptprogs/college_depts"),
-      axios.get("/deptprogs/fetch_programs"),
-      axios.get("/paper/research_areas"),
-    ]);
+    const [collegesRes, programsRes, researchAreasRes, researchTypesRes] =
+      await Promise.all([
+        axios.get("/deptprogs/college_depts"),
+        axios.get("/deptprogs/fetch_programs"),
+        axios.get("/paper/research_areas"),
+        axios.get("/paper/research_types"),
+      ]);
 
     const data = {
       colleges: collegesRes.data.colleges,
       programs: programsRes.data.programs,
       researchAreas: researchAreasRes.data.research_areas,
+      researchTypes: researchTypesRes.data.research_types,
     };
 
     filterCache.set(data);

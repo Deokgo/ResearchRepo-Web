@@ -27,7 +27,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
   const [programs, setPrograms] = useState([]);
   const [selectedCollege, setSelectedCollege] = useState("");
   const [selectedProgram, setSelectedProgram] = useState("");
-  const [researchType, setResearchType] = useState("Integrative");
+  const [researchType, setResearchType] = useState("FD");
   const [dateApproved, setDateApproved] = useState("");
   const [title, setTitle] = useState("");
   const [groupCode, setGroupCode] = useState("");
@@ -56,11 +56,9 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
   // Fetch research types from the API
   useEffect(() => {
     const fetchResearchTypes = async () => {
-      try {
-        const response = await axios.get("/paper/research_types");
-        setResearchTypes(response.data.research_types);
-      } catch (error) {
-        console.error("Error fetching research types:", error);
+      const cached = filterCache.get();
+      if (cached.researchTypes) {
+        setResearchTypes(cached.researchTypes);
       }
     };
 
@@ -312,7 +310,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
       setGroupCode("");
       setSelectedCollege("");
       setSelectedProgram("");
-      setResearchType("Integrative"); // Reset to Integrative
+      setResearchType("FD");
       setDateApproved("");
       setTitle("");
       setAbstract("");
@@ -331,7 +329,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
 
   // Initialize research type
   useEffect(() => {
-    setResearchType("Integrative");
+    setResearchType("FD");
   }, []); // Run once when component mounts
 
   // Modify the program admin initialization effect
@@ -544,16 +542,14 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
                 onChange={(event) => {
                   const newResearchType = event.target.value;
                   handleResearchTypeChange(event);
-                  if (
-                    newResearchType !== "FD"
-                  ) {
+                  if (newResearchType !== "FD") {
                     setAdviser(""); // Clear adviser selection
                     setAdviserInputValue(""); // Clear adviser input field
                     setPanels([]); // Clear panels selection
                     setPanelInputValue(""); // Clear panel input field
                   }
                 }}
-                label="Research Type"
+                label='Research Type'
                 defaultValue='FD'
               >
                 {researchTypes.map((type) => (
@@ -715,18 +711,14 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
               onChange={(event, newValue) => setAdviser(newValue)}
               inputValue={adviserInputValue}
               onInputChange={(event, newInputValue) => {
-                if (
-                  researchType === "FD"
-                ) {
+                if (researchType === "FD") {
                   setAdviserInputValue(newInputValue); // Update input normally
                   handleAdviserSearch(newInputValue); // Perform search
                 } else {
                   setAdviserInputValue(""); // Ensure input is cleared for specific research types
                 }
               }}
-              disabled={
-                researchType !== "FD"
-              }
+              disabled={researchType !== "FD"}
               renderInput={(params) => (
                 <TextField
                   {...params}
@@ -737,11 +729,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
                       ? null
                       : "Type at least 3 characters to search for an adviser"
                   }
-                  sx={
-                    researchType !== "FD"
-                      ? disabledSelectStyle
-                      : null
-                  }
+                  sx={researchType !== "FD" ? disabledSelectStyle : null}
                   InputLabelProps={createInputLabelProps()}
                 />
               )}
@@ -769,18 +757,14 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
               onChange={(event, newValue) => setPanels(newValue)}
               inputValue={panelInputValue}
               onInputChange={(event, newInputValue) => {
-                if (
-                  researchType === "FD"
-                ) {
+                if (researchType === "FD") {
                   setPanelInputValue(newInputValue); // Update input field
                   handlePanelSearch(newInputValue); // Perform panel search
                 } else {
                   setPanelInputValue(""); // Clear input field
                 }
               }}
-              disabled={
-                researchType !== "FD"
-              }
+              disabled={researchType !== "FD"}
               renderInput={(params) => (
                 <TextField
                   {...params}
@@ -791,11 +775,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
                       ? null
                       : "Type at least 3 characters to search and select multiple panel members"
                   }
-                  sx={
-                    researchType !== "FD"
-                      ? disabledSelectStyle
-                      : null
-                  }
+                  sx={researchType !== "FD" ? disabledSelectStyle : null}
                   InputLabelProps={createInputLabelProps()}
                 />
               )}
