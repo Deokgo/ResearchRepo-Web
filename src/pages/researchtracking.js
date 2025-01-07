@@ -87,7 +87,7 @@ const ResearchTracking = () => {
     {
       color: "#B0B0B0",
       hoverColor: "#888888",
-      label: "READY",
+      label: "READY FOR PUBLICATION",
       icon: "fa-check-to-slot",
       badge: badgeValues.total_ready,
       activeColor: "#F44336",
