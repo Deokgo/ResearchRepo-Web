@@ -904,7 +904,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
                 <Typography variant='caption' color='textSecondary'>
                   {isModelPredicting
                     ? "Predicting..."
-                    : "Click to predict research areas"}
+                    : "Click to provide suggested research area"}
                 </Typography>
               </Box>
             </FormControl>

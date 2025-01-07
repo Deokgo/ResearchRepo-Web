@@ -126,7 +126,7 @@ const Navbar = () => {
   };
 
   const handleMainDash = () => {
-    navigate("/publication");
+    navigate("/dash/analytics");
   };
 
   const handleReports = () => {
