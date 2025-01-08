@@ -333,33 +333,16 @@ const DisplayResearchInfo = ({ route, navigate }) => {
 
   const handleSaveChanges = async () => {
     try {
-      // Check if any changes were made by comparing editableData with original data
+      // Get the original data from the current dataset
       const originalData = data.dataset.find(
         (item) => item.research_id === editableData.research_id
       );
 
-      // Format dates for comparison
-      const originalDate = originalData.date_approved
-        ? new Date(originalData.date_approved).toISOString().split("T")[0]
-        : "";
-      const editableDate = editableData.date_approved || "";
-
-      // Compare relevant fields
-      const hasChanges =
-        originalData.title !== editableData.title ||
-        originalData.college_id !== editableData.college_id ||
-        originalData.program_id !== editableData.program_id ||
+      let hasChanges =
         originalData.abstract !== editableData.abstract ||
-        originalData.research_type !== editableData.research_type ||
-        originalDate !== editableDate ||
-        originalData.adviser?.user_id !== editableData.adviser?.user_id ||
         JSON.stringify(originalData.keywords.sort()) !==
           JSON.stringify(keywords.sort()) ||
         originalData.sdg !== selectedSDGs.map((sdg) => sdg.id).join(";") ||
-        JSON.stringify(originalData.authors.map((a) => a.user_id).sort()) !==
-          JSON.stringify(editableData.authors.map((a) => a.user_id).sort()) ||
-        JSON.stringify(originalData.panels.map((p) => p.user_id).sort()) !==
-          JSON.stringify(editableData.panels.map((p) => p.user_id).sort()) ||
         JSON.stringify(
           originalData.research_areas.map((ra) => ra.research_area_id).sort()
         ) !==
@@ -379,21 +362,21 @@ const DisplayResearchInfo = ({ route, navigate }) => {
       const formData = new FormData();
       const userId = localStorage.getItem("user_id");
 
-      // Add all required fields to formData
+      // Add only editable fields to formData
       formData.append("user_id", userId);
-      formData.append("college_id", editableData.college_id);
-      formData.append("program_id", editableData.program_id);
-      formData.append("title", editableData.title);
       formData.append("abstract", editableData.abstract);
-      formData.append("date_approved", editableData.date_approved);
-      formData.append("research_type", editableData.research_type);
-      formData.append("adviser_id", editableData.adviser?.user_id || "");
       formData.append("sdg", selectedSDGs.map((sdg) => sdg.id).join(";"));
 
       // Add research areas
-      editableData.research_areas.forEach((area) => {
-        formData.append("research_area_ids", area.research_area_id);
-      });
+      if (
+        editableData.research_areas &&
+        editableData.research_areas.length > 0
+      ) {
+        const researchAreaIds = editableData.research_areas
+          .map((area) => area.research_area_id)
+          .join(";");
+        formData.append("research_areas", researchAreaIds);
+      }
 
       // Handle file upload
       if (file) {
@@ -402,16 +385,6 @@ const DisplayResearchInfo = ({ route, navigate }) => {
       if (extendedAbstract) {
         formData.append("extended_abstract", extendedAbstract);
       }
-
-      // Add authors
-      editableData.authors.forEach((author) => {
-        formData.append("author_ids", author.user_id);
-      });
-
-      // Add panel members
-      editableData.panels.forEach((panel) => {
-        formData.append("panel_ids", panel.user_id);
-      });
 
       // Add keywords
       formData.append("keywords", keywords.join(";"));
@@ -1231,6 +1204,7 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                                 label='Program'
                                 sx={createTextFieldStyles()}
                                 value={editableData.program_id || ""}
+                                disabled={true}
                                 onChange={(e) =>
                                   setEditableData((prev) => ({
                                     ...prev,
@@ -1273,11 +1247,8 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                                 label='Research Type'
                                 sx={createTextFieldStyles()}
                                 value={editableData.research_type || ""}
+                                disabled={true}
                                 onChange={(e) => {
-                                  console.log(
-                                    "Selected research type:",
-                                    e.target.value
-                                  ); // Debug log
                                   setEditableData((prev) => ({
                                     ...prev,
                                     research_type: e.target.value,
@@ -1309,66 +1280,27 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                               type='date'
                               variant='outlined'
                               value={editableData.date_approved}
+                              disabled={true}
                               sx={createTextFieldStyles()}
-                              onChange={(e) =>
-                                setEditableData((prev) => ({
-                                  ...prev,
-                                  date_approved: e.target.value,
-                                }))
-                              }
                               InputLabelProps={{ shrink: true }}
                             />
                           </Grid2>
                           <Grid2 size={4}>
                             <Autocomplete
                               multiple
+                              disabled={true}
                               value={editableData.authors}
-                              onChange={(event, newValue) => {
-                                const formattedAuthors = newValue.map(
-                                  (author) => ({
-                                    user_id:
-                                      author.user_id || author.researcher_id,
-                                    name:
-                                      author.name ||
-                                      `${author.first_name} ${author.last_name}`,
-                                    email: author.email,
-                                  })
-                                );
-                                setEditableData((prev) => ({
-                                  ...prev,
-                                  authors: formattedAuthors,
-                                }));
-                              }}
-                              inputValue={authorInputValue}
-                              onInputChange={(event, newInputValue) => {
-                                setAuthorInputValue(newInputValue);
-                                handleAuthorSearch(newInputValue);
-                              }}
-                              options={authorOptions}
+                              options={[]} // No need for options since it's disabled
                               getOptionLabel={(option) =>
                                 option.name
                                   ? `${option.name} (${option.email})`
                                   : `${option.first_name} ${option.last_name} (${option.email})`
                               }
-                              componentsProps={{
-                                popper: {
-                                  sx: {
-                                    "& .MuiAutocomplete-listbox": {
-                                      fontSize: {
-                                        xs: "0.75rem",
-                                        md: "0.75rem",
-                                        lg: "0.8rem",
-                                      },
-                                    },
-                                  },
-                                },
-                              }}
                               renderInput={(params) => (
                                 <TextField
                                   {...params}
                                   label='Authors'
                                   variant='outlined'
-                                  helperText='Type at least 3 characters to search and select author/s'
                                   sx={createTextFieldStyles()}
                                   InputLabelProps={createInputLabelProps()}
                                 />
@@ -1377,59 +1309,21 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                           </Grid2>
                           <Grid2 size={4}>
                             <Autocomplete
+                              disabled={true}
                               value={editableData.adviser}
-                              disabled={
-                                editableData.research_type ===
-                                  "COLLEGE-DRIVEN" ||
-                                editableData.research_type === "EXTRAMURAL"
-                              }
-                              onChange={(event, newValue) => {
-                                const formattedAdviser = newValue
-                                  ? {
-                                      user_id:
-                                        newValue.user_id ||
-                                        newValue.researcher_id,
-                                      name:
-                                        newValue.name ||
-                                        `${newValue.first_name} ${newValue.last_name}`,
-                                      email: newValue.email,
-                                    }
-                                  : null;
-                                setEditableData((prev) => ({
-                                  ...prev,
-                                  adviser: formattedAdviser,
-                                }));
-                              }}
-                              inputValue={adviserInputValue}
-                              onInputChange={(event, newInputValue) => {
-                                setAdviserInputValue(newInputValue);
-                                handleAdviserSearch(newInputValue);
-                              }}
-                              options={adviserOptions}
+                              options={[]} // No need for options since it's disabled
                               getOptionLabel={(option) =>
-                                option.name
+                                option?.name
                                   ? `${option.name} (${option.email})`
-                                  : `${option.first_name} ${option.last_name} (${option.email})`
+                                  : option
+                                  ? `${option.first_name} ${option.last_name} (${option.email})`
+                                  : ""
                               }
-                              componentsProps={{
-                                popper: {
-                                  sx: {
-                                    "& .MuiAutocomplete-listbox": {
-                                      fontSize: {
-                                        xs: "0.75rem",
-                                        md: "0.75rem",
-                                        lg: "0.8rem",
-                                      },
-                                    },
-                                  },
-                                },
-                              }}
                               renderInput={(params) => (
                                 <TextField
                                   {...params}
                                   label='Adviser'
                                   variant='outlined'
-                                  helperText='Type at least 3 characters to search for an adviser'
                                   sx={createTextFieldStyles()}
                                   InputLabelProps={createInputLabelProps()}
                                 />
@@ -1439,58 +1333,19 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                           <Grid2 size={4}>
                             <Autocomplete
                               multiple
+                              disabled={true}
                               value={editableData.panels}
-                              disabled={
-                                editableData.research_type ===
-                                  "COLLEGE-DRIVEN" ||
-                                editableData.research_type === "EXTRAMURAL"
-                              }
-                              onChange={(event, newValue) => {
-                                const formattedPanels = newValue.map(
-                                  (panel) => ({
-                                    user_id:
-                                      panel.user_id || panel.researcher_id,
-                                    name:
-                                      panel.name ||
-                                      `${panel.first_name} ${panel.last_name}`,
-                                    email: panel.email,
-                                  })
-                                );
-                                setEditableData((prev) => ({
-                                  ...prev,
-                                  panels: formattedPanels,
-                                }));
-                              }}
-                              inputValue={panelInputValue}
-                              onInputChange={(event, newInputValue) => {
-                                setPanelInputValue(newInputValue);
-                                handlePanelSearch(newInputValue);
-                              }}
-                              options={panelOptions}
+                              options={[]} // No need for options since it's disabled
                               getOptionLabel={(option) =>
                                 option.name
                                   ? `${option.name} (${option.email})`
                                   : `${option.first_name} ${option.last_name} (${option.email})`
                               }
-                              componentsProps={{
-                                popper: {
-                                  sx: {
-                                    "& .MuiAutocomplete-listbox": {
-                                      fontSize: {
-                                        xs: "0.75rem",
-                                        md: "0.75rem",
-                                        lg: "0.8rem",
-                                      },
-                                    },
-                                  },
-                                },
-                              }}
                               renderInput={(params) => (
                                 <TextField
                                   {...params}
                                   label='Panel Members'
                                   variant='outlined'
-                                  helperText='Type at least 3 characters to search and select panel members'
                                   sx={createTextFieldStyles()}
                                   InputLabelProps={createInputLabelProps()}
                                 />
@@ -1502,15 +1357,10 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                               fullWidth
                               label='Title'
                               variant='outlined'
-                              value={editableData.title}
+                              value={editableData.title || ""}
+                              disabled={true}
                               sx={createTextFieldStyles()}
                               InputLabelProps={createInputLabelProps()}
-                              onChange={(e) =>
-                                setEditableData((prev) => ({
-                                  ...prev,
-                                  title: e.target.value,
-                                }))
-                              }
                             />
                           </Grid2>
                           <Grid2 size={6}>
