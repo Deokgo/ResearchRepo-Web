@@ -139,12 +139,12 @@ const DisplayResearchInfo = ({ route, navigate }) => {
   };
 
   const handleNavigateBack = async () => {
-    if (isEditMode){
+    if (isEditMode) {
       handleCancelEdit();
       return;
-    }    
-    navpage(-1)
-  }
+    }
+    navpage(-1);
+  };
   const handleViewEA = async (researchItem) => {
     const { research_id } = researchItem;
     if (research_id) {
@@ -354,9 +354,8 @@ const DisplayResearchInfo = ({ route, navigate }) => {
       extendedAbstract !== null;
 
     return hasChanges;
-  }
+  };
   const handleCancelEdit = () => {
-
     const hasChanges = handleCheckChanges();
 
     if (!hasChanges) {
@@ -365,7 +364,9 @@ const DisplayResearchInfo = ({ route, navigate }) => {
       return;
     }
 
-    const userConfirmed = window.confirm("You have unsaved changes. Save Changes?");
+    const userConfirmed = window.confirm(
+      "You have unsaved changes. Save Changes?"
+    );
 
     if (userConfirmed) {
       handleSaveChanges();

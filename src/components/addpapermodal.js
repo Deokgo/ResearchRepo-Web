@@ -28,7 +28,8 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
   const [selectedCollege, setSelectedCollege] = useState("");
   const [selectedProgram, setSelectedProgram] = useState("");
   const [researchType, setResearchType] = useState("FD");
-  const [dateApproved, setDateApproved] = useState("");
+  const [schoolYear, setSchoolYear] = useState("");
+  const [term, setTerm] = useState("");
   const [title, setTitle] = useState("");
   const [groupCode, setGroupCode] = useState("");
   const [abstract, setAbstract] = useState("");
@@ -52,6 +53,20 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
   const [selectedResearchAreas, setSelectedResearchAreas] = useState([]);
   const [isModelPredicting, setIsModelPredicting] = useState(false);
   const [researchTypes, setResearchTypes] = useState([]);
+
+  // Create array of school years (last 10 years)
+  const currentYear = new Date().getFullYear();
+  const schoolYears = Array.from({ length: 10 }, (_, i) => {
+    const year = currentYear - i;
+    return `${year}-${year + 1}`;
+  });
+
+  // Create array of terms with their corresponding values
+  const terms = [
+    { display: "1st", value: "1" },
+    { display: "2nd", value: "2" },
+    { display: "3rd", value: "3" },
+  ];
 
   // Fetch research types from the API
   useEffect(() => {
@@ -200,10 +215,8 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
       // Validate required fields
       const requiredFields = {
         "Group Code": groupCode,
-        Department: selectedCollege,
-        Program: selectedProgram,
-        "Research Type": researchType,
-        "Date Approved": dateApproved,
+        "School Year": schoolYear,
+        Term: term,
         Title: title,
         Abstract: abstract,
         "SDG Goals": selectedSDGs,
@@ -250,7 +263,8 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
       formData.append("program_id", selectedProgram);
       formData.append("title", title);
       formData.append("abstract", abstract);
-      formData.append("date_approved", dateApproved);
+      formData.append("school_year", schoolYear);
+      formData.append("term", term);
       formData.append("research_type", researchType);
       formData.append("adviser_id", adviser?.user_id || "");
       formData.append("sdg", selectedSDGs.map((sdg) => sdg.id).join(";"));
@@ -311,7 +325,8 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
       setSelectedCollege("");
       setSelectedProgram("");
       setResearchType("FD");
-      setDateApproved("");
+      setSchoolYear(""); // Reset school year
+      setTerm(""); // Reset term
       setTitle("");
       setAbstract("");
       setAdviser(null);
@@ -640,17 +655,41 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
               </Select>
             </FormControl>
           </Grid2>
-          <Grid2 size={2}>
-            <TextField
-              fullWidth
-              label='Date Approved'
-              variant='outlined'
-              type='date'
-              value={dateApproved}
-              onChange={(e) => setDateApproved(e.target.value)}
-              InputLabelProps={{ shrink: true }}
-              sx={createTextFieldStyles()}
-            />
+          <Grid2 size={1}>
+            <FormControl fullWidth variant='outlined'>
+              <InputLabel>School Year</InputLabel>
+              <Select
+                value={schoolYear}
+                onChange={(e) => setSchoolYear(e.target.value)}
+                label='School Year'
+                sx={createTextFieldStyles()}
+              >
+                {schoolYears.map((year) => (
+                  <MenuItem key={year} value={year.split("-")[0]}>
+                    {" "}
+                    {/* Only store first year */}
+                    {year}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid2>
+          <Grid2 size={1}>
+            <FormControl fullWidth variant='outlined'>
+              <InputLabel>Term</InputLabel>
+              <Select
+                value={term}
+                onChange={(e) => setTerm(e.target.value)}
+                label='Term'
+                sx={createTextFieldStyles()}
+              >
+                {terms.map((termOption) => (
+                  <MenuItem key={termOption.value} value={termOption.value}>
+                    {termOption.display}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
           </Grid2>
           <Grid2 size={4}>
             <Autocomplete
@@ -866,47 +905,12 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
                     {...params}
                     label='Research Areas'
                     variant='outlined'
-                    helperText='Select or predict research areas'
+                    helperText='Select research areas'
                     sx={createTextFieldStyles()}
                     InputLabelProps={createInputLabelProps()}
                   />
                 )}
               />
-              <Box
-                sx={{ mt: 1, display: "flex", alignItems: "center", gap: 1 }}
-              >
-                <Tooltip title='Predict research areas using AI'>
-                  <span>
-                    <IconButton
-                      onClick={predictResearchAreas}
-                      disabled={
-                        isModelPredicting ||
-                        !title ||
-                        !abstract ||
-                        !keywords.length
-                      }
-                      color='primary'
-                    >
-                      <AutorenewIcon
-                        sx={{
-                          animation: isModelPredicting
-                            ? "spin 1s linear infinite"
-                            : "none",
-                          "@keyframes spin": {
-                            "0%": { transform: "rotate(0deg)" },
-                            "100%": { transform: "rotate(360deg)" },
-                          },
-                        }}
-                      />
-                    </IconButton>
-                  </span>
-                </Tooltip>
-                <Typography variant='caption' color='textSecondary'>
-                  {isModelPredicting
-                    ? "Predicting..."
-                    : "Click to provide suggested research area"}
-                </Typography>
-              </Box>
             </FormControl>
           </Grid2>
           <Grid2 size={6}>
