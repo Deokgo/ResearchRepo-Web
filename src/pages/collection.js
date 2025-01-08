@@ -485,7 +485,7 @@ const Collection = () => {
                   zIndex: 2,
                 }}
               >
-                Collection
+                Collections
               </Typography>
             </Box>
           </Box>
