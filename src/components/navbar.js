@@ -231,8 +231,7 @@ const Navbar = () => {
     const roleSpecificItems = {
       "01": [
         // System Administrator
-        { label: "System Management", onClick: handleOpenSymaMenu },
-        ...commonItems,
+        { label: "System Management", onClick: handleOpenSymaMenu }
       ],
       "02": [
         // Director
