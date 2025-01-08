@@ -138,6 +138,13 @@ const DisplayResearchInfo = ({ route, navigate }) => {
     }
   };
 
+  const handleNavigateBack = async () => {
+    if (isEditMode){
+      handleCancelEdit();
+      return;
+    }    
+    navpage(-1)
+  }
   const handleViewEA = async (researchItem) => {
     const { research_id } = researchItem;
     if (research_id) {
@@ -326,7 +333,44 @@ const DisplayResearchInfo = ({ route, navigate }) => {
     }
   };
 
+  const handleCheckChanges = () => {
+    // Get the original data from the current dataset
+    const originalData = data.dataset.find(
+      (item) => item.research_id === editableData.research_id
+    );
+
+    let hasChanges =
+      originalData.abstract !== editableData.abstract ||
+      JSON.stringify(originalData.keywords.sort()) !==
+        JSON.stringify(keywords.sort()) ||
+      originalData.sdg !== selectedSDGs.map((sdg) => sdg.id).join(";") ||
+      JSON.stringify(
+        originalData.research_areas.map((ra) => ra.research_area_id).sort()
+      ) !==
+        JSON.stringify(
+          editableData.research_areas.map((ra) => ra.research_area_id).sort()
+        ) ||
+      file !== null ||
+      extendedAbstract !== null;
+
+    return hasChanges;
+  }
   const handleCancelEdit = () => {
+
+    const hasChanges = handleCheckChanges();
+
+    if (!hasChanges) {
+      setIsEditMode(false);
+      setEditableData(null);
+      return;
+    }
+
+    const userConfirmed = window.confirm("You have unsaved changes. Save Changes?");
+
+    if (userConfirmed) {
+      handleSaveChanges();
+    }
+
     setIsEditMode(false);
     setEditableData(null);
   };
@@ -616,7 +660,7 @@ const DisplayResearchInfo = ({ route, navigate }) => {
             />
             <Box sx={{ display: "flex", ml: "5rem", zIndex: 3 }}>
               <IconButton
-                onClick={() => navpage(-1)}
+                onClick={handleNavigateBack}
                 sx={{
                   color: "#fff",
                   transform: {
