@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Navbar from "../components/navbar";
 import { isMobile } from "react-device-detect";
 import DynamicTimeline from "../components/Timeline";
@@ -19,6 +19,8 @@ import {
   FormControl,
   Autocomplete,
   useMediaQuery,
+  Checkbox,
+  Chip,
 } from "@mui/material";
 import Stack from "@mui/material/Stack";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
@@ -70,7 +72,25 @@ const DisplayResearchInfo = ({ route, navigate }) => {
   const [researchAreas, setResearchAreas] = useState([]);
   const [researchTypes, setResearchTypes] = useState([]);
 
+  const [schoolYear, setSchoolYear] = useState("");
+  const [term, setTerm] = useState("");
+
+  const terms = [
+    { display: "1st", value: "1" },
+    { display: "2nd", value: "2" },
+    { display: "3rd", value: "3" },
+  ];
+
+  const currentYear = new Date().getFullYear();
+  const schoolYears = Array.from({ length: 10 }, (_, i) => {
+    const year = currentYear - i;
+    return `${year}-${year + 1}`;
+  });
+
   const { user } = useAuth();
+
+  const fileInputRef = useRef(null);
+  const extendedAbstractRef = useRef(null);
 
   useEffect(() => {
     if (id) {
@@ -247,10 +267,14 @@ const DisplayResearchInfo = ({ route, navigate }) => {
     try {
       const cached = filterCache.get();
       if (cached.researchAreas) {
-        const formattedAreas = cached.researchAreas.map((area) => ({
-          research_area_id: area.id,
-          research_area_name: area.name,
-        }));
+        const formattedAreas = cached.researchAreas
+          .map((area) => ({
+            research_area_id: area.id,
+            research_area_name: area.name,
+          }))
+          .sort((a, b) =>
+            a.research_area_name.localeCompare(b.research_area_name)
+          ); // Sort alphabetically
         setResearchAreas(formattedAreas);
       }
     } catch (error) {
@@ -261,14 +285,76 @@ const DisplayResearchInfo = ({ route, navigate }) => {
   const handleEdit = async (item) => {
     try {
       await fetchResearchAreas();
-      // Find the matching research type ID from the name
       const matchingResearchType = researchTypes.find(
-        (type) =>
-          type.name === item.research_type ||
-          type.research_type_name === item.research_type
+        (type) => type.research_type_name === item.research_type
       );
 
-      console.log("Matching research type:", matchingResearchType);
+      // Extract just the filenames without the full path
+      const manuscriptFileName = item.full_manuscript
+        ? item.full_manuscript.split("/").pop().split("\\").pop()
+        : null;
+
+      const extendedAbstractFileName = item.extended_abstract
+        ? item.extended_abstract.split("/").pop().split("\\").pop()
+        : null;
+
+      // Store the original file paths
+      setFile(
+        manuscriptFileName
+          ? {
+              name: manuscriptFileName,
+              isExisting: true,
+              path: item.full_manuscript,
+            }
+          : null
+      );
+
+      setExtendedAbstract(
+        extendedAbstractFileName
+          ? {
+              name: extendedAbstractFileName,
+              isExisting: true,
+              path: item.extended_abstract,
+            }
+          : null
+      );
+
+      // Update the file input refs to show the filenames
+      if (manuscriptFileName && fileInputRef.current) {
+        fileInputRef.current.querySelector(".MuiInputBase-input").value =
+          manuscriptFileName;
+      }
+      if (extendedAbstractFileName && extendedAbstractRef.current) {
+        extendedAbstractRef.current.querySelector(".MuiInputBase-input").value =
+          extendedAbstractFileName;
+      }
+
+      // Parse existing SDGs and match them with their titles
+      const existingSDGs =
+        item.sdg && item.sdg !== "Not Specified"
+          ? item.sdg
+              .split(";")
+              .map((sdgString) => {
+                // Extract just the number from "SDG X"
+                const match = sdgString.trim().match(/SDG\s+(\d+)/);
+                if (match) {
+                  const sdgNumber = match[1];
+                  // Find matching SDG from sdgGoalsData
+                  const sdgGoal = sdgGoalsData.sdgGoals.find(
+                    (goal) => goal.id === `SDG ${sdgNumber}`
+                  );
+                  return sdgGoal || null;
+                }
+                return null;
+              })
+              .filter((sdg) => sdg !== null)
+          : [];
+
+      // Format school year using item.year instead of item.school_year
+      const startYear = item.year?.toString();
+      const formattedSchoolYear = startYear
+        ? `${startYear}-${parseInt(startYear) + 1}`
+        : "";
 
       setEditableData({
         research_id: item.research_id,
@@ -276,37 +362,37 @@ const DisplayResearchInfo = ({ route, navigate }) => {
         college_id: item.college_id,
         program_id: item.program_id,
         abstract: item.abstract,
-        // Use the ID from the matched research type
         research_type: matchingResearchType ? matchingResearchType.id : "FD",
         date_approved: item.date_approved
           ? new Date(item.date_approved).toISOString().split("T")[0]
           : "",
-        sdgs: item.sdg
-          ? item.sdg.split(";").map((sdgId) => ({
-              id: sdgId,
-              title:
-                sdgGoalsData.sdgGoals.find((goal) => goal.id === sdgId)
-                  ?.title || "",
-            }))
-          : [],
+        sdgs: existingSDGs,
         keywords: item.keywords || [],
         authors: item.authors || [],
         adviser: item.adviser || null,
         panels: item.panels || [],
-        file: item.full_manuscript || null,
+        file: manuscriptFileName
+          ? {
+              name: manuscriptFileName,
+              isExisting: true,
+              path: item.full_manuscript,
+            }
+          : null,
+        extended_abstract: extendedAbstractFileName
+          ? {
+              name: extendedAbstractFileName,
+              isExisting: true,
+              path: item.extended_abstract,
+            }
+          : null,
         research_areas: item.research_areas || [],
+        full_manuscript: manuscriptFileName,
+        extended_abstract: extendedAbstractFileName,
+        school_year: startYear,
+        term: item.term?.toString(),
       });
 
-      setSelectedSDGs(
-        item.sdg
-          ? item.sdg.split(";").map((sdgId) => ({
-              id: sdgId,
-              title:
-                sdgGoalsData.sdgGoals.find((goal) => goal.id === sdgId)
-                  ?.title || "",
-            }))
-          : []
-      );
+      setSelectedSDGs(existingSDGs);
       setKeywords(item.keywords || []);
       setIsEditMode(true);
 
@@ -328,6 +414,10 @@ const DisplayResearchInfo = ({ route, navigate }) => {
           setPrograms(response.data.programs);
         }
       }
+
+      // Set the select fields
+      setSchoolYear(startYear);
+      setTerm(item.term?.toString());
     } catch (error) {
       console.error("Error setting up edit mode:", error);
     }
@@ -356,63 +446,43 @@ const DisplayResearchInfo = ({ route, navigate }) => {
     return hasChanges;
   };
   const handleCancelEdit = () => {
-    const hasChanges = handleCheckChanges();
-
-    if (!hasChanges) {
-      setIsEditMode(false);
-      setEditableData(null);
-      return;
-    }
-
-    const userConfirmed = window.confirm(
-      "You have unsaved changes. Save Changes?"
-    );
-
-    if (userConfirmed) {
-      handleSaveChanges();
-    }
-
     setIsEditMode(false);
     setEditableData(null);
+    setFile(null);
+    setExtendedAbstract(null);
   };
 
   const handleSaveChanges = async () => {
     try {
-      // Get the original data from the current dataset
-      const originalData = data.dataset.find(
-        (item) => item.research_id === editableData.research_id
-      );
+      const formData = new FormData();
 
-      let hasChanges =
-        originalData.abstract !== editableData.abstract ||
-        JSON.stringify(originalData.keywords.sort()) !==
-          JSON.stringify(keywords.sort()) ||
-        originalData.sdg !== selectedSDGs.map((sdg) => sdg.id).join(";") ||
-        JSON.stringify(
-          originalData.research_areas.map((ra) => ra.research_area_id).sort()
-        ) !==
-          JSON.stringify(
-            editableData.research_areas.map((ra) => ra.research_area_id).sort()
-          ) ||
-        file !== null ||
-        extendedAbstract !== null;
+      // Add basic fields
+      formData.append("abstract", editableData.abstract || "");
 
-      if (!hasChanges) {
-        alert("No changes were made to save.");
-        setIsEditMode(false);
-        setEditableData(null);
-        return;
+      // Add SDGs if they exist
+      if (selectedSDGs && selectedSDGs.length > 0) {
+        formData.append(
+          "sdg",
+          selectedSDGs
+            .map((sdg) => {
+              // Extract just the number from "SDG X"
+              const sdgNumber = sdg.id.replace("SDG ", "");
+              return `SDG ${sdgNumber}`;
+            })
+            .join(";")
+        );
+      } else {
+        formData.append("sdg", "");
       }
 
-      const formData = new FormData();
-      const userId = localStorage.getItem("user_id");
+      // Add keywords if they exist
+      if (keywords && keywords.length > 0) {
+        formData.append("keywords", keywords.join(";"));
+      } else {
+        formData.append("keywords", "");
+      }
 
-      // Add only editable fields to formData
-      formData.append("user_id", userId);
-      formData.append("abstract", editableData.abstract);
-      formData.append("sdg", selectedSDGs.map((sdg) => sdg.id).join(";"));
-
-      // Add research areas
+      // Add research areas if they exist
       if (
         editableData.research_areas &&
         editableData.research_areas.length > 0
@@ -421,19 +491,19 @@ const DisplayResearchInfo = ({ route, navigate }) => {
           .map((area) => area.research_area_id)
           .join(";");
         formData.append("research_areas", researchAreaIds);
+      } else {
+        formData.append("research_areas", "");
       }
 
-      // Handle file upload
-      if (file) {
+      // Handle file uploads
+      if (file && !file.isExisting) {
         formData.append("file", file);
       }
-      if (extendedAbstract) {
+      if (extendedAbstract && !extendedAbstract.isExisting) {
         formData.append("extended_abstract", extendedAbstract);
       }
 
-      // Add keywords
-      formData.append("keywords", keywords.join(";"));
-
+      // Make the API call
       const response = await axios.put(
         `/paper/update_paper/${editableData.research_id}`,
         formData,
@@ -441,9 +511,11 @@ const DisplayResearchInfo = ({ route, navigate }) => {
           headers: {
             "Content-Type": "multipart/form-data",
           },
+          withCredentials: true,
         }
       );
 
+      // Handle success
       console.log("Response:", response.data);
       alert("Paper updated successfully!");
       setIsEditMode(false);
@@ -458,7 +530,17 @@ const DisplayResearchInfo = ({ route, navigate }) => {
       setData({ dataset: refreshResponse.data.dataset || [] });
     } catch (error) {
       console.error("Error updating paper:", error);
-      alert("Failed to update paper. Please try again.");
+      if (error.response) {
+        console.error("Response data:", error.response.data);
+        console.error("Response status:", error.response.status);
+        alert(
+          `Failed to update paper: ${
+            error.response.data.error || "Unknown error"
+          }`
+        );
+      } else {
+        alert("Failed to update paper. Please try again.");
+      }
     }
   };
 
@@ -547,23 +629,29 @@ const DisplayResearchInfo = ({ route, navigate }) => {
   const onSelectFileHandler = (e) => {
     const selectedFile = e.target.files[0];
     if (selectedFile && selectedFile.type === "application/pdf") {
-      setFile(selectedFile);
+      setFile(selectedFile); // This will be a new File object without isExisting flag
     } else {
       alert("Please select a PDF file");
+      setFile(null);
     }
   };
 
   const onSelectFileHandlerEA = (e) => {
     const selectedFile = e.target.files[0];
     if (selectedFile && selectedFile.type === "application/pdf") {
-      setExtendedAbstract(selectedFile);
+      setExtendedAbstract(selectedFile); // This will be a new File object without isExisting flag
     } else {
       alert("Please select a PDF file");
+      setExtendedAbstract(null);
     }
   };
 
-  const onDeleteFileHandler = () => {
-    setFile(null);
+  const onDeleteFileHandler = (type) => {
+    if (type === "manuscript") {
+      setFile(null);
+    } else if (type === "extended_abstract") {
+      setExtendedAbstract(null);
+    }
   };
 
   // Utility function to create responsive TextField styles
@@ -1181,6 +1269,49 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                       <>
                         <Grid2 container spacing={2}>
                           <Grid2 size={2}>
+                            <FormControl fullWidth variant='outlined'>
+                              <InputLabel
+                                sx={{
+                                  fontSize: {
+                                    xs: "0.75rem",
+                                    md: "0.75rem",
+                                    lg: "0.8rem",
+                                  },
+                                }}
+                              >
+                                Research Type
+                              </InputLabel>
+                              <Select
+                                label='Research Type'
+                                sx={createTextFieldStyles()}
+                                value={editableData.research_type || ""}
+                                disabled={true}
+                                onChange={(e) => {
+                                  setEditableData((prev) => ({
+                                    ...prev,
+                                    research_type: e.target.value,
+                                  }));
+                                }}
+                              >
+                                {researchTypes.map((type) => (
+                                  <MenuItem
+                                    key={type.id}
+                                    value={type.id}
+                                    sx={{
+                                      fontSize: {
+                                        xs: "0.75rem",
+                                        md: "0.75rem",
+                                        lg: "0.8rem",
+                                      },
+                                    }}
+                                  >
+                                    {type.name}
+                                  </MenuItem>
+                                ))}
+                              </Select>
+                            </FormControl>
+                          </Grid2>
+                          <Grid2 size={2}>
                             <TextField
                               fullWidth
                               label='Group Code'
@@ -1191,7 +1322,7 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                               disabled
                             />
                           </Grid2>
-                          <Grid2 size={4}>
+                          <Grid2 size={2.5}>
                             <FormControl fullWidth variant='outlined' disabled>
                               <InputLabel
                                 sx={{
@@ -1228,7 +1359,7 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                               </Select>
                             </FormControl>
                           </Grid2>
-                          <Grid2 size={2}>
+                          <Grid2 size={2.5}>
                             <FormControl
                               fullWidth
                               variant='outlined'
@@ -1275,60 +1406,66 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                               </Select>
                             </FormControl>
                           </Grid2>
-                          <Grid2 size={2}>
-                            <FormControl fullWidth variant='outlined'>
-                              <InputLabel
-                                sx={{
-                                  fontSize: {
-                                    xs: "0.75rem",
-                                    md: "0.75rem",
-                                    lg: "0.8rem",
-                                  },
-                                }}
-                              >
-                                Research Type
+
+                          <Grid2 size={1.5}>
+                            <FormControl fullWidth>
+                              <InputLabel required shrink>
+                                School Year
                               </InputLabel>
                               <Select
-                                label='Research Type'
-                                sx={createTextFieldStyles()}
-                                value={editableData.research_type || ""}
-                                disabled={true}
+                                value={editableData?.school_year || ""}
                                 onChange={(e) => {
                                   setEditableData((prev) => ({
                                     ...prev,
-                                    research_type: e.target.value,
+                                    school_year: e.target.value,
                                   }));
+                                  setSchoolYear(e.target.value);
                                 }}
+                                label='School Year'
+                                notched
+                                disabled={true}
+                                sx={createTextFieldStyles()}
                               >
-                                {researchTypes.map((type) => (
+                                {schoolYears.map((year) => (
                                   <MenuItem
-                                    key={type.id}
-                                    value={type.id}
-                                    sx={{
-                                      fontSize: {
-                                        xs: "0.75rem",
-                                        md: "0.75rem",
-                                        lg: "0.8rem",
-                                      },
-                                    }}
+                                    key={year}
+                                    value={year.split("-")[0]}
                                   >
-                                    {type.name}
+                                    {year}
                                   </MenuItem>
                                 ))}
                               </Select>
                             </FormControl>
                           </Grid2>
-                          <Grid2 size={2}>
-                            <TextField
-                              fullWidth
-                              label='Date Approved'
-                              type='date'
-                              variant='outlined'
-                              value={editableData.date_approved}
-                              disabled={true}
-                              sx={createTextFieldStyles()}
-                              InputLabelProps={{ shrink: true }}
-                            />
+                          <Grid2 size={1.5}>
+                            <FormControl fullWidth>
+                              <InputLabel required shrink>
+                                Term
+                              </InputLabel>
+                              <Select
+                                value={editableData?.term || ""}
+                                onChange={(e) => {
+                                  setEditableData((prev) => ({
+                                    ...prev,
+                                    term: e.target.value,
+                                  }));
+                                  setTerm(e.target.value);
+                                }}
+                                label='Term'
+                                notched
+                                disabled={true}
+                                sx={createTextFieldStyles()}
+                              >
+                                {terms.map((termOption) => (
+                                  <MenuItem
+                                    key={termOption.value}
+                                    value={termOption.value}
+                                  >
+                                    {termOption.display}
+                                  </MenuItem>
+                                ))}
+                              </Select>
+                            </FormControl>
                           </Grid2>
                           <Grid2 size={4}>
                             <Autocomplete
@@ -1412,12 +1549,16 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                             <Autocomplete
                               multiple
                               value={selectedSDGs}
+                              disableCloseOnSelect
                               onChange={(event, newValue) =>
                                 setSelectedSDGs(newValue)
                               }
                               options={sdgGoalsData.sdgGoals}
                               getOptionLabel={(option) =>
                                 `${option.id} - ${option.title}`
+                              }
+                              isOptionEqualToValue={(option, value) =>
+                                option.id === value.id
                               }
                               renderInput={(params) => (
                                 <TextField
@@ -1429,6 +1570,36 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                                   InputLabelProps={createInputLabelProps()}
                                 />
                               )}
+                              renderTags={(value, getTagProps) =>
+                                value.map((option, index) => (
+                                  <Chip
+                                    label={`${option.id} - ${option.title}`}
+                                    {...getTagProps({ index })}
+                                    sx={{
+                                      backgroundColor: "#f0f0f0",
+                                      margin: "2px",
+                                      "& .MuiChip-deleteIcon": {
+                                        color: "#666",
+                                      },
+                                    }}
+                                  />
+                                ))
+                              }
+                              renderOption={(props, option) => (
+                                <li {...props}>
+                                  {`${option.id} - ${option.title}`}
+                                </li>
+                              )}
+                              ListboxProps={{
+                                sx: {
+                                  maxHeight: "250px",
+                                },
+                              }}
+                              sx={{
+                                "& .MuiAutocomplete-tag": {
+                                  maxWidth: "calc(100% - 8px)",
+                                },
+                              }}
                             />
                           </Grid2>
                           <Grid2 size={6}>
@@ -1474,6 +1645,7 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                             <Autocomplete
                               multiple
                               value={editableData.research_areas || []}
+                              disableCloseOnSelect
                               onChange={(event, newValue) => {
                                 setEditableData((prev) => ({
                                   ...prev,
@@ -1510,9 +1682,9 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                               }}
                             />
                           </Grid2>
-
+                          <Grid2 size={6}></Grid2>
                           <Grid2
-                            size={6}
+                            size={3}
                             display='flex'
                             flexDirection='column'
                             justifyContent='center'
@@ -1544,8 +1716,11 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                               }}
                             >
                               <FileUploader
-                                onSelectFile={onSelectFileHandler}
-                                onDeleteFile={onDeleteFileHandler}
+                                onFileSelect={onSelectFileHandler}
+                                onFileDelete={() =>
+                                  onDeleteFileHandler("manuscript")
+                                }
+                                selectedFile={file}
                               />
                             </Box>
                             <Button
@@ -1586,7 +1761,7 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                             </Button>
                           </Grid2>
                           <Grid2
-                            size={6}
+                            size={3}
                             display='flex'
                             flexDirection='column'
                             justifyContent='center'
@@ -1618,8 +1793,11 @@ const DisplayResearchInfo = ({ route, navigate }) => {
                               }}
                             >
                               <FileUploader
-                                onSelectFile={onSelectFileHandlerEA}
-                                onDeleteFile={onDeleteFileHandler}
+                                onFileSelect={onSelectFileHandlerEA}
+                                onFileDelete={() =>
+                                  onDeleteFileHandler("extended_abstract")
+                                }
+                                selectedFile={extendedAbstract}
                               />
                             </Box>
                             <Button
