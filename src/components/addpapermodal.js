@@ -161,19 +161,23 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
     }
   };
   const handleAdviserSearch = async (query) => {
-    if (query.length > 2) {
-      try {
-        const response = await axios.get("/accounts/search_user", {
-          params: { query },
-        });
-        setAdviserOptions(response.data.users);
-      } catch (error) {
-        console.error("Error fetching users:", error);
-      }
+    if (query.length > 2) { 
+        try {
+            const response = await axios.get(`/accounts/search_user/${selectedCollege}`, { 
+                params: {
+                    query
+                },
+            });
+            setAdviserOptions(response.data.users);
+            console.log('advisers: ', response.data.users);
+        } catch (error) {
+            console.error("Error fetching users:", error);
+        }
     } else {
-      setAdviserOptions([]);
+        setAdviserOptions([]);
     }
-  };
+};
+
 
   const handlePanelSearch = async (query) => {
     if (query.length > 2) {
