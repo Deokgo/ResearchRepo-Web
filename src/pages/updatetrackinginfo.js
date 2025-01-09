@@ -203,34 +203,6 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
     setCurrentPage(1); // Reset to the first page on filter change
   }, [searchQuery, conferences]);
 
-  // Handle change in search query
-  const handleSearchChange = (e) => {
-    setSearchQuery(e.target.value.toLowerCase());
-  };
-
-  // Get the paginated conference details
-  const paginatedConferences = filteredConferences.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
-
-  // Handle pagination change
-  const handleChangePage = (event, newPage) => {
-    setCurrentPage(newPage);
-  };
-
-  const handleConferenceSelection = () => {
-    // Split the venue into parts
-    const venueParts = selectedVenue?.split(",") || []; // Ensure safe splitting
-    const city = venueParts[0]?.trim(); // First part as city (if exists)
-    const country = venueParts[1]?.trim() || venueParts[0]?.trim(); // Second part as country, fallback to the first part
-
-    setSingleCountry(country);
-    setSingleCity(venueParts.length > 1 ? city : ""); // Set city only if it exists
-
-    handleCloseModal();
-  };
-
   const handleAddConference = async () => {
     try {
       // Validate required fields
@@ -340,7 +312,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
         };
       } else {
         alert(
-          "Invalid indexing status. Please select either 'journal' or 'proceeding'."
+          "Invalid format. Please select either 'journal' or 'proceeding'."
         );
         return;
       }
@@ -965,8 +937,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                   <Grid2 display='flex' flexDirection='row'>
                                     <Grid2 size={6}>
                                       <Grid2
-                                        item
-                                        sx={{ mb: "1rem", mr: "3rem" }}
+                                        item sx={{ mb: "1rem", mr: "3rem" }}
                                       >
                                         {isEditing ? (
                                           <TextField
@@ -1461,84 +1432,9 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                   flexDirection='column'
                                   justifyContent='center'
                                 >
-                                  <Typography
-                                    variant='h6'
-                                    color='#d40821'
-                                    fontWeight='700'
-                                    sx={{
-                                      fontSize: {
-                                        xs: "0.8rem",
-                                        md: "1rem",
-                                        lg: "1.1rem",
-                                      },
-                                    }}
-                                  >
-                                    Publication:
-                                  </Typography>
-                                  <Grid2
-                                    display='flex'
-                                    flexDirection='column'
-                                    padding='1rem'
-                                  >
-                                    <Typography
-                                      variant='h7'
-                                      sx={{
-                                        mb: "1rem",
-                                        fontSize: {
-                                          xs: "0.7rem",
-                                          md: "0.8rem",
-                                          lg: "0.9rem",
-                                        },
-                                      }}
-                                    >
-                                      <strong>Name:</strong>{" "}
-                                      {publicationName || "None"}
-                                    </Typography>
-                                    <Typography
-                                      variant='h7'
-                                      sx={{
-                                        mb: "1rem",
-                                        fontSize: {
-                                          xs: "0.7rem",
-                                          md: "0.8rem",
-                                          lg: "0.9rem",
-                                        },
-                                      }}
-                                    >
-                                      <strong>Format:</strong>{" "}
-                                      {publicationFormat || "None"}
-                                    </Typography>
-                                    <Typography
-                                      variant='h7'
-                                      sx={{
-                                        mb: "1rem",
-                                        fontSize: {
-                                          xs: "0.7rem",
-                                          md: "0.8rem",
-                                          lg: "0.9rem",
-                                        },
-                                      }}
-                                    >
-                                      <strong>Date:</strong>{" "}
-                                      {datePublished || "None"}
-                                    </Typography>
-                                    <Typography
-                                      variant='h7'
-                                      sx={{
-                                        fontSize: {
-                                          xs: "0.7rem",
-                                          md: "0.8rem",
-                                          lg: "0.9rem",
-                                        },
-                                      }}
-                                    >
-                                      <strong>Indexing Status:</strong>{" "}
-                                      {indexingStatus || "None"}
-                                    </Typography>
-                                  </Grid2>
                                   <Grid2
                                     container
-                                    size={4}
+                                    size={6}
                                     justifyContent='flex-start'
                                     margin='1rem'
                                   >
@@ -1576,7 +1472,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                         }}
                                         onClick={handleOpenModalPub}
                                       >
-                                        + Add Publication
+                                        + Add Publication Details
                                       </Button>
                                     </Box>
                                   </Grid2>
@@ -1585,125 +1481,6 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                     flexItem
                                     sx={{ mt: "1rem", mb: "1rem" }}
                                   />
-                                  {publicationFormat === "proceeding" && ( // Render only if the selected type is not "Journal"
-                                    <>
-                                      <Typography
-                                        variant='h6'
-                                        color='#d40821'
-                                        fontWeight='700'
-                                        sx={{
-                                          fontSize: {
-                                            xs: "0.8rem",
-                                            md: "1rem",
-                                            lg: "1.1rem",
-                                          },
-                                        }}
-                                      >
-                                        Conference:
-                                      </Typography>
-                                      <Grid2
-                                        display='flex'
-                                        flexDirection='column'
-                                        padding='1rem'
-                                      >
-                                        <Typography
-                                          variant='h7'
-                                          sx={{
-                                            mb: "1rem",
-                                            fontSize: {
-                                              xs: "0.7rem",
-                                              md: "0.8rem",
-                                              lg: "0.9rem",
-                                            },
-                                          }}
-                                        >
-                                          <strong>Title:</strong>{" "}
-                                          {selectedTitle || "None"}
-                                        </Typography>
-                                        <Typography
-                                          variant='h7'
-                                          sx={{
-                                            mb: "1rem",
-                                            fontSize: {
-                                              xs: "0.7rem",
-                                              md: "0.8rem",
-                                              lg: "0.9rem",
-                                            },
-                                          }}
-                                        >
-                                          <strong>Venue:</strong>{" "}
-                                          {selectedVenue || "None"}
-                                        </Typography>
-                                        <Typography
-                                          variant='h7'
-                                          sx={{
-                                            mb: "1rem",
-                                            fontSize: {
-                                              xs: "0.7rem",
-                                              md: "0.8rem",
-                                              lg: "0.9rem",
-                                            },
-                                          }}
-                                        >
-                                          <strong>Date:</strong>{" "}
-                                          {selectedDate || "None"}
-                                        </Typography>
-                                      </Grid2>
-                                      <Grid2
-                                        display='flex'
-                                        paddingLeft='1rem'
-                                        justifyContent='flex-start'
-                                        gap={3}
-                                      >
-                                        <Box
-                                          sx={{
-                                            display: "flex",
-                                            alignItems: "center",
-                                            border: "1px dashed #0A438F",
-                                            borderRadius: 1,
-                                            cursor: "pointer",
-                                            justifyContent: "center",
-                                            gap: 2,
-                                          }}
-                                        >
-                                          <Button
-                                            variant='text'
-                                            color='primary'
-                                            sx={{
-                                              width: "100%",
-                                              color: "#08397C",
-                                              fontFamily:
-                                                "Montserrat, sans-serif",
-                                              fontWeight: 600,
-                                              textTransform: "none",
-                                              fontSize: {
-                                                xs: "0.6rem",
-                                                md: "0.7rem",
-                                                lg: "0.9rem",
-                                              },
-                                              padding: "1rem",
-                                              alignSelf: "center",
-                                              maxHeight: "2rem",
-                                              "&:hover": {
-                                                color: "#052045",
-                                              },
-                                            }}
-                                            onClick={handleOpenModalCon}
-                                          >
-                                            Select Conference
-                                          </Button>
-                                        </Box>
-                                      </Grid2>
-                                      <Box
-                                        sx={{
-                                          display: "flex",
-                                          flexDirection: "column",
-                                          alignItems: "flex-end",
-                                          marginTop: 3,
-                                        }}
-                                      ></Box>
-                                    </>
-                                  )}
                                   <Button
                                     variant='contained'
                                     color='primary'
@@ -1764,7 +1541,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                     variant='h3'
                     color='#08397C'
                     fontWeight='1000'
-                    mb={4}
+                    mb={3}
                     sx={{
                       textAlign: { xs: "left", md: "bottom" },
                       fontSize: {
@@ -1774,67 +1551,117 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                       },
                     }}
                   >
-                    Add Publication
+                    Add Publication Details
                   </Typography>
+                  <Grid2 container spacing={4}> 
+                    <Grid2 size={6}>
+                      <FormControl fullWidth variant='outlined' margin='dense'>
+                        <InputLabel
+                          sx={{
+                            fontSize: {
+                              xs: "0.75rem",
+                              md: "0.75rem",
+                              lg: "0.8rem",
+                            },
+                          }}
+                        >
+                          Format
+                        </InputLabel>
+                        <Select
+                          label='Format'
+                          sx={createTextFieldStyles()}
+                          value={publicationFormat}
+                          onChange={(e) => setPublicationFormat(e.target.value)}
+                        >
+                          <MenuItem
+                            value='journal'
+                            sx={{
+                              fontSize: {
+                                xs: "0.75rem",
+                                md: "0.75rem",
+                                lg: "0.8rem",
+                              },
+                            }}
+                          >
+                            Journal
+                          </MenuItem>
+                          <MenuItem
+                            value='proceeding'
+                            sx={{
+                              fontSize: {
+                                xs: "0.75rem",
+                                md: "0.75rem",
+                                lg: "0.8rem",
+                              },
+                            }}
+                          >
+                            Proceeding
+                          </MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Grid2>
+                    <Grid2 size={6}>
+                      <FormControl fullWidth variant='outlined' margin='dense'>
+                        <InputLabel
+                          sx={{
+                            fontSize: {
+                              xs: "0.75rem",
+                              md: "0.75rem",
+                              lg: "0.8rem",
+                            },
+                          }}
+                        >
+                          Indexing Status
+                        </InputLabel>
+                        <Select
+                          label='Indexing Status'
+                          sx={createTextFieldStyles()}
+                          value={indexingStatus}
+                          onChange={(e) => setIndexingStatus(e.target.value)}
+                        >
+                          <MenuItem
+                            value='SCOPUS'
+                            sx={{
+                              fontSize: {
+                                xs: "0.75rem",
+                                md: "0.75rem",
+                                lg: "0.8rem",
+                              },
+                            }}
+                          >
+                            Scopus
+                          </MenuItem>
+                          <MenuItem
+                            value='NON-SCOPUS'
+                            sx={{
+                              fontSize: {
+                                xs: "0.75rem",
+                                md: "0.75rem",
+                                lg: "0.8rem",
+                              },
+                            }}
+                          >
+                            Non-Scopus
+                          </MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Grid2>
+                  </Grid2>
                   <TextField
                     label='Publication Name'
                     value={publicationName}
                     fullWidth
                     onChange={(e) => setPublicationName(e.target.value)}
-                    margin='normal'
+                    margin='dense'
                     sx={createTextFieldStyles()}
                     InputLabelProps={createInputLabelProps()}
                   />
-                  <FormControl fullWidth variant='outlined' margin='normal'>
-                    <InputLabel
-                      sx={{
-                        fontSize: {
-                          xs: "0.75rem",
-                          md: "0.75rem",
-                          lg: "0.8rem",
-                        },
-                      }}
-                    >
-                      Format
-                    </InputLabel>
-                    <Select
-                      label='Format'
-                      sx={createTextFieldStyles()}
-                      value={publicationFormat}
-                      onChange={(e) => setPublicationFormat(e.target.value)}
-                    >
-                      <MenuItem
-                        value='journal'
-                        sx={{
-                          fontSize: {
-                            xs: "0.75rem",
-                            md: "0.75rem",
-                            lg: "0.8rem",
-                          },
-                        }}
-                      >
-                        Journal
-                      </MenuItem>
-                      <MenuItem
-                        value='proceeding'
-                        sx={{
-                          fontSize: {
-                            xs: "0.75rem",
-                            md: "0.75rem",
-                            lg: "0.8rem",
-                          },
-                        }}
-                      >
-                        Proceeding
-                      </MenuItem>
-                    </Select>
-                  </FormControl>
                   <TextField
                     fullWidth
                     label='Date'
                     variant='outlined'
                     type='date'
-                    margin='normal'
+                    margin='dense'
                     value={datePublished}
                     onChange={(e) => setDatePublished(e.target.value)}
                     sx={createTextFieldStyles()}
@@ -1843,50 +1670,126 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                       shrink: true,
                     }}
                   />
-                  <FormControl fullWidth variant='outlined' margin='normal'>
-                    <InputLabel
-                      sx={{
-                        fontSize: {
-                          xs: "0.75rem",
-                          md: "0.75rem",
-                          lg: "0.8rem",
-                        },
-                      }}
-                    >
-                      Indexing Status
-                    </InputLabel>
-                    <Select
-                      label='Indexing Status'
-                      sx={createTextFieldStyles()}
-                      value={indexingStatus}
-                      onChange={(e) => setIndexingStatus(e.target.value)}
-                    >
-                      <MenuItem
-                        value='SCOPUS'
-                        sx={{
-                          fontSize: {
-                            xs: "0.75rem",
-                            md: "0.75rem",
-                            lg: "0.8rem",
-                          },
+                  {publicationFormat === "proceeding" && (
+                    <Box>
+                      <Divider
+                        orientation='horizontal'
+                        flexItem
+                        sx= {{ mt: '0.5rem', mb: '0.5rem' }}
+                      />
+                      <TextField
+                        label='Conference Title'
+                        value={conferenceTitle}
+                        fullWidth
+                        onChange={(e) => setConferenceTitle(e.target.value)}
+                        margin='dense'
+                        sx={createTextFieldStyles()}
+                        InputLabelProps={createInputLabelProps()}
+                      />
+                      <Grid2 container spacing={4}> 
+                        <Grid2 size={6}>
+                           <TextField
+                            select
+                            fullWidth
+                            label='Country'
+                            value={singleCountry}
+                            onChange={(e) => {
+                              setSingleCountry(e.target.value);
+                              fetchCities(e.target.value);
+                            }}
+                            margin='dense'
+                            sx={createTextFieldStyles()}
+                            InputLabelProps={createInputLabelProps()}
+                          >
+                            <MenuItem
+                              value=''
+                              disabled
+                              sx={{
+                                fontSize: {
+                                  xs: "0.75rem",
+                                  md: "0.75rem",
+                                  lg: "0.8rem",
+                                },
+                              }}
+                            >
+                              Select your country
+                            </MenuItem>
+                            {countries.map((country) => (
+                              <MenuItem
+                                key={country.country}
+                                value={country.country}
+                                sx={{
+                                  fontSize: {
+                                    xs: "0.75rem",
+                                    md: "0.75rem",
+                                    lg: "0.8rem",
+                                  },
+                                }}
+                              >
+                                {country.country}
+                              </MenuItem>
+                            ))}
+                          </TextField>
+                        </Grid2>
+                        <Grid2 size={6}>
+                          <TextField
+                            select
+                            fullWidth
+                            label='City'
+                            value={singleCity}
+                            onChange={(e) => setSingleCity(e.target.value)}
+                            margin='dense'
+                            disabled={!Cities.length} // Disable if no cities are loaded
+                            sx={createTextFieldStyles()}
+                            InputLabelProps={createInputLabelProps()}
+                          >
+                            <MenuItem
+                              value=''
+                              disabled
+                              sx={{
+                                fontSize: {
+                                  xs: "0.75rem",
+                                  md: "0.75rem",
+                                  lg: "0.8rem",
+                                },
+                              }}
+                            >
+                              Select your city
+                            </MenuItem>
+                            {Cities.map((city) => (
+                              <MenuItem
+                                key={city}
+                                value={city}
+                                sx={{
+                                  fontSize: {
+                                    xs: "0.75rem",
+                                    md: "0.75rem",
+                                    lg: "0.8rem",
+                                  },
+                                }}
+                              >
+                                {city}
+                              </MenuItem>
+                            ))}
+                          </TextField>
+                        </Grid2>
+                      </Grid2>
+                      <TextField
+                        fullWidth
+                        label='Conference Date'
+                        variant='outlined'
+                        type='date'
+                        margin='dense'
+                        value={dateApproved}
+                        onChange={(e) => setDateApproved(e.target.value)}
+                        sx={createTextFieldStyles()}
+                        InputLabelProps={{
+                          ...createInputLabelProps(),
+                          shrink: true,
                         }}
-                      >
-                        Scopus
-                      </MenuItem>
-                      <MenuItem
-                        value='NON-SCOPUS'
-                        sx={{
-                          fontSize: {
-                            xs: "0.75rem",
-                            md: "0.75rem",
-                            lg: "0.8rem",
-                          },
-                        }}
-                      >
-                        Non-Scopus
-                      </MenuItem>
-                    </Select>
-                  </FormControl>
+                      />
+                    </Box>
+                  )}
                   <Box
                     sx={{
                       display: "flex",
@@ -1923,375 +1826,6 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                       variant='contained'
                       color='primary'
                       onClick={handleCloseModal}
-                      sx={{
-                        backgroundColor: "#CA031B",
-                        color: "#FFF",
-                        fontFamily: "Montserrat, sans-serif",
-                        fontWeight: 600,
-                        textTransform: "none",
-                        fontSize: { xs: "0.875rem", md: "1rem" },
-                        padding: { xs: "0.5rem 1rem", md: "1.25rem" },
-                        borderRadius: "100px",
-                        maxHeight: "3rem",
-                        "&:hover": {
-                          backgroundColor: "#A30417",
-                          color: "#FFF",
-                        },
-                      }}
-                    >
-                      Add
-                    </Button>
-                  </Box>
-                </Box>
-              </Modal>
-
-              {/* Select Conference Modal */}
-              <Modal open={openModalCon}>
-                <Box
-                  sx={{
-                    position: "absolute",
-                    top: "50%",
-                    left: "50%",
-                    transform: "translate(-50%, -50%)",
-                    width: "40rem",
-                    bgcolor: "background.paper",
-                    boxShadow: 24,
-                    p: 3,
-                    borderRadius: "8px",
-                  }}
-                >
-                  <TextField
-                    fullWidth
-                    variant='outlined'
-                    placeholder='Search by Title or Venue'
-                    value={searchQuery}
-                    onChange={handleSearchChange}
-                    InputLabelProps={createInputLabelProps()}
-                    sx={{ ...createTextFieldStyles(), flex: 2 }}
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position='start'>
-                          <Search />
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
-                  <Box
-                    sx={{
-                      backgroundColor: "#F7F9FC",
-                      borderRadius: 1,
-                      mt: 2,
-                      overflow: "hidden",
-                      display: "flex",
-                      flexDirection: "column",
-                      height: "auto",
-                    }}
-                  >
-                    <Box sx={{ height: "25em", overflow: "hidden" }}>
-                      {loading ? (
-                        <Typography>Loading...</Typography>
-                      ) : (
-                        <Virtuoso
-                          data={paginatedConferences}
-                          itemContent={(index, conference) => (
-                            <Box
-                              key={conference.conference_id}
-                              sx={{
-                                p: 2,
-                                cursor: "pointer",
-                                minHeight: "calc((100% - 48px) / 5)",
-                                display: "flex",
-                                flexDirection: "column",
-                                justifyContent: "center",
-                                borderBottom: "1px solid rgba(0, 0, 0, 0.1)",
-                                "&:hover": {
-                                  backgroundColor: "rgba(0, 0, 0, 0.04)",
-                                },
-                              }}
-                              onClick={() => {
-                                // Set values
-                                setSelectedTitle(conference.conference_title);
-                                setSelectedVenue(conference.conference_venue);
-                                setSelectedDate(conference.conference_date);
-                                handleConferenceSelection();
-                              }}
-                            >
-                              <Typography
-                                variant='h6'
-                                sx={{
-                                  fontSize: {
-                                    xs: "0.75rem",
-                                    md: "0.85rem",
-                                    lg: "0.95rem",
-                                  },
-                                  fontWeight: 500,
-                                }}
-                              >
-                                {conference.conference_title}
-                              </Typography>
-                              <Typography
-                                variant='body2'
-                                sx={{
-                                  color: "#666",
-                                  fontSize: {
-                                    xs: "0.6rem",
-                                    md: "0.7rem",
-                                    lg: "0.8rem",
-                                  },
-                                }}
-                              >
-                                {conference.conference_date}
-                              </Typography>
-                              <Typography
-                                variant='caption'
-                                sx={{
-                                  color: "#0A438F",
-                                  fontWeight: 500,
-                                  fontSize: {
-                                    xs: "0.6rem",
-                                    md: "0.7rem",
-                                    lg: "0.8rem",
-                                  },
-                                }}
-                              >
-                                {conference.conference_venue}
-                              </Typography>
-                            </Box>
-                          )}
-                        />
-                      )}
-                    </Box>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "center",
-                        py: 1,
-                        backgroundColor: "#fff",
-                        borderTop: "1px solid #eee",
-                      }}
-                    >
-                      <Pagination
-                        count={Math.ceil(
-                          filteredConferences.length / itemsPerPage
-                        )}
-                        page={currentPage}
-                        onChange={handleChangePage}
-                      />
-                    </Box>
-                  </Box>
-                  <Box
-                    display='flex'
-                    flexDirection='column'
-                    alignItems='center'
-                  >
-                    <Typography
-                      sx={{
-                        py: 2,
-                        fontSize: { xs: "0.7rem", md: "0.8rem", lg: "0.9rem" },
-                      }}
-                    >
-                      Didn’t find the conference you’re looking for?{" "}
-                      <a
-                        href='#'
-                        onClick={(e) => {
-                          e.preventDefault();
-                          handleOpenModal();
-                        }}
-                        style={{ color: "#CA031B" }}
-                      >
-                        Add a Conference
-                      </a>
-                    </Typography>
-                    <Button
-                      onClick={handleCloseModal}
-                      sx={{
-                        backgroundColor: "#08397C",
-                        color: "#FFF",
-                        fontFamily: "Montserrat, sans-serif",
-                        fontWeight: 600,
-                        fontSize: { xs: "0.875rem", md: "1rem" },
-                        padding: { xs: "0.5rem 1rem", md: "1.25rem" },
-                        borderRadius: "100px",
-                        maxHeight: "3rem",
-                        textTransform: "none",
-                        "&:hover": {
-                          backgroundColor: "#072d61",
-                        },
-                      }}
-                    >
-                      Cancel
-                    </Button>
-                  </Box>
-                </Box>
-              </Modal>
-
-              {/* Add Conference Modal */}
-              <Modal open={openModal} onClose={handleCloseModal}>
-                <Box
-                  sx={{
-                    position: "absolute",
-                    top: "50%",
-                    left: "50%",
-                    transform: "translate(-50%, -50%)",
-                    width: "30rem",
-                    bgcolor: "background.paper",
-                    boxShadow: 24,
-                    p: 5,
-                    borderRadius: "8px",
-                  }}
-                >
-                  <Typography
-                    variant='h3'
-                    color='#08397C'
-                    fontWeight='1000'
-                    mb={4}
-                    sx={{
-                      textAlign: { xs: "left", md: "bottom" },
-                      fontSize: {
-                        xs: "clamp(1rem, 2vw, 1rem)",
-                        sm: "clamp(1.5rem, 3.5vw, 1.5rem)",
-                        md: "clamp(2rem, 4vw, 2.25rem)",
-                      },
-                    }}
-                  >
-                    Add Conference
-                  </Typography>
-                  <TextField
-                    label='Conference Title'
-                    value={conferenceTitle}
-                    fullWidth
-                    onChange={(e) => setConferenceTitle(e.target.value)}
-                    margin='normal'
-                    sx={createTextFieldStyles()}
-                    InputLabelProps={createInputLabelProps()}
-                  />
-                  <TextField
-                    select
-                    fullWidth
-                    label='Country'
-                    value={singleCountry}
-                    onChange={(e) => {
-                      setSingleCountry(e.target.value);
-                      fetchCities(e.target.value);
-                    }}
-                    margin='normal'
-                    sx={createTextFieldStyles()}
-                    InputLabelProps={createInputLabelProps()}
-                  >
-                    <MenuItem
-                      value=''
-                      disabled
-                      sx={{
-                        fontSize: {
-                          xs: "0.75rem",
-                          md: "0.75rem",
-                          lg: "0.8rem",
-                        },
-                      }}
-                    >
-                      Select your country
-                    </MenuItem>
-                    {countries.map((country) => (
-                      <MenuItem
-                        key={country.country}
-                        value={country.country}
-                        sx={{
-                          fontSize: {
-                            xs: "0.75rem",
-                            md: "0.75rem",
-                            lg: "0.8rem",
-                          },
-                        }}
-                      >
-                        {country.country}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                  <TextField
-                    select
-                    fullWidth
-                    label='City'
-                    value={singleCity}
-                    onChange={(e) => setSingleCity(e.target.value)}
-                    margin='normal'
-                    disabled={!Cities.length} // Disable if no cities are loaded
-                    helperText='Select country first to select city'
-                    sx={createTextFieldStyles()}
-                    InputLabelProps={createInputLabelProps()}
-                  >
-                    <MenuItem
-                      value=''
-                      disabled
-                      sx={{
-                        fontSize: {
-                          xs: "0.75rem",
-                          md: "0.75rem",
-                          lg: "0.8rem",
-                        },
-                      }}
-                    >
-                      Select your city
-                    </MenuItem>
-                    {Cities.map((city) => (
-                      <MenuItem
-                        key={city}
-                        value={city}
-                        sx={{
-                          fontSize: {
-                            xs: "0.75rem",
-                            md: "0.75rem",
-                            lg: "0.8rem",
-                          },
-                        }}
-                      >
-                        {city}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                  <TextField
-                    fullWidth
-                    label='Conference Date'
-                    variant='outlined'
-                    type='date'
-                    margin='normal'
-                    value={dateApproved}
-                    onChange={(e) => setDateApproved(e.target.value)}
-                    sx={createTextFieldStyles()}
-                    InputLabelProps={{
-                      ...createInputLabelProps(),
-                      shrink: true,
-                    }}
-                  />
-                  <Box
-                    sx={{
-                      display: "flex",
-                      mt: 3,
-                      gap: 2,
-                    }}
-                  >
-                    <Button
-                      onClick={handleCloseModal}
-                      sx={{
-                        backgroundColor: "#08397C",
-                        color: "#FFF",
-                        fontFamily: "Montserrat, sans-serif",
-                        fontWeight: 600,
-                        fontSize: { xs: "0.875rem", md: "1rem" },
-                        padding: { xs: "0.5rem 1rem", md: "1.25rem" },
-                        borderRadius: "100px",
-                        maxHeight: "3rem",
-                        textTransform: "none",
-                        "&:hover": {
-                          backgroundColor: "#072d61",
-                        },
-                      }}
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      variant='contained'
-                      color='primary'
-                      onClick={handleAddConference}
                       sx={{
                         backgroundColor: "#CA031B",
                         color: "#FFF",
