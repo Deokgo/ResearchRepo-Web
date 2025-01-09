@@ -13,6 +13,7 @@ import {
   IconButton,
   Autocomplete,
   Tooltip,
+  FormHelperText,
 } from "@mui/material";
 import axios from "axios";
 import { useModalContext } from "../context/modalcontext";
@@ -21,6 +22,7 @@ import sdgGoalsData from "../data/sdgGoals.json";
 import { useAuth } from "../context/AuthContext";
 import AutorenewIcon from "@mui/icons-material/Autorenew";
 import { filterCache, fetchAndCacheFilterData } from "../utils/filterCache";
+import { toast } from "react-hot-toast";
 
 const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
   const [colleges, setColleges] = useState([]);
@@ -53,6 +55,8 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
   const [selectedResearchAreas, setSelectedResearchAreas] = useState([]);
   const [isModelPredicting, setIsModelPredicting] = useState(false);
   const [researchTypes, setResearchTypes] = useState([]);
+  const [formErrors, setFormErrors] = useState({});
+  const [formData] = useState(new FormData());
 
   // Create array of school years (last 10 years)
   const currentYear = new Date().getFullYear();
@@ -161,23 +165,25 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
     }
   };
   const handleAdviserSearch = async (query) => {
-    if (query.length > 2) { 
-        try {
-            const response = await axios.get(`/accounts/search_user/${selectedCollege}`, { 
-                params: {
-                    query
-                },
-            });
-            setAdviserOptions(response.data.users);
-            console.log('advisers: ', response.data.users);
-        } catch (error) {
-            console.error("Error fetching users:", error);
-        }
+    if (query.length > 2) {
+      try {
+        const response = await axios.get(
+          `/accounts/search_user/${selectedCollege}`,
+          {
+            params: {
+              query,
+            },
+          }
+        );
+        setAdviserOptions(response.data.users);
+        console.log("advisers: ", response.data.users);
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      }
     } else {
-        setAdviserOptions([]);
+      setAdviserOptions([]);
     }
-};
-
+  };
 
   const handlePanelSearch = async (query) => {
     if (query.length > 2) {
@@ -214,111 +220,101 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
     setKeywords(newValue);
   };
 
+  const validateForm = () => {
+    const errors = {};
+
+    // Required field validation
+    if (!researchType) errors.researchType = "Research Type is required";
+    if (!groupCode) errors.groupCode = "Group Code is required";
+    if (!selectedCollege) errors.college = "Department is required";
+    if (!selectedProgram) errors.program = "Program is required";
+    if (!schoolYear) errors.schoolYear = "School Year is required";
+    if (!term) errors.term = "Term is required";
+    if (authors.length === 0)
+      errors.authors = "At least one author is required";
+    if (!title) errors.title = "Title is required";
+    if (!abstract) errors.abstract = "Abstract is required";
+    if (!file) errors.manuscript = "Full Manuscript is required";
+    if (selectedSDGs.length === 0)
+      errors.sdgs = "At least one SDG Goal is required";
+    if (selectedResearchAreas.length === 0)
+      errors.researchAreas = "At least one Research Area is required";
+
+    // Special validation for FD research type
+    if (researchType === "FD") {
+      if (!adviser)
+        errors.adviser = "Adviser is required for Faculty Directed research";
+      if (panels.length === 0)
+        errors.panels =
+          "At least one Panel member is required for Faculty Directed research";
+    }
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleAddPaper = async () => {
-    try {
-      // Validate required fields
-      const requiredFields = {
-        "Group Code": groupCode,
-        "School Year": schoolYear,
-        Term: term,
-        Title: title,
-        Abstract: abstract,
-        "SDG Goals": selectedSDGs,
-        Keywords: keywords,
-        Authors: authors,
-        "Full Manuscript": file,
-        "Research Areas": selectedResearchAreas,
-      };
+    if (!validateForm()) {
+      toast.error("Please fill in all required fields", {
+        position: "top-right",
+        autoClose: 5000,
+      });
+      return;
+    }
 
-      // Conditionally include Adviser and Panels if researchType is "Integrative"
-      if (researchType === "Integrative") {
-        requiredFields.Adviser = adviser;
-        requiredFields.Panels = panels;
-      }
+    // Clear any existing data in formData
+    for (let pair of formData.entries()) {
+      formData.delete(pair[0]);
+    }
 
-      const missingFields = Object.entries(requiredFields)
-        .filter(([_, value]) => {
-          if (Array.isArray(value)) {
-            return value.length === 0;
-          }
-          return !value;
-        })
-        .map(([key]) => key);
+    // Add new data
+    formData.append("research_id", groupCode);
+    formData.append("college_id", selectedCollege);
+    formData.append("program_id", selectedProgram);
+    formData.append("title", title);
+    formData.append("abstract", abstract);
+    formData.append("school_year", schoolYear);
+    formData.append("term", term);
+    formData.append("research_type", researchType);
+    formData.append("file", file);
 
-      if (missingFields.length > 0) {
-        alert(
-          `Please fill in all required fields: ${missingFields.join(", ")}`
-        );
-        return;
-      }
-
-      console.log("File:", file);
-      console.log("Extended Abstract:", extendedAbstract);
-
-      const formData = new FormData();
-
-      // Get user_id from localStorage
-      const userId = localStorage.getItem("user_id");
-      formData.append("user_id", userId);
-
-      // Add all required fields to formData
-      formData.append("research_id", groupCode);
-      formData.append("college_id", selectedCollege);
-      formData.append("program_id", selectedProgram);
-      formData.append("title", title);
-      formData.append("abstract", abstract);
-      formData.append("school_year", schoolYear);
-      formData.append("term", term);
-      formData.append("research_type", researchType);
-      formData.append("adviser_id", adviser?.user_id || "");
-      formData.append("sdg", selectedSDGs.map((sdg) => sdg.id).join(";"));
-      formData.append("file", file);
+    if (extendedAbstract) {
       formData.append("extended_abstract", extendedAbstract);
+    }
 
-      // Add authors without order
-      authors.forEach((author) => {
-        formData.append("author_ids", author.user_id);
-      });
+    formData.append("sdg", selectedSDGs.map((sdg) => sdg.id).join(";"));
+    formData.append("keywords", keywords.join(";"));
 
-      // Add panel IDs
+    authors.forEach((author) => {
+      formData.append("author_ids", author.researcher_id);
+    });
+
+    if (researchType === "FD") {
+      if (adviser) {
+        formData.append("adviser_id", adviser.researcher_id);
+      }
       panels.forEach((panel) => {
-        formData.append("panel_ids", panel.user_id);
+        formData.append("panel_ids", panel.researcher_id);
       });
+    }
 
-      // Add keywords
-      formData.append("keywords", keywords.join(";"));
+    formData.append(
+      "research_areas",
+      selectedResearchAreas.map((area) => area.id).join(";")
+    );
 
-      // Add research areas
-      formData.append(
-        "research_areas",
-        selectedResearchAreas.map((area) => area.research_area_id).join(";")
-      );
-
-      // Send the paper data
+    try {
       const response = await axios.post("/paper/add_paper", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
 
-      console.log("Response:", response.data);
-      alert("Paper added successfully!");
-      if (onPaperAdded) {
-        onPaperAdded();
-      }
+      toast.success("Paper added successfully!");
       closeAddPaperModal();
     } catch (error) {
-      console.error("Error adding paper:", error);
-      if (error.response) {
-        console.error("Error response:", error.response.data);
-        alert(
-          `Failed to add paper: ${
-            error.response.data.error || "Please try again."
-          }`
-        );
-      } else {
-        alert("Failed to add paper. Please try again.");
-      }
+      toast.error(error.response?.data?.error || "Error adding paper");
+      console.error("Error:", error);
     }
   };
 
@@ -552,24 +548,25 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
         >
           Add New Paper
         </Typography>
+        <Typography
+          variant='caption'
+          color='text.secondary'
+          sx={{ mb: 2, display: "block" }}
+        >
+          * Required fields
+        </Typography>
         <Grid2 container spacing={2}>
           <Grid2 size={2}>
-            <FormControl fullWidth sx={{ mb: 2 }}>
-              <InputLabel>Research Type</InputLabel>
+            <FormControl fullWidth error={!!formErrors.researchType}>
+              <InputLabel required shrink>
+                Research Type
+              </InputLabel>
               <Select
                 value={researchType}
-                onChange={(event) => {
-                  const newResearchType = event.target.value;
-                  handleResearchTypeChange(event);
-                  if (newResearchType !== "FD") {
-                    setAdviser(""); // Clear adviser selection
-                    setAdviserInputValue(""); // Clear adviser input field
-                    setPanels([]); // Clear panels selection
-                    setPanelInputValue(""); // Clear panel input field
-                  }
-                }}
+                onChange={handleResearchTypeChange}
                 label='Research Type'
                 defaultValue='FD'
+                sx={createTextFieldStyles()}
               >
                 {researchTypes.map((type) => (
                   <MenuItem key={type.id} value={type.id}>
@@ -577,32 +574,36 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
                   </MenuItem>
                 ))}
               </Select>
+              {formErrors.researchType && (
+                <FormHelperText error>{formErrors.researchType}</FormHelperText>
+              )}
             </FormControl>
           </Grid2>
           <Grid2 size={2}>
             <TextField
               fullWidth
+              required
               label='Group Code'
               variant='outlined'
               value={groupCode}
               onChange={(e) => setGroupCode(e.target.value)}
-              inputProps={{ maxLength: 15 }} // Limits input to 15 characters
+              error={!!formErrors.groupCode}
+              helperText={formErrors.groupCode || "Maximum 15 characters"}
+              inputProps={{ maxLength: 15 }}
               sx={createTextFieldStyles()}
-              InputLabelProps={createInputLabelProps()}
+              InputLabelProps={{
+                shrink: true,
+                required: true,
+              }}
             />
           </Grid2>
-          <Grid2 size={3}>
-            <FormControl fullWidth variant='outlined'>
-              <InputLabel
-                sx={{
-                  color: user?.role === "05" ? "#666" : "inherit",
-                  "&.Mui-disabled": { color: "#666" },
-                }}
-              >
+          <Grid2 size={2.5}>
+            <FormControl fullWidth error={!!formErrors.college}>
+              <InputLabel required shrink>
                 Department
               </InputLabel>
               <Select
-                value={selectedCollege || ""}
+                value={selectedCollege}
                 onChange={handleCollegeChange}
                 label='Department'
                 disabled={user?.role === "05"}
@@ -623,20 +624,18 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
                   </MenuItem>
                 ))}
               </Select>
+              {formErrors.college && (
+                <FormHelperText error>{formErrors.college}</FormHelperText>
+              )}
             </FormControl>
           </Grid2>
-          <Grid2 size={3}>
-            <FormControl fullWidth variant='outlined'>
-              <InputLabel
-                sx={{
-                  color: user?.role === "05" ? "#666" : "inherit",
-                  "&.Mui-disabled": { color: "#666" },
-                }}
-              >
+          <Grid2 size={2.5}>
+            <FormControl fullWidth error={!!formErrors.program}>
+              <InputLabel required shrink>
                 Program
               </InputLabel>
               <Select
-                value={selectedProgram || ""}
+                value={selectedProgram}
                 onChange={(e) => setSelectedProgram(e.target.value)}
                 label='Program'
                 disabled={user?.role === "05"}
@@ -657,15 +656,21 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
                   </MenuItem>
                 ))}
               </Select>
+              {formErrors.program && (
+                <FormHelperText error>{formErrors.program}</FormHelperText>
+              )}
             </FormControl>
           </Grid2>
-          <Grid2 size={1}>
-            <FormControl fullWidth variant='outlined'>
-              <InputLabel>School Year</InputLabel>
+          <Grid2 size={1.5}>
+            <FormControl fullWidth error={!!formErrors.schoolYear}>
+              <InputLabel required shrink>
+                School Year
+              </InputLabel>
               <Select
                 value={schoolYear}
                 onChange={(e) => setSchoolYear(e.target.value)}
                 label='School Year'
+                notched
                 sx={createTextFieldStyles()}
               >
                 {schoolYears.map((year) => (
@@ -676,15 +681,21 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
                   </MenuItem>
                 ))}
               </Select>
+              {formErrors.schoolYear && (
+                <FormHelperText error>{formErrors.schoolYear}</FormHelperText>
+              )}
             </FormControl>
           </Grid2>
-          <Grid2 size={1}>
-            <FormControl fullWidth variant='outlined'>
-              <InputLabel>Term</InputLabel>
+          <Grid2 size={1.5}>
+            <FormControl fullWidth error={!!formErrors.term}>
+              <InputLabel required shrink>
+                Term
+              </InputLabel>
               <Select
                 value={term}
                 onChange={(e) => setTerm(e.target.value)}
                 label='Term'
+                notched
                 sx={createTextFieldStyles()}
               >
                 {terms.map((termOption) => (
@@ -693,11 +704,15 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
                   </MenuItem>
                 ))}
               </Select>
+              {formErrors.term && (
+                <FormHelperText error>{formErrors.term}</FormHelperText>
+              )}
             </FormControl>
           </Grid2>
           <Grid2 size={4}>
             <Autocomplete
               multiple
+              disableCloseOnSelect
               options={authorOptions}
               getOptionLabel={(option) =>
                 `${option.first_name || ""} ${option.last_name || ""} (${
@@ -723,11 +738,19 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
               renderInput={(params) => (
                 <TextField
                   {...params}
+                  required
                   label='Authors'
-                  variant='outlined'
-                  helperText='Type at least 3 characters to search and select author/s'
+                  error={!!formErrors.authors}
+                  helperText={
+                    formErrors.authors ||
+                    "Type at least 3 characters to search and select author/s"
+                  }
                   sx={createTextFieldStyles()}
-                  InputLabelProps={createInputLabelProps()}
+                  InputLabelProps={{
+                    ...params.InputLabelProps,
+                    shrink: true,
+                    required: true,
+                  }}
                 />
               )}
             />
@@ -765,15 +788,38 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
               renderInput={(params) => (
                 <TextField
                   {...params}
+                  required
                   label='Adviser'
-                  variant='outlined'
+                  error={!!formErrors.adviser}
                   helperText={
-                    researchType !== "FD"
-                      ? null
-                      : "Type at least 3 characters to search for an adviser"
+                    researchType === "FD"
+                      ? formErrors.adviser ||
+                        "Type at least 3 characters to search for an adviser"
+                      : ""
                   }
-                  sx={researchType !== "FD" ? disabledSelectStyle : null}
-                  InputLabelProps={createInputLabelProps()}
+                  InputLabelProps={{
+                    ...params.InputLabelProps,
+                    shrink: true,
+                    required: true,
+                  }}
+                  sx={
+                    researchType !== "FD"
+                      ? {
+                          ...disabledSelectStyle,
+                          fontSize: {
+                            xs: "0.75rem",
+                            md: "0.75rem",
+                            lg: "0.8rem",
+                          },
+                        }
+                      : {
+                          fontSize: {
+                            xs: "0.75rem",
+                            md: "0.75rem",
+                            lg: "0.8rem",
+                          },
+                        }
+                  }
                 />
               )}
             />
@@ -811,15 +857,38 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
               renderInput={(params) => (
                 <TextField
                   {...params}
-                  label='Panels'
-                  variant='outlined'
+                  required
+                  label='Panel Members'
+                  error={!!formErrors.panels}
                   helperText={
-                    researchType !== "FD"
-                      ? null
-                      : "Type at least 3 characters to search and select multiple panel members"
+                    researchType === "FD"
+                      ? formErrors.panels ||
+                        "Type at least 3 characters to search and select multiple panel members"
+                      : ""
                   }
-                  sx={researchType !== "FD" ? disabledSelectStyle : null}
-                  InputLabelProps={createInputLabelProps()}
+                  InputLabelProps={{
+                    ...params.InputLabelProps,
+                    shrink: true,
+                    required: true,
+                  }}
+                  sx={
+                    researchType !== "FD"
+                      ? {
+                          ...disabledSelectStyle,
+                          fontSize: {
+                            xs: "0.75rem",
+                            md: "0.75rem",
+                            lg: "0.8rem",
+                          },
+                        }
+                      : {
+                          fontSize: {
+                            xs: "0.75rem",
+                            md: "0.75rem",
+                            lg: "0.8rem",
+                          },
+                        }
+                  }
                 />
               )}
             />
@@ -827,12 +896,18 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
           <Grid2 size={12}>
             <TextField
               fullWidth
+              required
               label='Title'
               variant='outlined'
               value={title}
               onChange={(e) => setTitle(e.target.value)}
+              error={!!formErrors.title}
+              helperText={formErrors.title}
               sx={createTextFieldStyles()}
-              InputLabelProps={createInputLabelProps()}
+              InputLabelProps={{
+                shrink: true,
+                required: true,
+              }}
             />
           </Grid2>
           <Grid2 size={6}>
@@ -846,11 +921,15 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
               renderInput={(params) => (
                 <TextField
                   {...params}
+                  required
                   label='SDG Goals'
-                  variant='outlined'
-                  helperText='Select one or more SDG goals'
-                  sx={createTextFieldStyles()}
-                  InputLabelProps={createInputLabelProps()}
+                  error={!!formErrors.sdgs}
+                  helperText={formErrors.sdgs || "Select one or more SDG goals"}
+                  InputLabelProps={{
+                    ...params.InputLabelProps,
+                    shrink: true,
+                    required: true,
+                  }}
                 />
               )}
               renderOption={(props, option) => (
@@ -866,17 +945,20 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
             <Autocomplete
               multiple
               freeSolo
-              options={[]} // Empty array since keywords are free-form
+              options={[]}
               value={keywords}
               onChange={handleKeywordsChange}
               renderInput={(params) => (
                 <TextField
                   {...params}
+                  required
                   label='Keywords'
-                  variant='outlined'
                   helperText='Type and press Enter to add multiple keywords'
-                  sx={createTextFieldStyles()}
-                  InputLabelProps={createInputLabelProps()}
+                  InputLabelProps={{
+                    ...params.InputLabelProps,
+                    shrink: true,
+                    required: true,
+                  }}
                 />
               )}
             />
@@ -884,22 +966,27 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
           <Grid2 size={6}>
             <TextField
               fullWidth
+              required
               label='Abstract'
-              multiline
-              rows={3}
               variant='outlined'
+              multiline
+              rows={4}
               value={abstract}
               onChange={(e) => setAbstract(e.target.value)}
+              error={!!formErrors.abstract}
+              helperText={formErrors.abstract}
               sx={createTextFieldStyles()}
-              InputLabelProps={createInputLabelProps()}
+              InputLabelProps={{
+                shrink: true,
+                required: true,
+              }}
             />
           </Grid2>
           <Grid2 size={6}>
-            <FormControl fullWidth sx={{ mb: 2 }}>
+            <FormControl fullWidth error={!!formErrors.researchAreas}>
               <Autocomplete
                 multiple
                 disableCloseOnSelect
-                id='research-areas'
                 options={researchAreas}
                 getOptionLabel={(option) => option.research_area_name}
                 value={selectedResearchAreas}
@@ -909,36 +996,49 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
                 renderInput={(params) => (
                   <TextField
                     {...params}
+                    required
                     label='Research Areas'
-                    variant='outlined'
-                    helperText='Select research areas'
-                    sx={createTextFieldStyles()}
-                    InputLabelProps={createInputLabelProps()}
+                    error={!!formErrors.researchAreas}
+                    helperText={
+                      formErrors.researchAreas || "Select research areas"
+                    }
+                    InputLabelProps={{
+                      ...params.InputLabelProps,
+                      shrink: true,
+                      required: true,
+                    }}
                   />
                 )}
               />
             </FormControl>
           </Grid2>
-          <Grid2 size={6}>
+          <Grid2 size={6}></Grid2>
+          <Grid2 size={3}>
             <Typography variant='body2' sx={{ mb: 1 }}>
-              Upload Full Manuscript
+              Upload Full Manuscript *
             </Typography>
-            <FileUploader
-              label='Upload Full Manuscript'
-              onSelectFile={onSelectFileHandler}
-              onDeleteFile={onDeleteFileHandler}
-              file={file}
-            />
+            <FormControl fullWidth error={!!formErrors.manuscript}>
+              <FileUploader
+                onFileSelect={onSelectFileHandler}
+                onFileDelete={onDeleteFileHandler}
+                selectedFile={file}
+                required
+                sx={{ width: "100%" }}
+              />
+              {formErrors.manuscript && (
+                <FormHelperText error>{formErrors.manuscript}</FormHelperText>
+              )}
+            </FormControl>
           </Grid2>
-          <Grid2 size={6}>
+          <Grid2 size={3}>
             <Typography variant='body2' sx={{ mb: 1 }}>
               Upload Extended Abstract
             </Typography>
             <FileUploader
-              label='Upload Extended Abstract'
               onSelectFile={onSelectFileHandlerEA}
               onDeleteFile={onDeleteFileHandlerEA}
               file={extendedAbstract}
+              sx={{ width: "100%" }}
             />
           </Grid2>
         </Grid2>
