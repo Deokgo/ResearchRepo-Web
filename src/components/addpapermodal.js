@@ -512,7 +512,6 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
   return (
     <Modal
       open={isAddPaperModalOpen}
-      onClose={closeAddPaperModal}
       sx={{
         display: "flex",
         alignItems: "center",
