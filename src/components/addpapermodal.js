@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import {
   Box,
   Button,
@@ -14,6 +14,11 @@ import {
   Autocomplete,
   Tooltip,
   FormHelperText,
+  CircularProgress,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from "@mui/material";
 import axios from "axios";
 import { useModalContext } from "../context/modalcontext";
@@ -23,6 +28,7 @@ import { useAuth } from "../context/AuthContext";
 import AutorenewIcon from "@mui/icons-material/Autorenew";
 import { filterCache, fetchAndCacheFilterData } from "../utils/filterCache";
 import { toast } from "react-hot-toast";
+import { debounce } from "lodash";
 
 const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
   const [colleges, setColleges] = useState([]);
@@ -56,8 +62,14 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
   const [isModelPredicting, setIsModelPredicting] = useState(false);
   const [researchTypes, setResearchTypes] = useState([]);
   const [formErrors, setFormErrors] = useState({});
-  const [formData] = useState(new FormData());
-  const dismissAll = () =>  toast.dismiss();
+  const [isDuplicateCode, setIsDuplicateCode] = useState(false);
+  const [isDuplicateTitle, setIsDuplicateTitle] = useState(false);
+  const [isDuplicateAuthors, setIsDuplicateAuthors] = useState(false);
+  const [isValid, setIsValid] = useState(false);
+  const [attemptedSubmit, setAttemptedSubmit] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
+  const [shouldClearFields, setShouldClearFields] = useState(false);
 
   // Create array of school years (last 10 years)
   const currentYear = new Date().getFullYear();
@@ -246,29 +258,68 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
         errors.panels =
           "At least one Panel member is required for Faculty Directed research";
     }
-    console.log(Object.keys(errors).length)
-    setFormErrors(errors);
-    return Object.keys(errors).length
-  };
 
-  const handleBack = () => {
-    if (validateForm() === 11) {
-      closeAddPaperModal();
-      toast.dismiss();
-      return;
-    }
-    const userConfirmed = window.confirm(
-      "You have unsaved changes. Save Changes?"
+    setFormErrors(attemptedSubmit ? errors : {});
+    const errorCount = Object.keys(errors).length;
+
+    // Update isValid based on errors and duplicate checks
+    setIsValid(
+      errorCount === 0 &&
+        !isDuplicateCode &&
+        !(isDuplicateTitle && isDuplicateAuthors)
     );
 
-    if (userConfirmed) {
-      handleAddPaper();
+    return errorCount;
+  };
+
+  // Add useEffect to validate form when relevant fields change
+  useEffect(() => {
+    validateForm();
+  }, [
+    groupCode,
+    schoolYear,
+    term,
+    authors,
+    title,
+    abstract,
+    file,
+    selectedSDGs,
+    selectedResearchAreas,
+    adviser,
+    panels,
+    researchType,
+    isDuplicateCode,
+    isDuplicateTitle,
+    isDuplicateAuthors,
+  ]);
+
+  const handleBack = () => {
+    if (isSubmitting) {
+      return;
+    }
+
+    const hasChanges =
+      groupCode ||
+      title ||
+      abstract ||
+      authors.length > 0 ||
+      keywords.length > 0 ||
+      selectedSDGs.length > 0 ||
+      selectedResearchAreas.length > 0 ||
+      file ||
+      extendedAbstract ||
+      (researchType === "FD" && (adviser || panels.length > 0));
+
+    if (hasChanges) {
+      setIsConfirmDialogOpen(true);
     } else {
+      setShouldClearFields(true);
       closeAddPaperModal();
-    }   
-  }
+    }
+  };
 
   const handleAddPaper = async () => {
+    setAttemptedSubmit(true);
     if (validateForm() !== 0) {
       toast.error("Please fill in all required fields", {
         position: "top-right",
@@ -276,12 +327,42 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
       });
       return;
     }
-    toast.dismiss()
 
-    // Clear any existing data in formData
-    for (let pair of formData.entries()) {
-      formData.delete(pair[0]);
+    // Check for duplicate code first
+    if (isDuplicateCode) {
+      toast.error("Cannot submit: Group Code already exists", {
+        position: "top-right",
+        autoClose: 5000,
+      });
+      return;
     }
+
+    // If title is duplicate but authors are different, show confirmation
+    if (isDuplicateTitle && !isDuplicateAuthors) {
+      const userConfirmed = window.confirm(
+        "A paper with this title already exists. Are you sure you want to proceed?"
+      );
+      if (!userConfirmed) {
+        return;
+      }
+    }
+
+    // If both title and authors are duplicates, prevent submission
+    if (isDuplicateTitle && isDuplicateAuthors) {
+      toast.error(
+        "Cannot submit: This paper already exists with these authors",
+        {
+          position: "top-right",
+          autoClose: 5000,
+        }
+      );
+      return;
+    }
+
+    setIsSubmitting(true);
+    toast.dismiss();
+
+    const formData = new FormData();
 
     // Add new data
     formData.append("research_id", groupCode);
@@ -302,21 +383,21 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
     formData.append("keywords", keywords.join(";"));
 
     authors.forEach((author) => {
-      formData.append("author_ids", author.researcher_id);
+      formData.append("author_ids", author.user_id);
     });
 
     if (researchType === "FD") {
       if (adviser) {
-        formData.append("adviser_id", adviser.researcher_id);
+        formData.append("adviser_id", adviser.user_id);
       }
       panels.forEach((panel) => {
-        formData.append("panel_ids", panel.researcher_id);
+        formData.append("panel_ids", panel.user_id);
       });
     }
 
     formData.append(
       "research_areas",
-      selectedResearchAreas.map((area) => area.id).join(";")
+      selectedResearchAreas.map((area) => area.research_area_id).join(";")
     );
 
     try {
@@ -327,36 +408,56 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
       });
 
       toast.success("Paper added successfully!");
-      closeAddPaperModal();
+
+      if (onPaperAdded) {
+        await onPaperAdded();
+      }
+
+      // Only clear fields and close modal if this wasn't triggered from the confirmation dialog
+      if (!isConfirmDialogOpen) {
+        closeAddPaperModal();
+      }
+
+      setIsConfirmDialogOpen(false); // Just close the confirmation dialog if it was open
     } catch (error) {
       toast.error(error.response?.data?.error || "Error adding paper");
       console.error("Error:", error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  // Reset form state when modal opens
+  // Modify the useEffect that handles cleanup
   useEffect(() => {
-    if (!isAddPaperModalOpen) {
+    if (!isAddPaperModalOpen && shouldClearFields) {
+      // Only clear if explicitly set
       setGroupCode("");
       setSelectedCollege("");
       setSelectedProgram("");
       setResearchType("FD");
-      setSchoolYear(""); // Reset school year
-      setTerm(""); // Reset term
+      setSchoolYear("");
+      setTerm("");
       setTitle("");
       setAbstract("");
       setAdviser(null);
       setAdviserInputValue("");
       setAuthorInputValue("");
       setPanelInputValue("");
+      setPanels([]);
       setSelectedSDGs([]);
       setKeywords([]);
-      setPanels([]);
       setFile(null);
       setExtendedAbstract(null);
       setAuthors([]);
+      setFormErrors({});
+      setAttemptedSubmit(false);
+      setSelectedResearchAreas([]);
+      setAuthorOptions([]);
+      setAdviserOptions([]);
+      setPanelOptions([]);
+      setShouldClearFields(false); // Reset the flag
     }
-  }, [isAddPaperModalOpen]);
+  }, [isAddPaperModalOpen, shouldClearFields]);
 
   // Initialize research type
   useEffect(() => {
@@ -445,10 +546,14 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
     try {
       const cached = filterCache.get();
       if (cached.researchAreas) {
-        const formattedAreas = cached.researchAreas.map((area) => ({
-          research_area_id: area.id,
-          research_area_name: area.name,
-        }));
+        const formattedAreas = cached.researchAreas
+          .map((area) => ({
+            research_area_id: area.id,
+            research_area_name: area.name,
+          }))
+          .sort((a, b) =>
+            a.research_area_name.localeCompare(b.research_area_name)
+          );
         setResearchAreas(formattedAreas);
       }
     } catch (error) {
@@ -509,9 +614,113 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
     },
   };
 
+  // Create debounced check functions
+  const debouncedCheckDuplicateCode = useMemo(
+    () =>
+      debounce(async (code) => {
+        if (code.length > 0) {
+          try {
+            const response = await axios.get(`/paper/check_duplicate`, {
+              params: { group_code: code },
+            });
+            setIsDuplicateCode(response.data.isDuplicate);
+          } catch (error) {
+            console.error("Error checking duplicate code:", error);
+          }
+        } else {
+          setIsDuplicateCode(false);
+        }
+      }, 500),
+    []
+  );
+
+  const debouncedCheckDuplicates = useMemo(
+    () =>
+      debounce(async (title, authorIds) => {
+        if (title.length > 0 && authorIds.length > 0) {
+          try {
+            const response = await axios.get(`/paper/check_duplicate`, {
+              params: {
+                title: title,
+                author_ids: authorIds.join(","),
+              },
+            });
+            setIsDuplicateTitle(response.data.isDuplicateTitle);
+            setIsDuplicateAuthors(response.data.isDuplicateAuthors);
+          } catch (error) {
+            console.error("Error checking duplicates:", error);
+          }
+        } else {
+          setIsDuplicateTitle(false);
+          setIsDuplicateAuthors(false);
+        }
+      }, 500),
+    []
+  );
+
+  // Modify the existing handlers
+  const handleGroupCodeChange = (e) => {
+    const newCode = e.target.value;
+    setGroupCode(newCode);
+    debouncedCheckDuplicateCode(newCode);
+  };
+
+  const handleTitleChange = (e) => {
+    const newTitle = e.target.value;
+    setTitle(newTitle);
+    debouncedCheckDuplicates(
+      newTitle,
+      authors.map((author) => author.user_id)
+    );
+  };
+
+  // Add this function to check if form is valid
+  const isFormValid = () => {
+    // Check for required fields
+    if (
+      !groupCode ||
+      !schoolYear ||
+      !term ||
+      authors.length === 0 ||
+      !title ||
+      !abstract ||
+      !file ||
+      selectedSDGs.length === 0 ||
+      selectedResearchAreas.length === 0
+    ) {
+      return false;
+    }
+
+    // Check for FD specific requirements
+    if (researchType === "FD") {
+      if (!adviser || panels.length === 0) {
+        return false;
+      }
+    }
+
+    // Only check for duplicate code, not title
+    if (isDuplicateCode) {
+      return false;
+    }
+
+    return true;
+  };
+
+  // Update the authors change handler in the Autocomplete component
+  const handleAuthorsChange = (event, newValue) => {
+    setAuthors(newValue);
+    if (title) {
+      debouncedCheckDuplicates(
+        title,
+        newValue.map((author) => author.user_id)
+      );
+    }
+  };
+
   return (
     <Modal
       open={isAddPaperModalOpen}
+      onClose={isSubmitting ? undefined : handleBack} // Disable closing when submitting
       sx={{
         display: "flex",
         alignItems: "center",
@@ -589,9 +798,17 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
               label='Group Code'
               variant='outlined'
               value={groupCode}
-              onChange={(e) => setGroupCode(e.target.value)}
-              error={!!formErrors.groupCode}
-              helperText={formErrors.groupCode || "Maximum 15 characters"}
+              onChange={handleGroupCodeChange}
+              error={
+                isDuplicateCode || (attemptedSubmit && !!formErrors.groupCode)
+              }
+              helperText={
+                isDuplicateCode
+                  ? "This group code already exists"
+                  : attemptedSubmit && formErrors.groupCode
+                  ? formErrors.groupCode
+                  : "Maximum 15 characters"
+              }
               inputProps={{ maxLength: 15 }}
               sx={createTextFieldStyles()}
               InputLabelProps={{
@@ -732,7 +949,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
                 },
               }}
               value={authors}
-              onChange={(event, newValue) => setAuthors(newValue)}
+              onChange={handleAuthorsChange}
               inputValue={authorInputValue}
               onInputChange={(event, newInputValue) => {
                 setAuthorInputValue(newInputValue);
@@ -743,10 +960,16 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
                   {...params}
                   required
                   label='Authors'
-                  error={!!formErrors.authors}
+                  error={
+                    (isDuplicateTitle && isDuplicateAuthors) ||
+                    (attemptedSubmit && !!formErrors.authors)
+                  }
                   helperText={
-                    formErrors.authors ||
-                    "Type at least 3 characters to search and select author/s"
+                    isDuplicateTitle && isDuplicateAuthors
+                      ? "These authors already have a paper with this title"
+                      : attemptedSubmit && formErrors.authors
+                      ? formErrors.authors
+                      : "Type at least 3 characters to search and select author/s"
                   }
                   sx={createTextFieldStyles()}
                   InputLabelProps={{
@@ -793,12 +1016,12 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
                   {...params}
                   required
                   label='Adviser'
-                  error={!!formErrors.adviser}
+                  error={attemptedSubmit && !!formErrors.adviser}
                   helperText={
-                    researchType === "FD"
+                    attemptedSubmit
                       ? formErrors.adviser ||
                         "Type at least 3 characters to search for an adviser"
-                      : ""
+                      : "Type at least 3 characters to search for an adviser"
                   }
                   InputLabelProps={{
                     ...params.InputLabelProps,
@@ -862,12 +1085,12 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
                   {...params}
                   required
                   label='Panel Members'
-                  error={!!formErrors.panels}
+                  error={attemptedSubmit && !!formErrors.panels}
                   helperText={
-                    researchType === "FD"
+                    attemptedSubmit
                       ? formErrors.panels ||
                         "Type at least 3 characters to search and select multiple panel members"
-                      : ""
+                      : "Type at least 3 characters to search and select multiple panel members"
                   }
                   InputLabelProps={{
                     ...params.InputLabelProps,
@@ -903,9 +1126,20 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
               label='Title'
               variant='outlined'
               value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              error={!!formErrors.title}
-              helperText={formErrors.title}
+              onChange={handleTitleChange}
+              error={
+                (isDuplicateTitle && isDuplicateAuthors) ||
+                (attemptedSubmit && !!formErrors.title)
+              }
+              helperText={
+                isDuplicateTitle && isDuplicateAuthors
+                  ? "This paper already exists with these authors"
+                  : isDuplicateTitle
+                  ? "A paper with this title exists (different authors)"
+                  : attemptedSubmit && formErrors.title
+                  ? formErrors.title
+                  : ""
+              }
               sx={createTextFieldStyles()}
               InputLabelProps={{
                 shrink: true,
@@ -926,8 +1160,12 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
                   {...params}
                   required
                   label='SDG Goals'
-                  error={!!formErrors.sdgs}
-                  helperText={formErrors.sdgs || "Select one or more SDG goals"}
+                  error={attemptedSubmit && !!formErrors.sdgs}
+                  helperText={
+                    attemptedSubmit
+                      ? formErrors.sdgs || "Select one or more SDG goals"
+                      : "Select one or more SDG goals"
+                  }
                   InputLabelProps={{
                     ...params.InputLabelProps,
                     shrink: true,
@@ -976,8 +1214,13 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
               rows={4}
               value={abstract}
               onChange={(e) => setAbstract(e.target.value)}
-              error={!!formErrors.abstract}
-              helperText={formErrors.abstract}
+              error={attemptedSubmit && !!formErrors.abstract}
+              helperText={
+                attemptedSubmit
+                  ? formErrors.abstract ||
+                    "Type at least 3 characters to search and select author/s"
+                  : "Type at least 3 characters to search and select author/s"
+              }
               sx={createTextFieldStyles()}
               InputLabelProps={{
                 shrink: true,
@@ -986,11 +1229,14 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
             />
           </Grid2>
           <Grid2 size={6}>
-            <FormControl fullWidth error={!!formErrors.researchAreas}>
+            <FormControl
+              fullWidth
+              error={attemptedSubmit && !!formErrors.researchAreas}
+            >
               <Autocomplete
                 multiple
-                disableCloseOnSelect
                 options={researchAreas}
+                disableCloseOnSelect
                 getOptionLabel={(option) => option.research_area_name}
                 value={selectedResearchAreas}
                 onChange={(event, newValue) =>
@@ -1001,12 +1247,14 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
                     {...params}
                     required
                     label='Research Areas'
-                    error={!!formErrors.researchAreas}
+                    error={attemptedSubmit && !!formErrors.researchAreas}
                     helperText={
-                      formErrors.researchAreas || "Select research areas"
+                      attemptedSubmit
+                        ? formErrors.researchAreas || "Select research areas"
+                        : "Select research areas"
                     }
+                    sx={createTextFieldStyles()}
                     InputLabelProps={{
-                      ...params.InputLabelProps,
                       shrink: true,
                       required: true,
                     }}
@@ -1020,7 +1268,10 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
             <Typography variant='body2' sx={{ mb: 1 }}>
               Upload Full Manuscript *
             </Typography>
-            <FormControl fullWidth error={!!formErrors.manuscript}>
+            <FormControl
+              fullWidth
+              error={attemptedSubmit && !!formErrors.manuscript}
+            >
               <FileUploader
                 onFileSelect={onSelectFileHandler}
                 onFileDelete={onDeleteFileHandler}
@@ -1028,7 +1279,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
                 required
                 sx={{ width: "100%" }}
               />
-              {formErrors.manuscript && (
+              {attemptedSubmit && formErrors.manuscript && (
                 <FormHelperText error>{formErrors.manuscript}</FormHelperText>
               )}
             </FormControl>
@@ -1038,9 +1289,9 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
               Upload Extended Abstract
             </Typography>
             <FileUploader
-              onSelectFile={onSelectFileHandlerEA}
-              onDeleteFile={onDeleteFileHandlerEA}
-              file={extendedAbstract}
+              onFileSelect={onSelectFileHandlerEA}
+              onFileDelete={onDeleteFileHandlerEA}
+              selectedFile={extendedAbstract}
               sx={{ width: "100%" }}
             />
           </Grid2>
@@ -1074,6 +1325,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
           </Button>
           <Button
             onClick={handleAddPaper}
+            disabled={!isValid || isSubmitting}
             sx={{
               backgroundColor: "#CA031B",
               color: "#FFF",
@@ -1088,11 +1340,118 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
                 backgroundColor: "#A30417",
                 color: "#FFF",
               },
+              "&:disabled": {
+                backgroundColor: "#cccccc",
+                color: "#666666",
+              },
             }}
           >
-            Add Paper
+            {isSubmitting ? (
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <CircularProgress size={20} color='inherit' />
+                Adding Paper...
+              </Box>
+            ) : (
+              "Add Paper"
+            )}
           </Button>
         </Box>
+
+        {/* Add loading overlay */}
+        {isSubmitting && (
+          <Box
+            sx={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: "rgba(255, 255, 255, 0.7)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              zIndex: 9999,
+            }}
+          >
+            <Box sx={{ textAlign: "center" }}>
+              <CircularProgress />
+              <Typography sx={{ mt: 2 }}>Adding Paper...</Typography>
+            </Box>
+          </Box>
+        )}
+
+        <Dialog
+          open={isConfirmDialogOpen}
+          onClose={() => setIsConfirmDialogOpen(false)}
+          PaperProps={{
+            sx: {
+              borderRadius: "15px",
+              padding: "1rem",
+            },
+          }}
+        >
+          <DialogTitle
+            sx={{
+              fontFamily: "Montserrat, sans-serif",
+              fontWeight: 600,
+              color: "#08397C",
+            }}
+          >
+            Unsaved Changes
+          </DialogTitle>
+          <DialogContent>
+            <Typography
+              sx={{
+                fontFamily: "Montserrat, sans-serif",
+                color: "#666",
+              }}
+            >
+              You have unsaved changes. Do you want to save your progress?
+            </Typography>
+          </DialogContent>
+          <DialogActions sx={{ padding: "1rem" }}>
+            <Button
+              onClick={() => {
+                setIsConfirmDialogOpen(false);
+                setShouldClearFields(true); // Set flag to clear fields
+                closeAddPaperModal();
+              }}
+              sx={{
+                backgroundColor: "#08397C",
+                color: "#FFF",
+                fontFamily: "Montserrat, sans-serif",
+                fontWeight: 600,
+                textTransform: "none",
+                borderRadius: "100px",
+                "&:hover": {
+                  backgroundColor: "#072d61",
+                },
+              }}
+            >
+              Discard
+            </Button>
+            <Button
+              onClick={() => {
+                setIsConfirmDialogOpen(false);
+                setShouldClearFields(false); // Don't clear fields
+                closeAddPaperModal();
+              }}
+              sx={{
+                backgroundColor: "#CA031B",
+                color: "#FFF",
+                fontFamily: "Montserrat, sans-serif",
+                fontWeight: 600,
+                textTransform: "none",
+                borderRadius: "100px",
+                "&:hover": {
+                  backgroundColor: "#A30417",
+                },
+              }}
+            >
+              Save Changes
+            </Button>
+          </DialogActions>
+        </Dialog>
       </Box>
     </Modal>
   );
