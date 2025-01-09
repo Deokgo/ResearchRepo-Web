@@ -24,11 +24,11 @@ import { Search } from "@mui/icons-material";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import { useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
-import homeBg from "../assets/home_bg.png";
 import axios from "axios";
 import { Virtuoso } from "react-virtuoso";
 import { Snackbar, Alert } from "@mui/material"; // Import Snackbar and Alert from Material UI
 import HeaderWithBackButton from "../components/Header";
+import AutoCompleteTextBox from "../components/Intellibox";
 
 const UpdateTrackingInfo = ({ route, navigate }) => {
   const navpage = useNavigate();
@@ -698,6 +698,36 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
   const dismissAlert = () => {
     setHasError(false); // Dismiss the alert by setting hasError to false
   };
+  const [pub_names, setPubNames] = useState([]);
+  
+  // Fetch data from the API
+  useEffect(() => {
+    const fetchPub_Names = async () => {
+      try {
+        const response = await axios.get("/track/data_fetcher/publications/publication_name"); // Replace with your API endpoint
+        setPubNames(response.data); // Assuming the API returns an array of fruits
+      } catch (error) {
+        console.error("Error fetching fruits:", error);
+      }
+    };
+
+    fetchPub_Names();
+  }, []);
+  const [conf_title, setConfTitle] = useState([]);
+  
+  // Fetch data from the API
+  useEffect(() => {
+    const fetchConf_titles = async () => {
+      try {
+        const response = await axios.get("/track/data_fetcher/conference/conference_title"); // Replace with your API endpoint
+        setConfTitle(response.data); // Assuming the API returns an array of fruits
+      } catch (error) {
+        console.error("Error fetching fruits:", error);
+      }
+    };
+
+    fetchConf_titles();
+  }, []);
 
   return (
     <>
@@ -940,12 +970,12 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                         item sx={{ mb: "1rem", mr: "3rem" }}
                                       >
                                         {isEditing ? (
-                                          <TextField
+                                          <AutoCompleteTextBox
                                             fullWidth
+                                            data={pub_names}
                                             label='Publication Name'
                                             name='publicationName'
                                             value={publicationName || "None"}
-                                            variant='outlined'
                                             onChange={(e) =>
                                               setPublicationName(e.target.value)
                                             }
@@ -1647,12 +1677,14 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                       </FormControl>
                     </Grid2>
                   </Grid2>
-                  <TextField
+
+                  <AutoCompleteTextBox
                     label='Publication Name'
+                    data={pub_names}
                     value={publicationName}
                     fullWidth
                     onChange={(e) => setPublicationName(e.target.value)}
-                    margin='dense'
+                    placeholder="ex: PLOS One"
                     sx={createTextFieldStyles()}
                     InputLabelProps={createInputLabelProps()}
                   />
@@ -1677,12 +1709,13 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                         flexItem
                         sx= {{ mt: '0.5rem', mb: '0.5rem' }}
                       />
-                      <TextField
+                      <AutoCompleteTextBox
                         label='Conference Title'
+                        data={conf_title}
                         value={conferenceTitle}
                         fullWidth
+                        placeholder="ex: Proceedings of the International Conference on Artificial Intelligence"
                         onChange={(e) => setConferenceTitle(e.target.value)}
-                        margin='dense'
                         sx={createTextFieldStyles()}
                         InputLabelProps={createInputLabelProps()}
                       />

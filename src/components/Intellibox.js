@@ -15,6 +15,8 @@ const AutoCompleteTextBox = ({
   onItemSelected,
   label,
   id,
+  sx,
+  inputlabel
 }) => {
   const [inputValue, setInputValue] = useState("");
   const [suggestions, setSuggestions] = useState([]);
@@ -45,18 +47,17 @@ const AutoCompleteTextBox = ({
         alignItems: "center",
       }}
     >
-      {label && (
-        <Typography variant="subtitle1" style={{ marginRight: "10px" }}>
-          {label}
-        </Typography>
-      )}
       <TextField
         id={id}
+        label = {label}
         value={inputValue}
         onChange={handleChange}
         placeholder={placeholder || "Type to search..."}
         fullWidth
         variant="outlined"
+        margin="dense"
+        sx={sx}
+        InputLabelProps={inputlabel}
       />
       {suggestions.length > 0 && (
         <Paper
