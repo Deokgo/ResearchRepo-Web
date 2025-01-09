@@ -35,7 +35,6 @@ const Navbar = () => {
   const [anchorElUser, setAnchorElUser] = useState(null);
 
   const [anchorElDash, setAnchorElDash] = useState(null);
-  const [anchorElSyma, setAnchorElSyma] = useState(null);
 
   const [open, setOpen] = React.useState(false);
   const anchorRef = React.useRef < HTMLButtonElement > null;
@@ -91,14 +90,6 @@ const Navbar = () => {
 
   const handleCloseDashMenu = () => {
     setAnchorElDash(null);
-  };
-
-  const handleOpenSymaMenu = (event) => {
-    setAnchorElSyma(event.currentTarget);
-  };
-
-  const handleCloseSymaMenu = () => {
-    setAnchorElSyma(null);
   };
 
   const handleProfile = () => {
@@ -231,7 +222,10 @@ const Navbar = () => {
     const roleSpecificItems = {
       "01": [
         // System Administrator
-        { label: "System Management", onClick: handleOpenSymaMenu }
+        { label: "Manage Users", onClick: handleManageUsers },
+        { label: "Manage Colleges", onClick: handleManageCollege },
+        { label: "Manage Programs", onClick: handleManageProgram },
+        { label: "View Audit Logs", onClick: handleViewAuditLog }
       ],
       "02": [
         // Director
@@ -534,28 +528,6 @@ const Navbar = () => {
               </MenuItem>
             </Menu>
           )}
-
-        {(!isMobile || !isSizeMobile) && user?.role === "01" && (
-          <Menu
-            anchorEl={anchorElSyma}
-            open={Boolean(anchorElSyma)}
-            onClose={handleCloseSymaMenu}
-            sx={{ "& .MuiPaper-root": { backgroundColor: "#CA031B" } }}
-          >
-            <MenuItem onClick={handleManageUsers}>
-              <Typography color='common.white'>Manage Users</Typography>
-            </MenuItem>
-            <MenuItem onClick={handleManageCollege}>
-              <Typography color='common.white'>Manage College</Typography>
-            </MenuItem>
-            <MenuItem onClick={handleManageProgram}>
-              <Typography color='common.white'>Manage Program</Typography>
-            </MenuItem>
-            <MenuItem onClick={handleViewAuditLog}>
-              <Typography color='common.white'>View Audit Logs</Typography>
-            </MenuItem>
-          </Menu>
-        )}
       </Toolbar>
       <LoginModal />
     </AppBar>

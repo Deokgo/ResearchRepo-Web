@@ -538,6 +538,31 @@ const ManageUsers = () => {
     );
   };
 
+  // Utility function to create responsive TextField styles
+  const createTextFieldStyles = (customFlex = 2) => ({
+    flex: customFlex,
+    "& .MuiInputBase-input": {
+      fontSize: {
+        xs: "0.6em", // Mobile
+        sm: "0.7rem", // Small devices
+        md: "0.8rem", // Medium devices
+        lg: "0.8rem", // Large devices
+      },
+    },
+  });
+
+  // Utility function to create responsive label styles
+  const createInputLabelProps = () => ({
+    sx: {
+      fontSize: {
+        xs: "0.45rem", // Mobile
+        sm: "0.55rem", // Small devices
+        md: "0.65rem", // Medium devices
+        lg: "0.75rem", // Large devices
+      },
+    },
+  });
+
   return (
     <>
       <Box
@@ -657,28 +682,8 @@ const ManageUsers = () => {
                 placeholder='Search by User ID or Email'
                 value={searchQuery}
                 onChange={handleSearchChange}
-                sx={{
-                  flex: 2,
-                  // Responsive font size
-                  "& .MuiInputBase-input": {
-                    fontSize: {
-                      xs: "0.75rem", // Mobile
-                      sm: "0.85rem", // Small devices
-                      md: "0.9rem", // Medium devices
-                      lg: "1rem", // Large devices
-                    },
-                    // Adjust input height
-                    padding: {
-                      xs: "8px 12px", // Mobile
-                      md: "12px 14px", // Larger screens
-                    },
-                    // Optional: adjust overall height
-                    height: {
-                      xs: "15px", // Mobile
-                      md: "25px", // Larger screens
-                    },
-                  },
-                }}
+                sx={createTextFieldStyles()}
+                InputLabelProps={createInputLabelProps()}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position='start'>
@@ -993,14 +998,27 @@ const ManageUsers = () => {
           {/* Common Dropdowns */}
           <Box sx={{ display: "flex", gap: 2, mb: 3 }}>
             <FormControl sx={{ minWidth: 200 }}>
-              <InputLabel>Role</InputLabel>
+              <InputLabel sx={{
+                fontSize: {
+                  xs: "0.75rem",
+                  md: "0.75rem",
+                  lg: "0.8rem",
+                },
+              }}>Role</InputLabel>
               <Select
                 value={selectedRole}
                 onChange={(e) => setSelectedRole(e.target.value)}
                 label='Role'
+                sx={createTextFieldStyles()}
               >
                 {roles.map((role) => (
-                  <MenuItem key={role.role_id} value={role.role_id}>
+                  <MenuItem key={role.role_id} value={role.role_id} sx={{
+                    fontSize: {
+                      xs: "0.75rem",
+                      md: "0.75rem",
+                      lg: "0.8rem",
+                    },
+                  }}>
                     {role.role_name}
                   </MenuItem>
                 ))}
@@ -1008,14 +1026,27 @@ const ManageUsers = () => {
             </FormControl>
 
             <FormControl sx={{ minWidth: 200 }}>
-              <InputLabel>College</InputLabel>
+              <InputLabel sx={{
+                fontSize: {
+                  xs: "0.75rem",
+                  md: "0.75rem",
+                  lg: "0.8rem",
+                },
+              }}>College</InputLabel>
               <Select
                 value={selectedCollege}
                 onChange={(e) => handleCollegeChange(e.target.value)}
                 label='College'
+                sx={createTextFieldStyles()}
               >
                 {colleges.map((college) => (
-                  <MenuItem key={college.college_id} value={college.college_id}>
+                  <MenuItem key={college.college_id} value={college.college_id} sx={{
+                    fontSize: {
+                      xs: "0.75rem",
+                      md: "0.75rem",
+                      lg: "0.8rem",
+                    },
+                  }}>
                     {college.college_name}
                   </MenuItem>
                 ))}
@@ -1023,15 +1054,28 @@ const ManageUsers = () => {
             </FormControl>
 
             <FormControl sx={{ minWidth: 200 }}>
-              <InputLabel>Program</InputLabel>
+              <InputLabel sx={{
+                fontSize: {
+                  xs: "0.75rem",
+                  md: "0.75rem",
+                  lg: "0.8rem",
+                },
+              }}>Program</InputLabel>
               <Select
                 value={selectedProgram}
                 onChange={(e) => setSelectedProgram(e.target.value)}
                 label='Program'
                 disabled={!selectedCollege}
+                sx={createTextFieldStyles()}
               >
                 {programs.map((program) => (
-                  <MenuItem key={program.program_id} value={program.program_id}>
+                  <MenuItem key={program.program_id} value={program.program_id} sx={{
+                    fontSize: {
+                      xs: "0.75rem",
+                      md: "0.75rem",
+                      lg: "0.8rem",
+                    },
+                  }}>
                     {program.program_name}
                   </MenuItem>
                 ))}
@@ -1181,6 +1225,8 @@ const ManageUsers = () => {
                         })
                       }
                       placeholder='Email'
+                      sx={createTextFieldStyles()}
+                      InputLabelProps={createInputLabelProps()}
                     />
                   </TableCell>
                   <TableCell>
@@ -1194,6 +1240,8 @@ const ManageUsers = () => {
                         })
                       }
                       placeholder='First Name'
+                      sx={createTextFieldStyles()}
+                      InputLabelProps={createInputLabelProps()}
                     />
                   </TableCell>
                   <TableCell>
@@ -1207,6 +1255,8 @@ const ManageUsers = () => {
                         })
                       }
                       placeholder='MI'
+                      sx={createTextFieldStyles()}
+                      InputLabelProps={createInputLabelProps()}
                     />
                   </TableCell>
                   <TableCell>
@@ -1220,6 +1270,8 @@ const ManageUsers = () => {
                         })
                       }
                       placeholder='Surname'
+                      sx={createTextFieldStyles()}
+                      InputLabelProps={createInputLabelProps()}
                     />
                   </TableCell>
                   <TableCell>
@@ -1233,6 +1285,8 @@ const ManageUsers = () => {
                         })
                       }
                       placeholder='Suffix'
+                      sx={createTextFieldStyles()}
+                      InputLabelProps={createInputLabelProps()}
                     />
                   </TableCell>
                   <TableCell>

@@ -57,6 +57,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
   const [researchTypes, setResearchTypes] = useState([]);
   const [formErrors, setFormErrors] = useState({});
   const [formData] = useState(new FormData());
+  const dismissAll = () =>  toast.dismiss();
 
   // Create array of school years (last 10 years)
   const currentYear = new Date().getFullYear();
@@ -224,10 +225,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
     const errors = {};
 
     // Required field validation
-    if (!researchType) errors.researchType = "Research Type is required";
     if (!groupCode) errors.groupCode = "Group Code is required";
-    if (!selectedCollege) errors.college = "Department is required";
-    if (!selectedProgram) errors.program = "Program is required";
     if (!schoolYear) errors.schoolYear = "School Year is required";
     if (!term) errors.term = "Term is required";
     if (authors.length === 0)
@@ -248,19 +246,37 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
         errors.panels =
           "At least one Panel member is required for Faculty Directed research";
     }
-
+    console.log(Object.keys(errors).length)
     setFormErrors(errors);
-    return Object.keys(errors).length === 0;
+    return Object.keys(errors).length
   };
 
+  const handleBack = () => {
+    if (validateForm() === 11) {
+      closeAddPaperModal();
+      toast.dismiss();
+      return;
+    }
+    const userConfirmed = window.confirm(
+      "You have unsaved changes. Save Changes?"
+    );
+
+    if (userConfirmed) {
+      handleAddPaper();
+    } else {
+      closeAddPaperModal();
+    }   
+  }
+
   const handleAddPaper = async () => {
-    if (!validateForm()) {
+    if (validateForm() !== 0) {
       toast.error("Please fill in all required fields", {
         position: "top-right",
         autoClose: 5000,
       });
       return;
     }
+    toast.dismiss()
 
     // Clear any existing data in formData
     for (let pair of formData.entries()) {
@@ -416,18 +432,6 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
         sm: "0.7rem", // Small devices
         md: "0.8rem", // Medium devices
         lg: "0.8rem", // Large devices
-      },
-    },
-  });
-
-  // Utility function to create responsive label styles
-  const createInputLabelProps = () => ({
-    sx: {
-      fontSize: {
-        xs: "0.45rem", // Mobile
-        sm: "0.55rem", // Small devices
-        md: "0.65rem", // Medium devices
-        lg: "0.75rem", // Large devices
       },
     },
   });
@@ -1051,7 +1055,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
           }}
         >
           <Button
-            onClick={closeAddPaperModal}
+            onClick={handleBack}
             sx={{
               backgroundColor: "#08397C",
               color: "#FFF",
@@ -1067,7 +1071,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
               },
             }}
           >
-            Back
+            Cancel
           </Button>
           <Button
             onClick={handleAddPaper}

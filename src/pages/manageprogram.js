@@ -127,13 +127,65 @@ const ManageProgram = () => {
   };
 
   const handleCloseModal = () => {
-    setAddModal(false);
-    setOpenModal(false);
     setDeleteModal(false);
     setSelectedProgram(null);
 
+    const missingFields = handleCheckFields();
+    if (missingFields.length === 3) {
+      setAddModal(false);
+    } else {
+      const userConfirmed = window.confirm(
+        "You have unsaved changes. Save Changes?"
+      );
+  
+      if (userConfirmed) {
+        handleAddProgram();
+        return;
+      }
+      setAddModal(false);
+    }
+
     handlePostModal();
   };
+
+  const handleCheckFields = () => {
+    // Validate required fields
+    const requiredFields = {
+      "College ID": collegeAbbrv,
+      "Program Abbrv": programAbbrv,
+      "Program Name": programName,
+    };
+
+    const missingFields = Object.entries(requiredFields)
+      .filter(([_, value]) => {
+        if (Array.isArray(value)) {
+          return value.length === 0;
+        }
+        return !value;
+      })
+      .map(([key]) => key);
+
+    return missingFields;
+  }
+
+  const handleCheckChanges = () => {
+    const hasChanges = newName !== initialData?.program_name;
+
+    if (!hasChanges) {
+      setOpenModal(false);
+    } else {
+      const userConfirmed = window.confirm(
+        "Save Changes?"
+      );
+  
+      if (userConfirmed) {
+        updateProgram();
+        return;
+      }
+      setOpenModal(false);
+    }
+    handlePostModal();
+  }
 
   const handleOpenAddModal = () => {
     setAddModal(true);
@@ -141,21 +193,7 @@ const ManageProgram = () => {
 
   const handleAddProgram = async () => {
     try {
-      // Validate required fields
-      const requiredFields = {
-        "College ID": collegeAbbrv,
-        "Program Abbrv": programAbbrv,
-        "Program Name": programName,
-      };
-
-      const missingFields = Object.entries(requiredFields)
-        .filter(([_, value]) => {
-          if (Array.isArray(value)) {
-            return value.length === 0;
-          }
-          return !value;
-        })
-        .map(([key]) => key);
+      const missingFields = handleCheckFields();
 
       if (missingFields.length > 0) {
         alert(
@@ -218,7 +256,8 @@ const ManageProgram = () => {
     const hasChanges = newName !== initialData?.program_name;
 
     if (!hasChanges) {
-      alert("No changes detected. Please modify user's details before saving.");
+      alert("No changes were made to save.");
+      handleCloseModal();
     } else {
       updateProgram();
     }
@@ -302,6 +341,31 @@ const ManageProgram = () => {
       }
     }
   };
+
+  // Utility function to create responsive TextField styles
+  const createTextFieldStyles = (customFlex = 2) => ({
+    flex: customFlex,
+    "& .MuiInputBase-input": {
+      fontSize: {
+        xs: "0.6em", // Mobile
+        sm: "0.7rem", // Small devices
+        md: "0.8rem", // Medium devices
+        lg: "0.8rem", // Large devices
+      },
+    },
+  });
+
+  // Utility function to create responsive label styles
+  const createInputLabelProps = () => ({
+    sx: {
+      fontSize: {
+        xs: "0.45rem", // Mobile
+        sm: "0.55rem", // Small devices
+        md: "0.65rem", // Medium devices
+        lg: "0.75rem", // Large devices
+      },
+    },
+  });
 
   return (
     <>
@@ -517,28 +581,8 @@ const ManageProgram = () => {
                         placeholder='Search program...'
                         value={searchQuery}
                         onChange={handleSearchChange}
-                        sx={{
-                          flex: 2,
-                          // Responsive font size
-                          "& .MuiInputBase-input": {
-                            fontSize: {
-                              xs: "0.75rem", // Mobile
-                              sm: "0.85rem", // Small devices
-                              md: "0.9rem", // Medium devices
-                              lg: "1rem", // Large devices
-                            },
-                            // Adjust input height
-                            padding: {
-                              xs: "8px 12px", // Mobile
-                              md: "12px 14px", // Larger screens
-                            },
-                            // Optional: adjust overall height
-                            height: {
-                              xs: "15px", // Mobile
-                              md: "25px", // Larger screens
-                            },
-                          },
-                        }}
+                        sx={createTextFieldStyles()}
+                        InputLabelProps={createInputLabelProps()}
                         InputProps={{
                           startAdornment: (
                             <InputAdornment position='start'>
@@ -710,16 +754,30 @@ const ManageProgram = () => {
                   Add Program
                 </Typography>
                 <FormControl fullWidth variant='outlined'>
-                  <InputLabel>College</InputLabel>
+                  <InputLabel sx={{
+                    fontSize: {
+                      xs: "0.75rem",
+                      md: "0.75rem",
+                      lg: "0.8rem",
+                    },
+                  }}>College</InputLabel>
                   <Select
                     value={collegeAbbrv}
                     onChange={(e) => setCollegeAbbrv(e.target.value)}
                     label='College'
+                    sx={createTextFieldStyles()}
                   >
                     {colleges.map((college) => (
                       <MenuItem
                         key={college.college_id}
                         value={college.college_id}
+                        sx={{
+                          fontSize: {
+                            xs: "0.75rem",
+                            md: "0.75rem",
+                            lg: "0.8rem",
+                          },
+                        }}
                       >
                         {college.college_id} - {college.college_name}
                       </MenuItem>
@@ -732,6 +790,8 @@ const ManageProgram = () => {
                   fullWidth
                   onChange={(e) => setProgramAbbrv(e.target.value)}
                   margin='normal'
+                  sx={createTextFieldStyles()}
+                  InputLabelProps={createInputLabelProps()}
                 />
                 <TextField
                   label='Name'
@@ -739,6 +799,8 @@ const ManageProgram = () => {
                   fullWidth
                   onChange={(e) => setProgramName(e.target.value)}
                   margin='normal'
+                  sx={createTextFieldStyles()}
+                  InputLabelProps={createInputLabelProps()}
                 />
                 <Box
                   sx={{
@@ -831,6 +893,8 @@ const ManageProgram = () => {
                     fullWidth
                     disabled
                     margin='normal'
+                    sx={createTextFieldStyles()}
+                    InputLabelProps={createInputLabelProps()}
                   />
                   <TextField
                     label='Program ID'
@@ -838,6 +902,8 @@ const ManageProgram = () => {
                     fullWidth
                     disabled
                     margin='normal'
+                    sx={createTextFieldStyles()}
+                    InputLabelProps={createInputLabelProps()}
                   />
                   <TextField
                     label='Name'
@@ -845,6 +911,8 @@ const ManageProgram = () => {
                     fullWidth
                     onChange={(e) => setNewName(e.target.value)}
                     margin='normal'
+                    sx={createTextFieldStyles()}
+                    InputLabelProps={createInputLabelProps()}
                   />
                   <Box
                     sx={{
@@ -854,7 +922,7 @@ const ManageProgram = () => {
                     }}
                   >
                     <Button
-                      onClick={handleCloseModal}
+                      onClick={handleCheckChanges}
                       sx={{
                         backgroundColor: "#08397C",
                         color: "#FFF",

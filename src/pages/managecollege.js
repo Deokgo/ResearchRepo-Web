@@ -88,30 +88,70 @@ const ManageCollege = () => {
   };
 
   const handleCloseModal = () => {
-    setAddModal(false);
-    setOpenModal(false);
     setDeleteModal(false);
     setSelectedCollege(null);
+
+    const missingFields = handleCheckFields();
+    if (missingFields.length === 2) {
+      setAddModal(false);
+    } else {
+      const userConfirmed = window.confirm(
+        "You have unsaved changes. Save Changes?"
+      );
+  
+      if (userConfirmed) {
+        handleAddCollege();
+        return;
+      }
+      setAddModal(false);
+    }
 
     handlePostModal();
   };
 
+  const handleCheckFields = () => {
+    // Validate required fields
+    const requiredFields = {
+      "College ID": collegeAbbrv,
+      "College Name": collegeName,
+    };
+
+    const missingFields = Object.entries(requiredFields)
+      .filter(([_, value]) => {
+        if (Array.isArray(value)) {
+          return value.length === 0;
+        }
+        return !value;
+      })
+      .map(([key]) => key);
+
+    return missingFields;
+  }
+
+  const handleCheckChanges = () => {
+    const hasChanges =
+      newName !== initialData?.college_name ||
+      newColor !== initialData?.color_code;
+
+    if (!hasChanges) {
+      setOpenModal(false);
+    } else {
+      const userConfirmed = window.confirm(
+        "Save Changes?"
+      );
+  
+      if (userConfirmed) {
+        updateCollege();
+        return;
+      }
+      setOpenModal(false);
+    }
+    handlePostModal();
+  }
+
   const handleAddCollege = async () => {
     try {
-      // Validate required fields
-      const requiredFields = {
-        "College ID": collegeAbbrv,
-        "College Name": collegeName,
-      };
-
-      const missingFields = Object.entries(requiredFields)
-        .filter(([_, value]) => {
-          if (Array.isArray(value)) {
-            return value.length === 0;
-          }
-          return !value;
-        })
-        .map(([key]) => key);
+      const missingFields = handleCheckFields();
 
       if (missingFields.length > 0) {
         alert(
@@ -181,7 +221,8 @@ const ManageCollege = () => {
       newColor !== initialData?.color_code;
 
     if (!hasChanges) {
-      alert("No changes detected. Please modify user's details before saving.");
+      alert("No changes were made to save.");
+      handleCloseModal();
     } else {
       updateCollege();
     }
@@ -265,6 +306,31 @@ const ManageCollege = () => {
       }
     }
   };
+
+  // Utility function to create responsive TextField styles
+  const createTextFieldStyles = (customFlex = 2) => ({
+    flex: customFlex,
+    "& .MuiInputBase-input": {
+      fontSize: {
+        xs: "0.6em", // Mobile
+        sm: "0.7rem", // Small devices
+        md: "0.8rem", // Medium devices
+        lg: "0.8rem", // Large devices
+      },
+    },
+  });
+
+  // Utility function to create responsive label styles
+  const createInputLabelProps = () => ({
+    sx: {
+      fontSize: {
+        xs: "0.45rem", // Mobile
+        sm: "0.55rem", // Small devices
+        md: "0.65rem", // Medium devices
+        lg: "0.75rem", // Large devices
+      },
+    },
+  });
 
   return (
     <>
@@ -385,28 +451,8 @@ const ManageCollege = () => {
                 placeholder='Search College...'
                 value={searchQuery}
                 onChange={handleSearchChange}
-                sx={{
-                  flex: 2,
-                  // Responsive font size
-                  "& .MuiInputBase-input": {
-                    fontSize: {
-                      xs: "0.75rem", // Mobile
-                      sm: "0.85rem", // Small devices
-                      md: "0.9rem", // Medium devices
-                      lg: "1rem", // Large devices
-                    },
-                    // Adjust input height
-                    padding: {
-                      xs: "8px 12px", // Mobile
-                      md: "12px 14px", // Larger screens
-                    },
-                    // Optional: adjust overall height
-                    height: {
-                      xs: "15px", // Mobile
-                      md: "25px", // Larger screens
-                    },
-                  },
-                }}
+                sx={createTextFieldStyles()}
+                InputLabelProps={createInputLabelProps()}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position='start'>
@@ -574,6 +620,8 @@ const ManageCollege = () => {
                   fullWidth
                   onChange={(e) => setCollegeAbbrv(e.target.value)}
                   margin='normal'
+                  sx={createTextFieldStyles()}
+                  InputLabelProps={createInputLabelProps()}
                 />
                 <TextField
                   label='Name'
@@ -581,6 +629,8 @@ const ManageCollege = () => {
                   fullWidth
                   onChange={(e) => setCollegeName(e.target.value)}
                   margin='normal'
+                  sx={createTextFieldStyles()}
+                  InputLabelProps={createInputLabelProps()}
                 />
                 <Grid2 display='flex'>
                   <Grid2 width='50%' size={6}>
@@ -695,6 +745,8 @@ const ManageCollege = () => {
                     fullWidth
                     disabled
                     margin='normal'
+                    sx={createTextFieldStyles()}
+                    InputLabelProps={createInputLabelProps()}
                   />
                   <TextField
                     label='Name'
@@ -702,6 +754,8 @@ const ManageCollege = () => {
                     fullWidth
                     onChange={(e) => setNewName(e.target.value)}
                     margin='normal'
+                    sx={createTextFieldStyles()}
+                    InputLabelProps={createInputLabelProps()}
                   />
                   <Grid2 display='flex'>
                     <Grid2 width='50%' size={6}>
@@ -733,7 +787,7 @@ const ManageCollege = () => {
                     }}
                   >
                     <Button
-                      onClick={handleCloseModal}
+                      onClick={handleCheckChanges}
                       sx={{
                         backgroundColor: "#08397C",
                         color: "#FFF",
@@ -825,7 +879,7 @@ const ManageCollege = () => {
                       <Grid2
                         display='flex'
                         flexDirection='row'
-                        paddingTop='1rem'
+                        paddingTop='0.5rem'
                       >
                         <Grid2 size={6}>
                           <CircleIcon
