@@ -834,6 +834,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
           <Grid2 size={6}>
             <Autocomplete
               multiple
+              disableCloseOnSelect
               options={sdgGoalsData.sdgGoals}
               getOptionLabel={(option) => `${option.id} - ${option.title}`}
               value={selectedSDGs}
@@ -893,6 +894,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
             <FormControl fullWidth sx={{ mb: 2 }}>
               <Autocomplete
                 multiple
+                disableCloseOnSelect
                 id='research-areas'
                 options={researchAreas}
                 getOptionLabel={(option) => option.research_area_name}
