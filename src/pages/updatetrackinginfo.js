@@ -288,14 +288,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
       // Determine required fields based on publicationFormat
       let requiredFields;
 
-      if (publicationFormat === "journal") {
-        requiredFields = {
-          "Publication Name": publicationName,
-          "Publication Format": publicationFormat,
-          "Publication Date":datePublished,
-          "Indexing Status": indexingStatus,
-        };
-      } else if (publicationFormat === "proceeding") {
+      if (publicationFormat === "PC") {
         requiredFields = {
           "Publication Name": publicationName,
           "Publication Format": publicationFormat,
@@ -307,11 +300,14 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
           "Conference Date": dateApproved,
         };
       } else {
-        alert(
-          "Invalid format. Please select either 'journal' or 'proceeding'."
-        );
-        return;
-      }
+          requiredFields = {
+            "Publication Name": publicationName,
+            "Publication Format": publicationFormat,
+            "Publication Date":datePublished,
+            "Indexing Status": indexingStatus,}
+          
+          }
+
 
       const missingFields = Object.entries(requiredFields)
         .filter(([_, value]) => {
@@ -698,6 +694,28 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
     fetchConf_titles();
   }, []);
 
+  const [publicationFormats, setPublicationFormats] = useState([]);
+
+  useEffect(() => {
+    const fetchPublicationFormats = async () => {
+      try {
+        const response = await fetch("/track/fetch_data/pub_format"); // Replace with your API URL
+        const data = await response.json(); // Directly parse the JSON response (array format)
+        setPublicationFormats(data);
+      } catch (error) {
+        console.error("Error fetching publication formats:", error);
+      }
+    };
+
+    fetchPublicationFormats();
+  }, []);
+
+  // Handle change event
+  const handleChange = (e) => {
+    setPublicationFormat(e.target.value); // Update state with selected value
+    console.log("Selected Publication Format ID:", e.target.value); // Log the selected value
+  };
+
   return (
     <>
       <Box
@@ -916,7 +934,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                       </Typography>
                                     </Grid2>
                                     <Grid2 size={6}>
-                                      {publicationFormat !== "journal" && (
+                                      {publicationFormat !== "JL" && (
                                         <Typography
                                           variant='h6'
                                           color='#d40821'
@@ -1518,7 +1536,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                     Add Publication Details
                   </Typography>
                   <FormControl fullWidth variant='outlined' margin='dense'>
-                    <InputLabel
+                  <InputLabel
                       sx={{
                         fontSize: {
                           xs: "0.75rem",
@@ -1530,35 +1548,16 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                       Format
                     </InputLabel>
                     <Select
-                      label='Format'
-                      sx={createTextFieldStyles()}
-                      value={publicationFormat}
-                      onChange={(e) => setPublicationFormat(e.target.value)}
+                      label="Format"
+                      sx={createTextFieldStyles()} // Assuming this is a custom style function
+                      value={publicationFormat || ""}
+                      onChange={handleChange} // Call handleChange when user selects an option
                     >
-                      <MenuItem
-                        value='journal'
-                        sx={{
-                          fontSize: {
-                            xs: "0.75rem",
-                            md: "0.75rem",
-                            lg: "0.8rem",
-                          },
-                        }}
-                      >
-                        Journal
-                      </MenuItem>
-                      <MenuItem
-                        value='proceeding'
-                        sx={{
-                          fontSize: {
-                            xs: "0.75rem",
-                            md: "0.75rem",
-                            lg: "0.8rem",
-                          },
-                        }}
-                      >
-                        Proceeding
-                      </MenuItem>
+                      {publicationFormats.map((format) => (
+                        <MenuItem key={format.pub_format_id} value={format.pub_format_id}>
+                          {format.pub_format_name}
+                        </MenuItem>
+                      ))}
                     </Select>
                   </FormControl>
                   <AutoCompleteTextBox
@@ -1635,7 +1634,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                       </FormControl>
                     </Grid2>
                   </Grid2>
-                  {publicationFormat === "proceeding" && (
+                  {publicationFormat === "PC" && (
                     <Box>
                       <Divider
                         orientation='horizontal'
