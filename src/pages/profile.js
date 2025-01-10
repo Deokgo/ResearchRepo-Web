@@ -20,6 +20,7 @@ import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import HeaderWithBackButton from "../components/Header";
 
 const modalStyle = {
   position: "absolute",
@@ -357,67 +358,18 @@ const Profile = () => {
             flexGrow: 1,
             display: "flex",
             flexDirection: "column",
-            height: { xs: "100%", md: "calc(100vh - 9rem)" },
             marginTop: { xs: "3.5rem", sm: "4rem", md: "5rem" },
+            height: {
+              xs: "calc(100vh - 3.5rem)",
+              sm: "calc(100vh - 4rem)",
+              md: "calc(100vh - 6rem)",
+            },
           }}
         >
-          {/* Header Section */}
-          <Box
-            sx={{
-              position: "relative",
-              width: "100%",
-              height: {
-                xs: "clamp(2rem, 3vh, 3rem)",
-                sm: "clamp(3rem, 8vh, 4rem)",
-                md: "clamp(3rem, 14vh, 4rem)",
-                lg: "clamp(4rem, 20vh, 5rem)",
-              },
-              backgroundColor: "#0A438F",
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-              display: "flex",
-              alignItems: "center",
-              zIndex: 1,
-            }}
-          >
-            <Box
-              sx={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                backgroundImage: `url(${homeBg})`,
-                backgroundSize: "cover",
-                opacity: 0.25,
-                zIndex: 1,
-              }}
-            />
-            <Box sx={{ display: "flex", ml: "5rem", zIndex: 3 }}>
-              <IconButton
-                onClick={() => navigate(-1)}
-                sx={{
-                  color: "#fff",
-                }}
-              >
-                <ArrowBackIosIcon />
-              </IconButton>
-              <Typography
-                variant='h3'
-                sx={{
-                  fontFamily: "Montserrat, sans-serif",
-                  fontWeight: 800,
-                  fontSize: { xs: "1.5rem", sm: "2rem", md: "2.575rem" },
-                  color: "#FFF",
-                  lineHeight: 1.25,
-                  alignSelf: "center",
-                  zIndex: 2,
-                }}
-              >
-                Profile
-              </Typography>
-            </Box>
-          </Box>
+          <HeaderWithBackButton
+            title="Profile"
+            onBack={() => navigate(-1)}
+          />
 
           {/* Content Section */}
           <Box
@@ -437,7 +389,7 @@ const Profile = () => {
                 alignItems: "center", // Centers buttons vertically
                 flexWrap: "wrap", // Ensures wrapping on smaller screens
                 width: "100%", // Full width for responsiveness
-                maxWidth: "800px", // Limit the max width for better layout
+                width: { xs: "100%", sm: "100%", md: "90%", lg: "70%" },
                 mb: "1.5rem",
               }}
             >
@@ -460,7 +412,7 @@ const Profile = () => {
                 sx={{
                   fontWeight: 600,
                   flex: "0 1 auto", // Same flexibility as the first button
-                  minWidth: "120px",
+                  minWidth: "150px",
                 }}
               >
                 Edit Profile
@@ -469,9 +421,9 @@ const Profile = () => {
 
             <Grid2
               container
-              spacing={2}
+              spacing={5}
               sx={{
-                width: { xs: "100%", sm: "90%", md: "70%", lg: "60%" },
+                width: { xs: "100%", sm: "100%", md: "90%", lg: "70%" },
                 margin: "0 auto",
               }}
             >
@@ -515,7 +467,7 @@ const Profile = () => {
                   },
                 ].map((field, index) => (
                   <Grid2
-                    size={{ xs: 12, sm: 6 }}
+                    size={{ xs: 12, sm: 4 }}
                     key={index}
                     sx={{
                       display: "flex",
@@ -533,11 +485,10 @@ const Profile = () => {
                       {field.label}
                     </Typography>
                     <Typography
-                      variant='h6'
+                      variant='h7'
                       sx={{
                         color: "#001C43",
                         fontWeight: 600,
-                        fontSize: { xs: "1rem", sm: "1.25rem" },
                         mt: "0.25rem",
                       }}
                     >

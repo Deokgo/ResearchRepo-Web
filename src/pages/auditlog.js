@@ -19,6 +19,7 @@ import { useNavigate } from "react-router-dom";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import axios from "axios";
 import { Virtuoso } from "react-virtuoso";
+import HeaderWithBackButton from "../components/Header";
 
 const DisplayAuditLog = () => {
   const navigate = useNavigate();
@@ -207,6 +208,31 @@ const DisplayAuditLog = () => {
   // Get current page data
   const currentPageData = filteredAuditLogs.slice(startIndex, endIndex);
 
+  // Utility function to create responsive TextField styles
+  const createTextFieldStyles = (customFlex = 2) => ({
+    flex: customFlex,
+    "& .MuiInputBase-input": {
+      fontSize: {
+        xs: "0.6em", // Mobile
+        sm: "0.7rem", // Small devices
+        md: "0.8rem", // Medium devices
+        lg: "0.8rem", // Large devices
+      },
+    },
+  });
+
+  // Utility function to create responsive label styles
+  const createInputLabelProps = () => ({
+    sx: {
+      fontSize: {
+        xs: "0.45rem", // Mobile
+        sm: "0.55rem", // Small devices
+        md: "0.65rem", // Medium devices
+        lg: "0.75rem", // Large devices
+      },
+    },
+  });
+
   return (
     <>
       <Box
@@ -234,72 +260,10 @@ const DisplayAuditLog = () => {
             overflow: "hidden",
           }}
         >
-          {/* Header with back button */}
-          <Box
-            sx={{
-              position: "relative",
-              width: "100%",
-              height: {
-                xs: "clamp(2rem, 3vh, 3rem)",
-                sm: "clamp(3rem, 8vh, 4rem)",
-                md: "clamp(3rem, 14vh, 4rem)",
-                lg: "clamp(4rem, 20vh, 5rem)",
-              },
-              backgroundColor: "#0A438F",
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-              display: "flex",
-              alignItems: "center",
-              zIndex: 1,
-            }}
-          >
-            <Box
-              sx={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                backgroundImage: `url(${homeBg})`,
-                backgroundSize: "cover",
-                opacity: 0.25,
-                zIndex: 1,
-              }}
-            />
-            <Box sx={{ display: "flex", ml: "5rem", zIndex: 3 }}>
-              <IconButton
-                onClick={() => navigate(-1)}
-                sx={{
-                  color: "#fff",
-                  transform: {
-                    xs: "scale(0.8)",
-                    sm: "scale(1)",
-                    md: "scale(1.2)",
-                  },
-                }}
-              >
-                <ArrowBackIosIcon />
-              </IconButton>
-              <Typography
-                variant='h3'
-                sx={{
-                  fontFamily: "Montserrat, sans-serif",
-                  fontWeight: 800,
-                  fontSize: {
-                    xs: "clamp(1rem, 2vw, 1rem)",
-                    sm: "clamp(1.5rem, 3.5vw, 1.5rem)",
-                    md: "clamp(2rem, 4vw, 2.25rem)",
-                  },
-                  color: "#FFF",
-                  lineHeight: 1.25,
-                  alignSelf: "center",
-                  zIndex: 2,
-                }}
-              >
-                Audit Logs
-              </Typography>
-            </Box>
-          </Box>
+          <HeaderWithBackButton
+            title="View Audit Logs"
+            onBack={() => navigate(-1)}
+          />
 
           {/* Main content area */}
           <Box
@@ -365,7 +329,8 @@ const DisplayAuditLog = () => {
                               : null,
                           }));
                         }}
-                        InputLabelProps={{ shrink: true }}
+                        sx={createTextFieldStyles()}
+                        InputLabelProps={{...createInputLabelProps(), shrink: true}}
                         fullWidth
                         size='small'
                       />
@@ -385,7 +350,8 @@ const DisplayAuditLog = () => {
                               : null,
                           }));
                         }}
-                        InputLabelProps={{ shrink: true }}
+                        sx={createTextFieldStyles()}
+                        InputLabelProps={{...createInputLabelProps(), shrink: true}}
                         fullWidth
                         size='small'
                       />
@@ -539,28 +505,8 @@ const DisplayAuditLog = () => {
                         placeholder='Search by Log ID or Email User'
                         value={searchQuery}
                         onChange={handleSearchChange}
-                        sx={{
-                          flex: 2,
-                          // Responsive font size
-                          "& .MuiInputBase-input": {
-                            fontSize: {
-                              xs: "0.75rem", // Mobile
-                              sm: "0.85rem", // Small devices
-                              md: "0.9rem", // Medium devices
-                              lg: "1rem", // Large devices
-                            },
-                            // Adjust input height
-                            padding: {
-                              xs: "8px 12px", // Mobile
-                              md: "12px 14px", // Larger screens
-                            },
-                            // Optional: adjust overall height
-                            height: {
-                              xs: "15px", // Mobile
-                              md: "25px", // Larger screens
-                            },
-                          },
-                        }}
+                        sx={createTextFieldStyles()}
+                        InputLabelProps={createInputLabelProps()}
                         InputProps={{
                           startAdornment: (
                             <InputAdornment position='start'>
