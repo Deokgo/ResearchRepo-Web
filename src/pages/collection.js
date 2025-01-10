@@ -31,6 +31,10 @@ import { useModalContext } from "../context/modalcontext";
 import AddPaperModal from "../components/addpapermodal";
 import { useAuth } from "../context/AuthContext";
 import { filterCache } from "../utils/filterCache";
+import Accordion from "@mui/material/Accordion";
+import AccordionSummary from "@mui/material/AccordionSummary";
+import AccordionDetails from "@mui/material/AccordionDetails";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import HeaderWithBackButton from "../components/Header";
 
 // Debounce function to limit rapid state updates
@@ -206,39 +210,73 @@ const Collection = () => {
   }, []);
 
   useEffect(() => {
-    if (!isLoading && debouncedColleges.length > 0) {
+    if (!isLoading) {
       const cached = filterCache.get();
       if (cached) {
-        const filteredPrograms = cached.programs.filter((program) =>
-          debouncedColleges.includes(String(program.college_id))
+        // Get programs from selected colleges
+        let filteredPrograms =
+          debouncedColleges.length === 0
+            ? cached.programs
+            : cached.programs.filter((program) =>
+                debouncedColleges.includes(String(program.college_id))
+              );
+
+        // Add any selected programs that aren't in the filtered list
+        const selectedProgramObjects = cached.programs.filter((program) =>
+          selectedPrograms.includes(program.program_name)
         );
+
+        // Combine and remove duplicates
+        filteredPrograms = [
+          ...new Map(
+            [...filteredPrograms, ...selectedProgramObjects].map((program) => [
+              program.program_name,
+              program,
+            ])
+          ).values(),
+        ];
+
         setPrograms(filteredPrograms);
       }
-    } else {
-      const cached = filterCache.get();
-      if (cached) {
-        setPrograms(cached.programs);
-      }
     }
-  }, [debouncedColleges, isLoading]);
+  }, [debouncedColleges, isLoading, selectedPrograms]);
 
   useEffect(() => {
     const applyFilters = () => {
-      let filtered = [...research]; // Create a new array to avoid mutations
+      let filtered = [...research];
 
-      // Apply filters in order of most restrictive first
-      if (selectedColleges.length > 0) {
-        filtered = filtered.filter((item) =>
-          selectedColleges.includes(String(item.college_id))
-        );
+      // Handle college and program filtering
+      if (selectedColleges.length > 0 || selectedPrograms.length > 0) {
+        filtered = filtered.filter((item) => {
+          // Check if item matches any selected program
+          const matchesProgram =
+            selectedPrograms.length > 0 &&
+            selectedPrograms.includes(item.program_name);
+
+          // Check if item's college is selected
+          const matchesCollege =
+            selectedColleges.length > 0 &&
+            selectedColleges.includes(String(item.college_id));
+
+          // Show items that either:
+          // 1. Match any selected program (regardless of college), OR
+          // 2. Belong to a selected college (if no program from that college is selected)
+          return (
+            matchesProgram ||
+            (matchesCollege &&
+              !selectedPrograms.some((prog) => {
+                // Find the college of this selected program
+                const programCollege = programs.find(
+                  (p) => p.program_name === prog
+                )?.college_id;
+                // Only apply college filter if no program from this college is selected
+                return String(programCollege) === String(item.college_id);
+              }))
+          );
+        });
       }
 
-      if (selectedPrograms.length > 0) {
-        filtered = filtered.filter((item) =>
-          selectedPrograms.includes(item.program_name)
-        );
-      }
-
+      // Apply remaining filters
       if (sliderValue[0] !== dateRange[0] || sliderValue[1] !== dateRange[1]) {
         filtered = filtered.filter(
           (item) => item.year >= sliderValue[0] && item.year <= sliderValue[1]
@@ -270,13 +308,13 @@ const Collection = () => {
       setCurrentPage(1);
     };
 
-    // Debounce the filter application
     const timeoutId = setTimeout(applyFilters, 300);
     return () => clearTimeout(timeoutId);
   }, [
     research,
     selectedColleges,
     selectedPrograms,
+    programs,
     sliderValue,
     selectedFormats,
     searchQuery,
@@ -425,7 +463,7 @@ const Collection = () => {
           }}
         >
           <HeaderWithBackButton
-            title="Collections"
+            title='Collections'
             onBack={() => navigate(-1)}
           />
 
@@ -455,7 +493,7 @@ const Collection = () => {
                       height: "100%",
                       borderRadius: 3,
                       padding: 3,
-                      overflow: "hidden",
+                      overflow: "auto",
                       display: "flex",
                       flexDirection: "column",
                     }}
@@ -466,6 +504,7 @@ const Collection = () => {
                     >
                       Filters
                     </Typography>
+
                     <Box sx={{ mb: 2 }}>
                       <Typography
                         variant='body1'
@@ -516,165 +555,141 @@ const Collection = () => {
                         />
                       </Box>
                     </Box>
-                    <Typography
-                      variant='body1'
-                      sx={{
-                        color: "#08397C",
-                        fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" },
-                      }}
-                    >
-                      College:
-                    </Typography>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        flexDirection: "column",
-                        height: "50%",
-                        overflowY: "auto",
-                        mb: 2,
-                        "&::-webkit-scrollbar": {
-                          width: "8px",
-                        },
-                        "&::-webkit-scrollbar-track": {
-                          background: "#f1f1f1",
-                          borderRadius: "4px",
-                        },
-                        "&::-webkit-scrollbar-thumb": {
-                          background: "#08397C",
-                          borderRadius: "4px",
-                        },
-                      }}
-                    >
-                      {colleges.map((college) => (
-                        <FormControlLabel
-                          key={college.college_id}
-                          control={
-                            <Checkbox
-                              checked={selectedColleges.includes(
-                                college.college_id
-                              )}
-                              onChange={handleCollegeChange}
-                              value={college.college_id}
-                            />
-                          }
-                          label={college.college_name}
+
+                    <Accordion defaultExpanded>
+                      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                        <Typography
                           sx={{
-                            "& .MuiTypography-root": {
-                              fontSize: {
-                                xs: "0.5rem",
-                                md: "0.75rem",
-                                lg: "0.9rem",
-                              },
+                            color: "#08397C",
+                            fontSize: {
+                              xs: "0.5rem",
+                              md: "0.5rem",
+                              lg: "0.9rem",
                             },
                           }}
-                        />
-                      ))}
-                    </Box>
-                    <Typography
-                      variant='body1'
-                      sx={{
-                        color: "#08397C",
-                        fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" },
-                      }}
-                    >
-                      Program:
-                    </Typography>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        flexDirection: "column",
-                        height: "50%",
-                        overflowY: "auto",
-                        mb: 2,
-                        "&::-webkit-scrollbar": {
-                          width: "8px",
-                        },
-                        "&::-webkit-scrollbar-track": {
-                          background: "#f1f1f1",
-                          borderRadius: "4px",
-                        },
-                        "&::-webkit-scrollbar-thumb": {
-                          background: "#08397C",
-                          borderRadius: "4px",
-                        },
-                      }}
-                    >
-                      {programs.map((program) => (
-                        <FormControlLabel
-                          key={program.program_id}
-                          control={
-                            <Checkbox
-                              checked={selectedPrograms.includes(
-                                program.program_name
-                              )}
-                              onChange={handleProgramChange}
-                              value={program.program_name}
+                        >
+                          College
+                        </Typography>
+                      </AccordionSummary>
+                      <AccordionDetails>
+                        <Box sx={{ maxHeight: "200px", overflow: "auto" }}>
+                          {colleges.map((college) => (
+                            <FormControlLabel
+                              key={college.college_id}
+                              control={
+                                <Checkbox
+                                  checked={selectedColleges.includes(
+                                    college.college_id
+                                  )}
+                                  onChange={handleCollegeChange}
+                                  value={college.college_id}
+                                />
+                              }
+                              label={college.college_name}
+                              sx={{
+                                "& .MuiTypography-root": {
+                                  fontSize: {
+                                    xs: "0.5rem",
+                                    md: "0.75rem",
+                                    lg: "0.9rem",
+                                  },
+                                },
+                              }}
                             />
-                          }
-                          label={program.program_name}
+                          ))}
+                        </Box>
+                      </AccordionDetails>
+                    </Accordion>
+
+                    <Accordion>
+                      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                        <Typography
                           sx={{
-                            "& .MuiTypography-root": {
-                              fontSize: {
-                                xs: "0.5rem",
-                                md: "0.75rem",
-                                lg: "0.9rem",
-                              },
+                            color: "#08397C",
+                            fontSize: {
+                              xs: "0.5rem",
+                              md: "0.5rem",
+                              lg: "0.9rem",
                             },
                           }}
-                        />
-                      ))}
-                    </Box>
-                    <Typography
-                      variant='body1'
-                      sx={{
-                        color: "#08397C",
-                        fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" },
-                      }}
-                    >
-                      Publication Format:
-                    </Typography>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        flexDirection: "column",
-                        height: "50%",
-                        overflowY: "auto",
-                        "&::-webkit-scrollbar": {
-                          width: "8px",
-                        },
-                        "&::-webkit-scrollbar-track": {
-                          background: "#f1f1f1",
-                          borderRadius: "4px",
-                        },
-                        "&::-webkit-scrollbar-thumb": {
-                          background: "#08397C",
-                          borderRadius: "4px",
-                        },
-                      }}
-                    >
-                      {publicationFormats.map((format) => (
-                        <FormControlLabel
-                          key={format.id}
-                          control={
-                            <Checkbox
-                              checked={selectedFormats.includes(format.name)}
-                              onChange={handleFormatChange}
-                              value={format.name} // Use format.name for the value
+                        >
+                          Program
+                        </Typography>
+                      </AccordionSummary>
+                      <AccordionDetails>
+                        <Box sx={{ maxHeight: "200px", overflow: "auto" }}>
+                          {programs.map((program) => (
+                            <FormControlLabel
+                              key={program.program_id}
+                              control={
+                                <Checkbox
+                                  checked={selectedPrograms.includes(
+                                    program.program_name
+                                  )}
+                                  onChange={handleProgramChange}
+                                  value={program.program_name}
+                                />
+                              }
+                              label={program.program_name}
+                              sx={{
+                                "& .MuiTypography-root": {
+                                  fontSize: {
+                                    xs: "0.5rem",
+                                    md: "0.75rem",
+                                    lg: "0.9rem",
+                                  },
+                                },
+                              }}
                             />
-                          }
-                          label={format.name}
+                          ))}
+                        </Box>
+                      </AccordionDetails>
+                    </Accordion>
+
+                    <Accordion>
+                      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                        <Typography
                           sx={{
-                            "& .MuiTypography-root": {
-                              fontSize: {
-                                xs: "0.5rem",
-                                md: "0.75rem",
-                                lg: "0.9rem",
-                              },
+                            color: "#08397C",
+                            fontSize: {
+                              xs: "0.5rem",
+                              md: "0.5rem",
+                              lg: "0.9rem",
                             },
                           }}
-                        />
-                      ))}
-                    </Box>
+                        >
+                          Publication Format
+                        </Typography>
+                      </AccordionSummary>
+                      <AccordionDetails>
+                        <Box sx={{ maxHeight: "200px", overflow: "auto" }}>
+                          {publicationFormats.map((format) => (
+                            <FormControlLabel
+                              key={format.id}
+                              control={
+                                <Checkbox
+                                  checked={selectedFormats.includes(
+                                    format.name
+                                  )}
+                                  onChange={handleFormatChange}
+                                  value={format.name}
+                                />
+                              }
+                              label={format.name}
+                              sx={{
+                                "& .MuiTypography-root": {
+                                  fontSize: {
+                                    xs: "0.5rem",
+                                    md: "0.75rem",
+                                    lg: "0.9rem",
+                                  },
+                                },
+                              }}
+                            />
+                          ))}
+                        </Box>
+                      </AccordionDetails>
+                    </Accordion>
                   </Box>
                 </Grid2>
               )}
@@ -863,7 +878,7 @@ const Collection = () => {
                     }}
                   >
                     <iframe
-                      src="http://localhost:5000/collectionkg"
+                      src='http://localhost:5000/collectionkg'
                       style={{
                         width: "100%",
                         height: "100%",
@@ -884,7 +899,7 @@ const Collection = () => {
                       }}
                     />
                   </Box>
-                </Grid2>              
+                </Grid2>
               )}
             </Grid2>
           </Box>

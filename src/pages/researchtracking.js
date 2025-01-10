@@ -15,6 +15,9 @@ import {
   FormControlLabel,
   Checkbox,
   Divider,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import homeBg from "../assets/home_bg.png";
@@ -23,6 +26,7 @@ import { Search, Update } from "@mui/icons-material";
 import { Virtuoso } from "react-virtuoso";
 import axios from "axios";
 import { filterCache, fetchAndCacheFilterData } from "../utils/filterCache";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import HeaderWithBackButton from "../components/Header";
 
 // First, define the useDebounce hook
@@ -219,34 +223,78 @@ const ResearchTracking = () => {
 
   useEffect(() => {
     if (!isLoading) {
-      fetchProgramsByCollege(debouncedColleges);
+      const cached = filterCache.get();
+      if (cached) {
+        // Get programs from selected colleges
+        let filteredPrograms =
+          debouncedColleges.length === 0
+            ? cached.programs
+            : cached.programs.filter((program) =>
+                debouncedColleges.includes(String(program.college_id))
+              );
+
+        // Add any selected programs that aren't in the filtered list
+        const selectedProgramObjects = cached.programs.filter((program) =>
+          selectedPrograms.includes(program.program_name)
+        );
+
+        // Combine and remove duplicates
+        filteredPrograms = [
+          ...new Map(
+            [...filteredPrograms, ...selectedProgramObjects].map((program) => [
+              program.program_name,
+              program,
+            ])
+          ).values(),
+        ];
+
+        setPrograms(filteredPrograms);
+      }
     }
-  }, [debouncedColleges]); // Only depend on debounced value
+  }, [debouncedColleges, isLoading, selectedPrograms]);
 
   useEffect(() => {
     const applyFilters = () => {
-      let filtered = [...research]; // Create a new array to avoid mutations
+      let filtered = [...research];
 
-      // Apply filters in order of most restrictive first
-      if (selectedColleges.length > 0) {
-        filtered = filtered.filter((item) =>
-          selectedColleges.includes(String(item.college_id))
-        );
+      // Handle college and program filtering
+      if (selectedColleges.length > 0 || selectedPrograms.length > 0) {
+        filtered = filtered.filter((item) => {
+          // Check if item matches any selected program
+          const matchesProgram =
+            selectedPrograms.length > 0 &&
+            selectedPrograms.includes(item.program_name);
+
+          // Check if item's college is selected
+          const matchesCollege =
+            selectedColleges.length > 0 &&
+            selectedColleges.includes(String(item.college_id));
+
+          // Show items that either:
+          // 1. Match any selected program (regardless of college), OR
+          // 2. Belong to a selected college (if no program from that college is selected)
+          return (
+            matchesProgram ||
+            (matchesCollege &&
+              !selectedPrograms.some((prog) => {
+                // Find the college of this selected program
+                const programCollege = programs.find(
+                  (p) => p.program_name === prog
+                )?.college_id;
+                // Only apply college filter if no program from this college is selected
+                return String(programCollege) === String(item.college_id);
+              }))
+          );
+        });
       }
 
-      if (selectedPrograms.length > 0) {
-        filtered = filtered.filter((item) =>
-          selectedPrograms.includes(item.program_name)
-        );
-      }
-
+      // Apply remaining filters
       if (sliderValue[0] !== dateRange[0] || sliderValue[1] !== dateRange[1]) {
         filtered = filtered.filter(
           (item) => item.year >= sliderValue[0] && item.year <= sliderValue[1]
         );
       }
 
-      // Filter by Selected Status
       if (selectedStatus.length > 0) {
         filtered = filtered.filter((item) =>
           selectedStatus.some(
@@ -256,10 +304,11 @@ const ResearchTracking = () => {
       }
 
       if (searchQuery) {
+        const query = searchQuery.toLowerCase();
         filtered = filtered.filter(
           (item) =>
-            item.title.toLowerCase().includes(searchQuery) ||
-            item.research_id.toLowerCase().includes(searchQuery)
+            item.title.toLowerCase().includes(query) ||
+            item.research_id.toLowerCase().includes(query)
         );
       }
 
@@ -269,7 +318,7 @@ const ResearchTracking = () => {
       // Update badge counts based on the filtered data
       const updatedBadgeValues = {
         total_ready: filtered.filter(
-          (item) => item.status.toLowerCase() === "ready"
+          (item) => item.status.toLowerCase() === "ready for publication"
         ).length,
         total_submitted: filtered.filter(
           (item) => item.status.toLowerCase() === "submitted"
@@ -285,13 +334,13 @@ const ResearchTracking = () => {
       setBadgeValues(updatedBadgeValues);
     };
 
-    // Debounce the filter application
     const timeoutId = setTimeout(applyFilters, 300);
     return () => clearTimeout(timeoutId);
   }, [
     research,
     selectedColleges,
     selectedPrograms,
+    programs,
     sliderValue,
     selectedStatus,
     searchQuery,
@@ -382,7 +431,7 @@ const ResearchTracking = () => {
           }}
         >
           <HeaderWithBackButton
-            title="Research Publication Tracking"
+            title='Research Publication Tracking'
             onBack={() => navigate(-1)}
           />
           {/* Main Content */}
@@ -422,9 +471,15 @@ const ResearchTracking = () => {
                     <Typography
                       variant='body1'
                       sx={{
-                        mb: 1,
+                        mb: 2,
                         color: "#08397C",
-                        fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" },
+                        position: "relative",
+                        zIndex: 2,
+                        fontSize: {
+                          xs: "0.5rem",
+                          md: "0.5rem",
+                          lg: "0.9rem",
+                        },
                       }}
                     >
                       Year Range:
@@ -463,116 +518,95 @@ const ResearchTracking = () => {
                     </Box>
                   </Box>
 
-                  <Typography
-                    variant='body1'
-                    sx={{
-                      mb: 1,
-                      color: "#08397C",
-                      fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" },
-                    }}
-                  >
-                    College:
-                  </Typography>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      flexDirection: "column",
-                      height: "50%",
-                      overflowY: "auto",
-                      mb: 2,
-                      "&::-webkit-scrollbar": {
-                        width: "8px",
-                      },
-                      "&::-webkit-scrollbar-track": {
-                        background: "#f1f1f1",
-                        borderRadius: "4px",
-                      },
-                      "&::-webkit-scrollbar-thumb": {
-                        background: "#08397C",
-                        borderRadius: "4px",
-                      },
-                    }}
-                  >
-                    {colleges.map((college) => (
-                      <FormControlLabel
-                        key={college.college_id}
-                        control={
-                          <Checkbox
-                            checked={selectedColleges.includes(
-                              college.college_id
-                            )}
-                            onChange={handleCollegeChange}
-                            value={college.college_id}
-                          />
-                        }
-                        label={college.college_name}
+                  <Accordion defaultExpanded>
+                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                      <Typography
                         sx={{
-                          "& .MuiTypography-root": {
-                            fontSize: {
-                              xs: "0.5rem",
-                              md: "0.75rem",
-                              lg: "0.9rem",
-                            },
+                          color: "#08397C",
+                          fontSize: {
+                            xs: "0.5rem",
+                            md: "0.5rem",
+                            lg: "0.9rem",
                           },
                         }}
-                      />
-                    ))}
-                  </Box>
-                  <Typography
-                    variant='body1'
-                    sx={{
-                      mb: 1,
-                      color: "#08397C",
-                      fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" },
-                    }}
-                  >
-                    Program:
-                  </Typography>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      flexDirection: "column",
-                      height: "50%",
-                      overflowY: "auto",
-                      mb: 2,
-                      "&::-webkit-scrollbar": {
-                        width: "8px",
-                      },
-                      "&::-webkit-scrollbar-track": {
-                        background: "#f1f1f1",
-                        borderRadius: "4px",
-                      },
-                      "&::-webkit-scrollbar-thumb": {
-                        background: "#08397C",
-                        borderRadius: "4px",
-                      },
-                    }}
-                  >
-                    {programs.map((program) => (
-                      <FormControlLabel
-                        key={program.program_id}
-                        control={
-                          <Checkbox
-                            checked={selectedPrograms.includes(
-                              program.program_name
-                            )}
-                            onChange={handleProgramChange}
-                            value={program.program_name}
+                      >
+                        College
+                      </Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <Box sx={{ maxHeight: "200px", overflow: "auto" }}>
+                        {colleges.map((college) => (
+                          <FormControlLabel
+                            key={college.college_id}
+                            control={
+                              <Checkbox
+                                checked={selectedColleges.includes(
+                                  String(college.college_id)
+                                )}
+                                onChange={handleCollegeChange}
+                                value={college.college_id}
+                              />
+                            }
+                            label={college.college_name}
+                            sx={{
+                              "& .MuiTypography-root": {
+                                fontSize: {
+                                  xs: "0.5rem",
+                                  md: "0.75rem",
+                                  lg: "0.9rem",
+                                },
+                              },
+                            }}
                           />
-                        }
-                        label={program.program_name}
+                        ))}
+                      </Box>
+                    </AccordionDetails>
+                  </Accordion>
+
+                  <Accordion>
+                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                      <Typography
                         sx={{
-                          "& .MuiTypography-root": {
-                            fontSize: {
-                              xs: "0.5rem",
-                              md: "0.75rem",
-                              lg: "0.9rem",
-                            },
+                          color: "#08397C",
+                          fontSize: {
+                            xs: "0.5rem",
+                            md: "0.5rem",
+                            lg: "0.9rem",
                           },
                         }}
-                      />
-                    ))}
-                  </Box>
+                      >
+                        Program
+                      </Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <Box sx={{ maxHeight: "200px", overflow: "auto" }}>
+                        {programs.map((program) => (
+                          <FormControlLabel
+                            key={program.program_id}
+                            control={
+                              <Checkbox
+                                checked={selectedPrograms.includes(
+                                  program.program_name
+                                )}
+                                onChange={handleProgramChange}
+                                value={program.program_name}
+                              />
+                            }
+                            label={program.program_name}
+                            sx={{
+                              "& .MuiTypography-root": {
+                                fontSize: {
+                                  xs: "0.5rem",
+                                  md: "0.75rem",
+                                  lg: "0.9rem",
+                                },
+                              },
+                            }}
+                          />
+                        ))}
+                      </Box>
+                    </AccordionDetails>
+                  </Accordion>
                 </Box>
               </Grid2>
 
