@@ -20,12 +20,10 @@ import {
   Pagination,
   InputAdornment,
 } from "@mui/material";
-import { Search } from "@mui/icons-material";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import { useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
-import { Virtuoso } from "react-virtuoso";
 import { Snackbar, Alert } from "@mui/material"; // Import Snackbar and Alert from Material UI
 import HeaderWithBackButton from "../components/Header";
 import AutoCompleteTextBox from "../components/Intellibox";
@@ -33,16 +31,10 @@ import AutoCompleteTextBox from "../components/Intellibox";
 const UpdateTrackingInfo = ({ route, navigate }) => {
   const navpage = useNavigate();
   const location = useLocation();
-  const [openModal, setOpenModal] = useState(false);
   const [openModalPub, setOpenModalPub] = useState(false);
-  const [openModalCon, setOpenModalCon] = useState(false);
   const { id } = location.state || {}; // Default to an empty object if state is undefined
   const [data, setData] = useState(null); // Start with null to represent no data
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [newRole, setNewRole] = useState("");
   const [loading, setLoading] = useState(true); // Track loading state
-  const [currentPage, setCurrentPage] = useState(1);
 
   const [pubData, setPubData] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -53,19 +45,13 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
   const [publicationFormat, setPublicationFormat] = useState("");
   const [indexingStatus, setIndexingStatus] = useState("");
 
-  const [conferences, setConferences] = useState([]);
-  const [filteredConferences, setFilteredConferences] = useState([]);
-
-  const [selectedTitle, setSelectedTitle] = useState("");
-  const [selectedVenue, setSelectedVenue] = useState("");
-  const [selectedDate, setSelectedDate] = useState("");
-
   const [conferenceTitle, setConferenceTitle] = useState("");
   const [singleCountry, setSingleCountry] = useState("");
   const [singleCity, setSingleCity] = useState("");
   const [countries, setCountries] = useState([]);
   const [Cities, setCities] = useState([]);
   const [dateApproved, setDateApproved] = useState("");
+  const [selectedVenue, setSelectedVenue] = useState("");
 
   const itemsPerPage = 5;
 
@@ -100,9 +86,9 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
           setPublicationFormat(initialData.journal);
           setDatePublished(initialData.date_published);
           setIndexingStatus(initialData.scopus);
-          setSelectedTitle(initialData.conference_title);
+          setConferenceTitle(initialData.conference_title);
           setSelectedVenue(initialData.conference_venue);
-          setSelectedDate(initialData.conference_date);
+          setDateApproved(initialData.conference_date);
 
           setPubData({ dataset: fetched_data });
         }
@@ -116,23 +102,6 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
   }, [id]);
 
   const isPaperEmpty = Array.isArray(pubData) && pubData.length === 0; // Checks if there are data to be retrived from the database
-
-  // Fetch all conference titles
-  const fetchConferenceTitles = async () => {
-    try {
-      const response = await axios.get(`/data/conferences`);
-      const fetchConferences = response.data.conferences;
-      setConferences(fetchConferences);
-      setFilteredConferences(fetchConferences);
-    } catch (error) {
-      console.error("Error fetching conference titles:", error);
-    }
-  };
-
-  // Fetch all conference_titles
-  useEffect(() => {
-    fetchConferenceTitles();
-  }, []);
 
   ///////////////////// RESEARCH DATA RETRIEVAL //////////////////////
   useEffect(() => {
@@ -182,106 +151,6 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
     fetchCountries();
   }, []);
 
-  ///////////////////// SELECTING AND ADDING CONFERENCE //////////////////////
-  useEffect(() => {
-    let filtered = conferences;
-
-    // Filter by Search Query
-    if (searchQuery) {
-      filtered = filtered.filter((conference) => {
-        const titleMatch = conference.conference_title
-          .toLowerCase()
-          .includes(searchQuery.toLowerCase());
-        const venueMatch = conference.conference_venue
-          .toLowerCase()
-          .includes(searchQuery.toLowerCase());
-
-        return titleMatch || venueMatch;
-      });
-    }
-    setFilteredConferences(filtered);
-    setCurrentPage(1); // Reset to the first page on filter change
-  }, [searchQuery, conferences]);
-
-  const handleAddConference = async () => {
-    try {
-      // Validate required fields
-      const requiredFields = {
-        "Conference Title": conferenceTitle,
-        Country: singleCountry,
-        City: singleCity,
-        "Conference Date": dateApproved,
-      };
-
-      const missingFields = Object.entries(requiredFields)
-        .filter(([_, value]) => {
-          if (Array.isArray(value)) {
-            return value.length === 0;
-          }
-          return !value;
-        })
-        .map(([key]) => key);
-
-      // Check if the conference date is valid and in the future
-      const today = new Date();
-      const approvedDate = new Date(dateApproved);
-      if (dateApproved && approvedDate <= today) {
-        alert("Conference Date must be in the future");
-        return;
-      }
-
-      if (missingFields.length > 0) {
-        alert(
-          `Please fill in all required fields: ${missingFields.join(", ")}`
-        );
-        return;
-      }
-
-      const formData = new FormData();
-
-      // Get user_id from localStorage
-      const userId = localStorage.getItem("user_id");
-      formData.append("user_id", userId);
-
-      // Add all required fields to formData
-      formData.append("conference_title", conferenceTitle);
-      formData.append("country", singleCountry);
-      formData.append("city", singleCity);
-      formData.append("conference_date", dateApproved);
-
-      // Send the conference data
-      const response = await axios.post(
-        "/conference/add_conference",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-
-      console.log("Response:", response.data);
-      alert("Conference added successfully!");
-      handleCloseModal();
-
-      setSelectedTitle(conferenceTitle);
-      setSelectedVenue(`${singleCity}, ${singleCountry}`);
-      setSelectedDate(dateApproved);
-    } catch (error) {
-      console.error("Error adding conference:", error);
-      if (error.response) {
-        console.error("Error response:", error.response.data);
-        alert(
-          `Failed to add conference: ${
-            error.response.data.error || "Please try again."
-          }`
-        );
-      } else {
-        alert("Failed to add conference. Please try again.");
-      }
-    }
-  };
-
   ///////////////////// ADD AND EDIT PUBLICATION //////////////////////
   const checkFields = () => {
     // Validate required fields
@@ -305,10 +174,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
             "Publication Format": publicationFormat,
             "Publication Date":datePublished,
             "Indexing Status": indexingStatus,}
-          
           }
-
-
       const missingFields = Object.entries(requiredFields)
         .filter(([_, value]) => {
           if (Array.isArray(value)) {
@@ -329,12 +195,6 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
   }
 
   const handleSavePublication = async () => {
-    if (selectedVenue) {
-      const venue = selectedVenue.split(",").map((item) => item.trim());
-      setSingleCity(venue.length > 1 ? venue[0] : "");
-      setSingleCountry(venue[1]);
-    }
-
     try {
       const missingFields = checkFields();
 
@@ -353,13 +213,13 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
 
       // Add all required fields to formData
       formData.append("publication_name", publicationName);
-      formData.append("journal", publicationFormat);
+      formData.append("pub_format_id", publicationFormat);
       formData.append("date_published", datePublished);
       formData.append("scopus", indexingStatus);
-      formData.append("conference_title", selectedTitle);
+      formData.append("conference_title", conferenceTitle);
       formData.append("city", singleCity);
       formData.append("country", singleCountry);
-      formData.append("conference_date", selectedDate);
+      formData.append("conference_date", dateApproved);
 
       // Send the conference data
       const response = await axios.post(`/track/publication/${id}`, formData, {
@@ -395,9 +255,6 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
       publicationFormat != initialValues?.journal ||
       datePublished != initialValues?.date_published ||
       indexingStatus != initialValues?.scopus ||
-      selectedTitle != initialValues?.conference_title ||
-      selectedDate != initialValues?.conference_date ||
-      selectedVenue != initialValues?.conference_venue;
 
     console.log("Initial Data:", initialValues);
 
@@ -432,10 +289,10 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
       formData.append("journal", publicationFormat);
       formData.append("date_published", datePublished);
       formData.append("scopus", indexingStatus);
-      formData.append("conference_title", selectedTitle);
+      formData.append("conference_title", conferenceTitle);
       formData.append("city", singleCity);
       formData.append("country", singleCountry);
-      formData.append("conference_date", selectedDate);
+      formData.append("conference_date", dateApproved);
 
       // Send the conference data
       const response = await axios.put(`/track/publication/${id}`, formData, {
@@ -471,8 +328,8 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
       setPublicationFormat(initialValues.journal);
       setDatePublished(initialValues.date_published);
       setIndexingStatus(initialValues.scopus);
-      setSelectedTitle(initialValues.conference_title);
-      setSelectedDate(initialValues.conference_date);
+      setConferenceTitle(initialValues.conference_title);
+      setDateApproved(initialValues.conference_date);
       setSelectedVenue(initialValues.conference_venue);
     }
     setIsEditing(!isEditing); // Switch view state from view to edit; vice versa
@@ -550,37 +407,8 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
   };
 
   ///////////////////// PRE-POST MODAL HANDLING //////////////////////
-  const handleResetCon = () => {
-    setSelectedTitle("");
-    setSelectedVenue("");
-    setSelectedDate("");
-  };
-
-  const handleOpenModal = () => {
-    setOpenModal(true);
-  };
-
   const handleOpenModalPub = () => {
     setOpenModalPub(true);
-  };
-
-  const handleOpenModalCon = () => {
-    setOpenModalCon(true);
-  };
-
-  const handleCloseModal = () => {
-    setSearchQuery("");
-
-    if (!openModal) {
-      setOpenModalCon(false);
-    }
-    if (openModalCon) {
-      setOpenModal(false);
-    }
-
-    if (openModalPub) {
-      setOpenModalPub(false);
-    }
   };
 
   const handleFormCleanup = () => {
@@ -594,9 +422,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
     setSingleCity("");
     setDateApproved("");
 
-    setSelectedTitle("");
     setSelectedVenue("");
-    setSelectedDate("");
   };
 
   // Utility function to create responsive TextField styles
@@ -915,6 +741,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                     height: "auto",
                                   }}
                                 >
+                                  {/* Labels */}
                                   <Grid2 display='flex' flexDirection='row'>
                                     <Grid2 size={6}>
                                       <Typography
@@ -934,7 +761,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                       </Typography>
                                     </Grid2>
                                     <Grid2 size={6}>
-                                      {publicationFormat !== "JL" && (
+                                      {conferenceTitle && (
                                         <Typography
                                           variant='h6'
                                           color='#d40821'
@@ -953,425 +780,128 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                       )}
                                     </Grid2>
                                   </Grid2>
+
+                                  {/* Details */}
                                   <Grid2 display='flex' flexDirection='row'>
-                                    <Grid2 size={6}>
-                                      <Grid2
-                                        item sx={{ mb: "1rem", mr: "3rem" }}
+                                    <Grid2 container size={6} display='flex' flexDirection='column'>
+                                    <Typography
+                                        variant='h7'
+                                        sx={{
+                                          mb: "1rem",
+                                          fontSize: {
+                                            xs: "0.7rem",
+                                            md: "0.8rem",
+                                            lg: "0.9rem",
+                                          },
+                                        }}
                                       >
-                                        {isEditing ? (
-                                        <AutoCompleteTextBox
-                                          fullWidth
-                                          data={pub_names}
-                                          label="Publication Name"
-                                          id="publication-name"
-                                          onItemSelected={(value) => setPublicationName(value)} // Update state when a suggestion is selected
-                                          sx={createTextFieldStyles()}
-                                          inputlabel={createInputLabelProps()}
-                                          placeholder="ex: PLOS One"
-                                        />
-                                        ) : (
-                                          <Typography
-                                            variant='h7'
-                                            sx={{
-                                              mb: "1rem",
-                                              fontSize: {
-                                                xs: "0.7rem",
-                                                md: "0.8rem",
-                                                lg: "0.9rem",
-                                              },
-                                            }}
-                                          >
-                                            <strong>Publication Name:</strong>{" "}
-                                            {publicationName || "None"}
-                                          </Typography>
-                                        )}
-                                      </Grid2>
-                                      <Grid2
-                                        item
-                                        sx={{ mb: "1rem", mr: "3rem" }}
+                                        <strong>Format:</strong>{" "}
+                                        {publicationFormat || "None"}
+                                      </Typography>
+                                      <Typography
+                                        variant='h7'
+                                        sx={{
+                                          mb: "1rem",
+                                          fontSize: {
+                                            xs: "0.7rem",
+                                            md: "0.8rem",
+                                            lg: "0.9rem",
+                                          },
+                                        }}
                                       >
-                                        {isEditing ? (
-                                          <TextField
-                                            fullWidth
-                                            label='Date Published'
-                                            name='date_published'
-                                            type='date'
-                                            value={
-                                              datePublished
-                                                ? new Date(
-                                                    datePublished
-                                                  ).toLocaleDateString("en-CA")
-                                                : ""
-                                            }
-                                            variant='outlined'
-                                            sx={createTextFieldStyles()}
-                                            InputLabelProps={{
-                                              ...createInputLabelProps(),
-                                              shrink: true,
-                                            }}
-                                            onChange={(e) =>
-                                              setDatePublished(e.target.value)
-                                            }
-                                          />
-                                        ) : (
-                                          <Typography
-                                            variant='h7'
-                                            sx={{
-                                              mb: "1rem",
-                                              fontSize: {
-                                                xs: "0.7rem",
-                                                md: "0.8rem",
-                                                lg: "0.9rem",
-                                              },
-                                            }}
-                                          >
-                                            <strong>Date Published:</strong>{" "}
-                                            {datePublished || "None"}
-                                          </Typography>
-                                        )}
-                                      </Grid2>
-                                      <Grid2
-                                        item
-                                        sx={{ mb: "1rem", mr: "3rem" }}
+                                        <strong>Publication Name:</strong>{" "}
+                                        {publicationName || "None"}
+                                      </Typography>
+                                      <Typography
+                                        variant='h7'
+                                        sx={{
+                                          mb: "1rem",
+                                          fontSize: {
+                                            xs: "0.7rem",
+                                            md: "0.8rem",
+                                            lg: "0.9rem",
+                                          },
+                                        }}
                                       >
-                                        {isEditing ? (
-                                          <FormControl
-                                            fullWidth
-                                            variant='outlined'
-                                          >
-                                            <InputLabel
-                                              sx={{
-                                                fontSize: {
-                                                  xs: "0.75rem",
-                                                  md: "0.75rem",
-                                                  lg: "0.8rem",
-                                                },
-                                              }}
-                                            >
-                                              Format
-                                            </InputLabel>
-                                            <Select
-                                              label='Format'
-                                              sx={createTextFieldStyles()}
-                                              value={publicationFormat || ""}
-                                              onChange={(e) =>
-                                                setPublicationFormat(
-                                                  e.target.value
-                                                )
-                                              }
-                                            >
-                                              <MenuItem value='journal'>
-                                                Journal
-                                              </MenuItem>
-                                              <MenuItem value='proceeding'>
-                                                Proceeding
-                                              </MenuItem>
-                                            </Select>
-                                          </FormControl>
-                                        ) : (
-                                          <Typography
-                                            variant='h7'
-                                            sx={{
-                                              mb: "1rem",
-                                              fontSize: {
-                                                xs: "0.7rem",
-                                                md: "0.8rem",
-                                                lg: "0.9rem",
-                                              },
-                                            }}
-                                          >
-                                            <strong>Format:</strong>{" "}
-                                            {publicationFormat
-                                              ? publicationFormat
-                                                  .charAt(0)
-                                                  .toUpperCase() +
-                                                publicationFormat
-                                                  .slice(1)
-                                                  .toLowerCase()
-                                              : "None"}
-                                          </Typography>
-                                        )}
-                                      </Grid2>
-                                      <Grid2
-                                        item
-                                        sx={{ mb: "1rem", mr: "3rem" }}
+                                        <strong>Date Published:</strong>{" "}
+                                        {datePublished || "None"}
+                                      </Typography>
+                                      <Typography
+                                        variant='h7'
+                                        sx={{
+                                          mb: "1rem",
+                                          fontSize: {
+                                            xs: "0.7rem",
+                                            md: "0.8rem",
+                                            lg: "0.9rem",
+                                          },
+                                        }}
                                       >
-                                        {isEditing ? (
-                                          <FormControl
-                                            fullWidth
-                                            variant='outlined'
-                                          >
-                                            <InputLabel
-                                              sx={{
-                                                fontSize: {
-                                                  xs: "0.75rem",
-                                                  md: "0.75rem",
-                                                  lg: "0.8rem",
-                                                },
-                                              }}
-                                            >
-                                              Indexing Status
-                                            </InputLabel>
-                                            <Select
-                                              label='Indexing Status'
-                                              sx={createTextFieldStyles()}
-                                              value={indexingStatus || ""}
-                                              onChange={(e) =>
-                                                setIndexingStatus(
-                                                  e.target.value
-                                                )
-                                              }
-                                            >
-                                              <MenuItem value='SCOPUS'>
-                                                Scopus
-                                              </MenuItem>
-                                              <MenuItem value='NON-SCOPUS'>
-                                                Non-Scopus
-                                              </MenuItem>
-                                            </Select>
-                                          </FormControl>
-                                        ) : (
-                                          <Typography
-                                            variant='h7'
-                                            sx={{
-                                              mb: "1rem",
-                                              fontSize: {
-                                                xs: "0.7rem",
-                                                md: "0.8rem",
-                                                lg: "0.9rem",
-                                              },
-                                            }}
-                                          >
-                                            <strong>Indexing Status:</strong>{" "}
-                                            {indexingStatus
-                                              ? indexingStatus
-                                                  .charAt(0)
-                                                  .toUpperCase() +
-                                                indexingStatus
-                                                  .slice(1)
-                                                  .toLowerCase()
-                                              : "None"}
-                                          </Typography>
-                                        )}
-                                      </Grid2>
+                                        <strong>Indexing Status:</strong>{" "}
+                                        {indexingStatus
+                                          ? indexingStatus
+                                              .charAt(0)
+                                              .toUpperCase() +
+                                            indexingStatus
+                                              .slice(1)
+                                              .toLowerCase()
+                                          : "None"}
+                                      </Typography>
                                     </Grid2>
 
-                                    {publicationFormat !== "journal" && (
+                                    {conferenceTitle && (
                                       <Grid2 size={6}>
                                         <Grid2
                                           item
                                           sx={{ mb: "1rem", mr: "2rem" }}
                                         >
-                                          {isEditing ? (
-                                            <Box
-                                              display='flex'
-                                              flexDirection='column'
+                                          <Box
+                                            display='flex'
+                                            flexDirection='column'
+                                          >
+                                            <Typography
+                                              variant='h7'
+                                              sx={{
+                                                mb: "1rem",
+                                                fontSize: {
+                                                  xs: "0.7rem",
+                                                  md: "0.8rem",
+                                                  lg: "0.9rem",
+                                                },
+                                              }}
                                             >
-                                              <Typography
-                                                variant='h7'
-                                                sx={{
-                                                  mb: "1rem",
-                                                  fontSize: {
-                                                    xs: "0.7rem",
-                                                    md: "0.8rem",
-                                                    lg: "0.9rem",
-                                                  },
-                                                }}
-                                              >
-                                                <strong>Title:</strong>{" "}
-                                                {selectedTitle || "None"}
-                                              </Typography>
-                                              <Typography
-                                                variant='h7'
-                                                sx={{
-                                                  mb: "1rem",
-                                                  fontSize: {
-                                                    xs: "0.7rem",
-                                                    md: "0.8rem",
-                                                    lg: "0.9rem",
-                                                  },
-                                                }}
-                                              >
-                                                <strong>Date:</strong>{" "}
-                                                {selectedDate || "None"}
-                                              </Typography>
-                                              <Typography
-                                                variant='h7'
-                                                sx={{
-                                                  mb: "1rem",
-                                                  fontSize: {
-                                                    xs: "0.7rem",
-                                                    md: "0.8rem",
-                                                    lg: "0.9rem",
-                                                  },
-                                                }}
-                                              >
-                                                <strong>Venue:</strong>{" "}
-                                                {selectedVenue || "None"}
-                                              </Typography>
-                                              <Box
-                                                sx={{
-                                                  display: "flex",
-                                                  alignItems: "center",
-                                                  border: "1px dashed #0A438F",
-                                                  borderRadius: 1,
-                                                  m: 0.5,
-                                                  cursor: "pointer",
-                                                  justifyContent: "center",
-                                                  gap: 2,
-                                                }}
-                                              >
-                                                <Button
-                                                  variant='text'
-                                                  color='primary'
-                                                  sx={{
-                                                    color: "#08397C",
-                                                    fontFamily:
-                                                      "Montserrat, sans-serif",
-                                                    fontWeight: 600,
-                                                    textTransform: "none",
-                                                    fontSize: {
-                                                      xs: "0.5rem",
-                                                      md: "0.65rem",
-                                                      lg: "0.8rem",
-                                                    },
-                                                    alignSelf: "center",
-                                                    maxHeight: "2rem",
-                                                    "&:hover": {
-                                                      color: "#052045",
-                                                    },
-                                                  }}
-                                                  onClick={handleOpenModalCon}
-                                                >
-                                                  Change Conference
-                                                </Button>
-                                              </Box>
-                                              <Box
-                                                sx={{
-                                                  display: "flex",
-                                                  alignItems: "center",
-                                                  border: "1px dashed #0A438F",
-                                                  borderRadius: 1,
-                                                  m: 0.5,
-                                                  cursor: "pointer",
-                                                  justifyContent: "center",
-                                                  gap: 2,
-                                                }}
-                                              >
-                                                <Button
-                                                  variant='text'
-                                                  color='primary'
-                                                  sx={{
-                                                    width: "100%",
-                                                    color: "#08397C",
-                                                    fontFamily:
-                                                      "Montserrat, sans-serif",
-                                                    fontWeight: 600,
-                                                    textTransform: "none",
-                                                    fontSize: {
-                                                      xs: "0.5rem",
-                                                      md: "0.65rem",
-                                                      lg: "0.8rem",
-                                                    },
-                                                    alignSelf: "center",
-                                                    maxHeight: "2rem",
-                                                    "&:hover": {
-                                                      color: "#052045",
-                                                    },
-                                                  }}
-                                                  onClick={handleOpenModal}
-                                                >
-                                                  + Add Conference
-                                                </Button>
-                                              </Box>
-                                              <Box
-                                                sx={{
-                                                  display: "flex",
-                                                  alignItems: "center",
-                                                  border: "1px dashed #CA031B",
-                                                  borderRadius: 1,
-                                                  m: 0.5,
-                                                  cursor: "pointer",
-                                                  justifyContent: "center",
-                                                  gap: 2,
-                                                }}
-                                              >
-                                                <Button
-                                                  variant='text'
-                                                  color='primary'
-                                                  sx={{
-                                                    width: "100%",
-                                                    color: "#CA031B",
-                                                    fontFamily:
-                                                      "Montserrat, sans-serif",
-                                                    fontWeight: 600,
-                                                    textTransform: "none",
-                                                    fontSize: {
-                                                      xs: "0.5rem",
-                                                      md: "0.65rem",
-                                                      lg: "0.8rem",
-                                                    },
-                                                    alignSelf: "center",
-                                                    maxHeight: "2rem",
-                                                    "&:hover": {
-                                                      color: "#A30417",
-                                                    },
-                                                  }}
-                                                  onClick={handleResetCon}
-                                                >
-                                                  Reset
-                                                </Button>
-                                              </Box>
-                                            </Box>
-                                          ) : (
-                                            <Box
-                                              display='flex'
-                                              flexDirection='column'
+                                              <strong>Title:</strong>{" "}
+                                              {conferenceTitle || "None"}
+                                            </Typography>
+                                            <Typography
+                                              variant='h7'
+                                              sx={{
+                                                mb: "1rem",
+                                                fontSize: {
+                                                  xs: "0.7rem",
+                                                  md: "0.8rem",
+                                                  lg: "0.9rem",
+                                                },
+                                              }}
                                             >
-                                              <Typography
-                                                variant='h7'
-                                                sx={{
-                                                  mb: "1rem",
-                                                  fontSize: {
-                                                    xs: "0.7rem",
-                                                    md: "0.8rem",
-                                                    lg: "0.9rem",
-                                                  },
-                                                }}
-                                              >
-                                                <strong>Title:</strong>{" "}
-                                                {selectedTitle || "None"}
-                                              </Typography>
-                                              <Typography
-                                                variant='h7'
-                                                sx={{
-                                                  mb: "1rem",
-                                                  fontSize: {
-                                                    xs: "0.7rem",
-                                                    md: "0.8rem",
-                                                    lg: "0.9rem",
-                                                  },
-                                                }}
-                                              >
-                                                <strong>Date:</strong>{" "}
-                                                {selectedDate || "None"}
-                                              </Typography>
-                                              <Typography
-                                                variant='h7'
-                                                sx={{
-                                                  mb: "1rem",
-                                                  fontSize: {
-                                                    xs: "0.7rem",
-                                                    md: "0.8rem",
-                                                    lg: "0.9rem",
-                                                  },
-                                                }}
-                                              >
-                                                <strong>Venue:</strong>{" "}
-                                                {selectedVenue || "None"}
-                                              </Typography>
-                                            </Box>
-                                          )}
+                                              <strong>Date:</strong>{" "}
+                                              {dateApproved || "None"}
+                                            </Typography>
+                                            <Typography
+                                              variant='h7'
+                                              sx={{
+                                                mb: "1rem",
+                                                fontSize: {
+                                                  xs: "0.7rem",
+                                                  md: "0.8rem",
+                                                  lg: "0.9rem",
+                                                },
+                                              }}
+                                            >
+                                              <strong>Venue:</strong>{" "}
+                                              {selectedVenue || "None"}
+                                            </Typography>
+                                          </Box>
                                         </Grid2>
                                       </Grid2>
                                     )}
@@ -1553,8 +1083,27 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                       value={publicationFormat || ""}
                       onChange={handleChange} // Call handleChange when user selects an option
                     >
+                      <MenuItem
+                        value=''
+                        disabled
+                        sx={{
+                          fontSize: {
+                            xs: "0.75rem",
+                            md: "0.75rem",
+                            lg: "0.8rem",
+                          },
+                        }}
+                      >
+                        Select publication format
+                      </MenuItem>
                       {publicationFormats.map((format) => (
-                        <MenuItem key={format.pub_format_id} value={format.pub_format_id}>
+                        <MenuItem key={format.pub_format_id} value={format.pub_format_id} sx={{
+                          fontSize: {
+                            xs: "0.75rem",
+                            md: "0.75rem",
+                            lg: "0.8rem",
+                          },
+                        }}>
                           {format.pub_format_name}
                         </MenuItem>
                       ))}
@@ -1566,8 +1115,15 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                     label="Publication Name"
                     id="publication-name"
                     onItemSelected={(value) => setPublicationName(value)} // Update state when a suggestion is selected
-                    sx={createTextFieldStyles()}
-                    inputlabel={createInputLabelProps()}
+                    sx={{...createTextFieldStyles(), 
+                      '& .MuiInputLabel-root': {
+                      fontSize: {
+                        xs: "0.75rem",
+                        md: "0.75rem",
+                        lg: "0.8rem",
+                      },
+                    }}}
+                    InputLabelProps={createInputLabelProps()}
                     placeholder="ex: PLOS One"
                   />
                   <Grid2 container spacing={4}> 
@@ -1606,6 +1162,19 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                           value={indexingStatus}
                           onChange={(e) => setIndexingStatus(e.target.value)}
                         >
+                          <MenuItem
+                              value=''
+                              disabled
+                              sx={{
+                                fontSize: {
+                                  xs: "0.75rem",
+                                  md: "0.75rem",
+                                  lg: "0.8rem",
+                                },
+                              }}
+                            >
+                              Select indexing status
+                            </MenuItem>
                           <MenuItem
                             value='SCOPUS'
                             sx={{
@@ -1647,8 +1216,15 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                         label='Conference Title'
                         id="conf-name"
                         onItemSelected={(value) => setConferenceTitle(value)}
-                        sx={createTextFieldStyles()}
-                        inputlabel={createInputLabelProps()}
+                        sx={{...createTextFieldStyles(), 
+                          '& .MuiInputLabel-root': {
+                          fontSize: {
+                            xs: "0.75rem",
+                            md: "0.75rem",
+                            lg: "0.8rem",
+                          },
+                        }}}
+                        InputLabelProps={createInputLabelProps()}
                         placeholder="ex: Proceedings of the International Conference on Artificial Intelligence"
                       />
 
@@ -1664,7 +1240,14 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                               fetchCities(e.target.value);
                             }}
                             margin='dense'
-                            sx={createTextFieldStyles()}
+                            sx={{...createTextFieldStyles(), 
+                              '& .MuiInputLabel-root': {
+                              fontSize: {
+                                xs: "0.75rem",
+                                md: "0.75rem",
+                                lg: "0.8rem",
+                              },
+                            }}}
                             InputLabelProps={createInputLabelProps()}
                           >
                             <MenuItem
@@ -1706,7 +1289,384 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                             onChange={(e) => setSingleCity(e.target.value)}
                             margin='dense'
                             disabled={!Cities.length} // Disable if no cities are loaded
-                            sx={createTextFieldStyles()}
+                            sx={{...createTextFieldStyles(), 
+                              '& .MuiInputLabel-root': {
+                              fontSize: {
+                                xs: "0.75rem",
+                                md: "0.75rem",
+                                lg: "0.8rem",
+                              },
+                            }}}
+                            InputLabelProps={createInputLabelProps()}
+                          >
+                            <MenuItem
+                              value=''
+                              disabled
+                              sx={{
+                                fontSize: {
+                                  xs: "0.75rem",
+                                  md: "0.75rem",
+                                  lg: "0.8rem",
+                                },
+                              }}
+                            >
+                              Select your city
+                            </MenuItem>
+                            {Cities.map((city) => (
+                              <MenuItem
+                                key={city}
+                                value={city}
+                                sx={{
+                                  fontSize: {
+                                    xs: "0.75rem",
+                                    md: "0.75rem",
+                                    lg: "0.8rem",
+                                  },
+                                }}
+                              >
+                                {city}
+                              </MenuItem>
+                            ))}
+                          </TextField>
+                        </Grid2>
+                      </Grid2>
+                      <TextField
+                        fullWidth
+                        label='Conference Date'
+                        variant='outlined'
+                        type='date'
+                        margin='dense'
+                        value={dateApproved}
+                        onChange={(e) => setDateApproved(e.target.value)}
+                        sx={createTextFieldStyles()}
+                        InputLabelProps={{
+                          ...createInputLabelProps(),
+                          shrink: true,
+                        }}
+                      />
+                    </Box>
+                  )}
+                  <Box
+                    sx={{
+                      display: "flex",
+                      mt: 3,
+                      gap: 2,
+                    }}
+                  >
+                    <Button
+                      onClick={() => {
+                        setPublicationName("");
+                        setPublicationFormat("");
+                        setDatePublished("");
+                        setIndexingStatus("");
+                        setOpenModalPub(false);
+                      }}
+                      sx={{
+                        backgroundColor: "#08397C",
+                        color: "#FFF",
+                        fontFamily: "Montserrat, sans-serif",
+                        fontWeight: 600,
+                        fontSize: { xs: "0.875rem", md: "1rem" },
+                        padding: { xs: "0.5rem 1rem", md: "1.25rem" },
+                        borderRadius: "100px",
+                        maxHeight: "3rem",
+                        textTransform: "none",
+                        "&:hover": {
+                          backgroundColor: "#072d61",
+                        },
+                      }}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      variant='contained'
+                      color='primary'
+                      onClick={handleSavePublication}
+                      sx={{
+                        backgroundColor: "#CA031B",
+                        color: "#FFF",
+                        fontFamily: "Montserrat, sans-serif",
+                        fontWeight: 600,
+                        textTransform: "none",
+                        fontSize: { xs: "0.875rem", md: "1rem" },
+                        padding: { xs: "0.5rem 1rem", md: "1.25rem" },
+                        borderRadius: "100px",
+                        maxHeight: "3rem",
+                        "&:hover": {
+                          backgroundColor: "#A30417",
+                          color: "#FFF",
+                        },
+                      }}
+                    >
+                      Add
+                    </Button>
+                  </Box>
+                </Box>
+              </Modal>
+
+              {/* Edit Publication Modal */}
+              <Modal open={openModalPub}>
+                <Box
+                  sx={{
+                    position: "absolute",
+                    top: "50%",
+                    left: "50%",
+                    transform: "translate(-50%, -50%)",
+                    width: "40rem",
+                    bgcolor: "background.paper",
+                    boxShadow: 24,
+                    p: 5,
+                    borderRadius: "8px",
+                  }}
+                >
+                  <Typography
+                    variant='h3'
+                    color='#08397C'
+                    fontWeight='1000'
+                    mb={3}
+                    sx={{
+                      textAlign: { xs: "left", md: "bottom" },
+                      fontSize: {
+                        xs: "clamp(1rem, 2vw, 1rem)",
+                        sm: "clamp(1.5rem, 3.5vw, 1.5rem)",
+                        md: "clamp(2rem, 4vw, 2.25rem)",
+                      },
+                    }}
+                  >
+                    Edit Publication Details
+                  </Typography>
+                  <FormControl fullWidth variant='outlined' margin='dense'>
+                  <InputLabel
+                      sx={{
+                        fontSize: {
+                          xs: "0.75rem",
+                          md: "0.75rem",
+                          lg: "0.8rem",
+                        },
+                      }}
+                    >
+                      Format
+                    </InputLabel>
+                    <Select
+                      label="Format"
+                      sx={createTextFieldStyles()} // Assuming this is a custom style function
+                      value={publicationFormat || ""}
+                      onChange={handleChange} // Call handleChange when user selects an option
+                    >
+                      <MenuItem
+                        value=''
+                        disabled
+                        sx={{
+                          fontSize: {
+                            xs: "0.75rem",
+                            md: "0.75rem",
+                            lg: "0.8rem",
+                          },
+                        }}
+                      >
+                        Select publication format
+                      </MenuItem>
+                      {publicationFormats.map((format) => (
+                        <MenuItem key={format.pub_format_id} value={format.pub_format_id} sx={{
+                          fontSize: {
+                            xs: "0.75rem",
+                            md: "0.75rem",
+                            lg: "0.8rem",
+                          },
+                        }}>
+                          {format.pub_format_name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                  <AutoCompleteTextBox
+                    fullWidth
+                    data={pub_names}
+                    label="Publication Name"
+                    id="publication-name"
+                    onItemSelected={(value) => setPublicationName(value)} // Update state when a suggestion is selected
+                    sx={{...createTextFieldStyles(), 
+                      '& .MuiInputLabel-root': {
+                      fontSize: {
+                        xs: "0.75rem",
+                        md: "0.75rem",
+                        lg: "0.8rem",
+                      },
+                    }}}
+                    InputLabelProps={createInputLabelProps()}
+                    placeholder="ex: PLOS One"
+                  />
+                  <Grid2 container spacing={4}> 
+                    <Grid2 size={6}>
+                      <TextField
+                        fullWidth
+                        label='Date'
+                        variant='outlined'
+                        type='date'
+                        margin='dense'
+                        value={datePublished}
+                        onChange={(e) => setDatePublished(e.target.value)}
+                        sx={createTextFieldStyles()}
+                        InputLabelProps={{
+                          ...createInputLabelProps(),
+                          shrink: true,
+                        }}
+                      />
+                    </Grid2>
+                    <Grid2 size={6}>
+                      <FormControl fullWidth variant='outlined' margin='dense'>
+                        <InputLabel
+                          sx={{
+                            fontSize: {
+                              xs: "0.75rem",
+                              md: "0.75rem",
+                              lg: "0.8rem",
+                            },
+                          }}
+                        >
+                          Indexing Status
+                        </InputLabel>
+                        <Select
+                          label='Indexing Status'
+                          sx={createTextFieldStyles()}
+                          value={indexingStatus}
+                          onChange={(e) => setIndexingStatus(e.target.value)}
+                        >
+                          <MenuItem
+                              value=''
+                              disabled
+                              sx={{
+                                fontSize: {
+                                  xs: "0.75rem",
+                                  md: "0.75rem",
+                                  lg: "0.8rem",
+                                },
+                              }}
+                            >
+                              Select indexing status
+                            </MenuItem>
+                          <MenuItem
+                            value='SCOPUS'
+                            sx={{
+                              fontSize: {
+                                xs: "0.75rem",
+                                md: "0.75rem",
+                                lg: "0.8rem",
+                              },
+                            }}
+                          >
+                            Scopus
+                          </MenuItem>
+                          <MenuItem
+                            value='NON-SCOPUS'
+                            sx={{
+                              fontSize: {
+                                xs: "0.75rem",
+                                md: "0.75rem",
+                                lg: "0.8rem",
+                              },
+                            }}
+                          >
+                            Non-Scopus
+                          </MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Grid2>
+                  </Grid2>
+                  {publicationFormat === "PC" && (
+                    <Box>
+                      <Divider
+                        orientation='horizontal'
+                        flexItem
+                        sx= {{ mt: '0.5rem', mb: '0.5rem' }}
+                      />
+                      <AutoCompleteTextBox
+                        fullWidth
+                        data={conf_title}
+                        label='Conference Title'
+                        id="conf-name"
+                        onItemSelected={(value) => setConferenceTitle(value)}
+                        sx={{...createTextFieldStyles(), 
+                          '& .MuiInputLabel-root': {
+                          fontSize: {
+                            xs: "0.75rem",
+                            md: "0.75rem",
+                            lg: "0.8rem",
+                          },
+                        }}}
+                        InputLabelProps={createInputLabelProps()}
+                        placeholder="ex: Proceedings of the International Conference on Artificial Intelligence"
+                      />
+
+                      <Grid2 container spacing={4}> 
+                        <Grid2 size={6}>
+                           <TextField
+                            select
+                            fullWidth
+                            label='Country'
+                            value={singleCountry}
+                            onChange={(e) => {
+                              setSingleCountry(e.target.value);
+                              fetchCities(e.target.value);
+                            }}
+                            margin='dense'
+                            sx={{...createTextFieldStyles(), 
+                              '& .MuiInputLabel-root': {
+                              fontSize: {
+                                xs: "0.75rem",
+                                md: "0.75rem",
+                                lg: "0.8rem",
+                              },
+                            }}}
+                            InputLabelProps={createInputLabelProps()}
+                          >
+                            <MenuItem
+                              value=''
+                              disabled
+                              sx={{
+                                fontSize: {
+                                  xs: "0.75rem",
+                                  md: "0.75rem",
+                                  lg: "0.8rem",
+                                },
+                              }}
+                            >
+                              Select your country
+                            </MenuItem>
+                            {countries.map((country) => (
+                              <MenuItem
+                                key={country.country}
+                                value={country.country}
+                                sx={{
+                                  fontSize: {
+                                    xs: "0.75rem",
+                                    md: "0.75rem",
+                                    lg: "0.8rem",
+                                  },
+                                }}
+                              >
+                                {country.country}
+                              </MenuItem>
+                            ))}
+                          </TextField>
+                        </Grid2>
+                        <Grid2 size={6}>
+                          <TextField
+                            select
+                            fullWidth
+                            label='City'
+                            value={singleCity}
+                            onChange={(e) => setSingleCity(e.target.value)}
+                            margin='dense'
+                            disabled={!Cities.length} // Disable if no cities are loaded
+                            sx={{...createTextFieldStyles(), 
+                              '& .MuiInputLabel-root': {
+                              fontSize: {
+                                xs: "0.75rem",
+                                md: "0.75rem",
+                                lg: "0.8rem",
+                              },
+                            }}}
                             InputLabelProps={createInputLabelProps()}
                           >
                             <MenuItem

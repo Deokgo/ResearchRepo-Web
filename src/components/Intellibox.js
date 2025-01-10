@@ -69,19 +69,23 @@ const AutoCompleteTextBox = ({
             top: "100%",
             left: 0,
             right: 0,
-            maxHeight: "200px",
+            maxHeight: "150px",
             overflowY: "auto",
             zIndex: 10,
           }}
         >
-          <List>
+          <List >
             {suggestions.map((suggestion, index) => (
               <ListItem
                 key={index}
                 button
                 onClick={() => handleSuggestionClick(suggestion)}
               >
-                <ListItemText primary={suggestion} />
+                <ListItemText primary={suggestion} primaryTypographyProps={{ fontSize: {
+                            xs: "0.75rem",
+                            md: "0.75rem",
+                            lg: "0.8rem",
+                          } }}/>
               </ListItem>
             ))}
           </List>
