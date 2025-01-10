@@ -494,7 +494,7 @@ const Profile = () => {
                     value: userData.researcher.suffix || "N/A",
                   },
                   {
-                    label: "Email Account",
+                    label: "Account",
                     value: userData.account.email,
                   },
                   {
@@ -611,7 +611,7 @@ const Profile = () => {
                 </Grid2>
                 <Grid2 size={{ xs: 12, sm: 6 }}>
                   <TextField
-                    label='Email Account'
+                    label='Account'
                     fullWidth
                     name='email'
                     value={formValues.email}

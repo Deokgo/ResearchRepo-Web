@@ -24,6 +24,7 @@ import {
   TableRow,
   TableContainer,
   Tooltip,
+  Switch
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import homeBg from "../assets/home_bg.png";
@@ -80,6 +81,49 @@ const ManageUsers = () => {
       alert("Error fetching users");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleToggleStatus = async (user, researcher_id) => {
+    try {
+        const updatedStatus = user.acc_status === "ACTIVATED" ? "DEACTIVATED" : "ACTIVATED";
+
+        // Ask for confirmation before proceeding
+        const confirmUpdate = window.confirm(
+            `Are you sure you want to change the status to ${updatedStatus}?`
+        );
+
+        if (!confirmUpdate) {
+            // Exit if user cancels the action
+            return;
+        }
+
+        // API call to update the status
+        const response = await fetch(`/accounts/update_status/${researcher_id}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ acc_status: updatedStatus }),
+        });
+
+        if (!response.ok) {
+            throw new Error("Failed to update account status");
+        }
+
+        // Update state for the specific user
+        setFilteredUsers((prevUsers) =>
+            prevUsers.map((u) =>
+                u.researcher_id === researcher_id
+                    ? { ...u, acc_status: updatedStatus }
+                    : u
+            )
+        );
+
+        console.log(`User ${researcher_id} status updated to ${updatedStatus}`);
+    } catch (error) {
+        console.error("Error updating account status:", error);
+        alert("Failed to update account status. Please try again.");
     }
   };
 
@@ -768,7 +812,7 @@ const ManageUsers = () => {
                           <Box sx={{ flex: 1 }}>User ID</Box>
                           <Box sx={{ flex: 2 }}>Email</Box>
                           <Box sx={{ flex: 2 }}>Role</Box>
-                          <Box sx={{ flex: 1 }}>Modify</Box>
+                          <Box sx={{ flex: 1 }}>Active</Box>
                         </Box>
                       ),
                     }}
@@ -791,10 +835,14 @@ const ManageUsers = () => {
                           <Box sx={{ flex: 1 }}>{user.researcher_id}</Box>
                           <Box sx={{ flex: 2 }}>{user.email}</Box>
                           <Box sx={{ flex: 2 }}>{user.role_name || "N/A"}</Box>
-                          <Box sx={{ flex: 1 }}>
-                            <IconButton onClick={() => handleOpenModal(user)}>
-                              <EditIcon color='primary' />
-                            </IconButton>
+                          <Box sx={{ flex: 1, display: "flex", alignItems: "center" }}>
+                            <Switch
+                              checked={user.acc_status === "ACTIVATED"}
+                              onChange={() => handleToggleStatus(user, user.researcher_id)}
+                              color="primary"
+                            />
+                            <Box sx={{ ml: 1, fontSize: "0.75rem", fontWeight: 600 }}>
+                            </Box>
                           </Box>
                         </Box>
                       );
@@ -998,33 +1046,42 @@ const ManageUsers = () => {
           {/* Common Dropdowns */}
           <Box sx={{ display: "flex", gap: 2, mb: 3 }}>
             <FormControl sx={{ minWidth: 200 }}>
-              <InputLabel sx={{
-                fontSize: {
-                  xs: "0.75rem",
-                  md: "0.75rem",
-                  lg: "0.8rem",
-                },
-              }}>Role</InputLabel>
+              <InputLabel
+                sx={{
+                  fontSize: {
+                    xs: "0.75rem",
+                    md: "0.75rem",
+                    lg: "0.8rem",
+                  },
+                }}
+              >
+                Role
+              </InputLabel>
               <Select
                 value={selectedRole}
                 onChange={(e) => setSelectedRole(e.target.value)}
-                label='Role'
+                label="Role"
                 sx={createTextFieldStyles()}
               >
-                {roles.map((role) => (
-                  <MenuItem key={role.role_id} value={role.role_id} sx={{
-                    fontSize: {
-                      xs: "0.75rem",
-                      md: "0.75rem",
-                      lg: "0.8rem",
-                    },
-                  }}>
-                    {role.role_name}
-                  </MenuItem>
-                ))}
+                {roles
+                  .filter((role) => role.role_id !== "01") // Exclude role_id "01"
+                  .map((role) => (
+                    <MenuItem
+                      key={role.role_id}
+                      value={role.role_id}
+                      sx={{
+                        fontSize: {
+                          xs: "0.75rem",
+                          md: "0.75rem",
+                          lg: "0.8rem",
+                        },
+                      }}
+                    >
+                      {role.role_name}
+                    </MenuItem>
+                  ))}
               </Select>
             </FormControl>
-
             <FormControl sx={{ minWidth: 200 }}>
               <InputLabel sx={{
                 fontSize: {

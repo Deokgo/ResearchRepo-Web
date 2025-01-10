@@ -205,10 +205,9 @@ const LoginModal = () => {
               }}
             >
               <TextField
-                label='Email'
+                label='Account'
                 fullWidth
                 name='email'
-                type='email'
                 value={formValues.email}
                 onChange={handleChange}
                 margin='normal'
