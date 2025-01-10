@@ -453,20 +453,15 @@ const DisplayResearchInfo = () => {
       // Add basic fields
       formData.append("abstract", editableData.abstract || "");
 
-      // Add SDGs if they exist
+      // Format and add SDGs
       if (selectedSDGs && selectedSDGs.length > 0) {
-        formData.append(
-          "sdg",
-          selectedSDGs
-            .map((sdg) => {
-              // Extract just the number from "SDG X"
-              const sdgNumber = sdg.id.replace("SDG ", "");
-              return `SDG ${sdgNumber}`;
-            })
-            .join(";")
-        );
+        const sdgString = selectedSDGs
+          .map((sdg) => sdg.id)
+          .sort() // Sort to maintain consistent order
+          .join(";");
+        formData.append("sdg", sdgString);
       } else {
-        formData.append("sdg", "");
+        formData.append("sdg", ""); // Send empty string if no SDGs selected
       }
 
       // Add keywords if they exist
@@ -683,6 +678,34 @@ const DisplayResearchInfo = () => {
 
     fetchResearchTypes();
   }, []);
+
+  // Add this function to validate required fields
+  const validateRequiredFields = () => {
+    // Check if abstract is empty
+    if (!editableData.abstract?.trim()) {
+      return false;
+    }
+
+    // Check if SDGs are selected
+    if (!selectedSDGs || selectedSDGs.length === 0) {
+      return false;
+    }
+
+    // Check if keywords are present
+    if (!keywords || keywords.length === 0) {
+      return false;
+    }
+
+    // Check if research areas are selected
+    if (
+      !editableData.research_areas ||
+      editableData.research_areas.length === 0
+    ) {
+      return false;
+    }
+
+    return true;
+  };
 
   return (
     <>
@@ -1340,9 +1363,7 @@ const DisplayResearchInfo = () => {
 
                           <Grid2 size={1.5}>
                             <FormControl fullWidth>
-                              <InputLabel required shrink>
-                                School Year
-                              </InputLabel>
+                              <InputLabel>School Year</InputLabel>
                               <Select
                                 value={editableData?.school_year || ""}
                                 onChange={(e) => {
@@ -1370,9 +1391,7 @@ const DisplayResearchInfo = () => {
                           </Grid2>
                           <Grid2 size={1.5}>
                             <FormControl fullWidth>
-                              <InputLabel required shrink>
-                                Term
-                              </InputLabel>
+                              <InputLabel>Term</InputLabel>
                               <Select
                                 value={editableData?.term || ""}
                                 onChange={(e) => {
@@ -1495,6 +1514,7 @@ const DisplayResearchInfo = () => {
                                 <TextField
                                   {...params}
                                   label='SDG Goals'
+                                  required
                                   variant='outlined'
                                   helperText='Select one or more SDG goals'
                                   sx={createTextFieldStyles()}
@@ -1546,6 +1566,7 @@ const DisplayResearchInfo = () => {
                                 <TextField
                                   {...params}
                                   label='Keywords'
+                                  required
                                   variant='outlined'
                                   helperText='Type and press Enter to add multiple keywords'
                                   sx={createTextFieldStyles()}
@@ -1558,6 +1579,7 @@ const DisplayResearchInfo = () => {
                             <TextField
                               fullWidth
                               label='Abstract'
+                              required
                               multiline
                               rows={3}
                               variant='outlined'
@@ -1595,6 +1617,7 @@ const DisplayResearchInfo = () => {
                                 <TextField
                                   {...params}
                                   label='Research Areas'
+                                  required
                                   variant='outlined'
                                   helperText='Select one or more research areas'
                                   sx={createTextFieldStyles()}
@@ -1800,6 +1823,7 @@ const DisplayResearchInfo = () => {
                             <Button
                               variant='contained'
                               onClick={handleSaveChanges}
+                              disabled={!validateRequiredFields()}
                               sx={{
                                 backgroundColor: "#CA031B",
                                 color: "#FFF",
@@ -1813,6 +1837,10 @@ const DisplayResearchInfo = () => {
                                 "&:hover": {
                                   backgroundColor: "#A30417",
                                   color: "#FFF",
+                                },
+                                "&:disabled": {
+                                  backgroundColor: "#ccc",
+                                  color: "#666",
                                 },
                               }}
                             >
