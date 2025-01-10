@@ -6,7 +6,6 @@ import {
   ListItem,
   ListItemText,
   Paper,
-  Typography,
 } from "@mui/material";
 
 const AutoCompleteTextBox = ({
@@ -16,7 +15,7 @@ const AutoCompleteTextBox = ({
   label,
   id,
   sx,
-  inputlabel
+  inputlabel,
 }) => {
   const [inputValue, setInputValue] = useState("");
   const [suggestions, setSuggestions] = useState([]);
@@ -24,6 +23,9 @@ const AutoCompleteTextBox = ({
   const handleChange = (e) => {
     const value = e.target.value;
     setInputValue(value);
+
+    // Optional: Notify parent component while typing
+    if (onItemSelected) onItemSelected(value);
 
     // Filter suggestions based on user input
     const filteredSuggestions = data.filter((item) =>
@@ -33,9 +35,9 @@ const AutoCompleteTextBox = ({
   };
 
   const handleSuggestionClick = (suggestion) => {
-    setInputValue(suggestion);
-    setSuggestions([]);
-    if (onItemSelected) onItemSelected(suggestion);
+    setInputValue(suggestion); // Update internal state
+    setSuggestions([]); // Clear suggestions
+    if (onItemSelected) onItemSelected(suggestion); // Notify parent component
   };
 
   return (
@@ -49,7 +51,7 @@ const AutoCompleteTextBox = ({
     >
       <TextField
         id={id}
-        label = {label}
+        label={label}
         value={inputValue}
         onChange={handleChange}
         placeholder={placeholder || "Type to search..."}
@@ -94,6 +96,9 @@ AutoCompleteTextBox.propTypes = {
   placeholder: PropTypes.string,
   onItemSelected: PropTypes.func,
   label: PropTypes.string,
+  id: PropTypes.string,
+  sx: PropTypes.object,
+  inputlabel: PropTypes.object,
 };
 
 export default AutoCompleteTextBox;

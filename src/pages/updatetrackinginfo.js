@@ -292,16 +292,19 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
         requiredFields = {
           "Publication Name": publicationName,
           "Publication Format": publicationFormat,
+          "Publication Date":datePublished,
           "Indexing Status": indexingStatus,
         };
       } else if (publicationFormat === "proceeding") {
         requiredFields = {
           "Publication Name": publicationName,
           "Publication Format": publicationFormat,
+          "Publication Date":datePublished,
           "Indexing Status": indexingStatus,
-          "Conference Title": selectedTitle,
-          "Conference Venue": selectedVenue,
-          "Conference Date": selectedDate,
+          "Conference Title": conferenceTitle,
+          "Country": singleCountry,
+          "City": singleCity,
+          "Conference Date": dateApproved,
         };
       } else {
         alert(
@@ -938,18 +941,16 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                         item sx={{ mb: "1rem", mr: "3rem" }}
                                       >
                                         {isEditing ? (
-                                          <AutoCompleteTextBox
-                                            fullWidth
-                                            data={pub_names}
-                                            label='Publication Name'
-                                            name='publicationName'
-                                            value={publicationName || "None"}
-                                            onChange={(e) =>
-                                              setPublicationName(e.target.value)
-                                            }
-                                            sx={createTextFieldStyles()}
-                                            InputLabelProps={createInputLabelProps()}
-                                          />
+                                        <AutoCompleteTextBox
+                                          fullWidth
+                                          data={pub_names}
+                                          label="Publication Name"
+                                          id="publication-name"
+                                          onItemSelected={(value) => setPublicationName(value)} // Update state when a suggestion is selected
+                                          sx={createTextFieldStyles()}
+                                          inputlabel={createInputLabelProps()}
+                                          placeholder="ex: PLOS One"
+                                        />
                                         ) : (
                                           <Typography
                                             variant='h7'
@@ -1561,13 +1562,14 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                     </Select>
                   </FormControl>
                   <AutoCompleteTextBox
-                    label='Publication Name'
-                    data={pub_names}
-                    value={publicationName}
                     fullWidth
-                    onChange={(e) => setPublicationName(e.target.value)}
-                    placeholder="ex: PLOS One"
+                    data={pub_names}
+                    label="Publication Name"
+                    id="publication-name"
+                    onItemSelected={(value) => setPublicationName(value)} // Update state when a suggestion is selected
                     sx={createTextFieldStyles()}
+                    inputlabel={createInputLabelProps()}
+                    placeholder="ex: PLOS One"
                   />
                   <Grid2 container spacing={4}> 
                     <Grid2 size={6}>
@@ -1641,15 +1643,16 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                         sx= {{ mt: '0.5rem', mb: '0.5rem' }}
                       />
                       <AutoCompleteTextBox
-                        label='Conference Title'
-                        data={conf_title}
-                        value={conferenceTitle}
                         fullWidth
-                        placeholder="ex: Proceedings of the International Conference on Artificial Intelligence"
-                        onChange={(e) => setConferenceTitle(e.target.value)}
+                        data={conf_title}
+                        label='Conference Title'
+                        id="conf-name"
+                        onItemSelected={(value) => setConferenceTitle(value)}
                         sx={createTextFieldStyles()}
-                        InputLabelProps={createInputLabelProps()}
+                        inputlabel={createInputLabelProps()}
+                        placeholder="ex: Proceedings of the International Conference on Artificial Intelligence"
                       />
+
                       <Grid2 container spacing={4}> 
                         <Grid2 size={6}>
                            <TextField
