@@ -283,15 +283,8 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
   };
 
   ///////////////////// ADD AND EDIT PUBLICATION //////////////////////
-  const handleSavePublication = async () => {
-    if (selectedVenue) {
-      const venue = selectedVenue.split(",").map((item) => item.trim());
-      setSingleCity(venue.length > 1 ? venue[0] : "");
-      setSingleCountry(venue[1]);
-    }
-
-    try {
-      // Validate required fields
+  const checkFields = () => {
+    // Validate required fields
       // Determine required fields based on publicationFormat
       let requiredFields;
 
@@ -332,6 +325,19 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
       // Normalize both dates to midnight
       approvedDate.setHours(0, 0, 0, 0);
       today.setHours(0, 0, 0, 0);
+
+      return missingFields;
+  }
+
+  const handleSavePublication = async () => {
+    if (selectedVenue) {
+      const venue = selectedVenue.split(",").map((item) => item.trim());
+      setSingleCity(venue.length > 1 ? venue[0] : "");
+      setSingleCountry(venue[1]);
+    }
+
+    try {
+      const missingFields = checkFields();
 
       if (missingFields.length > 0) {
         alert(
@@ -398,7 +404,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
 
     if (!hasChanges) {
       alert(
-        "No changes are made. Please modify publication data before saving."
+        "No changes were made to save."
       );
     } else {
       handleEditPublication();
@@ -407,47 +413,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
 
   const handleEditPublication = async () => {
     try {
-      // Validate required fields
-      // Determine required fields based on publicationFormat
-      let requiredFields;
-
-      if (publicationFormat === "journal") {
-        requiredFields = {
-          "Publication Name": publicationName,
-          "Publication Format": publicationFormat,
-          "Indexing Status": indexingStatus,
-        };
-      } else if (publicationFormat === "proceeding") {
-        requiredFields = {
-          "Publication Name": publicationName,
-          "Publication Format": publicationFormat,
-          "Indexing Status": indexingStatus,
-          "Conference Title": selectedTitle,
-          "Conference Venue": selectedVenue,
-          "Conference Date": selectedDate,
-        };
-      } else {
-        alert(
-          "Invalid indexing status. Please select either 'journal' or 'proceeding'."
-        );
-        return;
-      }
-
-      const missingFields = Object.entries(requiredFields)
-        .filter(([_, value]) => {
-          if (Array.isArray(value)) {
-            return value.length === 0;
-          }
-          return !value;
-        })
-        .map(([key]) => key);
-
-      const approvedDate = new Date(datePublished);
-      const today = new Date();
-
-      // Normalize both dates to midnight
-      approvedDate.setHours(0, 0, 0, 0);
-      today.setHours(0, 0, 0, 0);
+      const missingFields = checkFields();
 
       if (missingFields.length > 0) {
         alert(
@@ -885,10 +851,11 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                           ))
                         ) : (
                           <div>
-                            <p>No research information available.</p>
+                            <p>Loading Research Information...</p>
                           </div>
                         )}
                       </Grid2>
+
                       <div>
                         {/* Snackbar for Alert Banner */}
                         <Snackbar
@@ -904,6 +871,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                           </Alert>
                         </Snackbar>
                       </div>
+
                       {/* Publication Part */}
                       <Box padding={1}>
                         {isPaperEmpty ? (
@@ -1506,41 +1474,6 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                       </Button>
                                     </Box>
                                   </Grid2>
-                                  <Divider
-                                    orientation='horizontal'
-                                    flexItem
-                                    sx={{ mt: "1rem", mb: "1rem" }}
-                                  />
-                                  <Button
-                                    variant='contained'
-                                    color='primary'
-                                    sx={{
-                                      display: "flex",
-                                      backgroundColor: "#08397C",
-                                      color: "#FFF",
-                                      fontFamily: "Montserrat, sans-serif",
-                                      fontWeight: 600,
-                                      textTransform: "none",
-                                      fontSize: {
-                                        xs: "0.65rem",
-                                        md: "0.8rem",
-                                        lg: "1rem",
-                                      },
-                                      marginTop: "1rem",
-                                      alignSelf: "center",
-                                      paddingLeft: "3rem",
-                                      paddingRight: "3rem",
-                                      borderRadius: "100px",
-                                      maxHeight: "3rem",
-                                      "&:hover": {
-                                        backgroundColor: "#052045",
-                                        color: "#FFF",
-                                      },
-                                    }}
-                                    onClick={handleSavePublication}
-                                  >
-                                    Save Publication Details
-                                  </Button>
                                 </Box>
                               )}
                             </Box>
@@ -1583,52 +1516,75 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                   >
                     Add Publication Details
                   </Typography>
+                  <FormControl fullWidth variant='outlined' margin='dense'>
+                    <InputLabel
+                      sx={{
+                        fontSize: {
+                          xs: "0.75rem",
+                          md: "0.75rem",
+                          lg: "0.8rem",
+                        },
+                      }}
+                    >
+                      Format
+                    </InputLabel>
+                    <Select
+                      label='Format'
+                      sx={createTextFieldStyles()}
+                      value={publicationFormat}
+                      onChange={(e) => setPublicationFormat(e.target.value)}
+                    >
+                      <MenuItem
+                        value='journal'
+                        sx={{
+                          fontSize: {
+                            xs: "0.75rem",
+                            md: "0.75rem",
+                            lg: "0.8rem",
+                          },
+                        }}
+                      >
+                        Journal
+                      </MenuItem>
+                      <MenuItem
+                        value='proceeding'
+                        sx={{
+                          fontSize: {
+                            xs: "0.75rem",
+                            md: "0.75rem",
+                            lg: "0.8rem",
+                          },
+                        }}
+                      >
+                        Proceeding
+                      </MenuItem>
+                    </Select>
+                  </FormControl>
+                  <AutoCompleteTextBox
+                    label='Publication Name'
+                    data={pub_names}
+                    value={publicationName}
+                    fullWidth
+                    onChange={(e) => setPublicationName(e.target.value)}
+                    placeholder="ex: PLOS One"
+                    sx={createTextFieldStyles()}
+                  />
                   <Grid2 container spacing={4}> 
                     <Grid2 size={6}>
-                      <FormControl fullWidth variant='outlined' margin='dense'>
-                        <InputLabel
-                          sx={{
-                            fontSize: {
-                              xs: "0.75rem",
-                              md: "0.75rem",
-                              lg: "0.8rem",
-                            },
-                          }}
-                        >
-                          Format
-                        </InputLabel>
-                        <Select
-                          label='Format'
-                          sx={createTextFieldStyles()}
-                          value={publicationFormat}
-                          onChange={(e) => setPublicationFormat(e.target.value)}
-                        >
-                          <MenuItem
-                            value='journal'
-                            sx={{
-                              fontSize: {
-                                xs: "0.75rem",
-                                md: "0.75rem",
-                                lg: "0.8rem",
-                              },
-                            }}
-                          >
-                            Journal
-                          </MenuItem>
-                          <MenuItem
-                            value='proceeding'
-                            sx={{
-                              fontSize: {
-                                xs: "0.75rem",
-                                md: "0.75rem",
-                                lg: "0.8rem",
-                              },
-                            }}
-                          >
-                            Proceeding
-                          </MenuItem>
-                        </Select>
-                      </FormControl>
+                      <TextField
+                        fullWidth
+                        label='Date'
+                        variant='outlined'
+                        type='date'
+                        margin='dense'
+                        value={datePublished}
+                        onChange={(e) => setDatePublished(e.target.value)}
+                        sx={createTextFieldStyles()}
+                        InputLabelProps={{
+                          ...createInputLabelProps(),
+                          shrink: true,
+                        }}
+                      />
                     </Grid2>
                     <Grid2 size={6}>
                       <FormControl fullWidth variant='outlined' margin='dense'>
@@ -1677,31 +1633,6 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                       </FormControl>
                     </Grid2>
                   </Grid2>
-
-                  <AutoCompleteTextBox
-                    label='Publication Name'
-                    data={pub_names}
-                    value={publicationName}
-                    fullWidth
-                    onChange={(e) => setPublicationName(e.target.value)}
-                    placeholder="ex: PLOS One"
-                    sx={createTextFieldStyles()}
-                    InputLabelProps={createInputLabelProps()}
-                  />
-                  <TextField
-                    fullWidth
-                    label='Date'
-                    variant='outlined'
-                    type='date'
-                    margin='dense'
-                    value={datePublished}
-                    onChange={(e) => setDatePublished(e.target.value)}
-                    sx={createTextFieldStyles()}
-                    InputLabelProps={{
-                      ...createInputLabelProps(),
-                      shrink: true,
-                    }}
-                  />
                   {publicationFormat === "proceeding" && (
                     <Box>
                       <Divider
@@ -1858,7 +1789,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                     <Button
                       variant='contained'
                       color='primary'
-                      onClick={handleCloseModal}
+                      onClick={handleSavePublication}
                       sx={{
                         backgroundColor: "#CA031B",
                         color: "#FFF",
