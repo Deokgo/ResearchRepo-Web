@@ -245,6 +245,8 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
     if (!title) errors.title = "Title is required";
     if (!abstract) errors.abstract = "Abstract is required";
     if (!file) errors.manuscript = "Full Manuscript is required";
+    if (!extendedAbstract)
+      errors.extendedAbstract = "Extended Abstract is required";
     if (selectedSDGs.length === 0)
       errors.sdgs = "At least one SDG Goal is required";
     if (selectedResearchAreas.length === 0)
@@ -283,6 +285,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
     title,
     abstract,
     file,
+    extendedAbstract,
     selectedSDGs,
     selectedResearchAreas,
     adviser,
@@ -1286,14 +1289,25 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
           </Grid2>
           <Grid2 size={3}>
             <Typography variant='body2' sx={{ mb: 1 }}>
-              Upload Extended Abstract
+              Upload Extended Abstract *
             </Typography>
-            <FileUploader
-              onFileSelect={onSelectFileHandlerEA}
-              onFileDelete={onDeleteFileHandlerEA}
-              selectedFile={extendedAbstract}
-              sx={{ width: "100%" }}
-            />
+            <FormControl
+              fullWidth
+              error={attemptedSubmit && !!formErrors.extendedAbstract}
+            >
+              <FileUploader
+                onFileSelect={onSelectFileHandlerEA}
+                onFileDelete={onDeleteFileHandlerEA}
+                selectedFile={extendedAbstract}
+                required
+                sx={{ width: "100%" }}
+              />
+              {attemptedSubmit && formErrors.extendedAbstract && (
+                <FormHelperText error>
+                  {formErrors.extendedAbstract}
+                </FormHelperText>
+              )}
+            </FormControl>
           </Grid2>
         </Grid2>
         <Box

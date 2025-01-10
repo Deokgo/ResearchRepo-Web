@@ -37,9 +37,9 @@ import { useAuth } from "../context/AuthContext";
 import { filterCache, fetchAndCacheFilterData } from "../utils/filterCache";
 import HeaderWithBackButton from "../components/Header";
 
-const DisplayResearchInfo = ({ route, navigate }) => {
+const DisplayResearchInfo = () => {
   const [users, setUsers] = useState([]);
-  const navpage = useNavigate();
+  const navigate = useNavigate();
   const location = useLocation();
   const isSizeMobile = useMediaQuery("(max-width:600px)");
   const [openModal, setOpenModal] = useState(false);
@@ -159,13 +159,6 @@ const DisplayResearchInfo = ({ route, navigate }) => {
     }
   };
 
-  const handleNavigateBack = async () => {
-    if (isEditMode) {
-      handleCancelEdit();
-      return;
-    }
-    navpage(-1);
-  };
   const handleViewEA = async (researchItem) => {
     const { research_id } = researchItem;
     if (research_id) {
@@ -717,7 +710,7 @@ const DisplayResearchInfo = ({ route, navigate }) => {
           }}
         >
           <HeaderWithBackButton
-            title="Research Information"
+            title='Research Information'
             onBack={() => navigate(-1)}
           />
 
