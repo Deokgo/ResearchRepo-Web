@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import {
   TextField,
@@ -16,20 +16,28 @@ const AutoCompleteTextBox = ({
   id,
   sx,
   inputlabel,
+  value, // New prop for controlled input
 }) => {
-  const [inputValue, setInputValue] = useState("");
+  const [inputValue, setInputValue] = useState(value || ""); // Initialize with value prop
   const [suggestions, setSuggestions] = useState([]);
 
+  // Sync with external value changes
+  useEffect(() => {
+    if (value !== undefined) {
+      setInputValue(value);
+    }
+  }, [value]);
+
   const handleChange = (e) => {
-    const value = e.target.value;
-    setInputValue(value);
+    const newValue = e.target.value;
+    setInputValue(newValue);
 
     // Optional: Notify parent component while typing
-    if (onItemSelected) onItemSelected(value);
+    if (onItemSelected) onItemSelected(newValue);
 
     // Filter suggestions based on user input
     const filteredSuggestions = data.filter((item) =>
-      item.toLowerCase().includes(value.toLowerCase())
+      item.toLowerCase().includes(newValue.toLowerCase())
     );
     setSuggestions(filteredSuggestions);
   };
@@ -69,23 +77,19 @@ const AutoCompleteTextBox = ({
             top: "100%",
             left: 0,
             right: 0,
-            maxHeight: "150px",
+            maxHeight: "200px",
             overflowY: "auto",
             zIndex: 10,
           }}
         >
-          <List >
+          <List>
             {suggestions.map((suggestion, index) => (
               <ListItem
                 key={index}
                 button
                 onClick={() => handleSuggestionClick(suggestion)}
               >
-                <ListItemText primary={suggestion} primaryTypographyProps={{ fontSize: {
-                            xs: "0.75rem",
-                            md: "0.75rem",
-                            lg: "0.8rem",
-                          } }}/>
+                <ListItemText primary={suggestion} />
               </ListItem>
             ))}
           </List>
@@ -103,6 +107,7 @@ AutoCompleteTextBox.propTypes = {
   id: PropTypes.string,
   sx: PropTypes.object,
   inputlabel: PropTypes.object,
+  value: PropTypes.string, // New prop for controlled input
 };
 
 export default AutoCompleteTextBox;

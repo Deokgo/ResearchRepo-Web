@@ -561,6 +561,11 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
     console.log("Selected Publication Format ID:", e.target.value); // Log the selected value
   };
 
+  // Find the name corresponding to the current ID
+  const selectedFormatName = publicationFormats.find(
+    (format) => format.pub_format_id === publicationFormat
+  )?.pub_format_name;
+
   return (
     <>
       <Box
@@ -815,7 +820,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                         }}
                                       >
                                         <strong>Format:</strong>{" "}
-                                        {publicationFormat || "None"}
+                                        {selectedFormatName || "None"}
                                       </Typography>
                                       <Typography
                                         variant='h7'
@@ -1100,6 +1105,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                   <AutoCompleteTextBox
                     fullWidth
                     data={pub_names}
+                    value={publicationName}
                     label="Publication Name"
                     id="publication-name"
                     onItemSelected={(value) => setPublicationName(value)} // Update state when a suggestion is selected
@@ -1202,6 +1208,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                         fullWidth
                         data={conf_title}
                         label='Conference Title'
+                        value={conferenceTitle}
                         id="conf-name"
                         onItemSelected={(value) => setConferenceTitle(value)}
                         sx={{...createTextFieldStyles(), 
@@ -1578,6 +1585,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                         data={conf_title}
                         label='Conference Title'
                         id="conf-name"
+                        value={conferenceTitle}
                         onItemSelected={(value) => setConferenceTitle(value)}
                         sx={{...createTextFieldStyles(), 
                           '& .MuiInputLabel-root': {
