@@ -92,7 +92,7 @@ const ResearchTracking = () => {
     {
       color: "#B0B0B0",
       hoverColor: "#888888",
-      label: "READY FOR PUBLICATION",
+      label: "READY",
       icon: "fa-check-to-slot",
       badge: badgeValues.total_ready,
       activeColor: "#F44336",
@@ -124,22 +124,21 @@ const ResearchTracking = () => {
   ];
 
   const handleStepClick = (selectedStep) => {
-    const selectedStepStatus = selectedStep.label; //extract the label of the clicked step
+    const selectedStepStatus = selectedStep.label; // Extract the label of the clicked step
     console.log("Selected Step:", selectedStepStatus);
-
-    //update selectedStatus to filter the research data by the selected step's status
-    if (selectedStatus.includes(selectedStepStatus)) {
-      //if the status is already selected, remove it
-      setSelectedStatus((prevSelected) =>
-        prevSelected.filter((status) => status !== selectedStepStatus)
-      );
-    } else {
-      //otherwise, add the new status to the selected statuses
-      setSelectedStatus((prevSelected) => [
-        ...prevSelected,
-        selectedStepStatus,
-      ]);
-    }
+  
+    // Update selectedStatus to filter the research data by the selected step's status
+    setSelectedStatus((prevSelected) => {
+      const isAlreadySelected = prevSelected.includes(selectedStepStatus);
+  
+      if (isAlreadySelected) {
+        // Remove the status if it's already selected
+        return prevSelected.filter((status) => status !== selectedStepStatus);
+      } else {
+        // Add the new status to the selected statuses
+        return [...prevSelected, selectedStepStatus];
+      }
+    });
   };
 
   const fetchDeptProg = async () => {
@@ -318,7 +317,7 @@ const ResearchTracking = () => {
       // Update badge counts based on the filtered data
       const updatedBadgeValues = {
         total_ready: filtered.filter(
-          (item) => item.status.toLowerCase() === "ready for publication"
+          (item) => item.status.toLowerCase() === "ready"
         ).length,
         total_submitted: filtered.filter(
           (item) => item.status.toLowerCase() === "submitted"
