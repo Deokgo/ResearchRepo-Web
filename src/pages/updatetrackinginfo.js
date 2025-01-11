@@ -32,6 +32,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
   const navpage = useNavigate();
   const location = useLocation();
   const [openModalPub, setOpenModalPub] = useState(false);
+  const [openModalEdit, setOpenModalEdit] = useState(false);
   const { id } = location.state || {}; // Default to an empty object if state is undefined
   const [data, setData] = useState(null); // Start with null to represent no data
   const [loading, setLoading] = useState(true); // Track loading state
@@ -73,8 +74,8 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
             date_published: fetched_data[0].date_published,
             scopus: fetched_data[0].scopus || "",
             conference_title: fetched_data[0].conference_title || "",
-            conference_venue:
-              `${fetched_data[0].city}, ${fetched_data[0].country}` || "",
+            single_country: fetched_data[0].country || "",
+            single_city: fetched_data[0].city || "",
             conference_date: fetched_data[0].conference_date || "",
           };
 
@@ -87,7 +88,8 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
           setDatePublished(initialData.date_published);
           setIndexingStatus(initialData.scopus);
           setConferenceTitle(initialData.conference_title);
-          setSelectedVenue(initialData.conference_venue);
+          setSingleCountry(initialData.single_country);
+          setSingleCity(initialData.single_city);
           setDateApproved(initialData.conference_date);
 
           setPubData({ dataset: fetched_data });
@@ -147,9 +149,22 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
     }
   };
 
+  const fetchCities2 = (country) => {
+    const selectedCountry = countries.find((c) => c.country === country);
+    if (selectedCountry) {
+      setCities(selectedCountry.cities);
+    }
+  };
+
   useEffect(() => {
     fetchCountries();
   }, []);
+
+  useEffect(() => {
+    if (openModalEdit && singleCountry) {
+      fetchCities2(singleCountry); // Fetch cities for the selected country
+    }
+  }, [openModalEdit, singleCountry]);
 
   ///////////////////// ADD AND EDIT PUBLICATION //////////////////////
   const checkFields = () => {
@@ -273,7 +288,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
 
       if (missingFields.length > 0) {
         alert(
-          `Please fill in all required fields: ${missingFields.join(", ")}`
+          `All fields are required: ${missingFields.join(", ")}`
         );
         return;
       }
@@ -409,6 +424,10 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
   ///////////////////// PRE-POST MODAL HANDLING //////////////////////
   const handleOpenModalPub = () => {
     setOpenModalPub(true);
+  };
+
+  const handleOpenModalEdit= () => {
+    setOpenModalEdit(true);
   };
 
   const handleFormCleanup = () => {
@@ -899,7 +918,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                               }}
                                             >
                                               <strong>Venue:</strong>{" "}
-                                              {selectedVenue || "None"}
+                                              {`${singleCity}, ${singleCountry}` || "None"}
                                             </Typography>
                                           </Box>
                                         </Grid2>
@@ -936,41 +955,10 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                           backgroundColor: "#072d61",
                                         },
                                       }}
-                                      onClick={toggleEdit}
+                                      onClick={handleOpenModalEdit}
                                     >
-                                      {isEditing ? "Cancel" : "Edit"}
+                                      Edit
                                     </Button>
-
-                                    {isEditing && (
-                                      <Button
-                                        variant='contained'
-                                        color='primary'
-                                        onClick={handleSaveDetails}
-                                        sx={{
-                                          backgroundColor: "#CA031B",
-                                          color: "#FFF",
-                                          fontFamily: "Montserrat, sans-serif",
-                                          fontWeight: 600,
-                                          textTransform: "none",
-                                          fontSize: {
-                                            xs: "0.55rem",
-                                            md: "0.75rem",
-                                            lg: "0.9rem",
-                                          },
-                                          marginTop: "1rem",
-                                          paddingLeft: "1.5rem",
-                                          paddingRight: "1.5rem",
-                                          borderRadius: "100px",
-                                          maxHeight: "3rem",
-                                          "&:hover": {
-                                            backgroundColor: "#A30417",
-                                            color: "#FFF",
-                                          },
-                                        }}
-                                      >
-                                        Save
-                                      </Button>
-                                    )}
                                   </Box>
                                 </Box>
                               ) : (
@@ -1405,7 +1393,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
               </Modal>
 
               {/* Edit Publication Modal */}
-              <Modal open={openModalPub}>
+              <Modal open={openModalEdit}>
                 <Box
                   sx={{
                     position: "absolute",
@@ -1450,7 +1438,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                     <Select
                       label="Format"
                       sx={createTextFieldStyles()} // Assuming this is a custom style function
-                      value={publicationFormat || ""}
+                      value={publicationFormat}
                       onChange={handleChange} // Call handleChange when user selects an option
                     >
                       <MenuItem
@@ -1484,6 +1472,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                     data={pub_names}
                     label="Publication Name"
                     id="publication-name"
+                    value={publicationName}
                     onItemSelected={(value) => setPublicationName(value)} // Update state when a suggestion is selected
                     sx={{...createTextFieldStyles(), 
                       '& .MuiInputLabel-root': {
@@ -1504,7 +1493,11 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                         variant='outlined'
                         type='date'
                         margin='dense'
-                        value={datePublished}
+                        value={datePublished
+                          ? new Date(
+                              datePublished
+                            ).toLocaleDateString("en-CA")
+                          : ""}
                         onChange={(e) => setDatePublished(e.target.value)}
                         sx={createTextFieldStyles()}
                         InputLabelProps={{
@@ -1658,7 +1651,6 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                             value={singleCity}
                             onChange={(e) => setSingleCity(e.target.value)}
                             margin='dense'
-                            disabled={!Cities.length} // Disable if no cities are loaded
                             sx={{...createTextFieldStyles(), 
                               '& .MuiInputLabel-root': {
                               fontSize: {
@@ -1706,7 +1698,11 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                         variant='outlined'
                         type='date'
                         margin='dense'
-                        value={dateApproved}
+                        value={dateApproved
+                          ? new Date(
+                              dateApproved
+                            ).toLocaleDateString("en-CA")
+                          : ""}
                         onChange={(e) => setDateApproved(e.target.value)}
                         sx={createTextFieldStyles()}
                         InputLabelProps={{
@@ -1725,11 +1721,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                   >
                     <Button
                       onClick={() => {
-                        setPublicationName("");
-                        setPublicationFormat("");
-                        setDatePublished("");
-                        setIndexingStatus("");
-                        setOpenModalPub(false);
+                        setOpenModalEdit(false);
                       }}
                       sx={{
                         backgroundColor: "#08397C",
@@ -1768,7 +1760,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                         },
                       }}
                     >
-                      Add
+                      Save
                     </Button>
                   </Box>
                 </Box>
