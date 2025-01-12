@@ -41,6 +41,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [initialValues, setInitialValues] = useState(null);
 
+  const [publicationID, setPublicationID] = useState("");
   const [publicationName, setPublicationName] = useState("");
   const [datePublished, setDatePublished] = useState("");
   const [publicationFormat, setPublicationFormat] = useState("");
@@ -53,8 +54,6 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
   const [Cities, setCities] = useState([]);
   const [dateApproved, setDateApproved] = useState("");
   const [selectedVenue, setSelectedVenue] = useState("");
-
-  const itemsPerPage = 5;
 
   ///////////////////// PUBLICATION DATA RETRIEVAL //////////////////////
 
@@ -69,20 +68,22 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
           console.log("Fetched publication data:", fetched_data);
 
           const initialData = {
-            publication_name: fetched_data[0].publication_name || "",
-            journal: fetched_data[0].journal || "",
+            publication_id: fetched_data[0].publication_id,
+            publication_name: fetched_data[0].publication_name,
+            journal: fetched_data[0].journal,
             date_published: fetched_data[0].date_published,
-            scopus: fetched_data[0].scopus || "",
-            conference_title: fetched_data[0].conference_title || "",
-            single_country: fetched_data[0].country || "",
-            single_city: fetched_data[0].city || "",
-            conference_date: fetched_data[0].conference_date || "",
+            scopus: fetched_data[0].scopus,
+            conference_title: fetched_data[0].conference_title,
+            single_country: fetched_data[0].country,
+            single_city: fetched_data[0].city,
+            conference_date: fetched_data[0].conference_date,
           };
 
           setInitialValues(initialData);
           console.log(initialData);
 
           // Set current values
+          setPublicationID(initialData.publication_id);
           setPublicationName(initialData.publication_name);
           setPublicationFormat(initialData.journal);
           setDatePublished(initialData.date_published);
@@ -263,23 +264,63 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
     }
   };
 
-  const handleSaveDetails = () => {
+  const handleCheckChanges = () => {
     // Check if there are any changes by comparing the current state with initial data
     const hasChanges =
       publicationName != initialValues?.publication_name ||
       publicationFormat != initialValues?.journal ||
       datePublished != initialValues?.date_published ||
-      indexingStatus != initialValues?.scopus ||
+      conferenceTitle != initialValues?.conference_title ||
+      dateApproved != initialValues?.conference_date ||
+      singleCity != initialValues?.single_city ||
+      singleCountry != initialValues?.single_country ||
 
-    console.log("Initial Data:", initialValues);
+      console.log("Initial Data:", initialValues);
 
+    return hasChanges;
+  }
+
+  const handleSaveDetails = () => {
+    
+    const hasChanges = handleCheckChanges();
+    
     if (!hasChanges) {
       alert(
         "No changes were made to save."
       );
-    } else {
-      handleEditPublication();
+      setOpenModalEdit(false);
+      return;
     }
+    handleEditPublication();
+  };
+
+  const handleCheckDetails = () => {
+    
+    const hasChanges = handleCheckChanges();
+    
+    if (hasChanges) {
+      const userConfirmed = window.confirm(
+        "You have unsaved changes. Save Changes?"
+      );
+  
+      if (userConfirmed) {
+        handleEditPublication();
+        return;
+      }
+      setOpenModalEdit(false);
+    }
+    
+    // Reset current values
+    setPublicationName(initialValues?.publication_name);
+    setPublicationFormat(initialValues?.journal);
+    setDatePublished(initialValues?.date_published);
+    setIndexingStatus(initialValues?.scopus);
+    setConferenceTitle(initialValues?.conference_title);
+    setSingleCountry(initialValues?.single_country);
+    setSingleCity(initialValues?.single_city);
+    setDateApproved(initialValues?.conference_date);
+
+    setOpenModalEdit(false);
   };
 
   const handleEditPublication = async () => {
@@ -300,15 +341,19 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
       formData.append("user_id", userId);
 
       // Add all required fields to formData
+      formData.append("publication_id", publicationID);
       formData.append("publication_name", publicationName);
       formData.append("journal", publicationFormat);
       formData.append("date_published", datePublished);
       formData.append("scopus", indexingStatus);
-      formData.append("conference_title", conferenceTitle);
-      formData.append("city", singleCity);
-      formData.append("country", singleCountry);
-      formData.append("conference_date", dateApproved);
 
+      if (publicationFormat === 'PC'){
+        formData.append("conference_title", conferenceTitle);
+        formData.append("city", singleCity);
+        formData.append("country", singleCountry);
+        formData.append("conference_date", dateApproved);
+      }
+      
       // Send the conference data
       const response = await axios.put(`/track/publication/${id}`, formData, {
         headers: {
@@ -563,7 +608,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
 
   // Find the name corresponding to the current ID
   const selectedFormatName = publicationFormats.find(
-    (format) => format.pub_format_id === publicationFormat
+    (format) => format.pub_format_id === initialValues?.journal
   )?.pub_format_name;
 
   return (
@@ -834,7 +879,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                         }}
                                       >
                                         <strong>Publication Name:</strong>{" "}
-                                        {publicationName || "None"}
+                                        {initialValues?.publication_name || "None"}
                                       </Typography>
                                       <Typography
                                         variant='h7'
@@ -848,7 +893,9 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                         }}
                                       >
                                         <strong>Date Published:</strong>{" "}
-                                        {datePublished || "None"}
+                                        {initialValues?.date_published ? new Intl.DateTimeFormat(
+                                          'en-US', { month: 'long', day: '2-digit', year: 'numeric' }).format(
+                                            new Date(initialValues.date_published)) : 'None'}
                                       </Typography>
                                       <Typography
                                         variant='h7'
@@ -862,11 +909,11 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                         }}
                                       >
                                         <strong>Indexing Status:</strong>{" "}
-                                        {indexingStatus
-                                          ? indexingStatus
+                                        {initialValues?.scopus
+                                          ? initialValues?.scopus
                                               .charAt(0)
                                               .toUpperCase() +
-                                            indexingStatus
+                                            initialValues?.scopus
                                               .slice(1)
                                               .toLowerCase()
                                           : "None"}
@@ -895,7 +942,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                               }}
                                             >
                                               <strong>Title:</strong>{" "}
-                                              {conferenceTitle || "None"}
+                                              {initialValues?.conference_title || "None"}
                                             </Typography>
                                             <Typography
                                               variant='h7'
@@ -909,7 +956,9 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                               }}
                                             >
                                               <strong>Date:</strong>{" "}
-                                              {dateApproved || "None"}
+                                              {initialValues?.conference_date ? new Intl.DateTimeFormat(
+                                          'en-US', { month: 'long', day: '2-digit', year: 'numeric' }).format(
+                                            new Date(initialValues.conference_date)) : 'None'}
                                             </Typography>
                                             <Typography
                                               variant='h7'
@@ -923,7 +972,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                               }}
                                             >
                                               <strong>Venue:</strong>{" "}
-                                              {`${singleCity}, ${singleCountry}` || "None"}
+                                              {`${initialValues?.single_city}, ${initialValues?.single_country}` || "None"}
                                             </Typography>
                                           </Box>
                                         </Grid2>
@@ -1728,9 +1777,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                     }}
                   >
                     <Button
-                      onClick={() => {
-                        setOpenModalEdit(false);
-                      }}
+                      onClick={handleCheckDetails}
                       sx={{
                         backgroundColor: "#08397C",
                         color: "#FFF",
@@ -1751,7 +1798,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                     <Button
                       variant='contained'
                       color='primary'
-                      onClick={handleSavePublication}
+                      onClick={handleSaveDetails}
                       sx={{
                         backgroundColor: "#CA031B",
                         color: "#FFF",
