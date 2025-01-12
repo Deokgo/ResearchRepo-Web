@@ -1411,7 +1411,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
               color: "#08397C",
             }}
           >
-            Unsaved Changes
+            Unsaved Progress
           </DialogTitle>
           <DialogContent>
             <Typography
@@ -1420,7 +1420,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
                 color: "#666",
               }}
             >
-              You have unsaved changes. Do you want to save your progress?
+              You have unsaved progress. Do you want to save your progress?
             </Typography>
           </DialogContent>
           <DialogActions sx={{ padding: "1rem" }}>
@@ -1431,7 +1431,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
                 closeAddPaperModal();
               }}
               sx={{
-                backgroundColor: "#08397C",
+                backgroundColor: "#CA031B",
                 color: "#FFF",
                 fontFamily: "Montserrat, sans-serif",
                 fontWeight: 600,
@@ -1451,7 +1451,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
                 closeAddPaperModal();
               }}
               sx={{
-                backgroundColor: "#CA031B",
+                backgroundColor: "#08397C",
                 color: "#FFF",
                 fontFamily: "Montserrat, sans-serif",
                 fontWeight: 600,
@@ -1462,7 +1462,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
                 },
               }}
             >
-              Save Changes
+              Save Progress
             </Button>
           </DialogActions>
         </Dialog>

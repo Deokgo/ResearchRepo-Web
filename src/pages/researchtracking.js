@@ -72,7 +72,6 @@ const ResearchTracking = () => {
   const [research, setResearch] = useState([]);
   const [programs, setPrograms] = useState([]);
   const [filteredResearch, setFilteredResearch] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
   const [dateRange, setDateRange] = useState([2010, 2025]); // Default min and max year
   const [sliderValue, setSliderValue] = useState([2010, 2025]); // Initial slider value
   const [selectedPrograms, setSelectedPrograms] = useState([]);
@@ -87,6 +86,9 @@ const ResearchTracking = () => {
 
   // Use the debounced value after the state declarations
   const debouncedColleges = useDebounce(selectedColleges, 300);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5; // Or whatever number you prefer
 
   const steps = [
     {
@@ -126,11 +128,11 @@ const ResearchTracking = () => {
   const handleStepClick = (selectedStep) => {
     const selectedStepStatus = selectedStep.label; // Extract the label of the clicked step
     console.log("Selected Step:", selectedStepStatus);
-  
+
     // Update selectedStatus to filter the research data by the selected step's status
     setSelectedStatus((prevSelected) => {
       const isAlreadySelected = prevSelected.includes(selectedStepStatus);
-  
+
       if (isAlreadySelected) {
         // Remove the status if it's already selected
         return prevSelected.filter((status) => status !== selectedStepStatus);
@@ -205,6 +207,11 @@ const ResearchTracking = () => {
     try {
       const response = await axios.get(`/dataset/fetch_dataset`);
       const fetchedResearch = response.data.dataset;
+      console.log("Fetched Research Data:", {
+        total: fetchedResearch.length,
+        data: fetchedResearch,
+        sample: fetchedResearch[0], // Show first item as sample
+      });
       setResearch(fetchedResearch);
       setFilteredResearch(fetchedResearch);
     } catch (error) {
@@ -394,12 +401,12 @@ const ResearchTracking = () => {
   };
 
   const handleChangePage = (event, newPage) => {
-    setPage(newPage);
+    setCurrentPage(newPage);
   };
 
   const paginatedResearch = filteredResearch.slice(
-    (page - 1) * rowsPerPage,
-    page * rowsPerPage
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
   );
 
   return (
@@ -711,66 +718,83 @@ const ResearchTracking = () => {
                     {loading ? (
                       <Typography>Loading...</Typography>
                     ) : (
-                      <>
-                        {/* Virtuoso Table */}
-                        <Virtuoso
-                          style={{ height: "100%" }}
-                          data={paginatedResearch}
-                          itemContent={(index, paper, key) => (
-                            <Box
-                              key={paper.research_id}
-                              sx={{
-                                padding: 2,
-                                borderBottom: "1px solid #ddd",
-                                cursor: "pointer",
-                              }}
-                              onClick={() => handleKey(paper.research_id)}
-                            >
-                              <Typography
-                                variant='h6'
+                      <Box
+                        sx={{
+                          display: "flex",
+                          flexDirection: "column",
+                          height: "100%",
+                        }}
+                      >
+                        <Box sx={{ flex: 1, overflow: "hidden" }}>
+                          <Virtuoso
+                            style={{ height: "100%" }}
+                            data={paginatedResearch}
+                            itemContent={(index, paper) => (
+                              <Box
+                                key={paper.research_id}
                                 sx={{
-                                  mb: 1,
-                                  fontSize: {
-                                    xs: "0.5rem",
-                                    md: "0.75rem",
-                                    lg: "1rem",
-                                  },
-                                  fontWeight: 500,
+                                  padding: 2,
+                                  borderBottom: "1px solid #ddd",
+                                  cursor: "pointer",
                                 }}
+                                onClick={() => handleKey(paper.research_id)}
                               >
-                                {paper.title}
-                              </Typography>
-                              <Typography
-                                variant='body2'
-                                color='textSecondary'
-                                sx={{
-                                  mb: 0.5,
-                                  color: "#666",
-                                  fontSize: {
-                                    xs: "0.5rem",
-                                    md: "0.5rem",
-                                    lg: "0.75rem",
-                                  },
-                                }}
-                              >
-                                Status: {paper.status} | Last Updated:{" "}
-                                {paper.timestamp}
-                              </Typography>
-                            </Box>
-                          )}
-                        />
-                      </>
+                                <Typography
+                                  variant='h6'
+                                  sx={{
+                                    mb: 1,
+                                    fontSize: {
+                                      xs: "0.5rem",
+                                      md: "0.75rem",
+                                      lg: "1rem",
+                                    },
+                                    fontWeight: 500,
+                                  }}
+                                >
+                                  {paper.title}
+                                </Typography>
+                                <Typography
+                                  variant='body2'
+                                  color='textSecondary'
+                                  sx={{
+                                    mb: 0.5,
+                                    color: "#666",
+                                    fontSize: {
+                                      xs: "0.5rem",
+                                      md: "0.5rem",
+                                      lg: "0.75rem",
+                                    },
+                                  }}
+                                >
+                                  Status: {paper.status} | Authors:{" "}
+                                  {paper.authors
+                                    .map((author) => author.name)
+                                    .join(", ")}{" "}
+                                  | Last Updated: {paper.timestamp}
+                                </Typography>
+                              </Box>
+                            )}
+                          />
+                        </Box>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "center",
+                            py: 1,
+                            backgroundColor: "#fff",
+                            borderTop: "1px solid #eee",
+                          }}
+                        >
+                          <Pagination
+                            count={Math.ceil(
+                              filteredResearch.length / itemsPerPage
+                            )}
+                            page={currentPage}
+                            onChange={handleChangePage}
+                          />
+                        </Box>
+                      </Box>
                     )}
-                  </Box>
-                  {/* Centered Pagination */}
-                  <Box
-                    sx={{ display: "flex", justifyContent: "center", mt: 2 }}
-                  >
-                    <Pagination
-                      count={Math.ceil(filteredResearch.length / rowsPerPage)}
-                      page={page}
-                      onChange={handleChangePage}
-                    />
                   </Box>
                 </Box>
               </Grid2>

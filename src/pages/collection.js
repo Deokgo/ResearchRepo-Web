@@ -177,6 +177,11 @@ const Collection = () => {
     try {
       const response = await axios.get(`/dataset/fetch_ordered_dataset`);
       const fetchedResearch = response.data.dataset;
+      console.log("Collections - Fetched Research Data:", {
+        total: fetchedResearch.length,
+        data: fetchedResearch,
+        sample: fetchedResearch[0], // Show first item as sample
+      });
       setResearch(fetchedResearch);
       setFilteredResearch(fetchedResearch);
     } catch (error) {
