@@ -287,8 +287,45 @@ const Profile = () => {
   };
 
   const handleCloseModal = () => {
+    const {
+      firstName,
+      middleName,
+      lastName,
+      suffix,
+      department: college_id,
+      program: program_id,
+    } = formValues;
+
+    const hasChanges =
+        firstName !== initialData?.firstName ||
+        middleName !== initialData?.middleName ||
+        lastName !== initialData?.lastName ||
+        suffix !== initialData?.suffix ||
+        college_id !== initialData?.department ||
+        program_id !== initialData?.program;
+
+    if(hasChanges)
+    {
+      const confirmLeave = window.confirm("You have unsaved changes. Do you want to leave?");
+      if (confirmLeave) {
+        setIsModalOpen(false);
+      }
+    }
+
     setIsModalOpen(false);
+
+    // Reset form values to blank
+    setFormValues({
+      firstName: "",
+      middleName: "",
+      lastName: "",
+      suffix: "",
+      department: "",
+      program: "",
+    });
+  
   };
+  
 
   // Fetch all colleges when the modal opens
   useEffect(() => {
