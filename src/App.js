@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import Home from "./pages/home";
 import ReadMore from "./pages/readmore";
+import AboutUs from "./pages/aboutus";
+import Help from "./pages/help";
 import Profile from "./pages/profile";
 import PrivateRoute from "./components/privateroute";
 import ManageUsers from "./pages/manageusers";
@@ -165,6 +167,23 @@ function App() {
               element={
                 <PrivateRoute>
                   <Profile />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path='/aboutus'
+              element={
+                <PrivateRoute>
+                  <AboutUs />
+                </PrivateRoute>
+              }
+            />
+
+            <Route
+              path='/help'
+              element={
+                <PrivateRoute>
+                  <Help />
                 </PrivateRoute>
               }
             />

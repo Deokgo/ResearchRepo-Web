@@ -96,6 +96,14 @@ const Navbar = () => {
     navigate("/profile");
   };
 
+  const handleAboutUs = () => {
+    navigate("/aboutus");
+  };
+
+  const handleHelp = () => {
+    navigate("/help");
+  };
+
   const handleCollection = () => {
     navigate("/collection");
   };
@@ -175,6 +183,8 @@ const Navbar = () => {
         { label: "Knowledge Graph", onClick: handleKnowledgeGraph },
         { label: "Research Thrusts", onClick: handleResearchThrust },
         { label: "Profile", onClick: handleProfile },
+        { label: "About Us", onClick: handleAboutUs },
+        { label: "Help", onClick: handleHelp },
       ]
     : [
         { label: "Home", onClick: handleNavigateHome },
@@ -494,10 +504,10 @@ const Navbar = () => {
           <MenuItem onClick={handleProfile}>
             <Typography color='common.white'>Profile</Typography>
           </MenuItem>
-          <MenuItem onClick={null}>
-            <Typography color='common.white'>Contact Us</Typography>
+          <MenuItem onClick={handleAboutUs}>
+            <Typography color='common.white'>About Us</Typography>
           </MenuItem>
-          <MenuItem onClick={null}>
+          <MenuItem onClick={handleHelp}>
             <Typography color='common.white'>Help</Typography>
           </MenuItem>
           <Divider />
