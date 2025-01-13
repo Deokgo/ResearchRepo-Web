@@ -865,42 +865,57 @@ const Collection = () => {
                 </Box>
               </Grid2>
 
-              {/* Knowledge Graph Section */}
-              {!isMobile && (
-                <Grid2 size={3}>
-                  <Box
-                    sx={{
-                      height: "100%",
-                      border: "1px solid #ccc",
-                      borderRadius: 3,
-                      overflow: "hidden",
-                      position: "relative", // Ensures child elements can be positioned
-                    }}
-                  >
-                    <iframe
-                      src='http://localhost:5000/collectionkg'
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        border: "none",
-                        overflow: "hidden",
-                      }}
-                    />
-                    <Box
-                      onClick={handleNavigateKnowledgeGraph}
-                      sx={{
-                        position: "absolute",
-                        top: 0,
-                        left: 0,
-                        width: "100%",
-                        height: "100%",
-                        cursor: "pointer",
-                        backgroundColor: "transparent", // Ensures no visual interference
-                      }}
-                    />
-                  </Box>
-                </Grid2>
-              )}
+              {/* Knowledge Graph Section */}           
+              <Grid2 
+  size={{ xs: 12, sm: 6, md: 3 }} 
+  sx={{
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: "1rem",
+  }}
+>
+  <Box
+    sx={{
+      width: "100%",
+      height: "100%", // Ensures Box takes full height
+      border: "1px solid #ccc",
+      borderRadius: 3,
+      position: "relative", // For child positioning
+      overflow: "hidden", // Prevents content overflow
+      boxSizing: "border-box", // Ensures padding is included in dimensions
+      padding: "1rem 1.5rem 1.5rem 1rem", // top, right, bottom, left
+    }}
+  >
+    <iframe
+      src='http://localhost:5000/collectionkg'
+      style={{
+        width: "100%", // Adjusts to parent size
+        height: "100%", // Adjusts to parent size
+        border: "none", // Removes border
+        display: "block", // Prevents inline-block spacing
+        margin: 0, // Removes default iframe margin
+        padding: 0, // Removes default iframe padding
+        overflow: "hidden", // Prevents content overflow inside iframe
+      }}
+      scrolling="no" // Removes the scrollbar
+    />
+    <Box
+      onClick={handleNavigateKnowledgeGraph}
+      sx={{
+        position: "absolute",
+        top: 0,
+        left: 0,
+        width: "100%",
+        height: "100%",
+        cursor: "pointer",
+        backgroundColor: "transparent", // No visual interference
+      }}
+    />
+  </Box>
+</Grid2>
+
+
             </Grid2>
           </Box>
         </Box>
