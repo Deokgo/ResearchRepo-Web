@@ -21,6 +21,11 @@ import {
   useMediaQuery,
   Checkbox,
   Chip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
 } from "@mui/material";
 import Stack from "@mui/material/Stack";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
@@ -92,6 +97,35 @@ const DisplayResearchInfo = () => {
 
   const fileInputRef = useRef(null);
   const extendedAbstractRef = useRef(null);
+
+  const [showCancelDialog, setShowCancelDialog] = useState(false);
+
+  const [hasChanges, setHasChanges] = useState(false);
+
+  const handleChange = (field, value) => {
+    setEditableData((prev) => {
+      const newData = { ...prev, [field]: value };
+
+      // Compare the new data with original data
+      const originalData = data.dataset[0];
+
+      // Check if there are any differences between original and new data
+      const isChanged = Object.keys(newData).some((key) => {
+        // Handle arrays (like authors, panels, etc.)
+        if (Array.isArray(newData[key])) {
+          return (
+            JSON.stringify(newData[key]) !== JSON.stringify(originalData[key])
+          );
+        }
+        // Handle regular values
+        return newData[key] !== originalData[key];
+      });
+
+      setHasChanges(isChanged);
+
+      return newData;
+    });
+  };
 
   useEffect(() => {
     if (id) {
@@ -278,6 +312,9 @@ const DisplayResearchInfo = () => {
 
   const handleEdit = async (item) => {
     try {
+      // Temporarily disable change detection while setting up initial data
+      setHasChanges(false);
+
       await fetchResearchAreas();
       const matchingResearchType = researchTypes.find(
         (type) => type.research_type_name === item.research_type
@@ -313,27 +350,15 @@ const DisplayResearchInfo = () => {
           : null
       );
 
-      // Update the file input refs to show the filenames
-      if (manuscriptFileName && fileInputRef.current) {
-        fileInputRef.current.querySelector(".MuiInputBase-input").value =
-          manuscriptFileName;
-      }
-      if (extendedAbstractFileName && extendedAbstractRef.current) {
-        extendedAbstractRef.current.querySelector(".MuiInputBase-input").value =
-          extendedAbstractFileName;
-      }
-
       // Parse existing SDGs and match them with their titles
       const existingSDGs =
         item.sdg && item.sdg !== "Not Specified"
           ? item.sdg
               .split(";")
               .map((sdgString) => {
-                // Extract just the number from "SDG X"
                 const match = sdgString.trim().match(/SDG\s+(\d+)/);
                 if (match) {
                   const sdgNumber = match[1];
-                  // Find matching SDG from sdgGoalsData
                   const sdgGoal = sdgGoalsData.sdgGoals.find(
                     (goal) => goal.id === `SDG ${sdgNumber}`
                   );
@@ -350,6 +375,7 @@ const DisplayResearchInfo = () => {
         ? `${startYear}-${parseInt(startYear) + 1}`
         : "";
 
+      // Set all the state updates at once
       setEditableData({
         research_id: item.research_id,
         title: item.title,
@@ -399,7 +425,6 @@ const DisplayResearchInfo = () => {
         );
         setPrograms(filteredPrograms);
       } else {
-        // Fallback to API calls if cache is missing
         await fetchDeptProg();
         if (item.college_id) {
           const response = await axios.get(
@@ -412,6 +437,11 @@ const DisplayResearchInfo = () => {
       // Set the select fields
       setSchoolYear(startYear);
       setTerm(item.term?.toString());
+
+      // Reset hasChanges after all state updates
+      setTimeout(() => {
+        setHasChanges(false);
+      }, 100);
     } catch (error) {
       console.error("Error setting up edit mode:", error);
     }
@@ -423,27 +453,78 @@ const DisplayResearchInfo = () => {
       (item) => item.research_id === editableData.research_id
     );
 
-    let hasChanges =
-      originalData.abstract !== editableData.abstract ||
-      JSON.stringify(originalData.keywords.sort()) !==
-        JSON.stringify(keywords.sort()) ||
-      originalData.sdg !== selectedSDGs.map((sdg) => sdg.id).join(";") ||
-      JSON.stringify(
-        originalData.research_areas.map((ra) => ra.research_area_id).sort()
-      ) !==
-        JSON.stringify(
-          editableData.research_areas.map((ra) => ra.research_area_id).sort()
-        ) ||
-      file !== null ||
-      extendedAbstract !== null;
+    // Compare abstract (trim whitespace to ensure accurate comparison)
+    const abstractChanged =
+      (originalData.abstract || "").trim() !==
+      (editableData.abstract || "").trim();
 
-    return hasChanges;
+    // Compare keywords (sort arrays to ensure order doesn't matter)
+    const originalKeywords = [...(originalData.keywords || [])].sort();
+    const currentKeywords = [...(keywords || [])].sort();
+    const keywordsChanged =
+      JSON.stringify(originalKeywords) !== JSON.stringify(currentKeywords);
+
+    // Compare SDGs - Fix the comparison format
+    const originalSDGs = originalData.sdg
+      ? originalData.sdg
+          .split(";")
+          .map((sdg) => sdg.trim())
+          .filter((sdg) => sdg)
+          .sort()
+      : [];
+
+    const currentSDGs = selectedSDGs
+      .map((sdg) => sdg.id)
+      .filter((sdg) => sdg)
+      .sort();
+
+    const sdgsChanged =
+      JSON.stringify(originalSDGs) !== JSON.stringify(currentSDGs);
+
+    // Compare research areas
+    const originalAreas = [...(originalData.research_areas || [])]
+      .map((ra) => ra.research_area_id)
+      .sort();
+    const currentAreas = [...(editableData.research_areas || [])]
+      .map((ra) => ra.research_area_id)
+      .sort();
+    const areasChanged =
+      JSON.stringify(originalAreas) !== JSON.stringify(currentAreas);
+
+    // Compare files (check if new files were added or existing files were removed)
+    const filesChanged =
+      (file && !file.isExisting) ||
+      (extendedAbstract && !extendedAbstract.isExisting) ||
+      (originalData.full_manuscript && !file) ||
+      (originalData.extended_abstract && !extendedAbstract);
+
+    const changes =
+      abstractChanged ||
+      keywordsChanged ||
+      sdgsChanged ||
+      areasChanged ||
+      filesChanged;
+
+    setHasChanges(changes);
+    return changes;
   };
+
+  // Add effect to check for changes when relevant states update
+  useEffect(() => {
+    if (editableData) {
+      handleCheckChanges();
+    }
+  }, [editableData, keywords, selectedSDGs, file, extendedAbstract]);
+
   const handleCancelEdit = () => {
-    setIsEditMode(false);
-    setEditableData(null);
-    setFile(null);
-    setExtendedAbstract(null);
+    if (handleCheckChanges()) {
+      setShowCancelDialog(true);
+    } else {
+      setIsEditMode(false);
+      setEditableData(null);
+      setFile(null);
+      setExtendedAbstract(null);
+    }
   };
 
   const handleSaveChanges = async () => {
@@ -1823,7 +1904,7 @@ const DisplayResearchInfo = () => {
                             <Button
                               variant='contained'
                               onClick={handleSaveChanges}
-                              disabled={!validateRequiredFields()}
+                              disabled={!hasChanges}
                               sx={{
                                 backgroundColor: "#CA031B",
                                 color: "#FFF",
@@ -1861,6 +1942,38 @@ const DisplayResearchInfo = () => {
           </Box>
         </Box>
       </Box>
+      <Dialog
+        open={showCancelDialog}
+        onClose={() => setShowCancelDialog(false)}
+        aria-labelledby='cancel-dialog-title'
+        aria-describedby='cancel-dialog-description'
+      >
+        <DialogTitle id='cancel-dialog-title'>{"Discard Changes?"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id='cancel-dialog-description'>
+            You have unsaved changes. Are you sure you want to cancel editing?
+            All changes will be lost.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowCancelDialog(false)} color='primary'>
+            Continue Editing
+          </Button>
+          <Button
+            onClick={() => {
+              setShowCancelDialog(false);
+              setIsEditMode(false);
+              setEditableData(null);
+              setFile(null);
+              setExtendedAbstract(null);
+            }}
+            color='error'
+            autoFocus
+          >
+            Discard Changes
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };
