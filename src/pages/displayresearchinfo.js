@@ -167,22 +167,23 @@ const DisplayResearchInfo = () => {
   }, []);
 
   const handleViewManuscript = async (researchItem) => {
-    const { research_id } = researchItem;
+    // Get the correct file path, either from current file or original data
+    const research_id = researchItem.research_id;
+    const currentData = data.dataset.find(
+      (item) => item.research_id === research_id
+    );
+
     if (research_id) {
       try {
-        // Make the API request to get the PDF as a Blob kasi may proxy issue if directly window.open, so padaanin muna natin kay axios
         const response = await axios.get(
           `/paper/view_manuscript/${research_id}`,
           {
-            responseType: "blob", // Get the response as a binary Blob (PDF)
+            responseType: "blob",
           }
         );
 
-        // Create a URL for the Blob and open it in a new tab
         const blob = new Blob([response.data], { type: "application/pdf" });
         const url = window.URL.createObjectURL(blob);
-
-        // Open the PDF in a new tab
         window.open(url, "_blank");
       } catch (error) {
         console.error("Error fetching the manuscript:", error);
@@ -194,10 +195,13 @@ const DisplayResearchInfo = () => {
   };
 
   const handleViewEA = async (researchItem) => {
-    const { research_id } = researchItem;
+    const research_id = researchItem.research_id;
+    const currentData = data.dataset.find(
+      (item) => item.research_id === research_id
+    );
+
     if (research_id) {
       try {
-        // Fetch the PDF as a Blob
         const response = await axios.get(
           `/paper/view_extended_abstract/${research_id}`,
           {
@@ -230,7 +234,7 @@ const DisplayResearchInfo = () => {
           ),
         }));
       } catch (error) {
-        console.error("Error fetching the manuscript:", error);
+        console.error("Error fetching the extended abstract:", error);
         alert("Failed to retrieve the extended abstract. Please try again.");
       }
     } else {
@@ -448,6 +452,12 @@ const DisplayResearchInfo = () => {
   };
 
   const handleCheckChanges = () => {
+    // First check if all required fields are filled
+    if (!validateRequiredFields()) {
+      setHasChanges(false);
+      return false;
+    }
+
     // Get the original data from the current dataset
     const originalData = data.dataset.find(
       (item) => item.research_id === editableData.research_id
@@ -464,7 +474,7 @@ const DisplayResearchInfo = () => {
     const keywordsChanged =
       JSON.stringify(originalKeywords) !== JSON.stringify(currentKeywords);
 
-    // Compare SDGs - Fix the comparison format
+    // Compare SDGs
     const originalSDGs = originalData.sdg
       ? originalData.sdg
           .split(";")
@@ -491,19 +501,27 @@ const DisplayResearchInfo = () => {
     const areasChanged =
       JSON.stringify(originalAreas) !== JSON.stringify(currentAreas);
 
-    // Compare files (check if new files were added or existing files were removed)
+    // Check file changes - only consider it a change if there's a new file
     const filesChanged =
-      (file && !file.isExisting) ||
-      (extendedAbstract && !extendedAbstract.isExisting) ||
-      (originalData.full_manuscript && !file) ||
-      (originalData.extended_abstract && !extendedAbstract);
+      (file?.file && !file.isExisting) ||
+      (extendedAbstract?.file && !extendedAbstract.isExisting);
+
+    // Don't allow saving if files were deleted without new uploads
+    const filesDeleted =
+      (originalData.full_manuscript &&
+        !file &&
+        !editableData.full_manuscript) ||
+      (originalData.extended_abstract &&
+        !extendedAbstract &&
+        !editableData.extended_abstract);
 
     const changes =
-      abstractChanged ||
-      keywordsChanged ||
-      sdgsChanged ||
-      areasChanged ||
-      filesChanged;
+      (abstractChanged ||
+        keywordsChanged ||
+        sdgsChanged ||
+        areasChanged ||
+        filesChanged) &&
+      !filesDeleted;
 
     setHasChanges(changes);
     return changes;
@@ -565,12 +583,12 @@ const DisplayResearchInfo = () => {
         formData.append("research_areas", "");
       }
 
-      // Handle file uploads
+      // Handle file uploads with the new structure
       if (file && !file.isExisting) {
-        formData.append("file", file);
+        formData.append("file", file.file);
       }
       if (extendedAbstract && !extendedAbstract.isExisting) {
-        formData.append("extended_abstract", extendedAbstract);
+        formData.append("extended_abstract", extendedAbstract.file);
       }
 
       // Make the API call
@@ -699,7 +717,11 @@ const DisplayResearchInfo = () => {
   const onSelectFileHandler = (e) => {
     const selectedFile = e.target.files[0];
     if (selectedFile && selectedFile.type === "application/pdf") {
-      setFile(selectedFile); // This will be a new File object without isExisting flag
+      setFile({
+        name: selectedFile.name,
+        file: selectedFile,
+        isExisting: false,
+      });
     } else {
       alert("Please select a PDF file");
       setFile(null);
@@ -709,7 +731,11 @@ const DisplayResearchInfo = () => {
   const onSelectFileHandlerEA = (e) => {
     const selectedFile = e.target.files[0];
     if (selectedFile && selectedFile.type === "application/pdf") {
-      setExtendedAbstract(selectedFile); // This will be a new File object without isExisting flag
+      setExtendedAbstract({
+        name: selectedFile.name,
+        file: selectedFile,
+        isExisting: false,
+      });
     } else {
       alert("Please select a PDF file");
       setExtendedAbstract(null);
@@ -760,9 +786,9 @@ const DisplayResearchInfo = () => {
     fetchResearchTypes();
   }, []);
 
-  // Add this function to validate required fields
+  // Update the validateRequiredFields function
   const validateRequiredFields = () => {
-    // Check if abstract is empty
+    // Check if abstract is empty or only whitespace
     if (!editableData.abstract?.trim()) {
       return false;
     }
@@ -1755,9 +1781,26 @@ const DisplayResearchInfo = () => {
                                 onFileDelete={() =>
                                   onDeleteFileHandler("manuscript")
                                 }
-                                selectedFile={file}
+                                selectedFile={file?.file}
                               />
                             </Box>
+                            {editableData.full_manuscript && (
+                              <Typography
+                                variant='body2'
+                                sx={{
+                                  textAlign: "center",
+                                  mt: 1,
+                                  fontSize: {
+                                    xs: "0.5rem",
+                                    md: "0.6rem",
+                                    lg: "0.75rem",
+                                  },
+                                  color: "#666",
+                                }}
+                              >
+                                Current file: {editableData.full_manuscript}
+                              </Typography>
+                            )}
                             <Button
                               variant='contained'
                               onClick={() => handleViewManuscript(editableData)}
@@ -1783,7 +1826,7 @@ const DisplayResearchInfo = () => {
                                   md: "0.65rem",
                                   lg: "0.8rem",
                                 },
-                                marginTop: "1.5rem",
+                                marginTop: "0.5rem",
                                 alignSelf: "center",
                                 borderRadius: "100px",
                                 maxHeight: "3rem",
@@ -1832,9 +1875,26 @@ const DisplayResearchInfo = () => {
                                 onFileDelete={() =>
                                   onDeleteFileHandler("extended_abstract")
                                 }
-                                selectedFile={extendedAbstract}
+                                selectedFile={extendedAbstract?.file}
                               />
                             </Box>
+                            {editableData.extended_abstract && (
+                              <Typography
+                                variant='body2'
+                                sx={{
+                                  textAlign: "center",
+                                  mt: 1,
+                                  fontSize: {
+                                    xs: "0.5rem",
+                                    md: "0.6rem",
+                                    lg: "0.75rem",
+                                  },
+                                  color: "#666",
+                                }}
+                              >
+                                Current file: {editableData.extended_abstract}
+                              </Typography>
+                            )}
                             <Button
                               variant='contained'
                               onClick={() => handleViewEA(editableData)}
@@ -1860,7 +1920,7 @@ const DisplayResearchInfo = () => {
                                   md: "0.65rem",
                                   lg: "0.8rem",
                                 },
-                                marginTop: "1.5rem",
+                                marginTop: "0.5rem",
                                 alignSelf: "center",
                                 borderRadius: "100px",
                                 maxHeight: "3rem",
@@ -1904,7 +1964,9 @@ const DisplayResearchInfo = () => {
                             <Button
                               variant='contained'
                               onClick={handleSaveChanges}
-                              disabled={!hasChanges}
+                              disabled={
+                                !hasChanges || !validateRequiredFields()
+                              }
                               sx={{
                                 backgroundColor: "#CA031B",
                                 color: "#FFF",
