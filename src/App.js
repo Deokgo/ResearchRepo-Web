@@ -25,6 +25,7 @@ import DisplayAuditLog from "./pages/auditlog";
 import RoleBasedRoute from "./components/rolebasedroute";
 import DashEmbed from "./pages/DashEmbed";
 import SDGdashEmbed from "./pages/SDGdashEmbed";
+import Collection2 from "./pages/collection2";
 
 function App() {
   const [data, setData] = useState([{}]);
@@ -50,6 +51,14 @@ function App() {
               element={
                 <PrivateRoute>
                   <Collection />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path='/collection2'
+              element={
+                <PrivateRoute>
+                  <Collection2 />
                 </PrivateRoute>
               }
             />
