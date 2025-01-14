@@ -26,7 +26,7 @@ import RoleBasedRoute from "./components/rolebasedroute";
 import DashEmbed from "./pages/DashEmbed";
 import SDGdashEmbed from "./pages/SDGdashEmbed";
 import Collection2 from "./pages/collection2";
-
+import EngageDash from "./pages/EngageDash";
 function App() {
   const [data, setData] = useState([{}]);
   const isLoggedIn = !!localStorage.getItem("token");
@@ -44,6 +44,7 @@ function App() {
             <Route path='/researchthrust' element={<ResearchThrust />} />
             <Route path='/dash' element={<DashEmbed />} />
             <Route path='/dash/analytics' element={<SDGdashEmbed />} />
+            <Route path='/dash/user-engagement' element={<EngageDash />} />
 
             {/* Common routes (available to all authenticated users) */}
             <Route
