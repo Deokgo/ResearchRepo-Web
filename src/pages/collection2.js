@@ -11,6 +11,7 @@ import {
   TextField,
   Typography,
   useMediaQuery,
+  Chip,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import Navbar from "../components/navbar";
@@ -55,6 +56,96 @@ const useDebounce = (value, delay) => {
   return debouncedValue;
 };
 
+const buildKnowledgeGraph = (research) => {
+  const graph = {
+    nodes: new Map(),
+    edges: new Map(),
+    weights: new Map(),
+  };
+
+  research.forEach((paper) => {
+    // Add paper node
+    const paperId = `paper_${paper.research_id}`;
+    graph.nodes.set(paperId, {
+      type: "paper",
+      data: paper,
+      connections: new Set(),
+    });
+
+    // Add SDG nodes and edges
+    if (paper.sdg) {
+      paper.sdg.split(";").forEach((sdg) => {
+        const sdgId = `sdg_${sdg.trim()}`;
+        if (!graph.nodes.has(sdgId)) {
+          graph.nodes.set(sdgId, {
+            type: "sdg",
+            data: { name: sdg.trim() },
+            connections: new Set(),
+          });
+        }
+        // Create bidirectional edges
+        graph.nodes.get(paperId).connections.add(sdgId);
+        graph.nodes.get(sdgId).connections.add(paperId);
+
+        // Increment edge weight
+        const edgeKey = [paperId, sdgId].sort().join("-");
+        graph.weights.set(edgeKey, (graph.weights.get(edgeKey) || 0) + 1);
+      });
+    }
+
+    // Add Research Area nodes and edges
+    if (paper.research_areas) {
+      paper.research_areas.forEach((area) => {
+        const areaId = `area_${area.research_area_id}`;
+        if (!graph.nodes.has(areaId)) {
+          graph.nodes.set(areaId, {
+            type: "area",
+            data: area,
+            connections: new Set(),
+          });
+        }
+        // Create bidirectional edges
+        graph.nodes.get(paperId).connections.add(areaId);
+        graph.nodes.get(areaId).connections.add(paperId);
+
+        // Increment edge weight
+        const edgeKey = [paperId, areaId].sort().join("-");
+        graph.weights.set(edgeKey, (graph.weights.get(edgeKey) || 0) + 1);
+      });
+    }
+  });
+
+  return graph;
+};
+
+const findRelatedPapers = (graph, paperId, maxDepth = 2) => {
+  const visited = new Set();
+  const related = new Map();
+
+  const traverse = (currentId, depth) => {
+    if (depth > maxDepth || visited.has(currentId)) return;
+    visited.add(currentId);
+
+    const node = graph.nodes.get(currentId);
+    node.connections.forEach((connectedId) => {
+      const connectedNode = graph.nodes.get(connectedId);
+
+      if (connectedNode.type === "paper" && connectedId !== paperId) {
+        const edgeKey = [currentId, connectedId].sort().join("-");
+        const weight = graph.weights.get(edgeKey) || 0;
+        related.set(connectedId, (related.get(connectedId) || 0) + weight);
+      }
+
+      traverse(connectedId, depth + 1);
+    });
+  };
+
+  traverse(paperId, 0);
+  return Array.from(related.entries())
+    .sort((a, b) => b[1] - a[1])
+    .map(([id]) => graph.nodes.get(id).data);
+};
+
 const Collection2 = () => {
   const navigate = useNavigate();
   const isMobile = useMediaQuery("(max-width:600px)"); // Checks if the screen is 600px or smaller (mobile)
@@ -88,6 +179,9 @@ const Collection2 = () => {
   const [sdgAreaMapping, setSDGAreaMapping] = useState({});
   const [sdgCounts, setSDGCounts] = useState({});
   const [collegeColors, setCollegeColors] = useState({});
+  const [knowledgeGraph, setKnowledgeGraph] = useState(null);
+  const [relatedPapers, setRelatedPapers] = useState([]);
+  const [selectedResearchArea, setSelectedResearchArea] = useState(null);
 
   const handleNavigateKnowledgeGraph = () => {
     navigate("/knowledgegraph");
@@ -136,9 +230,18 @@ const Collection2 = () => {
         download_count: response.data.download_count,
       };
 
-      // Navigate to the research details page
+      // Find related papers using the knowledge graph
+      if (knowledgeGraph) {
+        const paperId = `paper_${item.research_id}`;
+        const related = findRelatedPapers(knowledgeGraph, paperId);
+        setRelatedPapers(related);
+      }
+
       navigate(`/displayresearchinfo/${updatedItem.research_id}`, {
-        state: { id: updatedItem.research_id },
+        state: {
+          id: updatedItem.research_id,
+          relatedPapers: relatedPapers,
+        },
       });
 
       // Save the current timestamp to localStorage if incremented
@@ -146,17 +249,7 @@ const Collection2 = () => {
         localStorage.setItem(lastViewedTimeKey, currentTime);
       }
     } catch (error) {
-      console.error("Error handling research item click:", {
-        message: error.message,
-        response: error.response?.data,
-        status: error.response?.status,
-        item: item,
-      });
-
-      // Fall back to the original item if an error occurs
-      navigate(`/displayresearchinfo/${item.research_id}`, {
-        state: { id: item.research_id },
-      });
+      console.error("Error handling research item click:", error);
     }
   };
 
@@ -253,6 +346,29 @@ const Collection2 = () => {
     const applyFilters = () => {
       let filtered = [...research];
 
+      // Apply SDG filter
+      if (selectedSDG) {
+        filtered = filtered.filter(
+          (item) =>
+            item.sdg &&
+            item.sdg
+              .split(";")
+              .map((s) => s.trim())
+              .includes(selectedSDG)
+        );
+      }
+
+      // Apply research area filter
+      if (selectedResearchArea) {
+        filtered = filtered.filter(
+          (item) =>
+            item.research_areas &&
+            item.research_areas.some(
+              (area) => area.research_area_id === selectedResearchArea
+            )
+        );
+      }
+
       // Handle college and program filtering
       if (selectedColleges.length > 0 || selectedPrograms.length > 0) {
         filtered = filtered.filter((item) => {
@@ -327,6 +443,8 @@ const Collection2 = () => {
     selectedFormats,
     searchQuery,
     dateRange,
+    selectedSDG,
+    selectedResearchArea,
   ]);
 
   // Handle change in search query
@@ -534,17 +652,317 @@ const Collection2 = () => {
   }, []);
 
   const handleSDGClick = (sdg) => {
-    console.log("Clicked SDG:", sdg);
-    console.log("SDG Area Mapping:", sdgAreaMapping);
-    console.log("Research Areas:", researchAreas);
-    console.log("Area Counts:", researchAreaCounts);
-    setSelectedSDG(selectedSDG === sdg ? null : sdg);
+    // If clicking the same SDG, clear the filter
+    if (selectedSDG === sdg) {
+      setSelectedSDG(null);
+      setSelectedResearchArea(null); // Clear research area when clearing SDG
+      setFilteredResearch(research);
+    } else {
+      setSelectedSDG(sdg);
+      setSelectedResearchArea(null); // Clear research area when selecting new SDG
+
+      // Filter research papers by the selected SDG
+      const filtered = research.filter(
+        (paper) =>
+          paper.sdg &&
+          paper.sdg
+            .split(";")
+            .map((s) => s.trim())
+            .includes(sdg)
+      );
+      setFilteredResearch(filtered);
+    }
   };
 
   const handleFieldClick = (areaId) => {
-    // Implement your filtering logic here
-    console.log(`Clicked research area: ${areaId}`);
+    // If clicking the same area, clear the filter
+    if (selectedResearchArea === areaId) {
+      setSelectedResearchArea(null);
+      // If there's a selected SDG, reapply its filter, otherwise show all
+      if (selectedSDG) {
+        const filtered = research.filter(
+          (paper) =>
+            paper.sdg &&
+            paper.sdg
+              .split(";")
+              .map((s) => s.trim())
+              .includes(selectedSDG)
+        );
+        setFilteredResearch(filtered);
+      } else {
+        setFilteredResearch(research);
+      }
+    } else {
+      setSelectedResearchArea(areaId);
+
+      // Filter papers by both selected SDG (if any) and research area
+      let filtered = research;
+      if (selectedSDG) {
+        filtered = filtered.filter(
+          (paper) =>
+            paper.sdg &&
+            paper.sdg
+              .split(";")
+              .map((s) => s.trim())
+              .includes(selectedSDG)
+        );
+      }
+      filtered = filtered.filter(
+        (paper) =>
+          paper.research_areas &&
+          paper.research_areas.some((area) => area.research_area_id === areaId)
+      );
+      setFilteredResearch(filtered);
+    }
   };
+
+  useEffect(() => {
+    const initializeKnowledgeGraph = async () => {
+      try {
+        const response = await axios.get(`/dataset/fetch_ordered_dataset`);
+        const fetchedResearch = response.data.dataset;
+        const graph = buildKnowledgeGraph(fetchedResearch);
+        setKnowledgeGraph(graph);
+        setResearch(fetchedResearch);
+        setFilteredResearch(fetchedResearch);
+      } catch (error) {
+        console.error("Error initializing knowledge graph:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    initializeKnowledgeGraph();
+  }, []);
+
+  const renderRelatedPapers = (currentPaper) => {
+    if (!knowledgeGraph) return null;
+
+    const paperId = `paper_${currentPaper.research_id}`;
+    const related = findRelatedPapers(knowledgeGraph, paperId, 1).slice(0, 3);
+
+    return related.length > 0 ? (
+      <Box sx={{ mt: 1 }} onClick={(e) => e.stopPropagation()}>
+        <Typography variant='caption' sx={{ color: "#666" }}>
+          Related Papers:
+        </Typography>
+        {related.map((paper) => (
+          <Typography
+            key={paper.research_id}
+            variant='caption'
+            sx={{
+              display: "block",
+              color: "#0A438F",
+              cursor: "pointer",
+              width: "fit-content",
+              "&:hover": { textDecoration: "underline" },
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleResearchItemClick(paper);
+            }}
+          >
+            {paper.title}
+          </Typography>
+        ))}
+      </Box>
+    ) : null;
+  };
+
+  // Update the research areas section title and back navigation
+  const renderSidebarTitle = () => {
+    if (selectedSDG) {
+      return (
+        <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+          <IconButton
+            onClick={() => {
+              setSelectedSDG(null);
+              setSelectedResearchArea(null);
+              setFilteredResearch(research);
+            }}
+            sx={{ mr: 1 }}
+          >
+            <ArrowBackIosIcon sx={{ fontSize: "0.9rem" }} />
+          </IconButton>
+          <Typography
+            variant='h6'
+            sx={{
+              color: "#666",
+              fontSize: "1rem",
+              fontWeight: 500,
+            }}
+          >
+            Research Areas in {selectedSDG}
+          </Typography>
+        </Box>
+      );
+    }
+    return (
+      <Typography
+        variant='h6'
+        sx={{
+          color: "#666",
+          fontSize: "1rem",
+          fontWeight: 500,
+          mb: 1,
+        }}
+      >
+        Browse by SDG
+      </Typography>
+    );
+  };
+
+  // Update the sidebar content section
+  const renderSidebarContent = () => {
+    const contentBox = (
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          gap: 2,
+          maxHeight: "calc(100vh - 300px)",
+          overflowY: "auto",
+          padding: "0.5rem",
+          paddingTop: selectedSDG || selectedResearchArea ? "0.5rem" : "0.5rem", // Reduced padding
+          marginTop: "0", // Remove margin
+        }}
+      >
+        {selectedSDG
+          ? // Research areas content
+            Array.from(sdgAreaMapping[selectedSDG] || [])
+              .map((areaId) =>
+                researchAreas.find((a) => String(a.id) === String(areaId))
+              )
+              .filter((area) => area)
+              .sort((a, b) => a.name.localeCompare(b.name))
+              .map((area, index) => (
+                <Box
+                  key={area.id}
+                  onClick={() => handleFieldClick(area.id)}
+                  sx={{
+                    backgroundColor:
+                      selectedResearchArea === area.id
+                        ? "#d45d5d"
+                        : index % 2 === 0
+                        ? "#F17B7B"
+                        : "#F1A77B",
+                    borderRadius: 2,
+                    padding: 2,
+                    cursor: "pointer",
+                    transition: "transform 0.2s, background-color 0.2s",
+                    transform:
+                      selectedResearchArea === area.id ? "scale(1.02)" : "none",
+                    "&:hover": {
+                      transform: "translateY(-2px)",
+                      boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+                    },
+                  }}
+                >
+                  <Typography
+                    variant='subtitle1'
+                    sx={{ color: "white", fontWeight: 500 }}
+                  >
+                    {area.name}
+                  </Typography>
+                  <Typography
+                    variant='caption'
+                    sx={{ color: "white", opacity: 0.9 }}
+                  >
+                    {researchAreaCounts[selectedSDG]?.[area.id] || 0} papers
+                  </Typography>
+                </Box>
+              ))
+          : // SDG list content
+            sdgGoalsData.sdgGoals.map((sdg) => (
+              <Box
+                key={sdg.id}
+                onClick={() => handleSDGClick(sdg.id)}
+                sx={{
+                  backgroundColor: collegeColors[sdg.id] || "#F17B7B",
+                  borderRadius: 2,
+                  padding: 2,
+                  cursor: "pointer",
+                  transition: "transform 0.2s, background-color 0.2s",
+                  "&:hover": {
+                    transform: "translateY(-2px)",
+                    boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+                  },
+                }}
+              >
+                <Typography variant='subtitle2' sx={{ color: "white" }}>
+                  {sdg.id}
+                </Typography>
+                <Typography
+                  variant='subtitle1'
+                  sx={{ color: "white", fontWeight: 500 }}
+                >
+                  {sdg.title}
+                </Typography>
+                <Typography
+                  variant='caption'
+                  sx={{ color: "white", opacity: 0.9 }}
+                >
+                  {sdgCounts[sdg.id] || 0} papers
+                </Typography>
+              </Box>
+            ))}
+      </Box>
+    );
+
+    return (
+      <Box sx={{ position: "relative" }}>
+        <Box
+          sx={{
+            position: "sticky",
+            top: 0,
+            zIndex: 1,
+            backgroundColor: "white",
+            py: 1, // Reduced padding
+            borderBottom:
+              selectedSDG || selectedResearchArea ? "1px solid #eee" : "none",
+          }}
+        >
+          {activeFiltersSection}
+        </Box>
+        {contentBox}
+      </Box>
+    );
+  };
+
+  // Update the active filters section
+  const activeFiltersSection = (
+    <Box
+      sx={{
+        display: "flex",
+        flexWrap: "wrap",
+        gap: 1,
+        alignItems: "center",
+        py: 1, // Reduced padding
+      }}
+    >
+      {(selectedSDG || selectedResearchArea) && (
+        <Typography variant='body2' sx={{ color: "#666", mr: 1 }}>
+          Active filters:
+        </Typography>
+      )}
+      {selectedSDG && (
+        <Chip
+          label={`${selectedSDG}`}
+          onDelete={() => handleSDGClick(selectedSDG)}
+          sx={{ backgroundColor: "#0A438F", color: "white" }}
+        />
+      )}
+      {selectedResearchArea && (
+        <Chip
+          label={`${
+            researchAreas.find((a) => a.id === selectedResearchArea)?.name
+          }`}
+          onDelete={() => handleFieldClick(selectedResearchArea)}
+          sx={{ backgroundColor: "#F17B7B", color: "white" }}
+        />
+      )}
+    </Box>
+  );
 
   return (
     <>
@@ -949,6 +1367,7 @@ const Collection2 = () => {
                                 >
                                   {researchItem.journal}
                                 </Typography>
+                                {renderRelatedPapers(researchItem)}
                               </Box>
                             )}
                           />
@@ -986,160 +1405,8 @@ const Collection2 = () => {
                   marginBottom: "1rem",
                 }}
               >
-                <Typography
-                  variant='h6'
-                  sx={{
-                    color: "#666",
-                    fontSize: "1rem",
-                    fontWeight: 500,
-                    mb: 1,
-                  }}
-                >
-                  {selectedSDG
-                    ? `Research Areas in ${selectedSDG}`
-                    : "Browse by SDG"}
-                </Typography>
-
-                <Box
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: 2,
-                    maxHeight: "calc(100vh - 300px)",
-                    overflowY: "auto",
-                    padding: "0.5rem",
-                  }}
-                >
-                  {selectedSDG ? (
-                    <Box
-                      sx={{
-                        position: "relative",
-                        height: "100%",
-                        display: "flex",
-                        flexDirection: "column",
-                      }}
-                    >
-                      <Box
-                        sx={{
-                          display: "flex",
-                          justifyContent: "center",
-                          alignItems: "center",
-                          mb: 2,
-                        }}
-                      >
-                        <Button
-                          onClick={() => setSelectedSDG(null)}
-                          variant='contained'
-                          sx={{
-                            backgroundColor: "#08397C",
-                            color: "#FFF",
-                            fontFamily: "Montserrat, sans-serif",
-                            fontWeight: 600,
-                            textTransform: "none",
-                            fontSize: { xs: "0.875rem", md: "1rem" },
-                            padding: "0.5rem 1.5rem",
-                            borderRadius: "100px",
-                            "&:hover": {
-                              backgroundColor: "#072d61",
-                              transform: "translateY(-2px)",
-                              boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
-                            },
-                            transition: "all 0.2s",
-                          }}
-                        >
-                          ← Back to SDGs
-                        </Button>
-                      </Box>
-
-                      <Box
-                        sx={{
-                          flex: 1,
-                          overflowY: "auto",
-                          display: "flex",
-                          flexDirection: "column",
-                          gap: 2,
-                        }}
-                      >
-                        {sdgAreaMapping[selectedSDG] &&
-                          Array.from(sdgAreaMapping[selectedSDG])
-                            .map((areaId) =>
-                              researchAreas.find(
-                                (a) => String(a.id) === String(areaId)
-                              )
-                            )
-                            .filter((area) => area)
-                            .sort((a, b) => a.name.localeCompare(b.name))
-                            .map((area, index) => (
-                              <Box
-                                key={area.id}
-                                onClick={() => handleFieldClick(area.id)}
-                                sx={{
-                                  backgroundColor:
-                                    index % 2 === 0 ? "#F17B7B" : "#F1A77B",
-                                  borderRadius: 2,
-                                  padding: 2,
-                                  cursor: "pointer",
-                                  transition: "transform 0.2s",
-                                  "&:hover": {
-                                    transform: "translateY(-2px)",
-                                    boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
-                                  },
-                                }}
-                              >
-                                <Typography
-                                  variant='subtitle1'
-                                  sx={{ color: "white", fontWeight: 500 }}
-                                >
-                                  {area.name}
-                                </Typography>
-                                <Typography
-                                  variant='caption'
-                                  sx={{ color: "white", opacity: 0.9 }}
-                                >
-                                  {researchAreaCounts[selectedSDG]?.[area.id] ||
-                                    0}{" "}
-                                  papers
-                                </Typography>
-                              </Box>
-                            ))}
-                      </Box>
-                    </Box>
-                  ) : (
-                    sdgGoalsData.sdgGoals.map((sdg) => (
-                      <Box
-                        key={sdg.id}
-                        onClick={() => handleSDGClick(sdg.id)}
-                        sx={{
-                          backgroundColor: collegeColors[sdg.id] || "#F17B7B",
-                          borderRadius: 2,
-                          padding: 2,
-                          cursor: "pointer",
-                          transition: "transform 0.2s",
-                          "&:hover": {
-                            transform: "translateY(-2px)",
-                            boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
-                          },
-                        }}
-                      >
-                        <Typography variant='subtitle2' sx={{ color: "white" }}>
-                          {sdg.id}
-                        </Typography>
-                        <Typography
-                          variant='subtitle1'
-                          sx={{ color: "white", fontWeight: 500 }}
-                        >
-                          {sdg.title}
-                        </Typography>
-                        <Typography
-                          variant='caption'
-                          sx={{ color: "white", opacity: 0.9 }}
-                        >
-                          {sdgCounts[sdg.id] || 0} papers
-                        </Typography>
-                      </Box>
-                    ))
-                  )}
-                </Box>
+                {renderSidebarTitle()}
+                {renderSidebarContent()}
               </Grid2>
             </Grid2>
           </Box>
