@@ -18,7 +18,7 @@ import {
   useTheme,
 } from "@mui/material";
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import navLogo from "../assets/MMCL_Logo_Nav.png";
 import LoginModal from "./loginmodal";
 import { useAuth } from "../context/AuthContext";
@@ -39,6 +39,7 @@ const Navbar = () => {
   const [open, setOpen] = React.useState(false);
   const anchorRef = React.useRef < HTMLButtonElement > null;
   const navigate = useNavigate();
+  const location = useLocation();
 
   const {
     isLoginModalOpen,
@@ -49,6 +50,41 @@ const Navbar = () => {
     openPassresetModal,
     closePassresetModal,
   } = useModalContext();
+
+  // Add this style object for active buttons
+  const activeButtonStyle = {
+    backgroundColor: "#CA031B",
+    color: "#FFF",
+    "&:hover": {
+      backgroundColor: "#a8031b",
+    },
+  };
+
+  // Update buttonSettings to include active state
+  const buttonSettings = {
+    color: "#001C43",
+    fontFamily: "Montserrat, sans-serif",
+    fontWeight: 600,
+    fontSize: {
+      xs: "0.25rem",
+      sm: "0.25rem",
+      md: "0.60rem",
+      lg: "0.75rem",
+    },
+    marginRight: {
+      xs: "0.75rem",
+      sm: "0.50rem",
+      md: "0.25rem",
+    },
+    padding: {
+      xs: "0rem 0.25rem",
+      sm: "0.25rem 0.5rem",
+      md: "0.25rem 0.5rem",
+    },
+    "&:hover": {
+      backgroundColor: "rgba(202, 3, 27, 0.04)",
+    },
+  };
 
   {
     /*****************Event Handlers******************/
@@ -191,28 +227,6 @@ const Navbar = () => {
         { label: "Log in", onClick: handleLogin },
       ];
 
-  const buttonSettings = {
-    color: "#001C43",
-    fontFamily: "Montserrat, sans-serif",
-    fontWeight: 600,
-    fontSize: {
-      xs: "0.25rem", // Smaller on extra small screens
-      sm: "0.25rem", // Slightly larger on small screens
-      md: "0.60rem", // Standard size on medium screens
-      lg: "0.75rem", // Slightly larger on large screens
-    },
-    marginRight: {
-      xs: "0.75rem",
-      sm: "0.50rem",
-      md: "0.25rem",
-    },
-    padding: {
-      xs: "0rem 0.25rem",
-      sm: "0.25rem 0.5rem",
-      md: "0.25rem 0.5rem",
-    },
-  };
-
   // Define which menu items are available for each role
   const getNavbarItems = () => {
     if (!user) return [];
@@ -235,7 +249,7 @@ const Navbar = () => {
         { label: "Manage Users", onClick: handleManageUsers },
         { label: "Manage Colleges", onClick: handleManageCollege },
         { label: "Manage Programs", onClick: handleManageProgram },
-        { label: "View Audit Logs", onClick: handleViewAuditLog }
+        { label: "View Audit Logs", onClick: handleViewAuditLog },
       ],
       "02": [
         // Director
@@ -269,7 +283,29 @@ const Navbar = () => {
       ],
     };
 
-    return roleSpecificItems[user.role] || commonItems;
+    return (
+      roleSpecificItems[user.role]?.map((item) => ({
+        ...item,
+        isActive: location.pathname === getPathFromLabel(item.label),
+      })) || commonItems
+    );
+  };
+
+  // Helper function to get path from label
+  const getPathFromLabel = (label) => {
+    const pathMap = {
+      Collections: "/collection",
+      "Research Thrusts": "/researchthrust",
+      Dashboard: "/dash",
+      "Manage Users": "/manage-users",
+      "Manage Colleges": "/managecollege",
+      "Manage Programs": "/manageprogram",
+      "View Audit Logs": "/auditlog",
+      "Research Tracking": "/researchtracking",
+      "Knowledge Graph": "/knowledgegraph",
+      Home: "/home",
+    };
+    return pathMap[label] || "/";
   };
 
   return (
@@ -404,12 +440,18 @@ const Navbar = () => {
                 <Button
                   key={index}
                   onClick={item.onClick}
-                  sx={buttonSettings}
+                  sx={{
+                    ...buttonSettings,
+                    ...(item.isActive ? activeButtonStyle : {}),
+                  }}
                   endIcon={
                     item.label === "Dashboard" ||
                     item.label === "System Management" ? (
                       <KeyboardArrowDownIcon
-                        style={{ color: "red", fontSize: 30 }}
+                        style={{
+                          color: item.isActive ? "#FFF" : "red",
+                          fontSize: 30,
+                        }}
                       />
                     ) : null
                   }
