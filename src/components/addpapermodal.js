@@ -70,6 +70,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
   const [shouldClearFields, setShouldClearFields] = useState(false);
+  const [isSuccessDialogOpen, setIsSuccessDialogOpen] = useState(false);
 
   // Create array of school years (last 10 years)
   const currentYear = new Date().getFullYear();
@@ -410,24 +411,26 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
         },
       });
 
-      toast.success("Paper added successfully!");
+      // Show success dialog instead of toast
+      setIsSuccessDialogOpen(true);
 
       if (onPaperAdded) {
         await onPaperAdded();
       }
 
-      // Only clear fields and close modal if this wasn't triggered from the confirmation dialog
-      if (!isConfirmDialogOpen) {
-        closeAddPaperModal();
-      }
-
-      setIsConfirmDialogOpen(false); // Just close the confirmation dialog if it was open
+      // Don't close the modal immediately - let user close via dialog
     } catch (error) {
       toast.error(error.response?.data?.error || "Error adding paper");
       console.error("Error:", error);
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleSuccessClose = () => {
+    setIsSuccessDialogOpen(false);
+    setShouldClearFields(true);
+    closeAddPaperModal();
   };
 
   // Modify the useEffect that handles cleanup
@@ -1463,6 +1466,73 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
               }}
             >
               Save Progress
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        {/* Add Success Dialog */}
+        <Dialog
+          open={isSuccessDialogOpen}
+          onClose={handleSuccessClose}
+          PaperProps={{
+            sx: {
+              borderRadius: "15px",
+              padding: "1rem",
+            },
+          }}
+        >
+          <DialogTitle
+            sx={{
+              fontFamily: "Montserrat, sans-serif",
+              fontWeight: 600,
+              color: "#08397C",
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
+            }}
+          >
+            <Box
+              component='span'
+              sx={{
+                backgroundColor: "#E8F5E9",
+                borderRadius: "50%",
+                padding: "8px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              ✓
+            </Box>
+            Success
+          </DialogTitle>
+          <DialogContent>
+            <Typography
+              sx={{
+                fontFamily: "Montserrat, sans-serif",
+                color: "#666",
+                mt: 1,
+              }}
+            >
+              Paper has been successfully added to the repository.
+            </Typography>
+          </DialogContent>
+          <DialogActions sx={{ padding: "1rem" }}>
+            <Button
+              onClick={handleSuccessClose}
+              sx={{
+                backgroundColor: "#08397C",
+                color: "#FFF",
+                fontFamily: "Montserrat, sans-serif",
+                fontWeight: 600,
+                textTransform: "none",
+                borderRadius: "100px",
+                "&:hover": {
+                  backgroundColor: "#072d61",
+                },
+              }}
+            >
+              Close
             </Button>
           </DialogActions>
         </Dialog>

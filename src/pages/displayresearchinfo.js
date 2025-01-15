@@ -102,6 +102,8 @@ const DisplayResearchInfo = () => {
 
   const [hasChanges, setHasChanges] = useState(false);
 
+  const [isSuccessDialogOpen, setIsSuccessDialogOpen] = useState(false);
+
   const handleChange = (field, value) => {
     setEditableData((prev) => {
       const newData = { ...prev, [field]: value };
@@ -603,9 +605,8 @@ const DisplayResearchInfo = () => {
         }
       );
 
-      // Handle success
-      console.log("Response:", response.data);
-      alert("Paper updated successfully!");
+      // Show success dialog instead of alert
+      setIsSuccessDialogOpen(true);
       setIsEditMode(false);
       setEditableData(null);
       setFile(null);
@@ -2033,6 +2034,73 @@ const DisplayResearchInfo = () => {
             autoFocus
           >
             Discard Changes
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Success Dialog */}
+      <Dialog
+        open={isSuccessDialogOpen}
+        onClose={() => setIsSuccessDialogOpen(false)}
+        PaperProps={{
+          sx: {
+            borderRadius: "15px",
+            padding: "1rem",
+          },
+        }}
+      >
+        <DialogTitle
+          sx={{
+            fontFamily: "Montserrat, sans-serif",
+            fontWeight: 600,
+            color: "#08397C",
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+          }}
+        >
+          <Box
+            component='span'
+            sx={{
+              backgroundColor: "#E8F5E9",
+              borderRadius: "50%",
+              padding: "8px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            ✓
+          </Box>
+          Success
+        </DialogTitle>
+        <DialogContent>
+          <Typography
+            sx={{
+              fontFamily: "Montserrat, sans-serif",
+              color: "#666",
+              mt: 1,
+            }}
+          >
+            Paper has been successfully updated.
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ padding: "1rem" }}>
+          <Button
+            onClick={() => setIsSuccessDialogOpen(false)}
+            sx={{
+              backgroundColor: "#08397C",
+              color: "#FFF",
+              fontFamily: "Montserrat, sans-serif",
+              fontWeight: 600,
+              textTransform: "none",
+              borderRadius: "100px",
+              "&:hover": {
+                backgroundColor: "#072d61",
+              },
+            }}
+          >
+            Close
           </Button>
         </DialogActions>
       </Dialog>
