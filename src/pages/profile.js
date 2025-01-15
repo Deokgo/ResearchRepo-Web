@@ -21,6 +21,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import HeaderWithBackButton from "../components/Header";
+import OtpModal from "../components/otpmodal"; // Adjust the path if needed
 
 const modalStyle = {
   position: "absolute",
@@ -46,6 +47,7 @@ const Profile = () => {
   const [programs, setPrograms] = useState([]);
   const [initialData, setInitialData] = useState(null);
   const navigate = useNavigate();
+  const [isOtpModalOpen, setIsOtpModalOpen] = useState(false);
   const [formValues, setFormValues] = useState({
     firstName: "",
     middleName: "",
@@ -57,6 +59,7 @@ const Profile = () => {
     role: "",
     institution: "",
   });
+  const [email, setEmail] = useState("user@example.com");
 
   const [passwordValues, setPasswordValues] = useState({
     newPassword: "",
@@ -73,6 +76,9 @@ const Profile = () => {
         setUserData(data);
         console.log("response: ", response);
 
+        // Set the email for the password reset (OTP)
+        setEmail(data.account.email);
+        
         // Set form values
         setFormValues({
           firstName: data.researcher.first_name || "",
@@ -366,6 +372,19 @@ const Profile = () => {
     setIsChangePasswordModalOpen(true);
   };
 
+  const handleOpenOtpModal = () => {
+    setIsOtpModalOpen(true);
+  };
+
+  const handleCloseOtpModal = () => {
+    setIsOtpModalOpen(false);
+  };
+
+  const handleOtpVerificationSuccess = () => {
+    handleCloseOtpModal(); // Close the OTP modal
+    handleOpenChangePasswordModal(); // Open the Change Password modal
+  };
+
   const handleCloseChangePasswordModal = () => {
     setIsChangePasswordModalOpen(false);
     setPasswordValues({
@@ -427,9 +446,9 @@ const Profile = () => {
               }}
             >
               <Button
-                variant='outlined'
+                variant="outlined"
                 startIcon={<EditIcon />}
-                onClick={handleOpenChangePasswordModal}
+                onClick={handleOpenOtpModal}
                 sx={{
                   fontWeight: 600,
                   flex: "0 1 auto", // Prevents shrinking too much
@@ -438,6 +457,15 @@ const Profile = () => {
               >
                 Change Password
               </Button>
+
+              {/* OTP Modal */}
+              <OtpModal
+                email={email}
+                open={isOtpModalOpen}
+                onClose={handleCloseOtpModal}
+                onVerify={handleOtpVerificationSuccess}
+              />
+
               <Button
                 variant='outlined'
                 startIcon={<EditIcon />}
