@@ -59,7 +59,6 @@ const Profile = () => {
   });
 
   const [passwordValues, setPasswordValues] = useState({
-    currentPassword: "",
     newPassword: "",
     confirmPassword: "",
   });
@@ -215,7 +214,7 @@ const Profile = () => {
   };
 
   const handleSaveNewPassword = async () => {
-    const { currentPassword, newPassword, confirmPassword } = passwordValues;
+    const { newPassword, confirmPassword } = passwordValues;
 
     if (!user?.user_id) {
       alert("User ID not found");
@@ -223,7 +222,7 @@ const Profile = () => {
     }
 
     // Validate input fields
-    if (!currentPassword || !newPassword || !confirmPassword) {
+    if (!newPassword || !confirmPassword) {
       alert("All fields are required.");
       return;
     }
@@ -238,7 +237,6 @@ const Profile = () => {
       const response = await axios.put(
         `/accounts/update_password/${user.user_id}`,
         {
-          currentPassword,
           newPassword,
           confirmPassword,
         }
@@ -250,7 +248,6 @@ const Profile = () => {
 
         // Reset fields and close modal
         setPasswordValues({
-          currentPassword: "",
           newPassword: "",
           confirmPassword: "",
         });
@@ -372,7 +369,6 @@ const Profile = () => {
   const handleCloseChangePasswordModal = () => {
     setIsChangePasswordModalOpen(false);
     setPasswordValues({
-      currentPassword: "",
       newPassword: "",
       confirmPassword: "",
     });
@@ -735,16 +731,6 @@ const Profile = () => {
                 Change Password
               </Typography>
               <Grid2 container spacing={2}>
-                <Grid2 size={{ xs: 12 }}>
-                  <TextField
-                    label='Current Password'
-                    fullWidth
-                    name='currentPassword'
-                    value={passwordValues.currentPassword}
-                    onChange={handlePasswordInputChange}
-                    type='password'
-                  />
-                </Grid2>
                 <Grid2 size={{ xs: 12 }}>
                   <TextField
                     label='New Password'
