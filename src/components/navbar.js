@@ -174,6 +174,10 @@ const Navbar = () => {
     navigate("/dash/analytics");
   };
 
+  const handleUserEngagementDash = () => {
+    navigate("/dash/user-engagement");
+  };
+
   const handleReports = () => {
     navigate("/dash");
   };
@@ -585,7 +589,10 @@ const Navbar = () => {
                 </Typography>
               </MenuItem>
               <MenuItem onClick={handleMainDash}>
-                <Typography color='common.white'>Analytics</Typography>
+                <Typography color='common.white'>SDG Impact Dashboard</Typography>
+              </MenuItem>
+              <MenuItem onClick={handleUserEngagementDash}>
+                <Typography color='common.white'>User Engagament Dashboard</Typography>
               </MenuItem>
             </Menu>
           )}

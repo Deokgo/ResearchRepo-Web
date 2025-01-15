@@ -86,7 +86,7 @@ const EngageDash = () => {
         }}
       >
         <HeaderWithBackButton
-            title="SDG Impact Dashboard"
+            title="User Engagement Dashboard"
             onBack={() => navigate(-1)}
           />
         <Box
