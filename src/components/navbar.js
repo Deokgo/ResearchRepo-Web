@@ -53,12 +53,22 @@ const Navbar = () => {
 
   // Add this style object for active buttons
   const activeButtonStyle = {
-    backgroundColor: "#CA031B",
-    color: "#FFF",
+    position: "relative",
+    color: "#CA031B", // Match the underline color
+    "&:after": {
+      content: '""',
+      position: "absolute",
+      bottom: 0, // Aligns the underline closely below the text
+      left: 0,
+      width: "100%",
+      height: "3px", // Thickness of the underline
+      backgroundColor: "#CA031B",
+    },
     "&:hover": {
-      backgroundColor: "#a8031b",
+      color: "#a8031b", // Darker shade on hover
     },
   };
+  
 
   // Update buttonSettings to include active state
   const buttonSettings = {
@@ -438,26 +448,25 @@ const Navbar = () => {
             <Box sx={{ display: "flex", gap: 2 }}>
               {getNavbarItems().map((item, index) => (
                 <Button
-                  key={index}
-                  onClick={item.onClick}
-                  sx={{
-                    ...buttonSettings,
-                    ...(item.isActive ? activeButtonStyle : {}),
-                  }}
-                  endIcon={
-                    item.label === "Dashboard" ||
-                    item.label === "System Management" ? (
-                      <KeyboardArrowDownIcon
-                        style={{
-                          color: item.isActive ? "#FFF" : "red",
-                          fontSize: 30,
-                        }}
-                      />
-                    ) : null
-                  }
-                >
-                  {item.label}
-                </Button>
+                key={index}
+                onClick={item.onClick}
+                sx={{
+                  ...buttonSettings,
+                  ...(item.isActive ? activeButtonStyle : {}),
+                }}
+                endIcon={
+                  item.label === "Dashboard" || item.label === "System Management" ? (
+                    <KeyboardArrowDownIcon
+                      style={{
+                        color: item.isActive ? "#CA031B" : "red", // Match underline color
+                        fontSize: 30,
+                      }}
+                    />
+                  ) : null
+                }
+              >
+                {item.label}
+              </Button>              
               ))}
               <IconButton
                 onClick={handleOpenUserMenu}
