@@ -19,6 +19,7 @@ import {
   MenuItem,
   Pagination,
   InputAdornment,
+  Autocomplete,
 } from "@mui/material";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import { useNavigate } from "react-router-dom";
@@ -27,6 +28,8 @@ import axios from "axios";
 import { Snackbar, Alert } from "@mui/material"; // Import Snackbar and Alert from Material UI
 import HeaderWithBackButton from "../components/Header";
 import AutoCompleteTextBox from "../components/Intellibox";
+import InfoIcon from "@mui/icons-material/Info";
+import Tooltip from "@mui/material/Tooltip";
 
 const UpdateTrackingInfo = ({ route, navigate }) => {
   const navpage = useNavigate();
@@ -51,9 +54,15 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
   const [singleCountry, setSingleCountry] = useState("");
   const [singleCity, setSingleCity] = useState("");
   const [countries, setCountries] = useState([]);
+  const [countriesAPI, setCountriesAPI] = useState([]);
+  const [citiesAPI, setCitiesAPI] = useState([]);
   const [Cities, setCities] = useState([]);
   const [dateApproved, setDateApproved] = useState("");
   const [selectedVenue, setSelectedVenue] = useState("");
+  const [conferenceVenues, setConferenceVenues] = useState([]);
+
+  const [countrySearchText, setCountrySearchText] = useState("");
+  const [citySearchText, setCitySearchText] = useState("");
 
   ///////////////////// PUBLICATION DATA RETRIEVAL //////////////////////
 
@@ -133,82 +142,150 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
 
   ///////////////////// COUNTRY AND CITY API RETRIEVAL //////////////////////
   const fetchCountries = async () => {
-    let country = await axios.get(
-      "https://countriesnow.space/api/v0.1/countries",
-      { withCredentials: false }
-    );
-    console.log(country);
-
-    setCountries(country.data.data);
-  };
-
-  const fetchCities = (country) => {
-    const selectedCountry = countries.find((c) => c.country === country);
-    if (selectedCountry) {
-      setCities(selectedCountry.cities);
-      setSingleCity(""); // Reset city when country changes
+    try {
+      const response = await axios.get(
+        "https://countriesnow.space/api/v0.1/countries",
+        { withCredentials: false }
+      );
+      console.log("Countries API response:", response.data.data);
+      setCountriesAPI(response.data.data);
+    } catch (error) {
+      console.error("Error fetching countries:", error);
     }
   };
 
-  const fetchCities2 = (country) => {
-    const selectedCountry = countries.find((c) => c.country === country);
-    if (selectedCountry) {
-      setCities(selectedCountry.cities);
+  const fetchConferenceVenues = async () => {
+    try {
+      const response = await axios.get("/track/fetch_data/conference");
+      console.log("Conference response:", response.data);
+
+      // Process the conference venues
+      const venues = response.data
+        .map((conf) => {
+          if (conf.conference_venue) {
+            const [city, country] = conf.conference_venue
+              .split(",")
+              .map((part) => part.trim());
+            return { city, country };
+          }
+          return null;
+        })
+        .filter((venue) => venue !== null);
+
+      console.log("Processed venues:", venues);
+      setConferenceVenues(venues);
+    } catch (error) {
+      console.error("Error fetching conference venues:", error);
     }
   };
 
+  // Combined function to fetch all data
+  const fetchAllData = async () => {
+    try {
+      await Promise.all([fetchCountries(), fetchConferenceVenues()]);
+      console.log("All data fetched successfully");
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  // Use effect to fetch data when component mounts
   useEffect(() => {
-    fetchCountries();
+    fetchAllData();
   }, []);
 
   useEffect(() => {
+    if (countriesAPI.length > 0 && conferenceVenues.length > 0) {
+      // Get unique countries from conference venues
+      const venueCountries = new Set(
+        conferenceVenues.map((venue) => venue.country)
+      );
+
+      const filteredCountries = countriesAPI.filter((country) =>
+        venueCountries.has(country.country)
+      );
+
+      console.log("Filtered countries:", filteredCountries);
+      setCountries(filteredCountries);
+    }
+  }, [countriesAPI, conferenceVenues]);
+
+  const fetchCities = (country, shouldClearCity = true) => {
+    // Get cities from countries API for the selected country
+    const selectedCountry = countries.find((c) => c.country === country);
+    if (selectedCountry) {
+      setCitiesAPI(selectedCountry.cities);
+
+      // Get cities from conference venues for the selected country
+      const venueCities = conferenceVenues
+        .filter((venue) => venue.country === country)
+        .map((venue) => venue.city);
+
+      // Filter API cities to only include those that are in our venues
+      const filteredCities = selectedCountry.cities.filter((city) =>
+        venueCities.includes(city)
+      );
+
+      console.log("Available cities for", country, ":", filteredCities);
+      setCities(filteredCities);
+
+      // Clear selected city if needed
+      if (shouldClearCity) {
+        setSingleCity("");
+      }
+    }
+  };
+
+  // Call this when country changes
+  useEffect(() => {
     if (openModalEdit && singleCountry) {
-      fetchCities2(singleCountry); // Fetch cities for the selected country
+      fetchCities(singleCountry); // Fetch cities for the selected country
     }
   }, [openModalEdit, singleCountry]);
 
   ///////////////////// ADD AND EDIT PUBLICATION //////////////////////
   const checkFields = () => {
     // Validate required fields
-      // Determine required fields based on publicationFormat
-      let requiredFields;
+    // Determine required fields based on publicationFormat
+    let requiredFields;
 
-      if (publicationFormat === "PC") {
-        requiredFields = {
-          "Publication Name": publicationName,
-          "Publication Format": publicationFormat,
-          "Publication Date":datePublished,
-          "Indexing Status": indexingStatus,
-          "Conference Title": conferenceTitle,
-          "Country": singleCountry,
-          "City": singleCity,
-          "Conference Date": dateApproved,
-        };
-      } else {
-          requiredFields = {
-            "Publication Name": publicationName,
-            "Publication Format": publicationFormat,
-            "Publication Date":datePublished,
-            "Indexing Status": indexingStatus,}
-          }
-      const missingFields = Object.entries(requiredFields)
-        .filter(([_, value]) => {
-          if (Array.isArray(value)) {
-            return value.length === 0;
-          }
-          return !value;
-        })
-        .map(([key]) => key);
+    if (publicationFormat === "PC") {
+      requiredFields = {
+        "Publication Name": publicationName,
+        "Publication Format": publicationFormat,
+        "Publication Date": datePublished,
+        "Indexing Status": indexingStatus,
+        "Conference Title": conferenceTitle,
+        Country: singleCountry,
+        City: singleCity,
+        "Conference Date": dateApproved,
+      };
+    } else {
+      requiredFields = {
+        "Publication Name": publicationName,
+        "Publication Format": publicationFormat,
+        "Publication Date": datePublished,
+        "Indexing Status": indexingStatus,
+      };
+    }
+    const missingFields = Object.entries(requiredFields)
+      .filter(([_, value]) => {
+        if (Array.isArray(value)) {
+          return value.length === 0;
+        }
+        return !value;
+      })
+      .map(([key]) => key);
 
-      const approvedDate = new Date(datePublished);
-      const today = new Date();
+    const approvedDate = new Date(datePublished);
+    const today = new Date();
 
-      // Normalize both dates to midnight
-      approvedDate.setHours(0, 0, 0, 0);
-      today.setHours(0, 0, 0, 0);
+    // Normalize both dates to midnight
+    approvedDate.setHours(0, 0, 0, 0);
+    today.setHours(0, 0, 0, 0);
 
-      return missingFields;
-  }
+    return missingFields;
+  };
 
   const handleSavePublication = async () => {
     try {
@@ -274,20 +351,16 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
       dateApproved != initialValues?.conference_date ||
       singleCity != initialValues?.single_city ||
       singleCountry != initialValues?.single_country ||
-
       console.log("Initial Data:", initialValues);
 
     return hasChanges;
-  }
+  };
 
   const handleSaveDetails = () => {
-    
     const hasChanges = handleCheckChanges();
-    
+
     if (!hasChanges) {
-      alert(
-        "No changes were made to save."
-      );
+      alert("No changes were made to save.");
       setOpenModalEdit(false);
       return;
     }
@@ -295,21 +368,20 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
   };
 
   const handleCheckDetails = () => {
-    
     const hasChanges = handleCheckChanges();
-    
+
     if (hasChanges) {
       const userConfirmed = window.confirm(
         "You have unsaved changes. Save Changes?"
       );
-  
+
       if (userConfirmed) {
         handleEditPublication();
         return;
       }
       setOpenModalEdit(false);
     }
-    
+
     // Reset current values
     setPublicationName(initialValues?.publication_name);
     setPublicationFormat(initialValues?.journal);
@@ -328,9 +400,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
       const missingFields = checkFields();
 
       if (missingFields.length > 0) {
-        alert(
-          `All fields are required: ${missingFields.join(", ")}`
-        );
+        alert(`All fields are required: ${missingFields.join(", ")}`);
         return;
       }
 
@@ -347,13 +417,13 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
       formData.append("date_published", datePublished);
       formData.append("scopus", indexingStatus);
 
-      if (publicationFormat === 'PC'){
+      if (publicationFormat === "PC") {
         formData.append("conference_title", conferenceTitle);
         formData.append("city", singleCity);
         formData.append("country", singleCountry);
         formData.append("conference_date", dateApproved);
       }
-      
+
       // Send the conference data
       const response = await axios.put(`/track/publication/${id}`, formData, {
         headers: {
@@ -471,7 +541,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
     setOpenModalPub(true);
   };
 
-  const handleOpenModalEdit= () => {
+  const handleOpenModalEdit = () => {
     setOpenModalEdit(true);
   };
 
@@ -554,12 +624,14 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
     setHasError(false); // Dismiss the alert by setting hasError to false
   };
   const [pub_names, setPubNames] = useState([]);
-  
+
   // Fetch data from the API
   useEffect(() => {
     const fetchPub_Names = async () => {
       try {
-        const response = await axios.get("/track/data_fetcher/publications/publication_name"); // Replace with your API endpoint
+        const response = await axios.get(
+          "/track/data_fetcher/publications/publication_name"
+        ); // Replace with your API endpoint
         setPubNames(response.data); // Assuming the API returns an array of fruits
       } catch (error) {
         console.error("Error fetching fruits:", error);
@@ -569,12 +641,14 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
     fetchPub_Names();
   }, []);
   const [conf_title, setConfTitle] = useState([]);
-  
+
   // Fetch data from the API
   useEffect(() => {
     const fetchConf_titles = async () => {
       try {
-        const response = await axios.get("/track/data_fetcher/conference/conference_title"); // Replace with your API endpoint
+        const response = await axios.get(
+          "/track/data_fetcher/conference/conference_title"
+        ); // Replace with your API endpoint
         setConfTitle(response.data); // Assuming the API returns an array of fruits
       } catch (error) {
         console.error("Error fetching fruits:", error);
@@ -611,6 +685,14 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
     (format) => format.pub_format_id === initialValues?.journal
   )?.pub_format_name;
 
+  // Modified country selection handling
+  const handleCountryChange = (event, newValue) => {
+    setSingleCountry(newValue);
+    if (newValue) {
+      fetchCities(newValue);
+    }
+  };
+
   return (
     <>
       <Box
@@ -637,7 +719,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
           }}
         >
           <HeaderWithBackButton
-            title="Update Tracking Info"
+            title='Update Tracking Info'
             onBack={() => navpage(-1)}
           />
 
@@ -852,8 +934,13 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
 
                                   {/* Details */}
                                   <Grid2 display='flex' flexDirection='row'>
-                                    <Grid2 container size={6} display='flex' flexDirection='column'>
-                                    <Typography
+                                    <Grid2
+                                      container
+                                      size={6}
+                                      display='flex'
+                                      flexDirection='column'
+                                    >
+                                      <Typography
                                         variant='h7'
                                         sx={{
                                           mb: "1rem",
@@ -879,7 +966,8 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                         }}
                                       >
                                         <strong>Publication Name:</strong>{" "}
-                                        {initialValues?.publication_name || "None"}
+                                        {initialValues?.publication_name ||
+                                          "None"}
                                       </Typography>
                                       <Typography
                                         variant='h7'
@@ -893,9 +981,17 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                         }}
                                       >
                                         <strong>Date Published:</strong>{" "}
-                                        {initialValues?.date_published ? new Intl.DateTimeFormat(
-                                          'en-US', { month: 'long', day: '2-digit', year: 'numeric' }).format(
-                                            new Date(initialValues.date_published)) : 'None'}
+                                        {initialValues?.date_published
+                                          ? new Intl.DateTimeFormat("en-US", {
+                                              month: "long",
+                                              day: "2-digit",
+                                              year: "numeric",
+                                            }).format(
+                                              new Date(
+                                                initialValues.date_published
+                                              )
+                                            )
+                                          : "None"}
                                       </Typography>
                                       <Typography
                                         variant='h7'
@@ -942,7 +1038,8 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                               }}
                                             >
                                               <strong>Title:</strong>{" "}
-                                              {initialValues?.conference_title || "None"}
+                                              {initialValues?.conference_title ||
+                                                "None"}
                                             </Typography>
                                             <Typography
                                               variant='h7'
@@ -956,9 +1053,20 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                               }}
                                             >
                                               <strong>Date:</strong>{" "}
-                                              {initialValues?.conference_date ? new Intl.DateTimeFormat(
-                                          'en-US', { month: 'long', day: '2-digit', year: 'numeric' }).format(
-                                            new Date(initialValues.conference_date)) : 'None'}
+                                              {initialValues?.conference_date
+                                                ? new Intl.DateTimeFormat(
+                                                    "en-US",
+                                                    {
+                                                      month: "long",
+                                                      day: "2-digit",
+                                                      year: "numeric",
+                                                    }
+                                                  ).format(
+                                                    new Date(
+                                                      initialValues.conference_date
+                                                    )
+                                                  )
+                                                : "None"}
                                             </Typography>
                                             <Typography
                                               variant='h7'
@@ -972,7 +1080,8 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                               }}
                                             >
                                               <strong>Venue:</strong>{" "}
-                                              {`${initialValues?.single_city}, ${initialValues?.single_country}` || "None"}
+                                              {`${initialValues?.single_city}, ${initialValues?.single_country}` ||
+                                                "None"}
                                             </Typography>
                                           </Box>
                                         </Grid2>
@@ -1108,7 +1217,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                     Add Publication Details
                   </Typography>
                   <FormControl fullWidth variant='outlined' margin='dense'>
-                  <InputLabel
+                    <InputLabel
                       sx={{
                         fontSize: {
                           xs: "0.75rem",
@@ -1120,7 +1229,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                       Format
                     </InputLabel>
                     <Select
-                      label="Format"
+                      label='Format'
                       sx={createTextFieldStyles()} // Assuming this is a custom style function
                       value={publicationFormat || ""}
                       onChange={handleChange} // Call handleChange when user selects an option
@@ -1139,13 +1248,17 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                         Select publication format
                       </MenuItem>
                       {publicationFormats.map((format) => (
-                        <MenuItem key={format.pub_format_id} value={format.pub_format_id} sx={{
-                          fontSize: {
-                            xs: "0.75rem",
-                            md: "0.75rem",
-                            lg: "0.8rem",
-                          },
-                        }}>
+                        <MenuItem
+                          key={format.pub_format_id}
+                          value={format.pub_format_id}
+                          sx={{
+                            fontSize: {
+                              xs: "0.75rem",
+                              md: "0.75rem",
+                              lg: "0.8rem",
+                            },
+                          }}
+                        >
                           {format.pub_format_name}
                         </MenuItem>
                       ))}
@@ -1155,21 +1268,23 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                     fullWidth
                     data={pub_names}
                     value={publicationName}
-                    label="Publication Name"
-                    id="publication-name"
+                    label='Publication Name'
+                    id='publication-name'
                     onItemSelected={(value) => setPublicationName(value)} // Update state when a suggestion is selected
-                    sx={{...createTextFieldStyles(), 
-                      '& .MuiInputLabel-root': {
-                      fontSize: {
-                        xs: "0.75rem",
-                        md: "0.75rem",
-                        lg: "0.8rem",
+                    sx={{
+                      ...createTextFieldStyles(),
+                      "& .MuiInputLabel-root": {
+                        fontSize: {
+                          xs: "0.75rem",
+                          md: "0.75rem",
+                          lg: "0.8rem",
+                        },
                       },
-                    }}}
+                    }}
                     InputLabelProps={createInputLabelProps()}
-                    placeholder="ex: PLOS One"
+                    placeholder='ex: PLOS One'
                   />
-                  <Grid2 container spacing={4}> 
+                  <Grid2 container spacing={4}>
                     <Grid2 size={6}>
                       <TextField
                         fullWidth
@@ -1206,18 +1321,18 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                           onChange={(e) => setIndexingStatus(e.target.value)}
                         >
                           <MenuItem
-                              value=''
-                              disabled
-                              sx={{
-                                fontSize: {
-                                  xs: "0.75rem",
-                                  md: "0.75rem",
-                                  lg: "0.8rem",
-                                },
-                              }}
-                            >
-                              Select indexing status
-                            </MenuItem>
+                            value=''
+                            disabled
+                            sx={{
+                              fontSize: {
+                                xs: "0.75rem",
+                                md: "0.75rem",
+                                lg: "0.8rem",
+                              },
+                            }}
+                          >
+                            Select indexing status
+                          </MenuItem>
                           <MenuItem
                             value='SCOPUS'
                             sx={{
@@ -1251,127 +1366,128 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                       <Divider
                         orientation='horizontal'
                         flexItem
-                        sx= {{ mt: '0.5rem', mb: '0.5rem' }}
+                        sx={{ mt: "0.5rem", mb: "0.5rem" }}
                       />
                       <AutoCompleteTextBox
                         fullWidth
                         data={conf_title}
                         label='Conference Title'
                         value={conferenceTitle}
-                        id="conf-name"
+                        id='conf-name'
                         onItemSelected={(value) => setConferenceTitle(value)}
-                        sx={{...createTextFieldStyles(), 
-                          '& .MuiInputLabel-root': {
-                          fontSize: {
-                            xs: "0.75rem",
-                            md: "0.75rem",
-                            lg: "0.8rem",
+                        sx={{
+                          ...createTextFieldStyles(),
+                          "& .MuiInputLabel-root": {
+                            fontSize: {
+                              xs: "0.75rem",
+                              md: "0.75rem",
+                              lg: "0.8rem",
+                            },
                           },
-                        }}}
+                        }}
                         InputLabelProps={createInputLabelProps()}
-                        placeholder="ex: Proceedings of the International Conference on Artificial Intelligence"
+                        placeholder='ex: Proceedings of the International Conference on Artificial Intelligence'
                       />
 
-                      <Grid2 container spacing={4}> 
+                      <Grid2 container spacing={4}>
                         <Grid2 size={6}>
-                           <TextField
-                            select
-                            fullWidth
-                            label='Country'
-                            value={singleCountry}
-                            onChange={(e) => {
-                              setSingleCountry(e.target.value);
-                              fetchCities(e.target.value);
+                          <Box
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 1,
                             }}
-                            margin='dense'
-                            sx={{...createTextFieldStyles(), 
-                              '& .MuiInputLabel-root': {
-                              fontSize: {
-                                xs: "0.75rem",
-                                md: "0.75rem",
-                                lg: "0.8rem",
-                              },
-                            }}}
-                            InputLabelProps={createInputLabelProps()}
                           >
-                            <MenuItem
-                              value=''
-                              disabled
-                              sx={{
-                                fontSize: {
-                                  xs: "0.75rem",
-                                  md: "0.75rem",
-                                  lg: "0.8rem",
-                                },
+                            <Autocomplete
+                              fullWidth
+                              options={
+                                countrySearchText
+                                  ? countriesAPI.map((c) => c.country)
+                                  : countries
+                                      .filter((c) =>
+                                        conferenceVenues.some(
+                                          (v) => v.country === c.country
+                                        )
+                                      )
+                                      .map((c) => c.country)
+                              }
+                              value={singleCountry}
+                              onChange={handleCountryChange}
+                              onInputChange={(event, newInputValue) => {
+                                setCountrySearchText(newInputValue);
                               }}
+                              renderInput={(params) => (
+                                <TextField
+                                  {...params}
+                                  label='Country'
+                                  margin='dense'
+                                  sx={createTextFieldStyles()}
+                                  InputLabelProps={createInputLabelProps()}
+                                />
+                              )}
+                            />
+                            <Tooltip
+                              title="Can't find your country? Type to search from all available countries"
+                              placement='right'
                             >
-                              Select your country
-                            </MenuItem>
-                            {countries.map((country) => (
-                              <MenuItem
-                                key={country.country}
-                                value={country.country}
+                              <InfoIcon
                                 sx={{
-                                  fontSize: {
-                                    xs: "0.75rem",
-                                    md: "0.75rem",
-                                    lg: "0.8rem",
-                                  },
+                                  color: "#08397C",
+                                  fontSize: "1.2rem",
+                                  cursor: "help",
                                 }}
-                              >
-                                {country.country}
-                              </MenuItem>
-                            ))}
-                          </TextField>
+                              />
+                            </Tooltip>
+                          </Box>
                         </Grid2>
                         <Grid2 size={6}>
-                          <TextField
-                            select
-                            fullWidth
-                            label='City'
-                            value={singleCity}
-                            onChange={(e) => setSingleCity(e.target.value)}
-                            margin='dense'
-                            disabled={!Cities.length} // Disable if no cities are loaded
-                            sx={{...createTextFieldStyles(), 
-                              '& .MuiInputLabel-root': {
-                              fontSize: {
-                                xs: "0.75rem",
-                                md: "0.75rem",
-                                lg: "0.8rem",
-                              },
-                            }}}
-                            InputLabelProps={createInputLabelProps()}
+                          <Box
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 1,
+                            }}
                           >
-                            <MenuItem
-                              value=''
-                              disabled
-                              sx={{
-                                fontSize: {
-                                  xs: "0.75rem",
-                                  md: "0.75rem",
-                                  lg: "0.8rem",
-                                },
+                            <Autocomplete
+                              fullWidth
+                              options={
+                                citySearchText
+                                  ? countries.find(
+                                      (c) => c.country === singleCountry
+                                    )?.cities || []
+                                  : Cities
+                              }
+                              value={singleCity}
+                              onChange={(event, newValue) => {
+                                setSingleCity(newValue);
                               }}
+                              onInputChange={(event, newInputValue) => {
+                                setCitySearchText(newInputValue);
+                              }}
+                              disabled={!singleCountry}
+                              renderInput={(params) => (
+                                <TextField
+                                  {...params}
+                                  label='City'
+                                  margin='dense'
+                                  sx={createTextFieldStyles()}
+                                  InputLabelProps={createInputLabelProps()}
+                                />
+                              )}
+                            />
+                            <Tooltip
+                              title="Can't find your city? Type to search from all available cities"
+                              placement='right'
                             >
-                              Select your city
-                            </MenuItem>
-                            {Cities.map((city) => (
-                              <MenuItem
-                                key={city}
-                                value={city}
+                              <InfoIcon
                                 sx={{
-                                  fontSize: {
-                                    xs: "0.75rem",
-                                    md: "0.75rem",
-                                    lg: "0.8rem",
-                                  },
+                                  color: "#08397C",
+                                  fontSize: "1.2rem",
+                                  cursor: "help",
                                 }}
-                              >
-                                {city}
-                              </MenuItem>
-                            ))}
-                          </TextField>
+                              />
+                            </Tooltip>
+                          </Box>
                         </Grid2>
                       </Grid2>
                       <TextField
@@ -1480,7 +1596,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                     Edit Publication Details
                   </Typography>
                   <FormControl fullWidth variant='outlined' margin='dense'>
-                  <InputLabel
+                    <InputLabel
                       sx={{
                         fontSize: {
                           xs: "0.75rem",
@@ -1492,7 +1608,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                       Format
                     </InputLabel>
                     <Select
-                      label="Format"
+                      label='Format'
                       sx={createTextFieldStyles()} // Assuming this is a custom style function
                       value={publicationFormat}
                       onChange={handleChange} // Call handleChange when user selects an option
@@ -1511,13 +1627,17 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                         Select publication format
                       </MenuItem>
                       {publicationFormats.map((format) => (
-                        <MenuItem key={format.pub_format_id} value={format.pub_format_id} sx={{
-                          fontSize: {
-                            xs: "0.75rem",
-                            md: "0.75rem",
-                            lg: "0.8rem",
-                          },
-                        }}>
+                        <MenuItem
+                          key={format.pub_format_id}
+                          value={format.pub_format_id}
+                          sx={{
+                            fontSize: {
+                              xs: "0.75rem",
+                              md: "0.75rem",
+                              lg: "0.8rem",
+                            },
+                          }}
+                        >
                           {format.pub_format_name}
                         </MenuItem>
                       ))}
@@ -1526,22 +1646,24 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                   <AutoCompleteTextBox
                     fullWidth
                     data={pub_names}
-                    label="Publication Name"
-                    id="publication-name"
+                    label='Publication Name'
+                    id='publication-name'
                     value={publicationName}
                     onItemSelected={(value) => setPublicationName(value)} // Update state when a suggestion is selected
-                    sx={{...createTextFieldStyles(), 
-                      '& .MuiInputLabel-root': {
-                      fontSize: {
-                        xs: "0.75rem",
-                        md: "0.75rem",
-                        lg: "0.8rem",
+                    sx={{
+                      ...createTextFieldStyles(),
+                      "& .MuiInputLabel-root": {
+                        fontSize: {
+                          xs: "0.75rem",
+                          md: "0.75rem",
+                          lg: "0.8rem",
+                        },
                       },
-                    }}}
+                    }}
                     InputLabelProps={createInputLabelProps()}
-                    placeholder="ex: PLOS One"
+                    placeholder='ex: PLOS One'
                   />
-                  <Grid2 container spacing={4}> 
+                  <Grid2 container spacing={4}>
                     <Grid2 size={6}>
                       <TextField
                         fullWidth
@@ -1549,11 +1671,13 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                         variant='outlined'
                         type='date'
                         margin='dense'
-                        value={datePublished
-                          ? new Date(
-                              datePublished
-                            ).toLocaleDateString("en-CA")
-                          : ""}
+                        value={
+                          datePublished
+                            ? new Date(datePublished).toLocaleDateString(
+                                "en-CA"
+                              )
+                            : ""
+                        }
                         onChange={(e) => setDatePublished(e.target.value)}
                         sx={createTextFieldStyles()}
                         InputLabelProps={{
@@ -1582,18 +1706,18 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                           onChange={(e) => setIndexingStatus(e.target.value)}
                         >
                           <MenuItem
-                              value=''
-                              disabled
-                              sx={{
-                                fontSize: {
-                                  xs: "0.75rem",
-                                  md: "0.75rem",
-                                  lg: "0.8rem",
-                                },
-                              }}
-                            >
-                              Select indexing status
-                            </MenuItem>
+                            value=''
+                            disabled
+                            sx={{
+                              fontSize: {
+                                xs: "0.75rem",
+                                md: "0.75rem",
+                                lg: "0.8rem",
+                              },
+                            }}
+                          >
+                            Select indexing status
+                          </MenuItem>
                           <MenuItem
                             value='SCOPUS'
                             sx={{
@@ -1627,126 +1751,128 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                       <Divider
                         orientation='horizontal'
                         flexItem
-                        sx= {{ mt: '0.5rem', mb: '0.5rem' }}
+                        sx={{ mt: "0.5rem", mb: "0.5rem" }}
                       />
                       <AutoCompleteTextBox
                         fullWidth
                         data={conf_title}
                         label='Conference Title'
-                        id="conf-name"
+                        id='conf-name'
                         value={conferenceTitle}
                         onItemSelected={(value) => setConferenceTitle(value)}
-                        sx={{...createTextFieldStyles(), 
-                          '& .MuiInputLabel-root': {
-                          fontSize: {
-                            xs: "0.75rem",
-                            md: "0.75rem",
-                            lg: "0.8rem",
+                        sx={{
+                          ...createTextFieldStyles(),
+                          "& .MuiInputLabel-root": {
+                            fontSize: {
+                              xs: "0.75rem",
+                              md: "0.75rem",
+                              lg: "0.8rem",
+                            },
                           },
-                        }}}
+                        }}
                         InputLabelProps={createInputLabelProps()}
-                        placeholder="ex: Proceedings of the International Conference on Artificial Intelligence"
+                        placeholder='ex: Proceedings of the International Conference on Artificial Intelligence'
                       />
 
-                      <Grid2 container spacing={4}> 
+                      <Grid2 container spacing={4}>
                         <Grid2 size={6}>
-                           <TextField
-                            select
-                            fullWidth
-                            label='Country'
-                            value={singleCountry}
-                            onChange={(e) => {
-                              setSingleCountry(e.target.value);
-                              fetchCities(e.target.value);
+                          <Box
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 1,
                             }}
-                            margin='dense'
-                            sx={{...createTextFieldStyles(), 
-                              '& .MuiInputLabel-root': {
-                              fontSize: {
-                                xs: "0.75rem",
-                                md: "0.75rem",
-                                lg: "0.8rem",
-                              },
-                            }}}
-                            InputLabelProps={createInputLabelProps()}
                           >
-                            <MenuItem
-                              value=''
-                              disabled
-                              sx={{
-                                fontSize: {
-                                  xs: "0.75rem",
-                                  md: "0.75rem",
-                                  lg: "0.8rem",
-                                },
+                            <Autocomplete
+                              fullWidth
+                              options={
+                                countrySearchText
+                                  ? countriesAPI.map((c) => c.country)
+                                  : countries
+                                      .filter((c) =>
+                                        conferenceVenues.some(
+                                          (v) => v.country === c.country
+                                        )
+                                      )
+                                      .map((c) => c.country)
+                              }
+                              value={singleCountry}
+                              onChange={handleCountryChange}
+                              onInputChange={(event, newInputValue) => {
+                                setCountrySearchText(newInputValue);
                               }}
+                              renderInput={(params) => (
+                                <TextField
+                                  {...params}
+                                  label='Country'
+                                  margin='dense'
+                                  sx={createTextFieldStyles()}
+                                  InputLabelProps={createInputLabelProps()}
+                                />
+                              )}
+                            />
+                            <Tooltip
+                              title="Can't find your country? Type to search from all available countries"
+                              placement='right'
                             >
-                              Select your country
-                            </MenuItem>
-                            {countries.map((country) => (
-                              <MenuItem
-                                key={country.country}
-                                value={country.country}
+                              <InfoIcon
                                 sx={{
-                                  fontSize: {
-                                    xs: "0.75rem",
-                                    md: "0.75rem",
-                                    lg: "0.8rem",
-                                  },
+                                  color: "#08397C",
+                                  fontSize: "1.2rem",
+                                  cursor: "help",
                                 }}
-                              >
-                                {country.country}
-                              </MenuItem>
-                            ))}
-                          </TextField>
+                              />
+                            </Tooltip>
+                          </Box>
                         </Grid2>
                         <Grid2 size={6}>
-                          <TextField
-                            select
-                            fullWidth
-                            label='City'
-                            value={singleCity}
-                            onChange={(e) => setSingleCity(e.target.value)}
-                            margin='dense'
-                            sx={{...createTextFieldStyles(), 
-                              '& .MuiInputLabel-root': {
-                              fontSize: {
-                                xs: "0.75rem",
-                                md: "0.75rem",
-                                lg: "0.8rem",
-                              },
-                            }}}
-                            InputLabelProps={createInputLabelProps()}
+                          <Box
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 1,
+                            }}
                           >
-                            <MenuItem
-                              value=''
-                              disabled
-                              sx={{
-                                fontSize: {
-                                  xs: "0.75rem",
-                                  md: "0.75rem",
-                                  lg: "0.8rem",
-                                },
+                            <Autocomplete
+                              fullWidth
+                              options={
+                                citySearchText
+                                  ? countries.find(
+                                      (c) => c.country === singleCountry
+                                    )?.cities || []
+                                  : Cities
+                              }
+                              value={singleCity}
+                              onChange={(event, newValue) => {
+                                setSingleCity(newValue);
                               }}
+                              onInputChange={(event, newInputValue) => {
+                                setCitySearchText(newInputValue);
+                              }}
+                              disabled={!singleCountry}
+                              renderInput={(params) => (
+                                <TextField
+                                  {...params}
+                                  label='City'
+                                  margin='dense'
+                                  sx={createTextFieldStyles()}
+                                  InputLabelProps={createInputLabelProps()}
+                                />
+                              )}
+                            />
+                            <Tooltip
+                              title="Can't find your city? Type to search from all available cities"
+                              placement='right'
                             >
-                              Select your city
-                            </MenuItem>
-                            {Cities.map((city) => (
-                              <MenuItem
-                                key={city}
-                                value={city}
+                              <InfoIcon
                                 sx={{
-                                  fontSize: {
-                                    xs: "0.75rem",
-                                    md: "0.75rem",
-                                    lg: "0.8rem",
-                                  },
+                                  color: "#08397C",
+                                  fontSize: "1.2rem",
+                                  cursor: "help",
                                 }}
-                              >
-                                {city}
-                              </MenuItem>
-                            ))}
-                          </TextField>
+                              />
+                            </Tooltip>
+                          </Box>
                         </Grid2>
                       </Grid2>
                       <TextField
@@ -1755,11 +1881,11 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                         variant='outlined'
                         type='date'
                         margin='dense'
-                        value={dateApproved
-                          ? new Date(
-                              dateApproved
-                            ).toLocaleDateString("en-CA")
-                          : ""}
+                        value={
+                          dateApproved
+                            ? new Date(dateApproved).toLocaleDateString("en-CA")
+                            : ""
+                        }
                         onChange={(e) => setDateApproved(e.target.value)}
                         sx={createTextFieldStyles()}
                         InputLabelProps={{
