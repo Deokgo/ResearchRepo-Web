@@ -71,6 +71,10 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
   const [shouldClearFields, setShouldClearFields] = useState(false);
   const [isSuccessDialogOpen, setIsSuccessDialogOpen] = useState(false);
+  const [isDuplicateDialogOpen, setIsDuplicateDialogOpen] = useState(false);
+  const [isConfirmDuplicateTitleOpen, setIsConfirmDuplicateTitleOpen] =
+    useState(false);
+  const [isAwaitingConfirmation, setIsAwaitingConfirmation] = useState(false);
 
   // Create array of school years (last 10 years)
   const currentYear = new Date().getFullYear();
@@ -239,7 +243,11 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
 
     // Required field validation
     if (!groupCode) errors.groupCode = "Group Code is required";
-    if (!schoolYear) errors.schoolYear = "School Year is required";
+    if (!schoolYear || schoolYear.length !== 9) {
+      errors.schoolYear = "School Year must be in YYYY-YYYY format";
+    } else if (!validateSchoolYear(schoolYear)) {
+      errors.schoolYear = "Invalid school year format";
+    }
     if (!term) errors.term = "Term is required";
     if (authors.length === 0)
       errors.authors = "At least one author is required";
@@ -304,6 +312,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
 
     const hasChanges =
       groupCode ||
+      schoolYear.length ||
       title ||
       abstract ||
       authors.length > 0 ||
@@ -322,44 +331,38 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
     }
   };
 
+  // Add this validation function
+  const validateSchoolYear = (input) => {
+    const regex = /^(\d{4})-(\d{4})$/;
+    const match = input.match(regex);
+
+    if (!match) return false;
+
+    const startYear = parseInt(match[1]);
+    const endYear = parseInt(match[2]);
+    const currentYear = new Date().getFullYear();
+    const minimumYear = 2011; // Add minimum year constant
+
+    return (
+      startYear <= currentYear &&
+      endYear === startYear + 1 &&
+      startYear >= minimumYear && // Add minimum year check
+      startYear <= 9999
+    );
+  };
+
   const handleAddPaper = async () => {
     setAttemptedSubmit(true);
-    if (validateForm() !== 0) {
-      toast.error("Please fill in all required fields", {
-        position: "top-right",
-        autoClose: 5000,
-      });
-      return;
-    }
 
-    // Check for duplicate code first
-    if (isDuplicateCode) {
-      toast.error("Cannot submit: Group Code already exists", {
-        position: "top-right",
-        autoClose: 5000,
-      });
-      return;
-    }
-
-    // If title is duplicate but authors are different, show confirmation
-    if (isDuplicateTitle && !isDuplicateAuthors) {
-      const userConfirmed = window.confirm(
-        "A paper with this title already exists. Are you sure you want to proceed?"
-      );
-      if (!userConfirmed) {
-        return;
-      }
-    }
-
-    // If both title and authors are duplicates, prevent submission
+    // Check for duplicate paper first
     if (isDuplicateTitle && isDuplicateAuthors) {
-      toast.error(
-        "Cannot submit: This paper already exists with these authors",
-        {
-          position: "top-right",
-          autoClose: 5000,
-        }
-      );
+      setIsDuplicateDialogOpen(true);
+      return;
+    }
+
+    // If title is duplicate but authors are different, show confirmation dialog
+    if (isDuplicateTitle && !isDuplicateAuthors && !isAwaitingConfirmation) {
+      setIsConfirmDuplicateTitleOpen(true);
       return;
     }
 
@@ -368,13 +371,16 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
 
     const formData = new FormData();
 
+    // Extract the first year from the school year input
+    const startYear = schoolYear.split("-")[0];
+
     // Add new data
     formData.append("research_id", groupCode);
     formData.append("college_id", selectedCollege);
     formData.append("program_id", selectedProgram);
     formData.append("title", title);
     formData.append("abstract", abstract);
-    formData.append("school_year", schoolYear);
+    formData.append("school_year", startYear);
     formData.append("term", term);
     formData.append("research_type", researchType);
     formData.append("file", file);
@@ -680,19 +686,33 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
     );
   };
 
-  // Add this function to check if form is valid
+  // Update the authors change handler in the Autocomplete component
+  const handleAuthorsChange = (event, newValue) => {
+    setAuthors(newValue);
+    if (title) {
+      debouncedCheckDuplicates(
+        title,
+        newValue.map((author) => author.user_id)
+      );
+    }
+  };
+
+  // Update the isFormValid function to properly check all fields
   const isFormValid = () => {
     // Check for required fields
     if (
       !groupCode ||
       !schoolYear ||
+      schoolYear.length !== 9 ||
       !term ||
       authors.length === 0 ||
       !title ||
       !abstract ||
       !file ||
+      !extendedAbstract ||
       selectedSDGs.length === 0 ||
-      selectedResearchAreas.length === 0
+      selectedResearchAreas.length === 0 ||
+      keywords.length === 0
     ) {
       return false;
     }
@@ -704,23 +724,22 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
       }
     }
 
-    // Only check for duplicate code, not title
+    // Check for any errors in form fields
+    if (Object.values(formErrors).some((error) => error !== null)) {
+      return false;
+    }
+
+    // Check for duplicate code
     if (isDuplicateCode) {
       return false;
     }
 
-    return true;
-  };
-
-  // Update the authors change handler in the Autocomplete component
-  const handleAuthorsChange = (event, newValue) => {
-    setAuthors(newValue);
-    if (title) {
-      debouncedCheckDuplicates(
-        title,
-        newValue.map((author) => author.user_id)
-      );
+    // Check for duplicate title and authors combination
+    if (isDuplicateTitle && isDuplicateAuthors) {
+      return false;
     }
+
+    return true;
   };
 
   return (
@@ -889,27 +908,136 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
           </Grid2>
           <Grid2 size={1.5}>
             <FormControl fullWidth error={!!formErrors.schoolYear}>
-              <InputLabel required shrink>
-                School Year
-              </InputLabel>
-              <Select
+              <Autocomplete
+                freeSolo
+                options={schoolYears}
                 value={schoolYear}
-                onChange={(e) => setSchoolYear(e.target.value)}
-                label='School Year'
-                notched
-                sx={createTextFieldStyles()}
-              >
-                {schoolYears.map((year) => (
-                  <MenuItem key={year} value={year.split("-")[0]}>
-                    {" "}
-                    {/* Only store first year */}
-                    {year}
-                  </MenuItem>
-                ))}
-              </Select>
-              {formErrors.schoolYear && (
-                <FormHelperText error>{formErrors.schoolYear}</FormHelperText>
-              )}
+                onChange={(event, newValue) => {
+                  setSchoolYear(newValue || "");
+                  if (!newValue) {
+                    setFormErrors((prev) => ({ ...prev, schoolYear: null }));
+                    setIsValid(false);
+                    return;
+                  }
+                  if (!validateSchoolYear(newValue)) {
+                    setFormErrors((prev) => ({
+                      ...prev,
+                      schoolYear:
+                        "Invalid school year format. Year must be between 2011 and current year.",
+                    }));
+                    setIsValid(false);
+                  } else {
+                    setFormErrors((prev) => ({ ...prev, schoolYear: null }));
+                    setIsValid(true);
+                  }
+                }}
+                onInputChange={(event, newInputValue) => {
+                  // Only allow numbers and remove any other characters immediately
+                  let formattedValue = newInputValue
+                    .replace(/[^0-9]/g, "")
+                    .slice(0, 4);
+
+                  // Clear error when user starts typing again
+                  if (formattedValue.length < 4) {
+                    setFormErrors((prev) => ({ ...prev, schoolYear: null }));
+                    setSchoolYear(formattedValue);
+                    return;
+                  }
+
+                  // When 4 digits are entered
+                  if (formattedValue.length === 4) {
+                    const startYear = parseInt(formattedValue);
+                    const currentYear = new Date().getFullYear();
+                    const minimumYear = 2011;
+
+                    // Always format as YYYY-YYYY first
+                    const endYear = startYear + 1;
+                    const displayValue = `${startYear}-${endYear}`;
+                    setSchoolYear(displayValue);
+
+                    // Set error message after a brief delay
+                    setTimeout(() => {
+                      if (startYear > currentYear) {
+                        setFormErrors((prev) => ({
+                          ...prev,
+                          schoolYear: `Start year cannot exceed current year (${currentYear})`,
+                        }));
+                      } else if (startYear < minimumYear) {
+                        setFormErrors((prev) => ({
+                          ...prev,
+                          schoolYear: `Start year cannot be earlier than ${minimumYear}`,
+                        }));
+                      } else {
+                        setFormErrors((prev) => ({
+                          ...prev,
+                          schoolYear: null,
+                        }));
+                      }
+                    }, 0);
+                  }
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    required
+                    label='School Year'
+                    placeholder='Enter start year (YYYY)'
+                    error={!!formErrors.schoolYear}
+                    helperText={formErrors.schoolYear || " "}
+                    FormHelperTextProps={{
+                      style: {
+                        visibility: formErrors.schoolYear
+                          ? "visible"
+                          : "hidden",
+                        minHeight: "1.5em",
+                        margin: "8px 14px 0",
+                      },
+                    }}
+                    InputLabelProps={{
+                      shrink: true,
+                      required: true,
+                    }}
+                    inputProps={{
+                      ...params.inputProps,
+                      maxLength: 4,
+                      pattern: "[0-9]*", // Add pattern for numeric input
+                      inputMode: "numeric", // Show numeric keyboard on mobile
+                      onKeyDown: (e) => {
+                        // Prevent non-numeric inputs except for backspace, delete, arrows
+                        if (
+                          !/[0-9]/.test(e.key) &&
+                          ![
+                            "Backspace",
+                            "Delete",
+                            "ArrowLeft",
+                            "ArrowRight",
+                            "Tab",
+                          ].includes(e.key)
+                        ) {
+                          e.preventDefault();
+                        }
+                      },
+                    }}
+                    sx={{
+                      ...createTextFieldStyles(),
+                      "& .MuiFormHelperText-root": {
+                        position: "static",
+                        marginBottom: "8px",
+                        color: (theme) => theme.palette.error.main,
+                        opacity: formErrors.schoolYear ? 1 : 0,
+                        transition: "opacity 0.2s ease-in-out",
+                      },
+                    }}
+                  />
+                )}
+                componentsProps={{
+                  popper: {
+                    sx: {
+                      zIndex: 1301,
+                    },
+                  },
+                }}
+              />
             </FormControl>
           </Grid2>
           <Grid2 size={1.5}>
@@ -949,7 +1077,11 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
                 popper: {
                   sx: {
                     "& .MuiAutocomplete-listbox": {
-                      fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" },
+                      fontSize: {
+                        xs: "0.75rem",
+                        md: "0.75rem",
+                        lg: "0.8rem",
+                      },
                     },
                   },
                 },
@@ -1000,7 +1132,11 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
                 popper: {
                   sx: {
                     "& .MuiAutocomplete-listbox": {
-                      fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" },
+                      fontSize: {
+                        xs: "0.75rem",
+                        md: "0.75rem",
+                        lg: "0.8rem",
+                      },
                     },
                   },
                 },
@@ -1069,7 +1205,11 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
                 popper: {
                   sx: {
                     "& .MuiAutocomplete-listbox": {
-                      fontSize: { xs: "0.75rem", md: "0.75rem", lg: "0.8rem" },
+                      fontSize: {
+                        xs: "0.75rem",
+                        md: "0.75rem",
+                        lg: "0.8rem",
+                      },
                     },
                   },
                 },
@@ -1342,7 +1482,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
           </Button>
           <Button
             onClick={handleAddPaper}
-            disabled={!isValid || isSubmitting}
+            disabled={!isFormValid() || isSubmitting}
             sx={{
               backgroundColor: "#CA031B",
               color: "#FFF",
@@ -1533,6 +1673,161 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
               }}
             >
               Close
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        {/* Add Duplicate Dialog */}
+        <Dialog
+          open={isDuplicateDialogOpen}
+          onClose={() => setIsDuplicateDialogOpen(false)}
+          PaperProps={{
+            sx: {
+              borderRadius: "15px",
+              padding: "1rem",
+            },
+          }}
+        >
+          <DialogTitle
+            sx={{
+              fontFamily: "Montserrat, sans-serif",
+              fontWeight: 600,
+              color: "#CA031B",
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
+            }}
+          >
+            <Box
+              component='span'
+              sx={{
+                backgroundColor: "#FFEAEA",
+                borderRadius: "50%",
+                padding: "8px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              ⚠️
+            </Box>
+            Duplicate Paper Detected
+          </DialogTitle>
+          <DialogContent>
+            <Typography
+              sx={{
+                fontFamily: "Montserrat, sans-serif",
+                color: "#666",
+                mt: 1,
+              }}
+            >
+              This paper already exists in the repository with the same title
+              and authors.
+            </Typography>
+          </DialogContent>
+          <DialogActions sx={{ padding: "1rem" }}>
+            <Button
+              onClick={() => setIsDuplicateDialogOpen(false)}
+              sx={{
+                backgroundColor: "#08397C",
+                color: "#FFF",
+                fontFamily: "Montserrat, sans-serif",
+                fontWeight: 600,
+                textTransform: "none",
+                borderRadius: "100px",
+                "&:hover": {
+                  backgroundColor: "#072d61",
+                },
+              }}
+            >
+              Close
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        {/* Add Confirm Duplicate Title Dialog */}
+        <Dialog
+          open={isConfirmDuplicateTitleOpen}
+          onClose={() => setIsConfirmDuplicateTitleOpen(false)}
+          PaperProps={{
+            sx: {
+              borderRadius: "15px",
+              padding: "1rem",
+            },
+          }}
+        >
+          <DialogTitle
+            sx={{
+              fontFamily: "Montserrat, sans-serif",
+              fontWeight: 600,
+              color: "#F5A524",
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
+            }}
+          >
+            <Box
+              component='span'
+              sx={{
+                backgroundColor: "#FFF8E7",
+                borderRadius: "50%",
+                padding: "8px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              ⚠️
+            </Box>
+            Similar Title Found
+          </DialogTitle>
+          <DialogContent>
+            <Typography
+              sx={{
+                fontFamily: "Montserrat, sans-serif",
+                color: "#666",
+                mt: 1,
+              }}
+            >
+              A paper with this title already exists. Are you sure you want to
+              proceed?
+            </Typography>
+          </DialogContent>
+          <DialogActions sx={{ padding: "1rem", gap: 1 }}>
+            <Button
+              onClick={() => {
+                setIsConfirmDuplicateTitleOpen(false);
+                setIsAwaitingConfirmation(false);
+              }}
+              sx={{
+                color: "#666",
+                fontFamily: "Montserrat, sans-serif",
+                fontWeight: 600,
+                textTransform: "none",
+                borderRadius: "100px",
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={() => {
+                setIsConfirmDuplicateTitleOpen(false);
+                setIsAwaitingConfirmation(true);
+                handleAddPaper();
+              }}
+              sx={{
+                backgroundColor: "#08397C",
+                color: "#FFF",
+                fontFamily: "Montserrat, sans-serif",
+                fontWeight: 600,
+                textTransform: "none",
+                borderRadius: "100px",
+                "&:hover": {
+                  backgroundColor: "#072d61",
+                },
+              }}
+            >
+              Proceed
             </Button>
           </DialogActions>
         </Dialog>
