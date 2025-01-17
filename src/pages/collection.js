@@ -885,7 +885,7 @@ const Collection = () => {
                       position: "relative", // For child positioning
                       overflow: "hidden", // Prevents content overflow
                       boxSizing: "border-box", // Ensures padding is included in dimensions
-                      padding: "1rem 1.5rem 1.5rem 1rem", // top, right, bottom, left
+                      padding: "0.5rem 1rem 1rem 0.5rem", // top, right, bottom, left
                     }}
                   >
                     <iframe
