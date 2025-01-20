@@ -46,7 +46,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
 
   const [publicationID, setPublicationID] = useState("");
   const [publicationName, setPublicationName] = useState("");
-  const [datePublished, setDatePublished] = useState("");
+  const [dateSubmitted, setDateSubmitted] = useState("");
   const [publicationFormat, setPublicationFormat] = useState("");
   const [indexingStatus, setIndexingStatus] = useState("");
 
@@ -57,7 +57,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
   const [countriesAPI, setCountriesAPI] = useState([]);
   const [citiesAPI, setCitiesAPI] = useState([]);
   const [Cities, setCities] = useState([]);
-  const [dateApproved, setDateApproved] = useState("");
+  const [datePresentation, setDatePresentation] = useState("");
   const [selectedVenue, setSelectedVenue] = useState("");
   const [conferenceVenues, setConferenceVenues] = useState([]);
 
@@ -81,6 +81,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
             publication_name: fetched_data[0].publication_name,
             journal: fetched_data[0].journal,
             date_published: fetched_data[0].date_published,
+            date_submitted: fetched_data[0].date_submitted,
             scopus: fetched_data[0].scopus,
             conference_title: fetched_data[0].conference_title,
             single_country: fetched_data[0].country,
@@ -95,12 +96,12 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
           setPublicationID(initialData.publication_id);
           setPublicationName(initialData.publication_name);
           setPublicationFormat(initialData.journal);
-          setDatePublished(initialData.date_published);
+          setDateSubmitted(initialData.date_submitted);
           setIndexingStatus(initialData.scopus);
           setConferenceTitle(initialData.conference_title);
           setSingleCountry(initialData.single_country);
           setSingleCity(initialData.single_city);
-          setDateApproved(initialData.conference_date);
+          setDatePresentation(initialData.conference_date);
 
           setPubData({ dataset: fetched_data });
         }
@@ -243,7 +244,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
     }
   }, [openModalEdit, singleCountry]);
 
-  ///////////////////// ADD AND EDIT PUBLICATION //////////////////////
+  ///////////////////// ADD AND UPDATE PUBLICATION //////////////////////
   const checkFields = () => {
     // Validate required fields
     // Determine required fields based on publicationFormat
@@ -251,21 +252,17 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
 
     if (publicationFormat === "PC") {
       requiredFields = {
-        "Publication Name": publicationName,
-        "Publication Format": publicationFormat,
-        "Publication Date": datePublished,
-        "Indexing Status": indexingStatus,
+        "Publication Type": publicationFormat,
         "Conference Title": conferenceTitle,
         Country: singleCountry,
         City: singleCity,
-        "Conference Date": dateApproved,
+        "Date of Presentation": datePresentation,
       };
     } else {
       requiredFields = {
         "Publication Name": publicationName,
-        "Publication Format": publicationFormat,
-        "Publication Date": datePublished,
-        "Indexing Status": indexingStatus,
+        "Publication Type": publicationFormat,
+        "Date of Submission": dateSubmitted,
       };
     }
     const missingFields = Object.entries(requiredFields)
@@ -277,7 +274,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
       })
       .map(([key]) => key);
 
-    const approvedDate = new Date(datePublished);
+    const approvedDate = new Date(dateSubmitted);
     const today = new Date();
 
     // Normalize both dates to midnight
@@ -307,15 +304,14 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
       // Add all required fields to formData
       formData.append("publication_name", publicationName);
       formData.append("pub_format_id", publicationFormat);
-      formData.append("date_published", datePublished);
-      formData.append("scopus", indexingStatus);
+      formData.append("date_submitted", dateSubmitted);
       formData.append("conference_title", conferenceTitle);
       formData.append("city", singleCity);
       formData.append("country", singleCountry);
-      formData.append("conference_date", dateApproved);
+      formData.append("conference_date", datePresentation);
 
       // Send the conference data
-      const response = await axios.post(`/track/publication/${id}`, formData, {
+      const response = await axios.post(`/track/form/submit/${id}`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -324,6 +320,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
       console.log("Response:", response.data);
       alert("Publication added successfully!");
       handleFormCleanup();
+      handleStatusUpdate();
 
       window.location.reload();
     } catch (error) {
@@ -346,9 +343,9 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
     const hasChanges =
       publicationName != initialValues?.publication_name ||
       publicationFormat != initialValues?.journal ||
-      datePublished != initialValues?.date_published ||
+      dateSubmitted != initialValues?.date_published ||
       conferenceTitle != initialValues?.conference_title ||
-      dateApproved != initialValues?.conference_date ||
+      datePresentation != initialValues?.conference_date ||
       singleCity != initialValues?.single_city ||
       singleCountry != initialValues?.single_country ||
       console.log("Initial Data:", initialValues);
@@ -385,12 +382,12 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
     // Reset current values
     setPublicationName(initialValues?.publication_name);
     setPublicationFormat(initialValues?.journal);
-    setDatePublished(initialValues?.date_published);
+    setDateSubmitted(initialValues?.date_published);
     setIndexingStatus(initialValues?.scopus);
     setConferenceTitle(initialValues?.conference_title);
     setSingleCountry(initialValues?.single_country);
     setSingleCity(initialValues?.single_city);
-    setDateApproved(initialValues?.conference_date);
+    setDatePresentation(initialValues?.conference_date);
 
     setOpenModalEdit(false);
   };
@@ -414,14 +411,14 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
       formData.append("publication_id", publicationID);
       formData.append("publication_name", publicationName);
       formData.append("journal", publicationFormat);
-      formData.append("date_published", datePublished);
+      formData.append("date_published", dateSubmitted);
       formData.append("scopus", indexingStatus);
 
       if (publicationFormat === "PC") {
         formData.append("conference_title", conferenceTitle);
         formData.append("city", singleCity);
         formData.append("country", singleCountry);
-        formData.append("conference_date", dateApproved);
+        formData.append("conference_date", datePresentation);
       }
 
       // Send the conference data
@@ -456,10 +453,10 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
     if (isEditing) {
       setPublicationName(initialValues.publication_name);
       setPublicationFormat(initialValues.journal);
-      setDatePublished(initialValues.date_published);
+      setDateSubmitted(initialValues.date_published);
       setIndexingStatus(initialValues.scopus);
       setConferenceTitle(initialValues.conference_title);
-      setDateApproved(initialValues.conference_date);
+      setDatePresentation(initialValues.conference_date);
       setSelectedVenue(initialValues.conference_venue);
     }
     setIsEditing(!isEditing); // Switch view state from view to edit; vice versa
@@ -548,13 +545,13 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
   const handleFormCleanup = () => {
     setPublicationName("");
     setPublicationFormat("");
-    setDatePublished("");
+    setDateSubmitted("");
     setIndexingStatus("");
 
     setConferenceTitle("");
     setSingleCountry("");
     setSingleCity("");
-    setDateApproved("");
+    setDatePresentation("");
 
     setSelectedVenue("");
   };
@@ -951,9 +948,26 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                           },
                                         }}
                                       >
-                                        <strong>Format:</strong>{" "}
+                                        <strong>Publication Type:</strong>{" "}
                                         {selectedFormatName || "None"}
                                       </Typography>
+                                      {initialValues?.publication_name && (
+                                        <Typography
+                                          variant='h7'
+                                          sx={{
+                                            mb: "1rem",
+                                            fontSize: {
+                                              xs: "0.7rem",
+                                              md: "0.8rem",
+                                              lg: "0.9rem",
+                                            },
+                                          }}
+                                        >
+                                          <strong>Publication Name:</strong>{" "}
+                                          {initialValues?.publication_name ||
+                                            "None"}
+                                        </Typography>
+                                      )}
                                       <Typography
                                         variant='h7'
                                         sx={{
@@ -965,55 +979,42 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                           },
                                         }}
                                       >
-                                        <strong>Publication Name:</strong>{" "}
-                                        {initialValues?.publication_name ||
-                                          "None"}
-                                      </Typography>
-                                      <Typography
-                                        variant='h7'
-                                        sx={{
-                                          mb: "1rem",
-                                          fontSize: {
-                                            xs: "0.7rem",
-                                            md: "0.8rem",
-                                            lg: "0.9rem",
-                                          },
-                                        }}
-                                      >
-                                        <strong>Date Published:</strong>{" "}
-                                        {initialValues?.date_published
+                                        <strong>Date Submitted:</strong>{" "}
+                                        {initialValues?.date_submitted
                                           ? new Intl.DateTimeFormat("en-US", {
                                               month: "long",
                                               day: "2-digit",
                                               year: "numeric",
                                             }).format(
                                               new Date(
-                                                initialValues.date_published
+                                                initialValues.date_submitted
                                               )
                                             )
                                           : "None"}
                                       </Typography>
-                                      <Typography
-                                        variant='h7'
-                                        sx={{
-                                          mb: "1rem",
-                                          fontSize: {
-                                            xs: "0.7rem",
-                                            md: "0.8rem",
-                                            lg: "0.9rem",
-                                          },
-                                        }}
-                                      >
-                                        <strong>Indexing Status:</strong>{" "}
-                                        {initialValues?.scopus
-                                          ? initialValues?.scopus
-                                              .charAt(0)
-                                              .toUpperCase() +
-                                            initialValues?.scopus
-                                              .slice(1)
-                                              .toLowerCase()
-                                          : "None"}
-                                      </Typography>
+                                      {/*
+                                        <Typography
+                                          variant='h7'
+                                          sx={{
+                                            mb: "1rem",
+                                            fontSize: {
+                                              xs: "0.7rem",
+                                              md: "0.8rem",
+                                              lg: "0.9rem",
+                                            },
+                                          }}
+                                        >
+                                          <strong>Indexing Status:</strong>{" "}
+                                          {initialValues?.scopus
+                                            ? initialValues?.scopus
+                                                .charAt(0)
+                                                .toUpperCase() +
+                                              initialValues?.scopus
+                                                .slice(1)
+                                                .toLowerCase()
+                                            : "None"}
+                                        </Typography>
+                                      */}
                                     </Grid2>
 
                                     {conferenceTitle && (
@@ -1052,7 +1053,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                                 },
                                               }}
                                             >
-                                              <strong>Date:</strong>{" "}
+                                              <strong>Date of Presentation:</strong>{" "}
                                               {initialValues?.conference_date
                                                 ? new Intl.DateTimeFormat(
                                                     "en-US",
@@ -1088,41 +1089,58 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                       </Grid2>
                                     )}
                                   </Grid2>
-                                  <Box
-                                    sx={{
-                                      display: "flex",
-                                      alignItems: "flex-start",
-                                      gap: 3,
-                                    }}
-                                  >
-                                    <Button
-                                      variant='contained'
-                                      color='primary'
+                                  {status === 'SUBMITTED' && (
+                                      <Box
                                       sx={{
-                                        backgroundColor: "#08397C",
-                                        color: "#FFF",
-                                        fontFamily: "Montserrat, sans-serif",
-                                        fontWeight: 600,
-                                        textTransform: "none",
-                                        fontSize: {
-                                          xs: "0.55rem",
-                                          md: "0.75rem",
-                                          lg: "0.9rem",
-                                        },
-                                        marginTop: "1rem",
-                                        paddingLeft: "1.5rem",
-                                        paddingRight: "1.5rem",
-                                        borderRadius: "100px",
-                                        maxHeight: "3rem",
-                                        "&:hover": {
-                                          backgroundColor: "#072d61",
-                                        },
+                                        display: "flex",
+                                        alignItems: "flex-start",
+                                        gap: 3,
                                       }}
-                                      onClick={handleOpenModalEdit}
                                     >
-                                      Edit
-                                    </Button>
-                                  </Box>
+                                      <Typography
+                                        variant='h6'
+                                        sx={{
+                                          fontSize: {
+                                            xs: "0.55rem",
+                                            md: "0.75rem",
+                                            lg: "0.9rem",
+                                          },
+                                          marginTop: "1.4rem",
+                                          borderRadius: "100px",
+                                          maxHeight: "3rem",
+                                        }}
+                                      >
+                                        <strong>Update Status:</strong>
+                                      </Typography>
+                                      <Button
+                                        variant='contained'
+                                        color='primary'
+                                        sx={{
+                                          backgroundColor: "#08397C",
+                                          color: "#FFF",
+                                          fontFamily: "Montserrat, sans-serif",
+                                          fontWeight: 300,
+                                          textTransform: "none",
+                                          fontSize: {
+                                            xs: "0.55rem",
+                                            md: "0.75rem",
+                                            lg: "0.9rem",
+                                          },
+                                          marginTop: "1rem",
+                                          paddingLeft: "1.5rem",
+                                          paddingRight: "1.5rem",
+                                          borderRadius: "100px",
+                                          maxHeight: "3rem",
+                                          "&:hover": {
+                                            backgroundColor: "#072d61",
+                                          },
+                                        }}
+                                        onClick={handleStatusUpdate}
+                                      >
+                                        SUBMITTED to&nbsp;<strong>ACCEPTED</strong>
+                                      </Button>
+                                    </Box>
+                                  )}
                                 </Box>
                               ) : (
                                 <Box
@@ -1214,7 +1232,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                       },
                     }}
                   >
-                    Add Publication Details
+                    Add Details
                   </Typography>
                   <FormControl fullWidth variant='outlined' margin='dense'>
                     <InputLabel
@@ -1226,10 +1244,10 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                         },
                       }}
                     >
-                      Format
+                      Publication Type
                     </InputLabel>
                     <Select
-                      label='Format'
+                      label='Publication Type'
                       sx={createTextFieldStyles()} // Assuming this is a custom style function
                       value={publicationFormat || ""}
                       onChange={handleChange} // Call handleChange when user selects an option
@@ -1245,7 +1263,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                           },
                         }}
                       >
-                        Select publication format
+                        Select type
                       </MenuItem>
                       {publicationFormats.map((format) => (
                         <MenuItem
@@ -1264,43 +1282,32 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                       ))}
                     </Select>
                   </FormControl>
-                  <AutoCompleteTextBox
-                    fullWidth
-                    data={pub_names}
-                    value={publicationName}
-                    label='Publication Name'
-                    id='publication-name'
-                    onItemSelected={(value) => setPublicationName(value)} // Update state when a suggestion is selected
-                    sx={{
-                      ...createTextFieldStyles(),
-                      "& .MuiInputLabel-root": {
-                        fontSize: {
-                          xs: "0.75rem",
-                          md: "0.75rem",
-                          lg: "0.8rem",
-                        },
-                      },
-                    }}
-                    InputLabelProps={createInputLabelProps()}
-                    placeholder='ex: PLOS One'
-                  />
-                  <Grid2 container spacing={4}>
-                    <Grid2 size={6}>
-                      <TextField
+                  {publicationFormat === "JL" && (
+                    <Box>
+                      <AutoCompleteTextBox
                         fullWidth
-                        label='Date'
-                        variant='outlined'
-                        type='date'
-                        margin='dense'
-                        value={datePublished}
-                        onChange={(e) => setDatePublished(e.target.value)}
-                        sx={createTextFieldStyles()}
-                        InputLabelProps={{
-                          ...createInputLabelProps(),
-                          shrink: true,
+                        data={pub_names}
+                        value={publicationName}
+                        label='Publication Name'
+                        id='publication-name'
+                        onItemSelected={(value) => setPublicationName(value)} // Update state when a suggestion is selected
+                        sx={{
+                          ...createTextFieldStyles(),
+                          "& .MuiInputLabel-root": {
+                            fontSize: {
+                              xs: "0.75rem",
+                              md: "0.75rem",
+                              lg: "0.8rem",
+                            },
+                          },
                         }}
+                        InputLabelProps={createInputLabelProps()}
+                        placeholder='ex: PLOS One'
                       />
-                    </Grid2>
+                    </Box>
+                  )}
+                  
+                  {/*
                     <Grid2 size={6}>
                       <FormControl fullWidth variant='outlined' margin='dense'>
                         <InputLabel
@@ -1360,14 +1367,10 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                         </Select>
                       </FormControl>
                     </Grid2>
-                  </Grid2>
+                  */}
+                    
                   {publicationFormat === "PC" && (
                     <Box>
-                      <Divider
-                        orientation='horizontal'
-                        flexItem
-                        sx={{ mt: "0.5rem", mb: "0.5rem" }}
-                      />
                       <AutoCompleteTextBox
                         fullWidth
                         data={conf_title}
@@ -1388,7 +1391,23 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                         InputLabelProps={createInputLabelProps()}
                         placeholder='ex: Proceedings of the International Conference on Artificial Intelligence'
                       />
-
+                     <TextField
+                        fullWidth
+                        label='Date of Presentation'
+                        variant='outlined'
+                        type='date'
+                        margin='dense'
+                        value={datePresentation}
+                        onChange={(e) => setDatePresentation(e.target.value)}
+                        inputProps={{
+                          min: new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().split('T')[0] // Sets tomorrow as the minimum date
+                        }}
+                        sx={createTextFieldStyles()}
+                        InputLabelProps={{
+                          ...createInputLabelProps(),
+                          shrink: true,
+                        }}
+                      />
                       <Grid2 container spacing={4}>
                         <Grid2 size={6}>
                           <Box
@@ -1490,22 +1509,25 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                           </Box>
                         </Grid2>
                       </Grid2>
-                      <TextField
-                        fullWidth
-                        label='Conference Date'
-                        variant='outlined'
-                        type='date'
-                        margin='dense'
-                        value={dateApproved}
-                        onChange={(e) => setDateApproved(e.target.value)}
-                        sx={createTextFieldStyles()}
-                        InputLabelProps={{
-                          ...createInputLabelProps(),
-                          shrink: true,
-                        }}
-                      />
                     </Box>
                   )}
+                  <TextField
+                    fullWidth
+                    label='Date of Submission'
+                    variant='outlined'
+                    type='date' 
+                    margin='dense'
+                    value={dateSubmitted}
+                    onChange={(e) => setDateSubmitted(e.target.value)}
+                    inputProps={{
+                    max: new Date().toISOString().split('T')[0] // This sets today as the maximum date
+                    }}
+                    sx={createTextFieldStyles()}
+                    InputLabelProps={{
+                    ...createInputLabelProps(),
+                    shrink: true,
+                    }}
+                  />
                   <Box
                     sx={{
                       display: "flex",
@@ -1517,8 +1539,10 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                       onClick={() => {
                         setPublicationName("");
                         setPublicationFormat("");
-                        setDatePublished("");
+                        setDateSubmitted("");
                         setIndexingStatus("");
+                        setSingleCountry("");
+                        setSingleCity("");
                         setOpenModalPub(false);
                       }}
                       sx={{
@@ -1558,13 +1582,13 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                         },
                       }}
                     >
-                      Add
+                      Submit
                     </Button>
                   </Box>
                 </Box>
               </Modal>
 
-              {/* Edit Publication Modal */}
+              {/* Update Publication Modal */}
               <Modal open={openModalEdit}>
                 <Box
                   sx={{
@@ -1672,13 +1696,13 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                         type='date'
                         margin='dense'
                         value={
-                          datePublished
-                            ? new Date(datePublished).toLocaleDateString(
+                          dateSubmitted
+                            ? new Date(dateSubmitted).toLocaleDateString(
                                 "en-CA"
                               )
                             : ""
                         }
-                        onChange={(e) => setDatePublished(e.target.value)}
+                        onChange={(e) => setDateSubmitted(e.target.value)}
                         sx={createTextFieldStyles()}
                         InputLabelProps={{
                           ...createInputLabelProps(),
@@ -1882,11 +1906,11 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                         type='date'
                         margin='dense'
                         value={
-                          dateApproved
-                            ? new Date(dateApproved).toLocaleDateString("en-CA")
+                          datePresentation
+                            ? new Date(datePresentation).toLocaleDateString("en-CA")
                             : ""
                         }
-                        onChange={(e) => setDateApproved(e.target.value)}
+                        onChange={(e) => setDatePresentation(e.target.value)}
                         sx={createTextFieldStyles()}
                         InputLabelProps={{
                           ...createInputLabelProps(),
