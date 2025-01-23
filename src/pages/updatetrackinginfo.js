@@ -1122,20 +1122,6 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                       </Grid2>
                                     )}
                                   </Grid2>
-                                  <Typography
-                                    variant='h7'
-                                    sx={{
-                                      mb: "1rem",
-                                      fontSize: {
-                                        xs: "0.7rem",
-                                        md: "0.8rem",
-                                        lg: "0.9rem",
-                                      },
-                                    }}
-                                  >
-                                    <strong>Status:</strong>{" "}
-                                    {initialValues?.status || "None"}
-                                  </Typography>
                                   {initialValues?.status === 'SUBMITTED' && (
                                       <Box
                                       sx={{
@@ -1192,6 +1178,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                       display='flex'
                                       flexDirection='column'
                                       justifyContent='center'
+                                      margin='1rem'
                                     >
                                       <Grid2
                                         container
@@ -1662,6 +1649,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                     value={publicationName}
                     onItemSelected={(value) => setPublicationName(value)} // Update state when a suggestion is selected
                     sx={{
+                      
                       ...createTextFieldStyles(),
                       "& .MuiInputLabel-root": {
                         fontSize: {
