@@ -64,6 +64,8 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
   const [countrySearchText, setCountrySearchText] = useState("");
   const [citySearchText, setCitySearchText] = useState("");
 
+  const [currentStatus, setCurrentStatus] = useState("");
+
   ///////////////////// PUBLICATION DATA RETRIEVAL //////////////////////
 
   // Retrives publication data from the database
@@ -87,6 +89,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
             single_country: fetched_data[0].country,
             single_city: fetched_data[0].city,
             conference_date: fetched_data[0].conference_date,
+            status: fetched_data[0].status
           };
 
           setInitialValues(initialData);
@@ -102,6 +105,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
           setSingleCountry(initialData.single_country);
           setSingleCity(initialData.single_city);
           setDatePresentation(initialData.conference_date);
+          setCurrentStatus(initialData.status);
 
           setPubData({ dataset: fetched_data });
         }
@@ -311,7 +315,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
       formData.append("conference_date", datePresentation);
 
       // Send the conference data
-      const response = await axios.post(`/track/form/submit/${id}`, formData, {
+      const response = await axios.post(`/track/form/submitted/${id}`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -320,7 +324,6 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
       console.log("Response:", response.data);
       alert("Publication added successfully!");
       handleFormCleanup();
-      handleStatusUpdate();
 
       window.location.reload();
     } catch (error) {
@@ -390,6 +393,35 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
     setDatePresentation(initialValues?.conference_date);
 
     setOpenModalEdit(false);
+  };
+
+  const handleUpdateToAccept = async () => {
+    try {
+      // Send the data
+      const response = await axios.post(`/track/form/accepted/${id}`, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      console.log("Response:", response.data);
+      alert("Status updated successfully!");
+      handleFormCleanup();
+
+      window.location.reload();
+    } catch (error) {
+      console.error("Error status update:", error);
+      if (error.response) {
+        console.error("Error response:", error.response.data);
+        alert(
+          `Failed to update status: ${
+            error.response.data.error || "Please try again."
+          }`
+        );
+      } else {
+        alert("Failed to update status. Please try again.");
+      }
+    }
   };
 
   const handleEditPublication = async () => {
@@ -463,6 +495,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
   };
 
   ///////////////////// TRACKING PART //////////////////////
+
   const [status, setStatus] = useState(null);
   const [error, setError] = useState(null);
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
@@ -538,7 +571,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
     setOpenModalPub(true);
   };
 
-  const handleOpenModalEdit = () => {
+  const handleUpdateModalPub = () => {
     setOpenModalEdit(true);
   };
 
@@ -552,6 +585,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
     setSingleCountry("");
     setSingleCity("");
     setDatePresentation("");
+    setCurrentStatus("");
 
     setSelectedVenue("");
   };
@@ -707,7 +741,6 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
             flexGrow: 1,
             display: "flex",
             flexDirection: "column",
-            marginTop: { xs: "3.5rem", sm: "4rem", md: "5rem" },
             height: {
               xs: "calc(100vh - 3.5rem)",
               sm: "calc(100vh - 4rem)",
@@ -1089,7 +1122,21 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                       </Grid2>
                                     )}
                                   </Grid2>
-                                  {status === 'SUBMITTED' && (
+                                  <Typography
+                                    variant='h7'
+                                    sx={{
+                                      mb: "1rem",
+                                      fontSize: {
+                                        xs: "0.7rem",
+                                        md: "0.8rem",
+                                        lg: "0.9rem",
+                                      },
+                                    }}
+                                  >
+                                    <strong>Status:</strong>{" "}
+                                    {initialValues?.status || "None"}
+                                  </Typography>
+                                  {initialValues?.status === 'SUBMITTED' && (
                                       <Box
                                       sx={{
                                         display: "flex",
@@ -1105,7 +1152,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                             md: "0.75rem",
                                             lg: "0.9rem",
                                           },
-                                          marginTop: "1.4rem",
+                                          marginTop: "0.3rem",
                                           borderRadius: "100px",
                                           maxHeight: "3rem",
                                         }}
@@ -1126,7 +1173,6 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                             md: "0.75rem",
                                             lg: "0.9rem",
                                           },
-                                          marginTop: "1rem",
                                           paddingLeft: "1.5rem",
                                           paddingRight: "1.5rem",
                                           borderRadius: "100px",
@@ -1135,10 +1181,61 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                             backgroundColor: "#072d61",
                                           },
                                         }}
-                                        onClick={handleStatusUpdate}
+                                        onClick={handleUpdateToAccept}
                                       >
                                         SUBMITTED to&nbsp;<strong>ACCEPTED</strong>
                                       </Button>
+                                    </Box>
+                                  )}
+                                  {initialValues?.status === 'ACCEPTED' && (
+                                    <Box
+                                      display='flex'
+                                      flexDirection='column'
+                                      justifyContent='center'
+                                    >
+                                      <Grid2
+                                        container
+                                        size={6}
+                                        justifyContent='flex-start'
+                                      >
+                                        <Box
+                                          sx={{
+                                            display: "flex",
+                                            alignItems: "center",
+                                            border: "1px dashed #0A438F",
+                                            borderRadius: 1,
+                                            cursor: "pointer",
+                                            justifyContent: "center",
+                                            gap: 2,
+                                          }}
+                                        >
+                                          <Button
+                                            variant='text'
+                                            color='primary'
+                                            sx={{
+                                              width: "100%",
+                                              color: "#08397C",
+                                              fontFamily: "Montserrat, sans-serif",
+                                              fontWeight: 600,
+                                              textTransform: "none",
+                                              fontSize: {
+                                                xs: "0.7rem",
+                                                md: "0.8rem",
+                                                lg: "0.9rem",
+                                              },
+                                              padding: "1rem",
+                                              alignSelf: "center",
+                                              maxHeight: "2rem",
+                                              "&:hover": {
+                                                color: "#052045",
+                                              },
+                                            }}
+                                            onClick={handleUpdateModalPub}
+                                          >
+                                            + Add More Details
+                                          </Button>
+                                        </Box>
+                                      </Grid2>
                                     </Box>
                                   )}
                                 </Box>
@@ -1306,68 +1403,6 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                       />
                     </Box>
                   )}
-                  
-                  {/*
-                    <Grid2 size={6}>
-                      <FormControl fullWidth variant='outlined' margin='dense'>
-                        <InputLabel
-                          sx={{
-                            fontSize: {
-                              xs: "0.75rem",
-                              md: "0.75rem",
-                              lg: "0.8rem",
-                            },
-                          }}
-                        >
-                          Indexing Status
-                        </InputLabel>
-                        <Select
-                          label='Indexing Status'
-                          sx={createTextFieldStyles()}
-                          value={indexingStatus}
-                          onChange={(e) => setIndexingStatus(e.target.value)}
-                        >
-                          <MenuItem
-                            value=''
-                            disabled
-                            sx={{
-                              fontSize: {
-                                xs: "0.75rem",
-                                md: "0.75rem",
-                                lg: "0.8rem",
-                              },
-                            }}
-                          >
-                            Select indexing status
-                          </MenuItem>
-                          <MenuItem
-                            value='SCOPUS'
-                            sx={{
-                              fontSize: {
-                                xs: "0.75rem",
-                                md: "0.75rem",
-                                lg: "0.8rem",
-                              },
-                            }}
-                          >
-                            Scopus
-                          </MenuItem>
-                          <MenuItem
-                            value='NON-SCOPUS'
-                            sx={{
-                              fontSize: {
-                                xs: "0.75rem",
-                                md: "0.75rem",
-                                lg: "0.8rem",
-                              },
-                            }}
-                          >
-                            Non-Scopus
-                          </MenuItem>
-                        </Select>
-                      </FormControl>
-                    </Grid2>
-                  */}
                     
                   {publicationFormat === "PC" && (
                     <Box>
@@ -1617,56 +1652,8 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                       },
                     }}
                   >
-                    Edit Publication Details
+                    Add More Details
                   </Typography>
-                  <FormControl fullWidth variant='outlined' margin='dense'>
-                    <InputLabel
-                      sx={{
-                        fontSize: {
-                          xs: "0.75rem",
-                          md: "0.75rem",
-                          lg: "0.8rem",
-                        },
-                      }}
-                    >
-                      Format
-                    </InputLabel>
-                    <Select
-                      label='Format'
-                      sx={createTextFieldStyles()} // Assuming this is a custom style function
-                      value={publicationFormat}
-                      onChange={handleChange} // Call handleChange when user selects an option
-                    >
-                      <MenuItem
-                        value=''
-                        disabled
-                        sx={{
-                          fontSize: {
-                            xs: "0.75rem",
-                            md: "0.75rem",
-                            lg: "0.8rem",
-                          },
-                        }}
-                      >
-                        Select publication format
-                      </MenuItem>
-                      {publicationFormats.map((format) => (
-                        <MenuItem
-                          key={format.pub_format_id}
-                          value={format.pub_format_id}
-                          sx={{
-                            fontSize: {
-                              xs: "0.75rem",
-                              md: "0.75rem",
-                              lg: "0.8rem",
-                            },
-                          }}
-                        >
-                          {format.pub_format_name}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
                   <AutoCompleteTextBox
                     fullWidth
                     data={pub_names}
@@ -1687,238 +1674,83 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                     InputLabelProps={createInputLabelProps()}
                     placeholder='ex: PLOS One'
                   />
-                  <Grid2 container spacing={4}>
-                    <Grid2 size={6}>
-                      <TextField
-                        fullWidth
-                        label='Date'
-                        variant='outlined'
-                        type='date'
-                        margin='dense'
-                        value={
-                          dateSubmitted
-                            ? new Date(dateSubmitted).toLocaleDateString(
-                                "en-CA"
-                              )
-                            : ""
-                        }
-                        onChange={(e) => setDateSubmitted(e.target.value)}
-                        sx={createTextFieldStyles()}
-                        InputLabelProps={{
-                          ...createInputLabelProps(),
-                          shrink: true,
-                        }}
-                      />
-                    </Grid2>
-                    <Grid2 size={6}>
-                      <FormControl fullWidth variant='outlined' margin='dense'>
-                        <InputLabel
-                          sx={{
-                            fontSize: {
-                              xs: "0.75rem",
-                              md: "0.75rem",
-                              lg: "0.8rem",
-                            },
-                          }}
-                        >
-                          Indexing Status
-                        </InputLabel>
-                        <Select
-                          label='Indexing Status'
-                          sx={createTextFieldStyles()}
-                          value={indexingStatus}
-                          onChange={(e) => setIndexingStatus(e.target.value)}
-                        >
-                          <MenuItem
-                            value=''
-                            disabled
-                            sx={{
-                              fontSize: {
-                                xs: "0.75rem",
-                                md: "0.75rem",
-                                lg: "0.8rem",
-                              },
-                            }}
-                          >
-                            Select indexing status
-                          </MenuItem>
-                          <MenuItem
-                            value='SCOPUS'
-                            sx={{
-                              fontSize: {
-                                xs: "0.75rem",
-                                md: "0.75rem",
-                                lg: "0.8rem",
-                              },
-                            }}
-                          >
-                            Scopus
-                          </MenuItem>
-                          <MenuItem
-                            value='NON-SCOPUS'
-                            sx={{
-                              fontSize: {
-                                xs: "0.75rem",
-                                md: "0.75rem",
-                                lg: "0.8rem",
-                              },
-                            }}
-                          >
-                            Non-Scopus
-                          </MenuItem>
-                        </Select>
-                      </FormControl>
-                    </Grid2>
-                  </Grid2>
-                  {publicationFormat === "PC" && (
-                    <Box>
-                      <Divider
-                        orientation='horizontal'
-                        flexItem
-                        sx={{ mt: "0.5rem", mb: "0.5rem" }}
-                      />
-                      <AutoCompleteTextBox
-                        fullWidth
-                        data={conf_title}
-                        label='Conference Title'
-                        id='conf-name'
-                        value={conferenceTitle}
-                        onItemSelected={(value) => setConferenceTitle(value)}
+                  <FormControl fullWidth variant='outlined' margin='dense'>
+                    <InputLabel
+                      sx={{
+                        fontSize: {
+                          xs: "0.75rem",
+                          md: "0.75rem",
+                          lg: "0.8rem",
+                        },
+                      }}
+                    >
+                      Indexing Status
+                    </InputLabel>
+                    <Select
+                      label='Indexing Status'
+                      sx={createTextFieldStyles()}
+                      value={indexingStatus}
+                      onChange={(e) => setIndexingStatus(e.target.value)}
+                    >
+                      <MenuItem
+                        value=''
+                        disabled
                         sx={{
-                          ...createTextFieldStyles(),
-                          "& .MuiInputLabel-root": {
-                            fontSize: {
-                              xs: "0.75rem",
-                              md: "0.75rem",
-                              lg: "0.8rem",
-                            },
+                          fontSize: {
+                            xs: "0.75rem",
+                            md: "0.75rem",
+                            lg: "0.8rem",
                           },
                         }}
-                        InputLabelProps={createInputLabelProps()}
-                        placeholder='ex: Proceedings of the International Conference on Artificial Intelligence'
-                      />
-
-                      <Grid2 container spacing={4}>
-                        <Grid2 size={6}>
-                          <Box
-                            sx={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: 1,
-                            }}
-                          >
-                            <Autocomplete
-                              fullWidth
-                              options={
-                                countrySearchText
-                                  ? countriesAPI.map((c) => c.country)
-                                  : countries
-                                      .filter((c) =>
-                                        conferenceVenues.some(
-                                          (v) => v.country === c.country
-                                        )
-                                      )
-                                      .map((c) => c.country)
-                              }
-                              value={singleCountry}
-                              onChange={handleCountryChange}
-                              onInputChange={(event, newInputValue) => {
-                                setCountrySearchText(newInputValue);
-                              }}
-                              renderInput={(params) => (
-                                <TextField
-                                  {...params}
-                                  label='Country'
-                                  margin='dense'
-                                  sx={createTextFieldStyles()}
-                                  InputLabelProps={createInputLabelProps()}
-                                />
-                              )}
-                            />
-                            <Tooltip
-                              title="Can't find your country? Type to search from all available countries"
-                              placement='right'
-                            >
-                              <InfoIcon
-                                sx={{
-                                  color: "#08397C",
-                                  fontSize: "1.2rem",
-                                  cursor: "help",
-                                }}
-                              />
-                            </Tooltip>
-                          </Box>
-                        </Grid2>
-                        <Grid2 size={6}>
-                          <Box
-                            sx={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: 1,
-                            }}
-                          >
-                            <Autocomplete
-                              fullWidth
-                              options={
-                                citySearchText
-                                  ? countries.find(
-                                      (c) => c.country === singleCountry
-                                    )?.cities || []
-                                  : Cities
-                              }
-                              value={singleCity}
-                              onChange={(event, newValue) => {
-                                setSingleCity(newValue);
-                              }}
-                              onInputChange={(event, newInputValue) => {
-                                setCitySearchText(newInputValue);
-                              }}
-                              disabled={!singleCountry}
-                              renderInput={(params) => (
-                                <TextField
-                                  {...params}
-                                  label='City'
-                                  margin='dense'
-                                  sx={createTextFieldStyles()}
-                                  InputLabelProps={createInputLabelProps()}
-                                />
-                              )}
-                            />
-                            <Tooltip
-                              title="Can't find your city? Type to search from all available cities"
-                              placement='right'
-                            >
-                              <InfoIcon
-                                sx={{
-                                  color: "#08397C",
-                                  fontSize: "1.2rem",
-                                  cursor: "help",
-                                }}
-                              />
-                            </Tooltip>
-                          </Box>
-                        </Grid2>
-                      </Grid2>
-                      <TextField
-                        fullWidth
-                        label='Conference Date'
-                        variant='outlined'
-                        type='date'
-                        margin='dense'
-                        value={
-                          datePresentation
-                            ? new Date(datePresentation).toLocaleDateString("en-CA")
-                            : ""
-                        }
-                        onChange={(e) => setDatePresentation(e.target.value)}
-                        sx={createTextFieldStyles()}
-                        InputLabelProps={{
-                          ...createInputLabelProps(),
-                          shrink: true,
+                      >
+                        Select indexing status
+                      </MenuItem>
+                      <MenuItem
+                        value='SCOPUS'
+                        sx={{
+                          fontSize: {
+                            xs: "0.75rem",
+                            md: "0.75rem",
+                            lg: "0.8rem",
+                          },
                         }}
-                      />
-                    </Box>
-                  )}
+                      >
+                        Scopus
+                      </MenuItem>
+                      <MenuItem
+                        value='NON-SCOPUS'
+                        sx={{
+                          fontSize: {
+                            xs: "0.75rem",
+                            md: "0.75rem",
+                            lg: "0.8rem",
+                          },
+                        }}
+                      >
+                        Non-Scopus
+                      </MenuItem>
+                    </Select>
+                  </FormControl>
+                  <TextField
+                    fullWidth
+                    label='Date of Presentation'
+                    variant='outlined'
+                    type='date'
+                    margin='dense'
+                    value={
+                      datePresentation
+                        ? new Date(datePresentation).toLocaleDateString(
+                            "en-CA"
+                          )
+                        : ""
+                    }
+                    onChange={(e) => setDatePresentation(e.target.value)}
+                    sx={createTextFieldStyles()}
+                    InputLabelProps={{
+                      ...createInputLabelProps(),
+                      shrink: true,
+                    }}
+                  />
                   <Box
                     sx={{
                       display: "flex",
@@ -1965,7 +1797,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                         },
                       }}
                     >
-                      Save
+                      Add
                     </Button>
                   </Box>
                 </Box>

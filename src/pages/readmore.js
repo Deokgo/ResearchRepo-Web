@@ -32,7 +32,7 @@ const ReadMore = () => {
           height: "100vh",
           display: "flex",
           flexDirection: "column",
-          justifyContent: "center",
+          overflow: "hidden",
         }}
       >
         <Navbar />
@@ -41,12 +41,12 @@ const ReadMore = () => {
             flexGrow: 1,
             display: "flex",
             flexDirection: "column",
-            marginTop: { xs: "3.5rem", sm: "4rem", md: "5rem" },
             height: {
               xs: "calc(100vh - 3.5rem)",
               sm: "calc(100vh - 4rem)",
               md: "calc(100vh - 6rem)",
             },
+            overflow: "hidden",
           }}
         >
           <HeaderWithBackButton
