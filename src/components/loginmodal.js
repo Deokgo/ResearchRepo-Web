@@ -31,6 +31,7 @@ const LoginModal = () => {
     email: "",
     password: "",
   });
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -62,6 +63,7 @@ const LoginModal = () => {
   // Handle form submission
   const handleLogin = async (e) => {
     e.preventDefault();
+    setErrorMessage("");
     try {
       const response = await axios.post("/auth/login", formValues);
       const { token } = response.data;
@@ -78,7 +80,6 @@ const LoginModal = () => {
       const userRole = userResponse.data.role;
 
       handleModalClose();
-      alert(`Login Successfully`);
 
       // If the user is on a mobile device, navigate to collections immediately
       if (isMobile || isSizeMobile) {
@@ -108,7 +109,9 @@ const LoginModal = () => {
       }
     } catch (error) {
       console.error("Login error details:", error);
-      alert(`Login failed: ${error.response?.data?.message || error.message}`);
+      setErrorMessage(
+        error.response?.data?.message || "Login failed. Please try again."
+      );
     }
   };
 
@@ -227,6 +230,24 @@ const LoginModal = () => {
                 sx={createTextFieldStyles()}
                 InputLabelProps={createInputLabelProps()}
               />
+              {errorMessage && (
+                <Typography
+                  color='error'
+                  sx={{
+                    width: "100%",
+                    textAlign: "center",
+                    marginTop: 1,
+                    marginBottom: 1,
+                    fontSize: {
+                      xs: "0.75rem",
+                      sm: "0.875rem",
+                      md: "1rem",
+                    },
+                  }}
+                >
+                  {errorMessage}
+                </Typography>
+              )}
               <Box
                 sx={{
                   display: "flex",
@@ -290,7 +311,7 @@ const LoginModal = () => {
                     },
                   }}
                 >
-                  Don’t have an account?{" "}
+                  Don't have an account?{" "}
                   <a
                     href='#'
                     onClick={(e) => {
