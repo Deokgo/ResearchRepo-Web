@@ -78,7 +78,7 @@ const Profile = () => {
 
         // Set the email for the password reset (OTP)
         setEmail(data.account.email);
-        
+
         // Set form values
         setFormValues({
           firstName: data.researcher.first_name || "",
@@ -300,16 +300,17 @@ const Profile = () => {
     } = formValues;
 
     const hasChanges =
-        firstName !== initialData?.firstName ||
-        middleName !== initialData?.middleName ||
-        lastName !== initialData?.lastName ||
-        suffix !== initialData?.suffix ||
-        college_id !== initialData?.department ||
-        program_id !== initialData?.program;
+      firstName !== initialData?.firstName ||
+      middleName !== initialData?.middleName ||
+      lastName !== initialData?.lastName ||
+      suffix !== initialData?.suffix ||
+      college_id !== initialData?.department ||
+      program_id !== initialData?.program;
 
-    if(hasChanges)
-    {
-      const confirmLeave = window.confirm("You have unsaved changes. Do you want to leave?");
+    if (hasChanges) {
+      const confirmLeave = window.confirm(
+        "You have unsaved changes. Do you want to leave?"
+      );
       if (confirmLeave) {
         setIsModalOpen(false);
       }
@@ -326,9 +327,7 @@ const Profile = () => {
       department: "",
       program: "",
     });
-  
   };
-  
 
   // Fetch all colleges when the modal opens
   useEffect(() => {
@@ -410,7 +409,6 @@ const Profile = () => {
             flexGrow: 1,
             display: "flex",
             flexDirection: "column",
-            marginTop: { xs: "3.5rem", sm: "4rem", md: "5rem" },
             height: {
               xs: "calc(100vh - 3.5rem)",
               sm: "calc(100vh - 4rem)",
@@ -418,10 +416,7 @@ const Profile = () => {
             },
           }}
         >
-          <HeaderWithBackButton
-            title="Profile"
-            onBack={() => navigate(-1)}
-          />
+          <HeaderWithBackButton title='Profile' onBack={() => navigate(-1)} />
 
           {/* Content Section */}
           <Box
@@ -446,7 +441,7 @@ const Profile = () => {
               }}
             >
               <Button
-                variant="outlined"
+                variant='outlined'
                 startIcon={<EditIcon />}
                 onClick={handleOpenOtpModal}
                 sx={{

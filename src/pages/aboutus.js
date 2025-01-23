@@ -22,26 +22,28 @@ import HeaderWithBackButton from "../components/Header";
 const AboutUs = () => {
   const navigate = useNavigate();
 
-  const team = [{
-    name: "Khristian G. Kikuchi",
-    role: "Thesis Adviser"
-  },
-  {
-    name: "Francis Nicole B. Cabansag",
-    role: "Web Developer"
-  },
-  {
-    name: "Kane Justine A. Cometa",
-    role: "Web UI Designer and Developer"
-  },
-  {
-    name: "Jelly Anne Kaye G. Mallari",
-    role: "Web UI Designer and Developer"
-  },
-  {
-    name: "John Rafael D. Mendegorin",
-    role: "Web Developer"
-  }]
+  const team = [
+    {
+      name: "Khristian G. Kikuchi",
+      role: "Thesis Adviser",
+    },
+    {
+      name: "Francis Nicole B. Cabansag",
+      role: "Web Developer",
+    },
+    {
+      name: "Kane Justine A. Cometa",
+      role: "Web UI Designer and Developer",
+    },
+    {
+      name: "Jelly Anne Kaye G. Mallari",
+      role: "Web UI Designer and Developer",
+    },
+    {
+      name: "John Rafael D. Mendegorin",
+      role: "Web Developer",
+    },
+  ];
 
   return (
     <>
@@ -61,7 +63,6 @@ const AboutUs = () => {
             flexGrow: 1,
             display: "flex",
             flexDirection: "column",
-            marginTop: { xs: "3.5rem", sm: "4rem", md: "5rem" },
             height: {
               xs: "calc(100vh - 3.5rem)",
               sm: "calc(100vh - 4rem)",
@@ -69,17 +70,14 @@ const AboutUs = () => {
             },
           }}
         >
-          <HeaderWithBackButton
-            title="About Us"
-            onBack={() => navigate(-1)}
-          />
+          <HeaderWithBackButton title='About Us' onBack={() => navigate(-1)} />
 
           {/* Content Section */}
           <Box sx={{ flexGrow: 1, p: { xs: 3, md: 8 } }}>
             <Grid2 container spacing={4} mb={15}>
               {/* Left Column */}
               <Grid2
-                size={{xs:12, md:6}}
+                size={{ xs: 12, md: 6 }}
                 sx={{
                   display: "flex",
                   flexDirection: "column",
@@ -95,7 +93,7 @@ const AboutUs = () => {
                     color: "#001C43",
                   }}
                 >
-                  A centralized <br/> hub for all your
+                  A centralized <br /> hub for all your
                   <Box
                     sx={{
                       backgroundColor: "#DF031D",
@@ -136,13 +134,14 @@ const AboutUs = () => {
                     color: "#001C43",
                   }}
                 >
-                  This Research Repository is developed by group CS202401 in partial requirement for CS Thesis
+                  This Research Repository is developed by group CS202401 in
+                  partial requirement for CS Thesis
                 </Typography>
               </Grid2>
 
               {/* Right Column */}
               <Grid2
-                size={{xs:12, md:6}}
+                size={{ xs: 12, md: 6 }}
                 sx={{
                   display: "flex",
                   flexDirection: "column",
@@ -162,55 +161,55 @@ const AboutUs = () => {
               </Grid2>
             </Grid2>
             <Typography
-                variant='h4'
-                display='flex'
-                justifyContent='center'
-                sx={{
-                    fontWeight: 600,
-                    color: "#DF031D",
-                    m: '3rem'
-                }}
+              variant='h4'
+              display='flex'
+              justifyContent='center'
+              sx={{
+                fontWeight: 600,
+                color: "#DF031D",
+                m: "3rem",
+              }}
             >
-                Development Team
+              Development Team
             </Typography>
             <Grid2 container spacing={3} display='flex' justifyContent='center'>
-                {team.map((member) => (
-                    <Grid2 key={member.name} xs={12} sm={6} md={4}>
-                        <Paper
-                            display='flex'
-                            sx={{
-                                background: 'white',
-                                borderRadius: '4px',
-                                padding: '2rem',
-                                width: "25rem",
-                                boxShadow: '0 10px 20px rgba(0, 0, 0, 0.12)'
-                            }}
-                        >
-                            <Typography
-                                display='flex'
-                                justifyContent='center'
-                                variant='h6'
-                                sx={{
-                                fontWeight: 700,
-                                color: "#001C43",
-                                }}
-                            >
-                                {member.name}
-                            </Typography>
-                            <Typography
-                                display='flex'
-                                justifyContent='center'
-                                variant='body1'
-                                sx={{
-                                color: "#001C43",
-                                mt: 1
-                                }}
-                            >
-                                {member.role}
-                            </Typography>
-                        </Paper>
-                    </Grid2>
-                ))}
+              {team.map((member) => (
+                <Grid2 key={member.name} xs={12} sm={6} md={4}>
+                  <Paper
+                    display='flex'
+                    sx={{
+                      background: "white",
+                      borderRadius: "4px",
+                      padding: "2rem",
+                      width: "25rem",
+                      boxShadow: "0 10px 20px rgba(0, 0, 0, 0.12)",
+                    }}
+                  >
+                    <Typography
+                      display='flex'
+                      justifyContent='center'
+                      variant='h6'
+                      sx={{
+                        fontWeight: 700,
+                        color: "#001C43",
+                      }}
+                    >
+                      {member.name}
+                    </Typography>
+                    <Typography
+                      display='flex'
+                      justifyContent='center'
+                      variant='body1'
+                      sx={{
+                        color: "#001C43",
+                        mt: 1,
+                      }}
+                    >
+                      {member.role}
+                    </Typography>
+                  </Paper>
+                </Grid2>
+              ))}
             </Grid2>
           </Box>
         </Box>

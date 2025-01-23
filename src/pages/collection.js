@@ -453,7 +453,6 @@ const Collection = () => {
             flexGrow: 1,
             display: "flex",
             flexDirection: "column",
-            marginTop: { xs: "3.5rem", sm: "4rem", md: "5rem" },
             height: {
               xs: "calc(100vh - 3.5rem)",
               sm: "calc(100vh - 4rem)",
@@ -865,10 +864,10 @@ const Collection = () => {
                 </Box>
               </Grid2>
 
-              {/* Knowledge Graph Section */}           
+              {/* Knowledge Graph Section */}
               {!isMobile && (
-                  <Grid2 
-                  size={{ xs: 12, sm: 6, md: 3 }} 
+                <Grid2
+                  size={{ xs: 12, sm: 6, md: 3 }}
                   sx={{
                     display: "flex",
                     justifyContent: "center",
@@ -899,7 +898,7 @@ const Collection = () => {
                         padding: 0, // Removes default iframe padding
                         overflow: "hidden", // Prevents content overflow inside iframe
                       }}
-                      scrolling="no" // Removes the scrollbar
+                      scrolling='no' // Removes the scrollbar
                     />
                     <Box
                       onClick={handleNavigateKnowledgeGraph}
@@ -916,7 +915,6 @@ const Collection = () => {
                   </Box>
                 </Grid2>
               )}
-              
             </Grid2>
           </Box>
         </Box>

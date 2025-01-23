@@ -68,7 +68,6 @@ const Navbar = () => {
       color: "#a8031b", // Darker shade on hover
     },
   };
-  
 
   // Update buttonSettings to include active state
   const buttonSettings = {
@@ -328,11 +327,10 @@ const Navbar = () => {
       sx={{
         backgroundColor: "#FFF",
         height: {
-          xs: "calc(3rem + env(safe-area-inset-top))",
-          sm: "calc(4rem + env(safe-area-inset-top))",
-          md: "calc(5rem + env(safe-area-inset-top))",
+          xs: "4rem",
+          sm: "4.5rem",
+          md: "5rem",
         },
-        // Ensure navbar doesn't overlap content
         zIndex: theme.zIndex.appBar,
       }}
     >
@@ -343,7 +341,7 @@ const Navbar = () => {
           flexWrap: "nowrap",
           justifyContent: "space-between",
           alignItems: "center",
-          px: { xs: 1, sm: 2, md: 3 }, // Responsive padding
+          px: { xs: 2, sm: 2, md: 3 },
         }}
       >
         <Box
@@ -357,8 +355,8 @@ const Navbar = () => {
             onClick={null}
             sx={{
               p: 0,
-              width: { xs: "2rem", sm: "3rem", md: "4rem", lg: "5rem" },
-              height: { xs: "2rem", sm: "3rem", md: "4rem", lg: "5rem" },
+              width: { xs: "3rem", sm: "3.5rem", md: "4rem", lg: "5rem" },
+              height: { xs: "3rem", sm: "3.5rem", md: "4rem", lg: "5rem" },
             }}
           >
             <img
@@ -376,10 +374,10 @@ const Navbar = () => {
             orientation='vertical'
             flexItem
             sx={{
-              mx: { xs: 1, md: 2 },
+              mx: { xs: 1.5, md: 2 },
               borderColor: "#CA031B",
-              height: { xs: "1.5rem", md: "2rem" },
-              borderWidth: { xs: "0.5px", sm: "1px", md: "2px" }, // Responsive padding,
+              height: { xs: "2rem", md: "2rem" },
+              borderWidth: { xs: "1px", sm: "1px", md: "2px" },
               alignSelf: "center",
             }}
           />
@@ -399,8 +397,8 @@ const Navbar = () => {
                 fontWeight: 600,
                 color: "#CA031B",
                 fontSize: {
-                  xs: "0.25rem",
-                  sm: "0.5rem",
+                  xs: "0.7rem",
+                  sm: "0.75rem",
                   md: "0.75rem",
                   lg: "1rem",
                 },
@@ -415,12 +413,12 @@ const Navbar = () => {
                 fontWeight: 600,
                 color: "#001C43",
                 fontSize: {
-                  xs: "0.25rem",
-                  sm: "0.5rem",
+                  xs: "0.7rem",
+                  sm: "0.75rem",
                   md: "0.75rem",
                   lg: "1rem",
                 },
-                lineHeight: { xs: "1", md: "1.2" },
+                lineHeight: { xs: "1.2", md: "1.2" },
               }}
             >
               Research Repository
@@ -452,25 +450,26 @@ const Navbar = () => {
             <Box sx={{ display: "flex", gap: 2 }}>
               {getNavbarItems().map((item, index) => (
                 <Button
-                key={index}
-                onClick={item.onClick}
-                sx={{
-                  ...buttonSettings,
-                  ...(item.isActive ? activeButtonStyle : {}),
-                }}
-                endIcon={
-                  item.label === "Dashboard" || item.label === "System Management" ? (
-                    <KeyboardArrowDownIcon
-                      style={{
-                        color: item.isActive ? "#CA031B" : "red", // Match underline color
-                        fontSize: 30,
-                      }}
-                    />
-                  ) : null
-                }
-              >
-                {item.label}
-              </Button>              
+                  key={index}
+                  onClick={item.onClick}
+                  sx={{
+                    ...buttonSettings,
+                    ...(item.isActive ? activeButtonStyle : {}),
+                  }}
+                  endIcon={
+                    item.label === "Dashboard" ||
+                    item.label === "System Management" ? (
+                      <KeyboardArrowDownIcon
+                        style={{
+                          color: item.isActive ? "#CA031B" : "red", // Match underline color
+                          fontSize: 30,
+                        }}
+                      />
+                    ) : null
+                  }
+                >
+                  {item.label}
+                </Button>
               ))}
               <IconButton
                 onClick={handleOpenUserMenu}
@@ -589,10 +588,14 @@ const Navbar = () => {
                 </Typography>
               </MenuItem>
               <MenuItem onClick={handleMainDash}>
-                <Typography color='common.white'>SDG Impact Dashboard</Typography>
+                <Typography color='common.white'>
+                  SDG Impact Dashboard
+                </Typography>
               </MenuItem>
               <MenuItem onClick={handleUserEngagementDash}>
-                <Typography color='common.white'>User Engagament Dashboard</Typography>
+                <Typography color='common.white'>
+                  User Engagament Dashboard
+                </Typography>
               </MenuItem>
             </Menu>
           )}

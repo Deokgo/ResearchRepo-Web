@@ -21,6 +21,11 @@ const HeaderWithBackButton = ({ title, onBack, backgroundImage }) => {
         display: "flex",
         alignItems: "center",
         zIndex: 1,
+        marginTop: {
+          xs: "4rem",
+          sm: "4.5rem",
+          md: "5rem",
+        },
       }}
     >
       {homeBg && (
@@ -53,7 +58,7 @@ const HeaderWithBackButton = ({ title, onBack, backgroundImage }) => {
           <ArrowBackIosIcon />
         </IconButton>
         <Typography
-          variant="h3"
+          variant='h3'
           sx={{
             py: 5,
             fontFamily: "Montserrat, sans-serif",

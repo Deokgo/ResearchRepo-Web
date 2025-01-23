@@ -43,32 +43,32 @@ const Help = () => {
 
   const faqs = [
     {
-        id: 1,
-        question: "How to change my password?",
-        answer:
+      id: 1,
+      question: "How to change my password?",
+      answer:
         "To change password, (1) go to the [user icon] on the upper-right corner. A user menu \
         will open, select [profile]. (2) Under the profile tab, select [change password]. A small window \
         will pop up to your screen, kindly input your old password and new password. For confirmation \
         purposes, you need enter the new password twice. (3) The click submit.",
     },
     {
-        id: 2,
-        question: "How to change my password?",
-        answer:
-            "To change password, (1) go to the [user icon] on the upper-right corner. A user menu \
+      id: 2,
+      question: "How to change my password?",
+      answer:
+        "To change password, (1) go to the [user icon] on the upper-right corner. A user menu \
             will open, select [profile]. (2) Under the profile tab, select [change password]. A small window \
             will pop up to your screen, kindly input your old password and new password. For confirmation \
             purposes, you need enter the new password twice. (3) The click submit.",
     },
     {
-        id: 3,
-        question: "How to change my password?",
-        answer:
-            "To change password, (1) go to the [user icon] on the upper-right corner. A user menu \
+      id: 3,
+      question: "How to change my password?",
+      answer:
+        "To change password, (1) go to the [user icon] on the upper-right corner. A user menu \
             will open, select [profile]. (2) Under the profile tab, select [change password]. A small window \
             will pop up to your screen, kindly input your old password and new password. For confirmation \
             purposes, you need enter the new password twice. (3) The click submit.",
-    }
+    },
   ];
 
   // State to track which accordion is currently expanded
@@ -103,7 +103,6 @@ const Help = () => {
             flexGrow: 1,
             display: "flex",
             flexDirection: "column",
-            marginTop: { xs: "3.5rem", sm: "4rem", md: "5rem" },
             height: {
               xs: "calc(100vh - 3.5rem)",
               sm: "calc(100vh - 4rem)",
@@ -111,10 +110,7 @@ const Help = () => {
             },
           }}
         >
-          <HeaderWithBackButton
-            title="Help"
-            onBack={() => navigate(-1)}
-          />
+          <HeaderWithBackButton title='Help' onBack={() => navigate(-1)} />
 
           {/* Content Section */}
           <Box
@@ -132,17 +128,17 @@ const Help = () => {
                 flexDirection: "column",
               }}
             >
-                <Typography
-                    variant='body1'
-                    sx={{
-                        m:3,
-                        fontWeight: 400,
-                        fontSize: { xs: "0.7rem", sm: "0.8rem", md: "1rem" },
-                        color: "#001C43",
-                    }}
-                >
-                    Here are the list of 'Frequently Asked Questions' (FAQs):
-                </Typography>
+              <Typography
+                variant='body1'
+                sx={{
+                  m: 3,
+                  fontWeight: 400,
+                  fontSize: { xs: "0.7rem", sm: "0.8rem", md: "1rem" },
+                  color: "#001C43",
+                }}
+              >
+                Here are the list of 'Frequently Asked Questions' (FAQs):
+              </Typography>
               <Box
                 sx={{
                   display: "flex",

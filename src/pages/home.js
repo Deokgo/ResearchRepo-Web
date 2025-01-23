@@ -126,6 +126,11 @@ const Home = () => {
           height: "100vh",
           display: "flex",
           flexDirection: "column",
+          paddingTop: {
+            xs: "4rem",
+            sm: "4.5rem",
+            md: "5rem",
+          },
         }}
       >
         <Navbar />
@@ -160,18 +165,31 @@ const Home = () => {
               width: "100%",
               zIndex: 2,
               padding: { xs: 2, md: 4 },
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
             }}
           >
             <Grid2
               container
               spacing={5}
               sx={{
-                overflow: 'hidden',
+                overflow: "hidden",
                 height: "100%",
-                alignItems: 'center'
+                alignItems: "center",
+                justifyContent: "center",
+                maxWidth: { xs: "100%", md: "none" },
               }}
             >
-              <Grid2 size={9}>
+              <Grid2
+                size={9}
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  width: "100%",
+                }}
+              >
                 <Box
                   sx={{
                     display: "flex",
@@ -179,13 +197,12 @@ const Home = () => {
                     alignContent: "center",
                     alignItems: "center",
                     mb: "3rem",
-                    paddingLeft: "1rem",
-                    width: "100%", // Ensure full width
+                    width: { xs: "90%", md: "100%" },
                     "& .slick-list": {
-                      width: "100%", // Ensure slider list takes full width
+                      width: "100%",
                     },
                     "& .slick-slide": {
-                      padding: "1rem 12px", // Add some padding between slides
+                      padding: { xs: "0.5rem", md: "1rem 12px" },
                     },
                   }}
                 >
