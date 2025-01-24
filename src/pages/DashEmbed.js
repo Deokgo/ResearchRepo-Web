@@ -70,47 +70,44 @@ const DashEmbed = () => {
   return (
     <>
       <Navbar />
-      <Box
-        sx={{
-          flexGrow: 1,
-          display: "flex",
-          flexDirection: "column",
-          height: {
-            xs: "calc(100vh - 3.5rem)",
-            sm: "calc(100vh - 4rem)",
-            md: "calc(100vh - 6rem)",
-          },
-          overflow: "hidden",
-        }}
-      >
-        <HeaderWithBackButton
-          title="Institutional Performance Dashboard"
-          onBack={() => navigate(-1)}
-        />
-        <Box
-          sx={{
-            flexGrow: 1,
-            backgroundColor: "#f5f5f5",
-            padding: 0,
-            margin: 0,
-            height: "100%",
-            overflow: "hidden",
-          }}
-        >
-          <iframe
-            id="dashboard-iframe"
-            src={dashUrl}
-            style={{
-              border: "none",
-              width: "100%",
-              height: "100%",
-              display: "block",
-            }}
-            sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
-            title="Dash App"
-          />
-        </Box>
-      </Box>
+<Box
+  sx={{
+    flexGrow: 1,
+    display: "flex",
+    flexDirection: "column",
+    height: "99.5vh", 
+    overflow: "hidden", // Ensures no overflow issues
+  }}
+>
+  <HeaderWithBackButton
+    title="Institutional Performance Dashboard"
+    onBack={() => navigate(-1)}
+  />
+  <Box
+    sx={{
+      flexGrow: 1,
+      backgroundColor: "#f5f5f5",
+      padding: 0,
+      margin: 0,
+      height: "calc(99.5vh - 3.5rem)", // Adjust height based on header size
+      overflow: "hidden",
+    }}
+  >
+    <iframe
+      id="dashboard-iframe"
+      src={dashUrl}
+      style={{
+        border: "none",
+        width: "100%",
+        height: "100%",
+        display: "block",
+      }}
+      sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+      title="Dash App"
+    />
+  </Box>
+</Box>
+
     </>
   );
 };
