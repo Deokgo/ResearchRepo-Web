@@ -1,24 +1,14 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Navbar from "../components/navbar";
-import { Box, IconButton, Typography } from "@mui/material";
-import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
+import { Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import homeBg from "../assets/home_bg.png"; // Replace with actual image path
 import HeaderWithBackButton from "../components/Header";
 
 const SDGdashEmbed = () => {
   const [dashUrl, setDashUrl] = useState(null);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
-
-  // Update iframe height on resize
-  const updateIframeSize = () => {
-    const iframe = document.getElementById("dashboard-iframe");
-    if (iframe) {
-      iframe.style.height = `${window.innerHeight - 100}px`; // Adjust this value based on your layout
-    }
-  };
 
   useEffect(() => {
     // Fetch the Dash app URL
@@ -35,7 +25,6 @@ const SDGdashEmbed = () => {
           },
         });
 
-        // Check if response contains URL
         if (response.data?.url) {
           setDashUrl(response.data.url); // Set the Dash app URL
         } else {
@@ -52,8 +41,15 @@ const SDGdashEmbed = () => {
   }, []);
 
   useEffect(() => {
+    const updateIframeSize = () => {
+      const iframe = document.getElementById("dashboard-iframe");
+      if (iframe) {
+        iframe.style.height = `${window.innerHeight}px`; // Dynamically set height
+      }
+    };
+
     window.addEventListener("resize", updateIframeSize);
-    updateIframeSize(); // Call initially to set the size
+    updateIframeSize(); // Set initial size
 
     return () => {
       window.removeEventListener("resize", updateIframeSize);
@@ -73,15 +69,12 @@ const SDGdashEmbed = () => {
       <Navbar />
       <Box
         sx={{
-          flexGrow: 1,
           display: "flex",
           flexDirection: "column",
-          height: {
-            xs: "calc(100vh - 3.5rem)",
-            sm: "calc(100vh - 4rem)",
-            md: "calc(100vh - 6rem)",
-          },
-          overflow: "hidden",
+          height: "100vh", // Full viewport height
+          margin: 0,
+          padding: 0,
+          overflow: "hidden", // Prevent scrollbars
         }}
       >
         <HeaderWithBackButton
@@ -91,11 +84,10 @@ const SDGdashEmbed = () => {
         <Box
           sx={{
             flexGrow: 1,
-            backgroundColor: "#f5f5f5",
             padding: 0,
             margin: 0,
-            height: "100%",
-            overflow: "hidden",
+            height: "100%", // Ensure it occupies full remaining height
+            overflow: "hidden", // Prevent scrollbars
           }}
         >
           <iframe
@@ -104,8 +96,8 @@ const SDGdashEmbed = () => {
             style={{
               border: "none",
               width: "100%",
-              height: "100%",
-              display: "block",
+              height: "100vh", // Set height to full viewport
+              display: "block", // Ensure block-level display
             }}
             sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
             title="SDG Dash App"
@@ -115,4 +107,5 @@ const SDGdashEmbed = () => {
     </>
   );
 };
+
 export default SDGdashEmbed;
