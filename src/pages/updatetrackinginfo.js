@@ -976,30 +976,32 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                             "None"}
                                         </Typography>
                                       )}
-                                      <Typography
-                                        variant='h7'
-                                        sx={{
-                                          mb: "1rem",
-                                          fontSize: {
-                                            xs: "0.7rem",
-                                            md: "0.8rem",
-                                            lg: "0.9rem",
-                                          },
-                                        }}
-                                      >
-                                        <strong>Date Submitted:</strong>{" "}
-                                        {initialValues?.date_submitted
-                                          ? new Intl.DateTimeFormat("en-US", {
-                                              month: "long",
-                                              day: "2-digit",
-                                              year: "numeric",
-                                            }).format(
-                                              new Date(
-                                                initialValues.date_submitted
+                                      {publicationFormat === 'JL' && (
+                                        <Typography
+                                          variant='h7'
+                                          sx={{
+                                            mb: "1rem",
+                                            fontSize: {
+                                              xs: "0.7rem",
+                                              md: "0.8rem",
+                                              lg: "0.9rem",
+                                            },
+                                          }}
+                                        >
+                                          <strong>Date Submitted:</strong>{" "}
+                                          {initialValues?.date_submitted
+                                            ? new Intl.DateTimeFormat("en-US", {
+                                                month: "long",
+                                                day: "2-digit",
+                                                year: "numeric",
+                                              }).format(
+                                                new Date(
+                                                  initialValues.date_submitted
+                                                )
                                               )
-                                            )
-                                          : "None"}
-                                      </Typography>
+                                            : "None"}
+                                        </Typography>
+                                      )}
                                       {initialValues?.status === 'PUBLISHED' && (
                                         <Box display='flex' flexDirection='column'>
                                           <Typography
