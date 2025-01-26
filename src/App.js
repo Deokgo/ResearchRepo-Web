@@ -27,6 +27,7 @@ import DashEmbed from "./pages/DashEmbed";
 import SDGdashEmbed from "./pages/SDGdashEmbed";
 import Collection2 from "./pages/collection2";
 import EngageDash from "./pages/EngageDash";
+import Backup from "./pages/backup";
 function App() {
   const [data, setData] = useState([{}]);
   const isLoggedIn = !!localStorage.getItem("token");
@@ -132,6 +133,16 @@ function App() {
                 <PrivateRoute>
                   <RoleBasedRoute allowedRoles={["01"]}>
                     <DisplayAuditLog />
+                  </RoleBasedRoute>
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path='/backup'
+              element={
+                <PrivateRoute>
+                  <RoleBasedRoute allowedRoles={["01"]}>
+                    <Backup />
                   </RoleBasedRoute>
                 </PrivateRoute>
               }

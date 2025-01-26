@@ -193,6 +193,10 @@ const Navbar = () => {
     navigate("/knowledgegraph");
   };
 
+  const handleBackup = () => {
+    navigate("/backup");
+  };
+
   const handleLogout = async () => {
     try {
       const response = await axios({
@@ -263,6 +267,7 @@ const Navbar = () => {
         { label: "Manage Colleges", onClick: handleManageCollege },
         { label: "Manage Programs", onClick: handleManageProgram },
         { label: "View Audit Logs", onClick: handleViewAuditLog },
+        { label: "Backup", onClick: handleBackup },
       ],
       "02": [
         // Director
@@ -314,6 +319,7 @@ const Navbar = () => {
       "Manage Colleges": "/managecollege",
       "Manage Programs": "/manageprogram",
       "View Audit Logs": "/auditlog",
+      Backup: "/backup",
       "Research Tracking": "/researchtracking",
       "Knowledge Graph": "/knowledgegraph",
       Home: "/home",
