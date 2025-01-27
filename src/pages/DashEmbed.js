@@ -70,12 +70,12 @@ const DashEmbed = () => {
   return (
     <>
       <Navbar />
-<Box
+      <Box
   sx={{
     flexGrow: 1,
     display: "flex",
     flexDirection: "column",
-    height: "99.5vh", 
+    height: "100vh", // Full viewport height
     overflow: "hidden", // Ensures no overflow issues
   }}
 >
@@ -89,7 +89,7 @@ const DashEmbed = () => {
       backgroundColor: "#f5f5f5",
       padding: 0,
       margin: 0,
-      height: "calc(99.5vh - 3.5rem)", // Adjust height based on header size
+      height: "100%", // Use remaining height
       overflow: "hidden",
     }}
   >
@@ -99,7 +99,7 @@ const DashEmbed = () => {
       style={{
         border: "none",
         width: "100%",
-        height: "100%",
+        height: "100%", // Take full height
         display: "block",
       }}
       sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
