@@ -31,13 +31,13 @@ const AutoCompleteTextBox = ({
   const handleChange = (e) => {
     const newValue = e.target.value;
     setInputValue(newValue);
-
+  
     // Optional: Notify parent component while typing
     if (onItemSelected) onItemSelected(newValue);
-
-    // Filter suggestions based on user input
+  
+    // Filter suggestions based on user input, and check for null/undefined values
     const filteredSuggestions = data.filter((item) =>
-      item.toLowerCase().includes(newValue.toLowerCase())
+      item && item.toLowerCase().includes(newValue.toLowerCase())
     );
     setSuggestions(filteredSuggestions);
   };

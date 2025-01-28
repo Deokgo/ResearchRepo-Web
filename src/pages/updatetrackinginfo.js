@@ -1011,6 +1011,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                         </Typography>
                                       )}
                                       {publicationFormat === 'JL' && (
+                                        
                                         <Typography
                                           variant='h7'
                                           sx={{
@@ -1056,7 +1057,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                                   .toUpperCase() +
                                                 initialValues?.scopus
                                                   .slice(1)
-                                                  .toLowerCase()
+                                                  .toUpperCase()
                                               : "None"}
                                           </Typography>
                                           <Typography
