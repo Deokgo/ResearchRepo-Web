@@ -3,6 +3,7 @@ import Navbar from "../components/navbar";
 import DynamicTimeline from "../components/Timeline";
 import StatusUpdateButton from "../components/StatusUpdateButton";
 import { CircularProgress } from "@mui/material";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 import { Link } from "react-router-dom";
 import {
   Box,
@@ -249,7 +250,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
     }
   }, [openModalEdit, singleCountry]);
 
-  ///////////////////// ADD AND UPDATE PUBLICATION //////////////////////
+  ///////////////////// STATUS UPDATE PUBLICATION //////////////////////
   const checkFields = () => {
     // Validate required fields
     // Determine required fields based on publicationFormat
@@ -503,28 +504,6 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
     }
   }, [status]);
 
-  // Handle status update and refresh timeline
-  const handleStatusUpdate = async (newStatus) => {
-    try {
-      // Make the status update request
-      const response = await axios.post(`/track/research_status/${id}`, {
-        status: newStatus,
-      });
-
-      if (response.status === 200 || response.status === 201) {
-        // Toggle refresh to trigger timeline update
-        setRefreshTimeline((prev) => !prev);
-
-        // Fetch the next available status
-        const nextStatusResponse = await axios.get(`/track/next_status/${id}`);
-        setStatus(nextStatusResponse.data);
-      }
-    } catch (err) {
-      console.error("Error updating status:", err);
-      setError(err.response?.data?.message || "Failed to update status");
-    }
-  };
-
   // Handle pull out status update
   const handlePullOut = async (newStatus) => {
     try {
@@ -538,6 +517,29 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
     } catch (err) {
       console.error("Error updating status:", err);
       setError(err.response?.data?.message || "Failed to update status");
+    }
+  };
+
+  ////////////////// VIEW FINAL SUBMITTED COPY FILE///////////////////
+  const handleViewFinalSC = async () => {
+    if (publicationID) {
+      try {
+        const response = await axios.get(
+          `/track/view_final_submitted/${publicationID}`,
+          {
+            responseType: "blob",
+          }
+        );
+
+        const blob = new Blob([response.data], { type: "application/pdf" });
+        const url = window.URL.createObjectURL(blob);
+        window.open(url, "_blank");
+      } catch (error) {
+        console.error("Error fetching the manuscript:", error);
+        alert("Failed to retrieve final submitted copy. Please try again.");
+      }
+    } else {
+      alert("No final submitted copy available for this publication.");
     }
   };
 
@@ -1052,6 +1054,43 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                                 )
                                               : "None"}
                                           </Typography>
+                                          <Button
+                                            variant='contained'
+                                            color='primary'
+                                            startIcon={
+                                              <VisibilityIcon
+                                                sx={{
+                                                  fontSize: {
+                                                    xs: "0.65rem",
+                                                    md: "0.75rem",
+                                                    lg: "1rem",
+                                                  },
+                                                }}
+                                              />
+                                            }
+                                            sx={{
+                                              backgroundColor: "#08397C",
+                                              color: "#FFF",
+                                              fontFamily: "Montserrat, sans-serif",
+                                              fontWeight: 400,
+                                              textTransform: "none",
+                                              fontSize: {
+                                                xs: "0.5rem",
+                                                md: "0.65rem",
+                                                lg: "0.8rem",
+                                              },
+                                              width: "inherit",
+                                              alignSelf: "start",
+                                              borderRadius: "100px",
+                                              maxHeight: "3rem",
+                                              "&:hover": {
+                                                backgroundColor: "#072d61",
+                                              },
+                                            }}
+                                            onClick={handleViewFinalSC}
+                                          >
+                                            Final Submitted Copy
+                                          </Button>
                                         </Box>
                                       )}
                                     </Grid2>
@@ -1655,7 +1694,6 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                     value={publicationTitle}
                     onItemSelected={(value) => setPublicationTitle(value)} // Update state when a suggestion is selected
                     sx={{
-                      
                       ...createTextFieldStyles(),
                       "& .MuiInputLabel-root": {
                         fontSize: {
@@ -1664,6 +1702,10 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                           lg: "0.8rem",
                         },
                       },
+                      ...(publicationFormat === "JL" && {
+                        pointerEvents: "none",
+                        opacity: 0.7
+                      })
                     }}
                     InputLabelProps={createInputLabelProps()}
                     placeholder='ex: PLOS One'
