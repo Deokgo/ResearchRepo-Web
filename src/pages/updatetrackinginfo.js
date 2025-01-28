@@ -91,7 +91,8 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
             single_country: fetched_data[0].country,
             single_city: fetched_data[0].city,
             conference_date: fetched_data[0].conference_date,
-            status: fetched_data[0].status
+            status: fetched_data[0].status,
+            publication_paper: fetched_data[0].publication_paper
           };
 
           setInitialValues(initialData);
@@ -108,6 +109,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
           setSingleCity(initialData.single_city);
           setDatePresentation(initialData.conference_date);
           setDatePublished(initialValues?.date_published);
+          setFinalSubmitted(initialData.publication_paper);
 
           setPubData({ dataset: fetched_data });
         }
@@ -701,6 +703,36 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
     }
   };
 
+  const [pdfUrl, setPdfUrl] = useState(null);
+
+  useEffect(() => {
+    const fetchPdfFile = async () => {
+      const filePath = initialValues?.publication_paper;
+      if (filePath) {
+        try {
+          const response = await axios.get(`/paper/view_fs_copy/${id}`, {
+            responseType: "blob",
+          });
+
+          // Create a blob URL for the PDF
+          const blob = new Blob([response.data], { type: "application/pdf" });
+          const blobUrl = URL.createObjectURL(blob);
+
+          setPdfUrl(blobUrl);
+        } catch (error) {
+          console.error("Error fetching the publication paper:", error);
+        }
+      }
+    };
+
+    fetchPdfFile();
+
+    // Cleanup blob URL when component unmounts
+    return () => {
+      if (pdfUrl) URL.revokeObjectURL(pdfUrl);
+    };
+  }, [initialValues?.publication_paper]);
+
   return (
     <>
       <Box
@@ -1054,43 +1086,34 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                                 )
                                               : "None"}
                                           </Typography>
-                                          <Button
-                                            variant='contained'
-                                            color='primary'
-                                            startIcon={
-                                              <VisibilityIcon
-                                                sx={{
-                                                  fontSize: {
-                                                    xs: "0.65rem",
-                                                    md: "0.75rem",
-                                                    lg: "1rem",
-                                                  },
-                                                }}
-                                              />
-                                            }
+
+                                          <Typography
+                                            variant="h7"
                                             sx={{
-                                              backgroundColor: "#08397C",
-                                              color: "#FFF",
-                                              fontFamily: "Montserrat, sans-serif",
-                                              fontWeight: 400,
-                                              textTransform: "none",
+                                              mb: "1rem",
                                               fontSize: {
-                                                xs: "0.5rem",
-                                                md: "0.65rem",
-                                                lg: "0.8rem",
-                                              },
-                                              width: "inherit",
-                                              alignSelf: "start",
-                                              borderRadius: "100px",
-                                              maxHeight: "3rem",
-                                              "&:hover": {
-                                                backgroundColor: "#072d61",
+                                                xs: "0.7rem",
+                                                md: "0.8rem",
+                                                lg: "0.9rem",
                                               },
                                             }}
-                                            onClick={handleViewFinalSC}
                                           >
-                                            Final Submitted Copy
-                                          </Button>
+                                            <strong>Published Paper:</strong>{" "}
+                                            {pdfUrl ? (
+                                              <iframe
+                                                src={pdfUrl}
+                                                title="Published Paper"
+                                                style={{
+                                                  width: "100%",
+                                                  height: "500px",
+                                                  border: "1px solid #ddd",
+                                                }}
+                                              ></iframe>
+                                            ) : (
+                                              "None"
+                                            )}
+                                          </Typography>
+
                                         </Box>
                                       )}
                                     </Grid2>
@@ -1270,6 +1293,9 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                       </Grid2>
                                     </Box>
                                   )}
+                                  <Grid2 display='flex' flexDirection='row'>
+                                    
+                                  </Grid2>
                                 </Box>
                               ) : (
                                 <Box
