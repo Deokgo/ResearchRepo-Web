@@ -6,6 +6,16 @@ import {
   TextField,
   Typography,
   InputAdornment,
+  CircularProgress,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import HeaderWithBackButton from "../components/Header";
 import { useNavigate } from "react-router-dom";
@@ -14,12 +24,26 @@ import axios from "axios";
 import RestoreIcon from "@mui/icons-material/Restore";
 import BackupIcon from "@mui/icons-material/Backup";
 import { Search } from "@mui/icons-material";
+import { formatBytes, formatDate } from "../utils/format";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
+
 const Backup = () => {
   const navigate = useNavigate();
   const [backups, setBackups] = useState([]);
   const [filteredBackups, setFilteredBackups] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [selectedBackup, setSelectedBackup] = useState(null);
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
 
   // Fetch backups from the database
   const fetchBackups = async () => {
@@ -30,7 +54,7 @@ const Backup = () => {
       setFilteredBackups(response.data.backups);
     } catch (error) {
       console.error("Error fetching backups:", error);
-      alert("Error fetching backups");
+      showMessage("Error fetching backups: " + error.message, "error");
     } finally {
       setLoading(false);
     }
@@ -59,38 +83,57 @@ const Backup = () => {
   };
 
   // Handle creating a new backup
-  const handleCreateBackup = async () => {
+  const handleCreateBackup = async (type) => {
+    setLoading(true);
     try {
-      setLoading(true);
-      await axios.post("/backup/create"); // TODO: API for create backup
-      await fetchBackups(); // Refresh the list after creating backup
-      alert("Backup created successfully!");
+      const response = await axios.post(`/backup/create/${type}`);
+      showMessage(response.data.message);
+      await fetchBackups();
     } catch (error) {
       console.error("Error creating backup:", error);
-      alert("Error creating backup");
+      showMessage("Error creating backup: " + error.message, "error");
     } finally {
       setLoading(false);
     }
   };
 
   // Handle restore functionality
-  const handleRestore = async (backupId) => {
-    try {
-      const confirmRestore = window.confirm(
-        "Are you sure you want to restore this backup? This will override current data."
-      );
+  const handleRestoreClick = (backup) => {
+    setSelectedBackup(backup);
+    setOpenDialog(true);
+  };
 
-      if (confirmRestore) {
-        setLoading(true);
-        await axios.post(`/backup/restore/${backupId}`); // TODO: API for restore
-        alert("Backup restored successfully!");
-      }
+  const handleRestoreConfirm = async () => {
+    setOpenDialog(false);
+    setLoading(true);
+    try {
+      const response = await axios.post(
+        `/backup/restore/${selectedBackup.backup_id}`
+      );
+      showMessage(response.data.message);
+      await fetchBackups();
     } catch (error) {
       console.error("Error restoring backup:", error);
-      alert("Error restoring backup");
+      showMessage("Error restoring backup: " + error.message, "error");
     } finally {
       setLoading(false);
     }
+  };
+
+  const getBackupTypeColor = (type) => {
+    return type === "FULL" ? "primary.main" : "secondary.main";
+  };
+
+  const handleCloseSnackbar = () => {
+    setSnackbar({ ...snackbar, open: false });
+  };
+
+  const showMessage = (message, severity = "success") => {
+    setSnackbar({
+      open: true,
+      message,
+      severity,
+    });
   };
 
   return (
@@ -164,28 +207,24 @@ const Backup = () => {
                   ),
                 }}
               />
-              <Button
-                variant='contained'
-                onClick={handleCreateBackup}
-                startIcon={<BackupIcon />}
-                sx={{
-                  backgroundColor: "#CA031B",
-                  color: "#FFF",
-                  fontFamily: "Montserrat, sans-serif",
-                  fontWeight: 600,
-                  textTransform: "none",
-                  fontSize: { xs: "0.875rem", md: "1rem" },
-                  padding: { xs: "0.5rem 1rem", md: "1.25rem" },
-                  marginLeft: "2rem",
-                  borderRadius: "100px",
-                  maxHeight: "3rem",
-                  "&:hover": {
-                    backgroundColor: "#A30417",
-                  },
-                }}
-              >
-                Create Backup
-              </Button>
+              <Box>
+                <Button
+                  variant='contained'
+                  onClick={() => handleCreateBackup("FULL")}
+                  disabled={loading}
+                  sx={{ mr: 2 }}
+                >
+                  Full Backup
+                </Button>
+                <Button
+                  variant='contained'
+                  color='secondary'
+                  onClick={() => handleCreateBackup("INCREMENTAL")}
+                  disabled={loading}
+                >
+                  Incremental Backup
+                </Button>
+              </Box>
             </Box>
 
             {/* Virtuoso Table */}
@@ -202,95 +241,97 @@ const Backup = () => {
             >
               {loading ? (
                 <Box sx={{ display: "flex", justifyContent: "center" }}>
-                  <Typography>Loading backups...</Typography>
+                  <CircularProgress />
                 </Box>
               ) : (
                 <Box sx={{ flex: 1, overflow: "hidden" }}>
-                  <Virtuoso
-                    style={{ height: "400px" }}
-                    totalCount={filteredBackups.length}
-                    components={{
-                      Header: () => (
-                        <Box
-                          sx={{
-                            display: "flex",
-                            backgroundColor: "#0A438F",
-                            fontSize: {
-                              xs: "0.5rem",
-                              md: "0.75rem",
-                              lg: "0.9rem",
-                            },
-                            color: "#FFF",
-                            padding: "10px",
-                            fontWeight: 700,
-                            position: "sticky",
-                            top: 0,
-                            zIndex: 1000,
-                          }}
-                        >
-                          <Box sx={{ flex: 1 }}>Backup ID</Box>
-                          <Box sx={{ flex: 2 }}>Backup Date</Box>
-                          <Box sx={{ flex: 2 }}>Database Location</Box>
-                          <Box sx={{ flex: 2 }}>Files Location</Box>
-                          <Box sx={{ flex: 1 }}>Size</Box>
-                          <Box sx={{ flex: 1 }}>Action</Box>
-                        </Box>
-                      ),
-                    }}
-                    itemContent={(index) => {
-                      const backup = filteredBackups[index];
-                      return (
-                        <Box
-                          sx={{
-                            display: "flex",
-                            padding: "0.5rem",
-                            borderBottom: "1px solid #ccc",
-                            fontSize: {
-                              xs: "0.5rem",
-                              md: "0.65rem",
-                              lg: "0.9rem",
-                            },
-                          }}
-                        >
-                          <Box sx={{ flex: 1 }}>{backup.backup_id}</Box>
-                          <Box sx={{ flex: 2 }}>
-                            {new Date(backup.backup_date).toLocaleString()}
-                          </Box>
-                          <Box sx={{ flex: 2 }}>
-                            {backup.database_backup_location}
-                          </Box>
-                          <Box sx={{ flex: 2 }}>
-                            {backup.files_backup_location}
-                          </Box>
-                          <Box sx={{ flex: 1 }}>
-                            {(backup.total_size / (1024 * 1024)).toFixed(2)} MB
-                          </Box>
-                          <Box sx={{ flex: 1 }}>
-                            <Button
-                              variant='contained'
-                              onClick={() => handleRestore(backup.backup_id)}
-                              startIcon={<RestoreIcon />}
-                              sx={{
-                                backgroundColor: "#08397C",
-                                fontSize: "0.8rem",
-                                "&:hover": {
-                                  backgroundColor: "#052045",
-                                },
-                              }}
-                            >
-                              Restore
-                            </Button>
-                          </Box>
-                        </Box>
-                      );
-                    }}
-                  />
+                  <TableContainer component={Paper}>
+                    <Table>
+                      <TableHead>
+                        <TableRow>
+                          <TableCell>Backup ID</TableCell>
+                          <TableCell>Type</TableCell>
+                          <TableCell>Date</TableCell>
+                          <TableCell>Size</TableCell>
+                          <TableCell>Actions</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {backups.map((backup) => (
+                          <TableRow key={backup.backup_id}>
+                            <TableCell>{backup.backup_id}</TableCell>
+                            <TableCell>
+                              <Typography
+                                color={getBackupTypeColor(backup.backup_type)}
+                              >
+                                {backup.backup_type}
+                              </Typography>
+                            </TableCell>
+                            <TableCell>
+                              {formatDate(backup.backup_date)}
+                            </TableCell>
+                            <TableCell>
+                              {formatBytes(backup.total_size)}
+                            </TableCell>
+                            <TableCell>
+                              <Button
+                                startIcon={<RestoreIcon />}
+                                onClick={() => handleRestoreClick(backup)}
+                                disabled={loading}
+                              >
+                                Restore
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
                 </Box>
               )}
             </Box>
           </Box>
         </Box>
       </Box>
+
+      <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
+        <DialogTitle>Confirm Restore</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to restore from backup{" "}
+            {selectedBackup?.backup_id}? This will replace all current data with
+            the backup data.
+            {selectedBackup?.backup_type === "INCREMENTAL" && (
+              <Box sx={{ mt: 2, color: "warning.main" }}>
+                Note: This is an incremental backup. The restore process will
+                include the base full backup and all incremental backups up to
+                this point.
+              </Box>
+            )}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
+          <Button
+            onClick={handleRestoreConfirm}
+            variant='contained'
+            color='primary'
+          >
+            Restore
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+      >
+        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </>
   );
 };
