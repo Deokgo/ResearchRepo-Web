@@ -5,12 +5,18 @@ import { Link } from "react-router-dom";
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 import PublishIcon from '@mui/icons-material/Publish';
 import ArrowForward from '@mui/icons-material/ArrowForward';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import {
   Box,
   Button,
   Typography,
   Grid2,
   Divider,
+  CircularProgress,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
@@ -20,6 +26,7 @@ import HeaderWithBackButton from "../components/Header";
 import { useModalContext } from "../context/modalcontext";
 import AddSubmission from "../components/addsubmission";
 import AddPublish from "../components/addpublish";
+import { toast } from "react-hot-toast";
 
 const UpdateTrackingInfo = ({ route, navigate }) => {
   const navpage = useNavigate();
@@ -37,6 +44,10 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
 
   const { isAddSubmitModalOpen, openAddSubmitModal, closeAddSubmitModal } = useModalContext();
   const { isAddPublishModalOpen, openAddPublishModal, closeAddPublishModal } = useModalContext();
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isPullOut, setIsPullOut] = useState(false);
+  const [isSuccessDialogOpen, setIsSuccessDialogOpen] = useState(false);
 
   ///////////////////// PUBLICATION DATA RETRIEVAL //////////////////////
 
@@ -113,6 +124,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
   ///////////////////// STATUS UPDATE PUBLICATION //////////////////////
   const handleUpdateToAccept = async () => {
     try {
+      setIsSubmitting(true);
       // Send the data
       const response = await axios.post(`/track/form/accepted/${id}`, {
         headers: {
@@ -120,22 +132,13 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
         },
       });
 
-      console.log("Response:", response.data);
-      alert("Status updated successfully!");
+      setIsSuccessDialogOpen(true);
 
-      window.location.reload();
     } catch (error) {
-      console.error("Error status update:", error);
-      if (error.response) {
-        console.error("Error response:", error.response.data);
-        alert(
-          `Failed to update status: ${
-            error.response.data.error || "Please try again."
-          }`
-        );
-      } else {
-        alert("Failed to update status. Please try again.");
-      }
+      toast.error(error.response?.data?.error || "Error updating status");
+      console.error("Error:", error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -176,6 +179,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
   // Handle pull out status update
   const handlePullOut = async (newStatus) => {
     try {
+      setIsPullOut(true);
       // Make the status update request
       const response = await axios.post(`/track/research_status/pullout/${id}`);
 
@@ -183,9 +187,12 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
         // Toggle refresh to trigger timeline update
         setRefreshTimeline((prev) => !prev);
       }
-    } catch (err) {
-      console.error("Error updating status:", err);
-      setError(err.response?.data?.message || "Failed to update status");
+      setIsSuccessDialogOpen(true);
+    } catch (error) {
+      toast.error(error.response?.data?.error || "Error updating status");
+      console.error("Error:", error);
+    } finally {
+      setIsPullOut(false);
     }
   };
 
@@ -639,6 +646,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                           <Typography
                                             variant="h7"
                                             sx={{
+                                              mt: "2rem",
                                               mb: "1rem",
                                               fontSize: {
                                                 xs: "0.7rem",
@@ -653,6 +661,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                                 src={pdfUrl}
                                                 title="Published Paper"
                                                 style={{
+                                                  marginTop: "1rem",
                                                   width: "100%",
                                                   height: "500px",
                                                   border: "1px solid #ddd",
@@ -785,7 +794,16 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                         }}
                                         onClick={handleUpdateToAccept}
                                       >
-                                        SUBMITTED &nbsp;<ArrowForward/>&nbsp;<strong>ACCEPTED</strong>
+                                        {isSubmitting ? (
+                                          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                                            <CircularProgress size={20} color='#08397C' />
+                                            Updating Status...
+                                          </Box>
+                                        ) : (
+                                            <Typography display='flex' justifyContent='center'>
+                                              SUBMITTED &nbsp;<ArrowForward/>&nbsp;<strong>ACCEPTED</strong>
+                                            </Typography>
+                                        )}
                                       </Button>
                                     </Box>
                                   )}
@@ -867,7 +885,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                         }}
                                         onClick={openAddSubmitModal}
                                       >
-                                        + Add Publication Details
+                                        + Submit Publication
                                       </Button>
                                     </Box>
                                   </Grid2>
@@ -880,6 +898,96 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                     </Box>
                   </form>
                 </Box>
+                {/* Add loading overlay */}
+                {isSubmitting && (
+                <Box
+                    sx={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    backgroundColor: "rgba(255, 255, 255, 0.7)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    zIndex: 9999,
+                    }}
+                >
+                    <Box sx={{ textAlign: "center" }}>
+                    <CircularProgress />
+                    <Typography sx={{ mt: 2, fontSize: "1.25rem"  }}>Updating Status...</Typography>
+                    </Box>
+                </Box>
+                )}
+                {/* Add Success Dialog */}
+                <Dialog
+                  open={isSuccessDialogOpen}
+                  PaperProps={{
+                      sx: {
+                      borderRadius: "15px",
+                      padding: "1rem",
+                      },
+                  }}
+                  >
+                  <DialogTitle
+                      sx={{
+                      fontFamily: "Montserrat, sans-serif",
+                      fontWeight: 600,
+                      color: "#08397C",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                      }}
+                  >
+                      <Box
+                      component='span'
+                      sx={{
+                          backgroundColor: "#E8F5E9",
+                          borderRadius: "75%",
+                          padding: "10px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                      }}
+                      >
+                      <CheckCircleIcon/>
+                      </Box>
+                      Success
+                  </DialogTitle>
+                  <DialogContent>
+                      <Typography
+                      sx={{
+                          fontFamily: "Montserrat, sans-serif",
+                          color: "#666",
+                          mt: 1,
+                      }}
+                      >
+                      Status has been updated succesfully.
+                      </Typography>
+                  </DialogContent>
+                  <DialogActions sx={{ padding: "1rem" }}>
+                      <Button
+                      onClick={() => {
+                          setIsSuccessDialogOpen(false);
+                          navpage(0); }}
+                      sx={{
+                          backgroundColor: "#08397C",
+                          color: "#FFF",
+                          fontFamily: "Montserrat, sans-serif",
+                          fontWeight: 600,
+                          textTransform: "none",
+                          borderRadius: "100px",
+                          padding: "0.75rem",
+                          "&:hover": {
+                          backgroundColor: "#072d61",
+                          },
+                      }}
+                      >
+                      Close
+                      </Button>
+                  </DialogActions>
+                </Dialog>
               </Grid2>
 
               {/* Right-side Timeline Section*/}
@@ -934,11 +1042,42 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                     },
                   }}
                 >
-                  <RemoveCircleIcon/>&nbsp; PULL OUT PAPER
+                  {isPullOut ? (
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                      <CircularProgress size={20} color='#08397C' />
+                      Pulling out...
+                    </Box>
+                  ) : (
+                      <Typography display='flex' justifyContent='center'>
+                        <RemoveCircleIcon/> &nbsp; <strong>PULL OUT PAPER</strong>
+                      </Typography>
+                  )}
                 </Button>
               </Grid2>
             </Grid2>
           </Box>
+          {/* Add loading overlay */}
+          {isPullOut && (
+          <Box
+              sx={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: "rgba(255, 255, 255, 0.7)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              zIndex: 9999,
+              }}
+          >
+              <Box sx={{ textAlign: "center" }}>
+              <CircularProgress />
+              <Typography sx={{ mt: 2, fontSize: "1.25rem" }}>Pulling out Publication...</Typography>
+              </Box>
+          </Box>
+        )}
         </Box>
       </Box>
       <AddSubmission

@@ -11,13 +11,20 @@ import {
   Modal,
   MenuItem,
   Autocomplete,
+  CircularProgress,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from "@mui/material";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
 import AutoCompleteTextBox from "../components/Intellibox";
 import InfoIcon from "@mui/icons-material/Info";
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import Tooltip from "@mui/material/Tooltip";
 import { useModalContext } from "../context/modalcontext";
+import { toast } from "react-hot-toast";
 
 const AddSubmission = () => {
   const location = useLocation();
@@ -41,6 +48,10 @@ const AddSubmission = () => {
   const [citySearchText, setCitySearchText] = useState("");
 
   const { isAddSubmitModalOpen, closeAddSubmitModal, openAddSubmitModal } = useModalContext();
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
+  const [isSuccessDialogOpen, setIsSuccessDialogOpen] = useState(false);
 
   ///////////////////// COUNTRY AND CITY API RETRIEVAL //////////////////////
   const fetchCountries = async () => {
@@ -113,29 +124,29 @@ const AddSubmission = () => {
     }, [countriesAPI, conferenceVenues]);
 
     const fetchCities = (country, shouldClearCity = true) => {
-    // Get cities from countries API for the selected country
-    const selectedCountry = countries.find((c) => c.country === country);
-    if (selectedCountry) {
-        setCitiesAPI(selectedCountry.cities);
+        // Get cities from countries API for the selected country
+        const selectedCountry = countries.find((c) => c.country === country);
+        if (selectedCountry) {
+            setCitiesAPI(selectedCountry.cities);
 
-        // Get cities from conference venues for the selected country
-        const venueCities = conferenceVenues
-        .filter((venue) => venue.country === country)
-        .map((venue) => venue.city);
+            // Get cities from conference venues for the selected country
+            const venueCities = conferenceVenues
+            .filter((venue) => venue.country === country)
+            .map((venue) => venue.city);
 
-        // Filter API cities to only include those that are in our venues
-        const filteredCities = selectedCountry.cities.filter((city) =>
-        venueCities.includes(city)
-        );
+            // Filter API cities to only include those that are in our venues
+            const filteredCities = selectedCountry.cities.filter((city) =>
+            venueCities.includes(city)
+            );
 
-        console.log("Available cities for", country, ":", filteredCities);
-        setCities(filteredCities);
+            console.log("Available cities for", country, ":", filteredCities);
+            setCities(filteredCities);
 
-        // Clear selected city if needed
-        if (shouldClearCity) {
-        setSingleCity("");
+            // Clear selected city if needed
+            if (shouldClearCity) {
+            setSingleCity("");
+            }
         }
-    }
     };
 
     // Call this when country changes
@@ -146,24 +157,52 @@ const AddSubmission = () => {
     }, [isAddSubmitModalOpen, singleCountry]);
 
   ///////////////////// STATUS UPDATE PUBLICATION //////////////////////
+  const handleBack = () => {
+    if (isSubmitting) {
+        return;
+    }
+    let hasChanges;
+    hasChanges =
+      publicationFormat ||
+      dateSubmitted;
+
+    if (publicationFormat === 'PC'){
+        hasChanges = 
+            hasChanges || 
+            conferenceTitle ||
+            singleCountry ||
+            singleCity || 
+            datePresentation;
+    } else {
+        hasChanges = hasChanges || publicationTitle;
+    }     
+
+    if (hasChanges) {
+      setIsConfirmDialogOpen(true);
+    } else {
+      handleFormCleanup();
+      closeAddSubmitModal();
+    }
+  };
+
   const checkFields = () => {
     // Validate required fields
     // Determine required fields based on publicationFormat
-    let requiredFields;
+    let requiredFields = {
+        "Publication Type": publicationFormat,
+        "Date of Submission": dateSubmitted
+    };
 
     if (publicationFormat === "PC") {
-      requiredFields = {
-        "Publication Type": publicationFormat,
+      requiredFields = {...requiredFields,
         "Conference Title": conferenceTitle,
         Country: singleCountry,
         City: singleCity,
         "Date of Presentation": datePresentation,
       };
     } else {
-      requiredFields = {
+      requiredFields = {...requiredFields,
         "Publication Title": publicationTitle,
-        "Publication Type": publicationFormat,
-        "Date of Submission": dateSubmitted,
       };
     }
     const missingFields = Object.entries(requiredFields)
@@ -182,19 +221,25 @@ const AddSubmission = () => {
     approvedDate.setHours(0, 0, 0, 0);
     today.setHours(0, 0, 0, 0);
 
-    return missingFields;
+    if (missingFields.length > 0){
+        return true;
+    } 
+    
+    return false;
   };
 
   const handleSavePublication = async () => {
     try {
       const missingFields = checkFields();
 
-      if (missingFields.length > 0) {
+      if (missingFields) {
         alert(
           `Please fill in all required fields: ${missingFields.join(", ")}`
         );
         return;
       }
+      
+      setIsSubmitting(true);
 
       const formData = new FormData();
 
@@ -218,23 +263,13 @@ const AddSubmission = () => {
         },
       });
 
-      console.log("Response:", response.data);
-      alert("Publication added successfully!");
-      handleFormCleanup();
+      setIsSuccessDialogOpen(true);
 
-      window.location.reload();
     } catch (error) {
-      console.error("Error adding publication:", error);
-      if (error.response) {
-        console.error("Error response:", error.response.data);
-        alert(
-          `Failed to add publication: ${
-            error.response.data.error || "Please try again."
-          }`
-        );
-      } else {
-        alert("Failed to add publication. Please try again.");
-      }
+        toast.error(error.response?.data?.error || "Error submitting publication");
+        console.error("Error:", error);
+      } finally {
+        setIsSubmitting(false);
     }
   };
 
@@ -343,7 +378,7 @@ const AddSubmission = () => {
   return (
     <>
     {/* Add Publication Modal */}
-    <Modal open={isAddSubmitModalOpen}>
+    <Modal open={isAddSubmitModalOpen} onClose={isSubmitting ? undefined : handleBack}>
         <Box
             sx={{
             position: "absolute",
@@ -371,7 +406,7 @@ const AddSubmission = () => {
                 },
             }}
             >
-            Add Details
+            Submit Publication
             </Typography>
             <FormControl fullWidth variant='outlined' margin='dense'>
             <InputLabel
@@ -589,21 +624,21 @@ const AddSubmission = () => {
             </Box>
             )}
             <TextField
-            fullWidth
-            label='Date of Submission'
-            variant='outlined'
-            type='date' 
-            margin='dense'
-            value={dateSubmitted}
-            onChange={(e) => setDateSubmitted(e.target.value)}
-            inputProps={{
-            max: new Date().toISOString().split('T')[0] // This sets today as the maximum date
-            }}
-            sx={createTextFieldStyles()}
-            InputLabelProps={{
-            ...createInputLabelProps(),
-            shrink: true,
-            }}
+                fullWidth
+                label='Date of Submission'
+                variant='outlined'
+                type='date' 
+                margin='dense'
+                value={dateSubmitted}
+                onChange={(e) => setDateSubmitted(e.target.value)}
+                inputProps={{
+                max: new Date().toISOString().split('T')[0] // This sets today as the maximum date
+                }}
+                sx={createTextFieldStyles()}
+                InputLabelProps={{
+                ...createInputLabelProps(),
+                shrink: true,
+                }}
             />
             <Box
             sx={{
@@ -613,14 +648,7 @@ const AddSubmission = () => {
             }}
             >
             <Button
-                onClick={() => {
-                setPublicationTitle("");
-                setPublicationFormat("");
-                setDateSubmitted("");
-                setSingleCountry("");
-                setSingleCity("");
-                closeAddSubmitModal();
-                }}
+                onClick={handleBack}
                 sx={{
                 backgroundColor: "#08397C",
                 color: "#FFF",
@@ -642,6 +670,7 @@ const AddSubmission = () => {
                 variant='contained'
                 color='primary'
                 onClick={handleSavePublication}
+                disabled={checkFields() || isSubmitting}
                 sx={{
                 backgroundColor: "#CA031B",
                 color: "#FFF",
@@ -658,9 +687,186 @@ const AddSubmission = () => {
                 },
                 }}
             >
-                Submit
+                {isSubmitting ? (
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    <CircularProgress size={20} color='#08397C' />
+                    Submitting Publication...
+                    </Box>
+                ) : (
+                    "Submit"
+                )}
             </Button>
           </Box>
+            {/* Add loading overlay */}
+            {isSubmitting && (
+            <Box
+                sx={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: "rgba(255, 255, 255, 0.7)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                zIndex: 9999,
+                }}
+            >
+                <Box sx={{ textAlign: "center" }}>
+                <CircularProgress />
+                <Typography sx={{ mt: 2, fontSize: "1.25rem" }}>Submitting Publication...</Typography>
+                </Box>
+            </Box>
+            )}
+
+            {/* Save Progress */}
+            <Dialog
+                open={isConfirmDialogOpen}
+                onClose={() => setIsConfirmDialogOpen(false)}
+                PaperProps={{
+                    sx: {
+                    borderRadius: "15px",
+                    padding: "1rem",
+                    },
+                }}
+                >
+                <DialogTitle
+                    sx={{
+                    fontFamily: "Montserrat, sans-serif",
+                    fontWeight: 600,
+                    color: "#08397C",
+                    }}
+                >
+                    Unsaved Progress
+                </DialogTitle>
+                <DialogContent>
+                    <Typography
+                    sx={{
+                        fontFamily: "Montserrat, sans-serif",
+                        color: "#666",
+                    }}
+                    >
+                    You have unsaved progress. Do you want to save your progress?
+                    </Typography>
+                </DialogContent>
+                <DialogActions sx={{ padding: "1rem" }}>
+                    <Button
+                    onClick={() => {
+                        setIsConfirmDialogOpen(false);
+                        handleFormCleanup(); // Set flag to clear fields
+                        closeAddSubmitModal();
+                    }}
+                    sx={{
+                        backgroundColor: "#CA031B",
+                        color: "#FFF",
+                        fontFamily: "Montserrat, sans-serif",
+                        fontWeight: 600,
+                        textTransform: "none",
+                        borderRadius: "100px",
+                        padding: "0.75rem",
+                        "&:hover": {
+                        backgroundColor: "#072d61",
+                        },
+                    }}
+                    >
+                    Discard
+                    </Button>
+                    <Button
+                    onClick={() => {
+                        setIsConfirmDialogOpen(false);
+                        closeAddSubmitModal();
+                    }}
+                    sx={{
+                        backgroundColor: "#08397C",
+                        color: "#FFF",
+                        fontFamily: "Montserrat, sans-serif",
+                        fontWeight: 600,
+                        textTransform: "none",
+                        borderRadius: "100px",
+                        padding: "0.75rem",
+                        "&:hover": {
+                        backgroundColor: "#A30417",
+                        },
+                    }}
+                    >
+                    Save Progress
+                    </Button>
+                </DialogActions>
+                </Dialog>
+
+                {/* Add Success Dialog */}
+                <Dialog
+                open={isSuccessDialogOpen}
+                onClose={() => {
+                    setIsSuccessDialogOpen(false);
+                    handleFormCleanup();}}
+                PaperProps={{
+                    sx: {
+                    borderRadius: "15px",
+                    padding: "1rem",
+                    },
+                }}
+                >
+                <DialogTitle
+                    sx={{
+                    fontFamily: "Montserrat, sans-serif",
+                    fontWeight: 600,
+                    color: "#08397C",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1,
+                    }}
+                >
+                    <Box
+                    component='span'
+                    sx={{
+                        backgroundColor: "#E8F5E9",
+                        borderRadius: "75%",
+                        padding: "10px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                    }}
+                    >
+                    <CheckCircleIcon/>
+                    </Box>
+                    Success
+                </DialogTitle>
+                <DialogContent>
+                    <Typography
+                    sx={{
+                        fontFamily: "Montserrat, sans-serif",
+                        color: "#666",
+                        mt: 1,
+                    }}
+                    >
+                    Publication has been submitted successfully.
+                    </Typography>
+                </DialogContent>
+                <DialogActions sx={{ padding: "1rem" }}>
+                    <Button
+                    onClick={() => {
+                        setIsSuccessDialogOpen(false);
+                        handleFormCleanup();
+                        window.location.reload(); }}
+                    sx={{
+                        backgroundColor: "#08397C",
+                        color: "#FFF",
+                        fontFamily: "Montserrat, sans-serif",
+                        fontWeight: 600,
+                        textTransform: "none",
+                        borderRadius: "100px",
+                        padding: "0.75rem",
+                        "&:hover": {
+                        backgroundColor: "#072d61",
+                        },
+                    }}
+                    >
+                    Close
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Box>
       </Modal>
     </>
