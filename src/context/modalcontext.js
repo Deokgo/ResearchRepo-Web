@@ -9,6 +9,8 @@ export const ModalProvider = ({ children }) => {
   const [isSignupModalOpen, setIsSignupModalOpen] = useState(false);
   const [isPassresetModalOpen, setIsPassresetModalOpen] = useState(false);
   const [isAddPaperModalOpen, setIsAddPaperModalOpen] = useState(false);
+  const [isAddSubmitModalOpen, setIsAddSubmitModalOpen] = useState(false);
+  const [isAddPublishModalOpen, setIsAddPublishModalOpen] = useState(false);
 
   const openLoginModal = () => setIsLoginModalOpen(true);
   const closeLoginModal = () => setIsLoginModalOpen(false);
@@ -18,6 +20,10 @@ export const ModalProvider = ({ children }) => {
   const closePassresetModal = () => setIsPassresetModalOpen(false);
   const openAddPaperModal = () => setIsAddPaperModalOpen(true);
   const closeAddPaperModal = () => setIsAddPaperModalOpen(false);
+  const openAddSubmitModal = () => setIsAddSubmitModalOpen(true);
+  const closeAddSubmitModal = () => setIsAddSubmitModalOpen(false);
+  const openAddPublishModal = () => setIsAddPublishModalOpen(true);
+  const closeAddPublishModal = () => setIsAddPublishModalOpen(false);
 
   return (
     <ModalContext.Provider
@@ -34,6 +40,12 @@ export const ModalProvider = ({ children }) => {
         isAddPaperModalOpen,
         closeAddPaperModal,
         openAddPaperModal,
+        isAddSubmitModalOpen,
+        closeAddSubmitModal,
+        openAddSubmitModal,
+        isAddPublishModalOpen,
+        closeAddPublishModal,
+        openAddPublishModal,
       }}
     >
       {children}
