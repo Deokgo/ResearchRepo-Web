@@ -24,17 +24,16 @@ import FileUploader from "../components/FileUploader";
 import { useModalContext } from "../context/modalcontext";
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { toast } from "react-hot-toast";
+import { filterCache, fetchAndCacheFilterData, getCitiesForCountry, searchCountries, searchCities } from "../utils/trackCache";
 
 const AddPublish = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [openModalEdit, setOpenModalEdit] = useState(false);
   const { id } = location.state || {}; // Default to an empty object if state is undefined
-  const [data, setData] = useState(null); // Start with null to represent no data
-  const [loading, setLoading] = useState(true); // Track loading state
 
-  const [pubData, setPubData] = useState(null);
   const [initialValues, setInitialValues] = useState(null);
+  const [pub_names, setPubNames] = useState([]);
+  const [publicationFormats, setPublicationFormats] = useState([]);
 
   const [publicationTitle, setPublicationTitle] = useState("");
   const [publicationFormat, setPublicationFormat] = useState("");
@@ -77,7 +76,6 @@ const AddPublish = () => {
           setPublicationFormat(initialData.journal);
           setDatePresentation(initialData.conference_date);
 
-          setPubData({ dataset: fetched_data });
         }
       } catch (error) {
         console.error("Error fetching publication data:", error);
@@ -89,36 +87,10 @@ const AddPublish = () => {
   }, [id]);
 
 
-  ///////////////////// RESEARCH DATA RETRIEVAL //////////////////////
-  useEffect(() => {
-    if (id) {
-      const fetchData = async () => {
-        try {
-          const response = await axios.get(
-            `/dataset/fetch_ordered_dataset/${id}`
-          );
-          const fetchedDataset = response.data.dataset || []; // Use empty array if dataset is undefined
-          console.log("Fetched data:", fetchedDataset);
-          setData({ dataset: fetchedDataset });
-        } catch (error) {
-          console.error("Error fetching data:", error);
-          setData({ dataset: [] }); // Set an empty dataset on error
-        } finally {
-          setLoading(false); // Stop loading regardless of success or failure
-        }
-      };
-      fetchData();
-    } else {
-      console.warn("ID is undefined or null:", id);
-      setLoading(false);
-    }
-  }, [id]);
-
   ///////////////////// STATUS UPDATE PUBLICATION //////////////////////
   const onSelectFileHandlerFS = (e) => {
     setFinalSubmitted(e.target.files[0]);
   };
-
 
   const onDeleteFileHandlerFS = () => {
     setFinalSubmitted(null);
@@ -222,7 +194,6 @@ const AddPublish = () => {
   ///////////////////// PRE-POST MODAL HANDLING //////////////////////
 
   const handleFormCleanup = () => {
-    setPublicationFormat("");
     setIndexingStatus("");
     setDatePresentation("");
     setDatePublished("");
@@ -253,39 +224,22 @@ const AddPublish = () => {
     },
   });
 
-  const [pub_names, setPubNames] = useState([]);
-
-  // Fetch data from the API
-  useEffect(() => {
-    const fetchPub_Names = async () => {
-      try {
-        const response = await axios.get(
-          "/track/data_fetcher/publications/publication_name"
-        ); // Replace with your API endpoint
-        setPubNames(response.data); // Assuming the API returns an array of fruits
-      } catch (error) {
-        console.error("Error fetching fruits:", error);
+  const loadInitialData = async () => {
+    try {
+      const cachedData = await fetchAndCacheFilterData();
+      if (cachedData) {
+        setPubNames(cachedData.publicationNames);
+        setPublicationFormats(cachedData.publicationFormats);
       }
-    };
-
-    fetchPub_Names();
+    } catch (error) {
+      console.error("Error loading initial data:", error);
+      toast.error("Failed to load form data");
+    }
+  };
+  // Use effect to load initial data
+  useEffect(() => {
+    loadInitialData();
   }, []);
-
-  const [publicationFormats, setPublicationFormats] = useState([]);
-  
-    useEffect(() => {
-        const fetchPublicationFormats = async () => {
-        try {
-            const response = await fetch("/track/fetch_data/pub_format"); // Replace with your API URL
-            const data = await response.json(); // Directly parse the JSON response (array format)
-            setPublicationFormats(data);
-        } catch (error) {
-            console.error("Error fetching publication formats:", error);
-        }
-        };
-
-        fetchPublicationFormats();
-    }, []);
 
   // Find the name corresponding to the current ID
   const selectedFormatName = publicationFormats.find(
@@ -325,7 +279,34 @@ const AddPublish = () => {
             >
             Publish {selectedFormatName}
             </Typography>
-            <TextField
+            { publicationFormat === "PC" && (
+              <AutoCompleteTextBox
+                fullWidth
+                data={pub_names}
+                label='Publication Title'
+                id='publication-name'
+                value={publicationTitle}
+                onItemSelected={(value) => setPublicationTitle(value)} // Update state when a suggestion is selected
+                sx={{
+                    ...createTextFieldStyles(),
+                    "& .MuiInputLabel-root": {
+                    fontSize: {
+                        xs: "0.75rem",
+                        md: "0.75rem",
+                        lg: "0.8rem",
+                    },
+                    },
+                    ...(publicationFormat === "JL" && {
+                    pointerEvents: "none",
+                    opacity: 0.7
+                    })
+                }}
+                InputLabelProps={createInputLabelProps()}
+                placeholder='ex: PLOS One'
+              />
+            )}
+            { publicationFormat === 'JL' && (
+              <TextField
                 fullWidth
                 label='Publication Title'
                 variant='outlined'
@@ -334,7 +315,8 @@ const AddPublish = () => {
                 value={publicationTitle}
                 sx={createTextFieldStyles()}
                 InputLabelProps={createInputLabelProps()}
-            />
+              />
+            )}
             <FormControl fullWidth variant='outlined' margin='dense'>
             <InputLabel
                 sx={{

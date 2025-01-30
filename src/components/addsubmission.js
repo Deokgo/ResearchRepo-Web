@@ -25,6 +25,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import Tooltip from "@mui/material/Tooltip";
 import { useModalContext } from "../context/modalcontext";
 import { toast } from "react-hot-toast";
+import { filterCache, fetchAndCacheFilterData, getCitiesForCountry, searchCountries, searchCities } from "../utils/trackCache";
 
 const AddSubmission = () => {
   const location = useLocation();
@@ -40,6 +41,9 @@ const AddSubmission = () => {
   const [countries, setCountries] = useState([]);
   const [countriesAPI, setCountriesAPI] = useState([]);
   const [citiesAPI, setCitiesAPI] = useState([]);
+  const [pub_names, setPubNames] = useState([]);
+  const [conf_title, setConfTitle] = useState([]);
+  const [publicationFormats, setPublicationFormats] = useState([]);
   const [Cities, setCities] = useState([]);
   const [datePresentation, setDatePresentation] = useState("");
   const [conferenceVenues, setConferenceVenues] = useState([]);
@@ -54,107 +58,68 @@ const AddSubmission = () => {
   const [isSuccessDialogOpen, setIsSuccessDialogOpen] = useState(false);
 
   ///////////////////// COUNTRY AND CITY API RETRIEVAL //////////////////////
-  const fetchCountries = async () => {
+  const loadInitialData = async () => {
     try {
-        const response = await axios.get(
-        "https://countriesnow.space/api/v0.1/countries",
-        { withCredentials: false }
-        );
-        console.log("Countries API response:", response.data.data);
-        setCountriesAPI(response.data.data);
+      const cachedData = await fetchAndCacheFilterData();
+      if (cachedData) {
+        setCountriesAPI(cachedData.countries);
+        setConferenceVenues(cachedData.venues);
+        setPubNames(cachedData.publicationNames);
+        setConfTitle(cachedData.conferenceTitles);
+        setPublicationFormats(cachedData.publicationFormats);
+      }
     } catch (error) {
-        console.error("Error fetching countries:", error);
+      console.error("Error loading initial data:", error);
+      toast.error("Failed to load form data");
     }
-    };
+  };
 
-    const fetchConferenceVenues = async () => {
-    try {
-        const response = await axios.get("/track/fetch_data/conference");
-        console.log("Conference response:", response.data);
+  // Use effect to load initial data
+  useEffect(() => {
+    loadInitialData();
+  }, []);
 
-        // Process the conference venues
-        const venues = response.data
-        .map((conf) => {
-            if (conf.conference_venue) {
-            const [city, country] = conf.conference_venue
-                .split(",")
-                .map((part) => part.trim());
-            return { city, country };
-            }
-            return null;
-        })
-        .filter((venue) => venue !== null);
+  useEffect(() => {
+  if (countriesAPI.length > 0 && conferenceVenues.length > 0) {
+      // Get unique countries from conference venues
+      const venueCountries = new Set(
+      conferenceVenues.map((venue) => venue.country)
+      );
 
-        console.log("Processed venues:", venues);
-        setConferenceVenues(venues);
-    } catch (error) {
-        console.error("Error fetching conference venues:", error);
+      const filteredCountries = countriesAPI.filter((country) =>
+      venueCountries.has(country.country)
+      );
+
+      console.log("Filtered countries:", filteredCountries);
+      setCountries(filteredCountries);
+  }
+  }, [countriesAPI, conferenceVenues]);
+    
+  // Update country selection handling
+  const handleCountryChange = (event, newValue) => {
+    setSingleCountry(newValue);
+    if (newValue) {
+      const citiesForCountry = getCitiesForCountry(newValue);
+      setCities(citiesForCountry);
+      setSingleCity("");
     }
-    };
+  };
 
-    // Combined function to fetch all data
-    const fetchAllData = async () => {
-    try {
-        await Promise.all([fetchCountries(), fetchConferenceVenues()]);
-        console.log("All data fetched successfully");
-    } catch (error) {
-        console.error("Error fetching data:", error);
+  // Update country search handling
+  useEffect(() => {
+    if (countrySearchText) {
+      const searchResults = searchCountries(countrySearchText);
+      setCountries(searchResults.map(country => ({ country })));
     }
-    };
+  }, [countrySearchText]);
 
-    // Use effect to fetch data when component mounts
-    useEffect(() => {
-    fetchAllData();
-    }, []);
-
-    useEffect(() => {
-    if (countriesAPI.length > 0 && conferenceVenues.length > 0) {
-        // Get unique countries from conference venues
-        const venueCountries = new Set(
-        conferenceVenues.map((venue) => venue.country)
-        );
-
-        const filteredCountries = countriesAPI.filter((country) =>
-        venueCountries.has(country.country)
-        );
-
-        console.log("Filtered countries:", filteredCountries);
-        setCountries(filteredCountries);
+  // Update city search handling
+  useEffect(() => {
+    if (citySearchText && singleCountry) {
+      const searchResults = searchCities(singleCountry, citySearchText);
+      setCities(searchResults);
     }
-    }, [countriesAPI, conferenceVenues]);
-
-    const fetchCities = (country, shouldClearCity = true) => {
-        // Get cities from countries API for the selected country
-        const selectedCountry = countries.find((c) => c.country === country);
-        if (selectedCountry) {
-            setCitiesAPI(selectedCountry.cities);
-
-            // Get cities from conference venues for the selected country
-            const venueCities = conferenceVenues
-            .filter((venue) => venue.country === country)
-            .map((venue) => venue.city);
-
-            // Filter API cities to only include those that are in our venues
-            const filteredCities = selectedCountry.cities.filter((city) =>
-            venueCities.includes(city)
-            );
-
-            console.log("Available cities for", country, ":", filteredCities);
-            setCities(filteredCities);
-
-            // Clear selected city if needed
-            if (shouldClearCity) {
-            setSingleCity("");
-            }
-        }
-    };
-
-    // Call this when country changes
-    useEffect(() => {
-    if (isAddSubmitModalOpen && singleCountry) {
-        fetchCities(singleCountry); // Fetch cities for the selected country
-    }
-    }, [isAddSubmitModalOpen, singleCountry]);
+  }, [citySearchText, singleCountry]);
 
   ///////////////////// STATUS UPDATE PUBLICATION //////////////////////
   const handleBack = () => {
@@ -310,69 +275,10 @@ const AddSubmission = () => {
     },
   });
 
-  const [pub_names, setPubNames] = useState([]);
-
-  // Fetch data from the API
-  useEffect(() => {
-    const fetchPub_Names = async () => {
-      try {
-        const response = await axios.get(
-          "/track/data_fetcher/publications/publication_name"
-        ); // Replace with your API endpoint
-        setPubNames(response.data); // Assuming the API returns an array of fruits
-      } catch (error) {
-        console.error("Error fetching fruits:", error);
-      }
-    };
-
-    fetchPub_Names();
-  }, []);
-  const [conf_title, setConfTitle] = useState([]);
-
-  // Fetch data from the API
-  useEffect(() => {
-    const fetchConf_titles = async () => {
-      try {
-        const response = await axios.get(
-          "/track/data_fetcher/conference/conference_title"
-        ); // Replace with your API endpoint
-        setConfTitle(response.data); // Assuming the API returns an array of fruits
-      } catch (error) {
-        console.error("Error fetching fruits:", error);
-      }
-    };
-
-    fetchConf_titles();
-  }, []);
-
-  const [publicationFormats, setPublicationFormats] = useState([]);
-
-  useEffect(() => {
-    const fetchPublicationFormats = async () => {
-      try {
-        const response = await fetch("/track/fetch_data/pub_format"); // Replace with your API URL
-        const data = await response.json(); // Directly parse the JSON response (array format)
-        setPublicationFormats(data);
-      } catch (error) {
-        console.error("Error fetching publication formats:", error);
-      }
-    };
-
-    fetchPublicationFormats();
-  }, []);
-
   // Handle change event
   const handleChange = (e) => {
     setPublicationFormat(e.target.value); // Update state with selected value
     console.log("Selected Publication Format ID:", e.target.value); // Log the selected value
-  };
-
-  // Modified country selection handling
-  const handleCountryChange = (event, newValue) => {
-    setSingleCountry(newValue);
-    if (newValue) {
-      fetchCities(newValue);
-    }
   };
 
   return (

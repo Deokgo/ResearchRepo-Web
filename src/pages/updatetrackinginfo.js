@@ -27,6 +27,7 @@ import { useModalContext } from "../context/modalcontext";
 import AddSubmission from "../components/addsubmission";
 import AddPublish from "../components/addpublish";
 import { toast } from "react-hot-toast";
+import { fetchAndCacheFilterData } from "../utils/trackCache";
 
 const UpdateTrackingInfo = ({ route, navigate }) => {
   const navpage = useNavigate();
@@ -143,38 +144,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
   };
 
   ///////////////////// TRACKING PART //////////////////////
-
-  const [status, setStatus] = useState(null);
-  const [error, setError] = useState(null);
-  const [isButtonDisabled, setIsButtonDisabled] = useState(false);
   const [refreshTimeline, setRefreshTimeline] = useState(false); // Track refresh state
-
-  useEffect(() => {
-    const fetchStatus = async () => {
-      try {
-        const response = await axios.get(`/track/next_status/${id}`); // Replace with your API endpoint
-        console.log("API Response:", response.data); // Log the raw response (string)
-
-        setStatus(response.data); // Directly set the response if it's a string
-      } catch (err) {
-        console.error(err);
-        setError("Failed to fetch status.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchStatus();
-  }, []);
-
-  useEffect(() => {
-    // Disable the button if the status is "PUBLISHED" or "PULLED OUT"
-    if (status === "COMPLETED" || status === "PULLOUT" || status === "READY") {
-      setIsButtonDisabled(true);
-    } else {
-      setIsButtonDisabled(false);
-    }
-  }, [status]);
 
   // Handle pull out status update
   const handlePullOut = async (newStatus) => {
@@ -239,18 +209,21 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
 
   const [publicationFormats, setPublicationFormats] = useState([]);
 
-  useEffect(() => {
-    const fetchPublicationFormats = async () => {
-      try {
-        const response = await fetch("/track/fetch_data/pub_format"); // Replace with your API URL
-        const data = await response.json(); // Directly parse the JSON response (array format)
-        setPublicationFormats(data);
-      } catch (error) {
-        console.error("Error fetching publication formats:", error);
+  const loadInitialData = async () => {
+    try {
+      const cachedData = await fetchAndCacheFilterData();
+      if (cachedData) {
+        setPublicationFormats(cachedData.publicationFormats);
       }
-    };
+    } catch (error) {
+      console.error("Error loading initial data:", error);
+      toast.error("Failed to load form data");
+    }
+  };
 
-    fetchPublicationFormats();
+  // Use effect to load initial data
+  useEffect(() => {
+    loadInitialData();
   }, []);
 
   // Find the name corresponding to the current ID
@@ -1021,38 +994,39 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                     }}
                   />
                 </Box>
-                <Button
-                  variant='contained'
-                  color='primary'
-                  onClick={handlePullOut}
-                  disabled={isButtonDisabled}
-                  sx={{
-                    backgroundColor: "#08397C",
-                    color: "#FFF",
-                    fontFamily: "Montserrat, sans-serif",
-                    fontWeight: 600,
-                    textTransform: "none",
-                    fontSize: { xs: "0.65rem", md: "0.8rem", lg: "1rem" },
-                    marginTop: "1rem",
-                    padding: "0.5rem",
-                    borderRadius: "100px",
-                    "&:hover": {
-                      backgroundColor: "#072d61",
+                { initialValues?.status === "SUBMITTED" || initialValues?.status === "ACCEPTED" && (
+                  <Button
+                    variant='contained'
+                    color='primary'
+                    onClick={handlePullOut}
+                    sx={{
+                      backgroundColor: "#08397C",
                       color: "#FFF",
-                    },
-                  }}
-                >
-                  {isPullOut ? (
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                      <CircularProgress size={20} color='#08397C' />
-                      Pulling out...
-                    </Box>
-                  ) : (
-                      <Typography display='flex' justifyContent='center'>
-                        <RemoveCircleIcon/> &nbsp; <strong>PULL OUT PAPER</strong>
-                      </Typography>
-                  )}
-                </Button>
+                      fontFamily: "Montserrat, sans-serif",
+                      fontWeight: 600,
+                      textTransform: "none",
+                      fontSize: { xs: "0.65rem", md: "0.8rem", lg: "1rem" },
+                      marginTop: "1rem",
+                      padding: "0.5rem",
+                      borderRadius: "100px",
+                      "&:hover": {
+                        backgroundColor: "#072d61",
+                        color: "#FFF",
+                      },
+                    }}
+                  >
+                    {isPullOut ? (
+                      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                        <CircularProgress size={20} color='#08397C' />
+                        Pulling out...
+                      </Box>
+                    ) : (
+                        <Typography display='flex' justifyContent='center'>
+                          <RemoveCircleIcon/> &nbsp; <strong>PULL OUT PAPER</strong>
+                        </Typography>
+                    )}
+                  </Button>
+                )}
               </Grid2>
             </Grid2>
           </Box>
