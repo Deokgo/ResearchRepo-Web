@@ -254,35 +254,55 @@ const ResearchTracking = () => {
     }
   }, [debouncedColleges, isLoading, selectedPrograms]);
 
+  // Add a new useEffect to calculate badge values only once when research data is loaded
+  useEffect(() => {
+    const calculateBadgeCounts = (researchData) => {
+      return {
+        total_ready: researchData.filter(
+          (item) => item.status.toLowerCase() === "ready"
+        ).length,
+        total_submitted: researchData.filter(
+          (item) => item.status.toLowerCase() === "submitted"
+        ).length,
+        total_accepted: researchData.filter(
+          (item) => item.status.toLowerCase() === "accepted"
+        ).length,
+        total_published: researchData.filter(
+          (item) => item.status.toLowerCase() === "published"
+        ).length,
+      };
+    };
+
+    if (research.length > 0) {
+      const counts = calculateBadgeCounts(research);
+      setBadgeValues(counts);
+    }
+  }, [research]); // Only recalculate when research data changes
+
+  // Modify the useEffect that handles filtering
   useEffect(() => {
     const applyFilters = () => {
       let filtered = [...research];
 
+      // Apply all filters except status first
       // Handle college and program filtering
       if (selectedColleges.length > 0 || selectedPrograms.length > 0) {
         filtered = filtered.filter((item) => {
-          // Check if item matches any selected program
           const matchesProgram =
             selectedPrograms.length > 0 &&
             selectedPrograms.includes(item.program_name);
 
-          // Check if item's college is selected
           const matchesCollege =
             selectedColleges.length > 0 &&
             selectedColleges.includes(String(item.college_id));
 
-          // Show items that either:
-          // 1. Match any selected program (regardless of college), OR
-          // 2. Belong to a selected college (if no program from that college is selected)
           return (
             matchesProgram ||
             (matchesCollege &&
               !selectedPrograms.some((prog) => {
-                // Find the college of this selected program
                 const programCollege = programs.find(
                   (p) => p.program_name === prog
                 )?.college_id;
-                // Only apply college filter if no program from this college is selected
                 return String(programCollege) === String(item.college_id);
               }))
           );
@@ -296,14 +316,6 @@ const ResearchTracking = () => {
         );
       }
 
-      if (selectedStatus.length > 0) {
-        filtered = filtered.filter((item) =>
-          selectedStatus.some(
-            (status) => status.toLowerCase() === item.status.toLowerCase()
-          )
-        );
-      }
-
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
         filtered = filtered.filter(
@@ -313,10 +325,6 @@ const ResearchTracking = () => {
         );
       }
 
-      setFilteredResearch(filtered);
-      setCurrentPage(1);
-
-      // Update badge counts based on the filtered data
       const updatedBadgeValues = {
         total_ready: filtered.filter(
           (item) => item.status.toLowerCase() === "ready"
@@ -333,6 +341,18 @@ const ResearchTracking = () => {
       };
 
       setBadgeValues(updatedBadgeValues);
+
+      // Finally, apply status filter if any
+      if (selectedStatus.length > 0) {
+        filtered = filtered.filter((item) =>
+          selectedStatus.some(
+            (status) => status.toLowerCase() === item.status.toLowerCase()
+          )
+        );
+      }
+
+      setFilteredResearch(filtered);
+      setCurrentPage(1);
     };
 
     const timeoutId = setTimeout(applyFilters, 300);

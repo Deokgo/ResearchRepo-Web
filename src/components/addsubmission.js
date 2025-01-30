@@ -25,7 +25,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import Tooltip from "@mui/material/Tooltip";
 import { useModalContext } from "../context/modalcontext";
 import { toast } from "react-hot-toast";
-import { filterCache, fetchAndCacheFilterData, getCitiesForCountry, searchCountries, searchCities } from "../utils/trackCache";
+import { fetchAndCacheFilterData, getCitiesForCountry, searchCountries, searchCities } from "../utils/trackCache";
 
 const AddSubmission = () => {
   const location = useLocation();

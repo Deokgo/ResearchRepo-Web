@@ -24,7 +24,7 @@ import FileUploader from "../components/FileUploader";
 import { useModalContext } from "../context/modalcontext";
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { toast } from "react-hot-toast";
-import { filterCache, fetchAndCacheFilterData, getCitiesForCountry, searchCountries, searchCities } from "../utils/trackCache";
+import { fetchAndCacheFilterData } from "../utils/trackCache";
 
 const AddPublish = () => {
   const navigate = useNavigate();

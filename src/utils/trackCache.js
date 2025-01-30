@@ -10,7 +10,7 @@ class FilterCache {
       publicationNames: [],
       publicationFormats: []
     };
-    this.CACHE_DURATION = 1000 * 60 * 60; // 1 hour in milliseconds
+    this.CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
   }
 
   isExpired() {
