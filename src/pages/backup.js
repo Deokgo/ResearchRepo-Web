@@ -219,7 +219,7 @@ const Backup = () => {
                 <Button
                   variant='contained'
                   color='secondary'
-                  onClick={() => handleCreateBackup("INCREMENTAL")}
+                  onClick={() => handleCreateBackup("INCR")}
                   disabled={loading}
                 >
                   Incremental Backup
@@ -301,7 +301,7 @@ const Backup = () => {
             Are you sure you want to restore from backup{" "}
             {selectedBackup?.backup_id}? This will replace all current data with
             the backup data.
-            {selectedBackup?.backup_type === "INCREMENTAL" && (
+            {selectedBackup?.backup_type === "INCR" && (
               <Box sx={{ mt: 2, color: "warning.main" }}>
                 Note: This is an incremental backup. The restore process will
                 include the base full backup and all incremental backups up to
