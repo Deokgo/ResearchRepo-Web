@@ -758,7 +758,11 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                             md: "0.9rem",
                                             lg: "0.9rem",
                                           },
-                                          width: "35%",
+                                          width: {
+                                            xs: "55%",
+                                            md: "55%",
+                                            lg: "35%",
+                                          },
                                           padding: "0.5rem",
                                           borderRadius: "100px",
                                           "&:hover": {
@@ -773,9 +777,15 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                             Updating Status...
                                           </Box>
                                         ) : (
-                                            <Typography display='flex' justifyContent='center'>
-                                              SUBMITTED &nbsp;<ArrowForward/>&nbsp;<strong>ACCEPTED</strong>
-                                            </Typography>
+                                          <Typography display='flex' justifyContent='center' 
+                                            sx={{fontSize: {
+                                              xs: "0.75rem",
+                                              md: "0.9rem",
+                                              lg: "0.9rem",
+                                            },}}
+                                          >
+                                            SUBMITTED &nbsp;<ArrowForward/>&nbsp;<strong>ACCEPTED</strong>
+                                          </Typography>
                                         )}
                                       </Button>
                                     </Box>

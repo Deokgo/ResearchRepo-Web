@@ -57,7 +57,6 @@ const AddSubmission = () => {
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
   const [isSuccessDialogOpen, setIsSuccessDialogOpen] = useState(false);
 
-  ///////////////////// COUNTRY AND CITY API RETRIEVAL //////////////////////
   const loadInitialData = async () => {
     try {
       const cachedData = await fetchAndCacheFilterData();
@@ -79,47 +78,54 @@ const AddSubmission = () => {
     loadInitialData();
   }, []);
 
+    ///////////////////// COUNTRY AND CITY API RETRIEVAL //////////////////////
   useEffect(() => {
-  if (countriesAPI.length > 0 && conferenceVenues.length > 0) {
+    if (countriesAPI.length > 0 && conferenceVenues.length > 0) {
       // Get unique countries from conference venues
       const venueCountries = new Set(
-      conferenceVenues.map((venue) => venue.country)
+        conferenceVenues.map((venue) => venue.country)
       );
 
       const filteredCountries = countriesAPI.filter((country) =>
-      venueCountries.has(country.country)
+        venueCountries.has(country.country)
       );
 
       console.log("Filtered countries:", filteredCountries);
       setCountries(filteredCountries);
-  }
+    }
   }, [countriesAPI, conferenceVenues]);
-    
-  // Update country selection handling
-  const handleCountryChange = (event, newValue) => {
-    setSingleCountry(newValue);
-    if (newValue) {
-      const citiesForCountry = getCitiesForCountry(newValue);
-      setCities(citiesForCountry);
-      setSingleCity("");
+
+  const fetchCities = (country, shouldClearCity = true) => {
+    // Get cities from countries API for the selected country
+    const selectedCountry = countries.find((c) => c.country === country);
+    if (selectedCountry) {
+      setCitiesAPI(selectedCountry.cities);
+
+      // Get cities from conference venues for the selected country
+      const venueCities = conferenceVenues
+        .filter((venue) => venue.country === country)
+        .map((venue) => venue.city);
+
+      // Filter API cities to only include those that are in our venues
+      const filteredCities = selectedCountry.cities.filter((city) =>
+        venueCities.includes(city)
+      );
+
+      console.log("Available cities for", country, ":", filteredCities);
+      setCities(filteredCities);
     }
   };
 
-  // Update country search handling
-  useEffect(() => {
-    if (countrySearchText) {
-      const searchResults = searchCountries(countrySearchText);
-      setCountries(searchResults.map(country => ({ country })));
+   // Modified country selection handling
+  const handleCountryChange = (event, newValue) => {
+    setSingleCity("");
+    setSingleCountry(newValue);
+    if (newValue) {
+      fetchCities(newValue);
+      console.log(newValue);
     }
-  }, [countrySearchText]);
+  };
 
-  // Update city search handling
-  useEffect(() => {
-    if (citySearchText && singleCountry) {
-      const searchResults = searchCities(singleCountry, citySearchText);
-      setCities(searchResults);
-    }
-  }, [citySearchText, singleCountry]);
 
   ///////////////////// STATUS UPDATE PUBLICATION //////////////////////
   const handleBack = () => {
