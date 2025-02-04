@@ -29,6 +29,7 @@ import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
+import BackupTableIcon from '@mui/icons-material/BackupTable';
 import DialogTitle from "@mui/material/DialogTitle";
 
 const Backup = () => {
@@ -210,19 +211,49 @@ const Backup = () => {
               <Box>
                 <Button
                   variant='contained'
+                  color='primary'
+                  sx={{
+                    backgroundColor: "#CA031B",
+                    color: "#FFF",
+                    fontFamily: "Montserrat, sans-serif",
+                    fontWeight: 600,
+                    textTransform: "none",
+                    fontSize: { xs: "0.875rem", md: "1rem" },
+                    padding: { xs: "0.5rem 1rem", md: "1.25rem" },
+                    marginLeft: "2rem",
+                    borderRadius: "100px",
+                    maxHeight: "3rem",
+                    "&:hover": {
+                      backgroundColor: "#A30417",
+                      color: "#FFF",
+                    },
+                  }}
                   onClick={() => handleCreateBackup("FULL")}
-                  disabled={loading}
-                  sx={{ mr: 2 }}
                 >
-                  Full Backup
+                  <BackupIcon sx={{ pb:"0.15rem" }}></BackupIcon>&nbsp; Full Backup
                 </Button>
                 <Button
                   variant='contained'
-                  color='secondary'
+                  color='primary'
+                  sx={{
+                    backgroundColor: "#08397C",
+                    color: "#FFF",
+                    fontFamily: "Montserrat, sans-serif",
+                    fontWeight: 600,
+                    textTransform: "none",
+                    fontSize: { xs: "0.875rem", md: "1rem" },
+                    padding: { xs: "0.5rem 1rem", md: "1.25rem" },
+                    marginLeft: "2rem",
+                    borderRadius: "100px",
+                    maxHeight: "3rem",
+                    "&:hover": {
+                      backgroundColor: "#072d61",
+                      color: "#FFF",
+                    },
+                  }}
                   onClick={() => handleCreateBackup("INCR")}
-                  disabled={loading}
                 >
-                  Incremental Backup
+                  <BackupTableIcon sx={{ pb:"0.15rem" }}></BackupTableIcon>&nbsp; Incremental Backup
                 </Button>
               </Box>
             </Box>

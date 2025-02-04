@@ -18,6 +18,7 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
+  useMediaQuery
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import homeBg from "../assets/home_bg.png";
@@ -76,6 +77,8 @@ const ResearchTracking = () => {
   const [sliderValue, setSliderValue] = useState([2010, 2025]); // Initial slider value
   const [selectedPrograms, setSelectedPrograms] = useState([]);
   const [selectedStatus, setSelectedStatus] = useState([]);
+  const isMobile = useMediaQuery("(max-width:600px)"); // Checks if the screen is 600px or smaller (mobile)
+  const [otherSectionsVisible, setOtherSectionsVisible] = useState(true);
 
   const [badgeValues, setBadgeValues] = useState({
     total_ready: 0,
@@ -424,6 +427,11 @@ const ResearchTracking = () => {
     currentPage * itemsPerPage
   );
 
+  useEffect(() => {
+    // If the screen is mobile, hide the other sections
+    setOtherSectionsVisible(!isMobile);
+  }, [isMobile]);
+
   return (
     <>
       <Box
@@ -469,172 +477,173 @@ const ResearchTracking = () => {
               sx={{ height: "100%", flexWrap: "nowrap" }}
             >
               {/* Filter Section (Left) */}
-              <Grid2 size={3}>
-                <Box
-                  sx={{
-                    border: "1px solid #0A438F",
-                    height: "100%",
-                    borderRadius: 3,
-                    padding: 3,
-                    overflow: "hidden",
-                    display: "flex",
-                    flexDirection: "column",
-                  }}
-                >
-                  <Typography
-                    variant='h6'
-                    sx={{ mb: 2, fontWeight: "bold", color: "#F40824" }}
+              {!isMobile && (
+                <Grid2 size={3}>
+                  <Box
+                    sx={{
+                      border: "1px solid #0A438F",
+                      height: "100%",
+                      borderRadius: 3,
+                      padding: 3,
+                      overflow: "hidden",
+                      display: "flex",
+                      flexDirection: "column",
+                    }}
                   >
-                    Filters
-                  </Typography>
-                  <Box sx={{ mb: 2 }}>
                     <Typography
-                      variant='body1'
-                      sx={{
-                        mb: 2,
-                        color: "#08397C",
-                        position: "relative",
-                        zIndex: 2,
-                        fontSize: {
-                          xs: "0.5rem",
-                          md: "0.5rem",
-                          lg: "0.9rem",
-                        },
-                      }}
+                      variant='h6'
+                      sx={{ mb: 2, fontWeight: "bold", color: "#F40824" }}
                     >
-                      Year Range:
+                      Filters
                     </Typography>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                        width: "100%",
-                        mt: 4,
-                      }}
-                    >
-                      <Slider
-                        value={sliderValue}
-                        onChange={handleDateRangeChange}
-                        valueLabelDisplay='on'
-                        min={dateRange[0]}
-                        max={dateRange[1]}
+                    <Box sx={{ mb: 2 }}>
+                      <Typography
+                        variant='body1'
                         sx={{
-                          width: "90%",
-                          "& .MuiSlider-valueLabel": {
-                            backgroundColor: "#08397C",
-                          },
-                          "& .MuiSlider-rail": {
-                            backgroundColor: "#ccc",
-                          },
-                          "& .MuiSlider-track": {
-                            backgroundColor: "#08397C",
-                          },
-                          "& .MuiSlider-thumb": {
-                            backgroundColor: "#08397C",
+                          mb: 2,
+                          color: "#08397C",
+                          position: "relative",
+                          zIndex: 2,
+                          fontSize: {
+                            xs: "0.5rem",
+                            md: "0.5rem",
+                            lg: "0.9rem",
                           },
                         }}
-                      />
+                      >
+                        Year Range:
+                      </Typography>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                          width: "100%",
+                          mt: 4,
+                        }}
+                      >
+                        <Slider
+                          value={sliderValue}
+                          onChange={handleDateRangeChange}
+                          valueLabelDisplay='on'
+                          min={dateRange[0]}
+                          max={dateRange[1]}
+                          sx={{
+                            width: "90%",
+                            "& .MuiSlider-valueLabel": {
+                              backgroundColor: "#08397C",
+                            },
+                            "& .MuiSlider-rail": {
+                              backgroundColor: "#ccc",
+                            },
+                            "& .MuiSlider-track": {
+                              backgroundColor: "#08397C",
+                            },
+                            "& .MuiSlider-thumb": {
+                              backgroundColor: "#08397C",
+                            },
+                          }}
+                        />
+                      </Box>
                     </Box>
+
+                    <Accordion defaultExpanded>
+                      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                        <Typography
+                          sx={{
+                            color: "#08397C",
+                            fontSize: {
+                              xs: "0.5rem",
+                              md: "0.5rem",
+                              lg: "0.9rem",
+                            },
+                          }}
+                        >
+                          College
+                        </Typography>
+                      </AccordionSummary>
+                      <AccordionDetails>
+                        <Box sx={{ maxHeight: "200px", overflow: "auto" }}>
+                          {colleges.map((college) => (
+                            <FormControlLabel
+                              key={college.college_id}
+                              control={
+                                <Checkbox
+                                  checked={selectedColleges.includes(
+                                    String(college.college_id)
+                                  )}
+                                  onChange={handleCollegeChange}
+                                  value={college.college_id}
+                                />
+                              }
+                              label={college.college_name}
+                              sx={{
+                                "& .MuiTypography-root": {
+                                  fontSize: {
+                                    xs: "0.5rem",
+                                    md: "0.75rem",
+                                    lg: "0.9rem",
+                                  },
+                                },
+                              }}
+                            />
+                          ))}
+                        </Box>
+                      </AccordionDetails>
+                    </Accordion>
+
+                    <Accordion>
+                      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                        <Typography
+                          sx={{
+                            color: "#08397C",
+                            fontSize: {
+                              xs: "0.5rem",
+                              md: "0.5rem",
+                              lg: "0.9rem",
+                            },
+                          }}
+                        >
+                          Program
+                        </Typography>
+                      </AccordionSummary>
+                      <AccordionDetails>
+                        <Box sx={{ maxHeight: "200px", overflow: "auto" }}>
+                          {programs.map((program) => (
+                            <FormControlLabel
+                              key={program.program_id}
+                              control={
+                                <Checkbox
+                                  checked={selectedPrograms.includes(
+                                    program.program_name
+                                  )}
+                                  onChange={handleProgramChange}
+                                  value={program.program_name}
+                                />
+                              }
+                              label={program.program_name}
+                              sx={{
+                                "& .MuiTypography-root": {
+                                  fontSize: {
+                                    xs: "0.5rem",
+                                    md: "0.75rem",
+                                    lg: "0.9rem",
+                                  },
+                                },
+                              }}
+                            />
+                          ))}
+                        </Box>
+                      </AccordionDetails>
+                    </Accordion>
                   </Box>
-
-                  <Accordion defaultExpanded>
-                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                      <Typography
-                        sx={{
-                          color: "#08397C",
-                          fontSize: {
-                            xs: "0.5rem",
-                            md: "0.5rem",
-                            lg: "0.9rem",
-                          },
-                        }}
-                      >
-                        College
-                      </Typography>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      <Box sx={{ maxHeight: "200px", overflow: "auto" }}>
-                        {colleges.map((college) => (
-                          <FormControlLabel
-                            key={college.college_id}
-                            control={
-                              <Checkbox
-                                checked={selectedColleges.includes(
-                                  String(college.college_id)
-                                )}
-                                onChange={handleCollegeChange}
-                                value={college.college_id}
-                              />
-                            }
-                            label={college.college_name}
-                            sx={{
-                              "& .MuiTypography-root": {
-                                fontSize: {
-                                  xs: "0.5rem",
-                                  md: "0.75rem",
-                                  lg: "0.9rem",
-                                },
-                              },
-                            }}
-                          />
-                        ))}
-                      </Box>
-                    </AccordionDetails>
-                  </Accordion>
-
-                  <Accordion>
-                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                      <Typography
-                        sx={{
-                          color: "#08397C",
-                          fontSize: {
-                            xs: "0.5rem",
-                            md: "0.5rem",
-                            lg: "0.9rem",
-                          },
-                        }}
-                      >
-                        Program
-                      </Typography>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      <Box sx={{ maxHeight: "200px", overflow: "auto" }}>
-                        {programs.map((program) => (
-                          <FormControlLabel
-                            key={program.program_id}
-                            control={
-                              <Checkbox
-                                checked={selectedPrograms.includes(
-                                  program.program_name
-                                )}
-                                onChange={handleProgramChange}
-                                value={program.program_name}
-                              />
-                            }
-                            label={program.program_name}
-                            sx={{
-                              "& .MuiTypography-root": {
-                                fontSize: {
-                                  xs: "0.5rem",
-                                  md: "0.75rem",
-                                  lg: "0.9rem",
-                                },
-                              },
-                            }}
-                          />
-                        ))}
-                      </Box>
-                    </AccordionDetails>
-                  </Accordion>
-                </Box>
-              </Grid2>
+                </Grid2>
+              )}
 
               <Grid2
                 display='flex'
                 flexDirection='column'
-                justifyContent='flex-start'
-                size={9}
+                size={otherSectionsVisible ? 9 : 12}
               >
                 {/* Stats Section */}
                 <div

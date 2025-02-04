@@ -615,36 +615,6 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                                 )
                                               : "None"}
                                           </Typography>
-
-                                          <Typography
-                                            variant="h7"
-                                            sx={{
-                                              mt: "2rem",
-                                              mb: "1rem",
-                                              fontSize: {
-                                                xs: "0.7rem",
-                                                md: "0.8rem",
-                                                lg: "0.9rem",
-                                              },
-                                            }}
-                                          >
-                                            <strong>Published Paper:</strong>{" "}
-                                            {pdfUrl ? (
-                                              <iframe
-                                                src={pdfUrl}
-                                                title="Published Paper"
-                                                style={{
-                                                  marginTop: "1rem",
-                                                  width: "100%",
-                                                  height: "500px",
-                                                  border: "1px solid #ddd",
-                                                }}
-                                              ></iframe>
-                                            ) : (
-                                              "None"
-                                            )}
-                                          </Typography>
-
                                         </Box>
                                       )}
                                     </Grid2>
@@ -820,6 +790,38 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                         <PublishIcon/>&nbsp;Publish {selectedFormatName}
                                       </Button>
                                     </Box>
+                                  )}
+                                  {initialValues?.status === "PUBLISHED" && (
+                                    <Typography
+                                      variant="h7"
+                                      sx={{
+                                        mt: "2rem",
+                                        mb: "1rem",
+                                        fontSize: {
+                                          xs: "0.7rem",
+                                          md: "0.8rem",
+                                          lg: "0.9rem",
+                                        },
+                                      }}
+                                      >
+                                      <strong>Published Paper:</strong>{" "}
+                                      {pdfUrl ? (
+                                        <iframe
+                                          src={pdfUrl}
+                                          title="Published Paper"
+                                          style={{
+                                            marginTop: "1rem",
+                                            width: "100%",
+                                            height: "800px", // Increased height from 500px to 800px
+                                            border: "1px solid #ddd",
+                                            boxShadow: "0 4px 6px rgba(0,0,0,0.1)", // Added subtle shadow
+                                            borderRadius: "8px", // Rounded corners
+                                          }}
+                                        ></iframe>
+                                      ) : (
+                                        "None"
+                                      )}
+                                    </Typography>
                                   )}
                                 </Box>
                               ) : (

@@ -36,7 +36,6 @@ import FileUploadIcon from "@mui/icons-material/FileUpload";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import ErrorIcon from "@mui/icons-material/Error";
-import EditIcon from "@mui/icons-material/Edit";
 import HeaderWithBackButton from "../components/Header";
 
 const ManageUsers = () => {
@@ -52,8 +51,6 @@ const ManageUsers = () => {
   const [accountStatus, setAccountStatus] = useState("");
   const [initialData, setInitialData] = useState(null);
   const [openAddModal, setOpenAddModal] = useState(false);
-  const [selectedUserType, setSelectedUserType] = useState("");
-  const [newUsers, setNewUsers] = useState([]);
   const [colleges, setColleges] = useState([]);
   const [programs, setPrograms] = useState([]);
   const [parsedUsers, setParsedUsers] = useState([]);
@@ -701,7 +698,7 @@ const ManageUsers = () => {
                   },
                 }}
               >
-                + Add Users
+                <AddIcon></AddIcon>&nbsp;Add Users
               </Button>
             </Box>
 

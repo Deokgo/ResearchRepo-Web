@@ -21,6 +21,7 @@ import axios from "axios";
 import HeaderWithBackButton from "../components/Header";
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
+import AddIcon from '@mui/icons-material/Add';
 import { toast } from "react-hot-toast";
 
 const ManageCollege = () => {
@@ -328,7 +329,7 @@ const ManageCollege = () => {
                 }}
                 onClick={handleOpenAddModal}
               >
-                + Add New College
+                <AddIcon></AddIcon>&nbsp;Add New College
               </Button>
             </Box>
 

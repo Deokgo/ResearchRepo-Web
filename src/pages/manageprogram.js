@@ -21,11 +21,12 @@ import {
   DialogActions,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { Search } from "@mui/icons-material";
+import { Add, Search } from "@mui/icons-material";
 import { Virtuoso } from "react-virtuoso";
 import axios from "axios";
 import HeaderWithBackButton from "../components/Header";
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import AddIcon from '@mui/icons-material/Add';
 import ErrorIcon from '@mui/icons-material/Error';
 import { toast } from "react-hot-toast";
 
@@ -437,7 +438,7 @@ const ManageProgram = () => {
                         }}
                         onClick={handleOpenAddModal}
                       >
-                        + Add New Program
+                        <AddIcon></AddIcon>&nbsp;Add New Program
                       </Button>
                     </Box>
 

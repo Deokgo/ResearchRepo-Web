@@ -14,19 +14,10 @@ import {
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import Navbar from "../components/navbar";
-import Footer from "../components/footer";
-import homeBg from "../assets/home_bg.png";
 import { Search } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-import Stack from "@mui/material/Stack";
-import Divider from "@mui/material/Divider";
-import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
-import DownloadIcon from "@mui/icons-material/Download";
-import VisibilityIcon from "@mui/icons-material/Visibility";
 import axios from "axios";
 import { Virtuoso } from "react-virtuoso";
-import DummyKG from "../assets/dummy_kg_keyword.png";
-import Modal from "@mui/material/Modal";
 import { useModalContext } from "../context/modalcontext";
 import AddPaperModal from "../components/addpapermodal";
 import { useAuth } from "../context/AuthContext";
@@ -36,6 +27,7 @@ import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import HeaderWithBackButton from "../components/Header";
+import AddIcon from '@mui/icons-material/Add';
 
 // Debounce function to limit rapid state updates
 const useDebounce = (value, delay) => {
@@ -751,7 +743,7 @@ const Collection = () => {
                           }}
                           onClick={openAddPaperModal}
                         >
-                          + Add New Paper
+                          <AddIcon></AddIcon>&nbsp;Add New Paper
                         </Button>
                       )}
                     </Box>
