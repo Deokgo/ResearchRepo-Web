@@ -31,6 +31,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import BackupTableIcon from '@mui/icons-material/BackupTable';
 import DialogTitle from "@mui/material/DialogTitle";
+import DownloadIcon from "@mui/icons-material/Download";
 
 const Backup = () => {
   const navigate = useNavigate();
@@ -45,6 +46,8 @@ const Backup = () => {
     message: "",
     severity: "success",
   });
+  const [currentTimeline, setCurrentTimeline] = useState(null);
+  const [openDownloadDialog, setOpenDownloadDialog] = useState(false);
 
   // Fetch backups from the database
   const fetchBackups = async () => {
@@ -61,8 +64,20 @@ const Backup = () => {
     }
   };
 
+  // Add function to fetch current timeline
+  const fetchCurrentTimeline = async () => {
+    try {
+      const response = await axios.get("/backup/current-timeline");
+      setCurrentTimeline(response.data.timeline_id);
+    } catch (error) {
+      console.error("Error fetching current timeline:", error);
+    }
+  };
+
+  // Update useEffect to fetch timeline
   useEffect(() => {
     fetchBackups();
+    fetchCurrentTimeline();
   }, []);
 
   // Handle search functionality
@@ -83,8 +98,28 @@ const Backup = () => {
     );
   };
 
-  // Handle creating a new backup
+  // Update the function to check for full backup in current timeline
+  const canCreateIncrementalBackup = () => {
+    // Get current timeline (highest timeline number)
+    const currentTimeline = Math.max(...backups.map((b) => b.timeline_id || 0));
+
+    // Check if there's a full backup in the current timeline
+    return backups.some(
+      (backup) =>
+        backup.backup_type === "FULL" && backup.timeline_id === currentTimeline
+    );
+  };
+
+  // Modify handleCreateBackup to include a more specific warning
   const handleCreateBackup = async (type) => {
+    if (type === "INCR" && !canCreateIncrementalBackup()) {
+      showMessage(
+        "Cannot create incremental backup: No full backup exists in the current timeline. Please create a full backup first.",
+        "warning"
+      );
+      return;
+    }
+
     setLoading(true);
     try {
       const response = await axios.post(`/backup/create/${type}`);
@@ -92,7 +127,11 @@ const Backup = () => {
       await fetchBackups();
     } catch (error) {
       console.error("Error creating backup:", error);
-      showMessage("Error creating backup: " + error.message, "error");
+      showMessage(
+        error.response?.data?.error ||
+          "Error creating backup: " + error.message,
+        "error"
+      );
     } finally {
       setLoading(false);
     }
@@ -112,7 +151,8 @@ const Backup = () => {
         `/backup/restore/${selectedBackup.backup_id}`
       );
       showMessage(response.data.message);
-      await fetchBackups();
+      // Fetch both backups and current timeline after restore
+      await Promise.all([fetchBackups(), fetchCurrentTimeline()]);
     } catch (error) {
       console.error("Error restoring backup:", error);
       showMessage("Error restoring backup: " + error.message, "error");
@@ -135,6 +175,36 @@ const Backup = () => {
       message,
       severity,
     });
+  };
+
+  // Modify the handleDownloadBackup function
+  const handleDownloadBackup = async (backup) => {
+    try {
+      if (backup.backup_type !== "FULL") {
+        showMessage(
+          "Only full backups can be downloaded. Incremental backups must be restored through the application.",
+          "warning"
+        );
+        return;
+      }
+
+      setLoading(true);
+      const response = await axios.get(`/backup/download/${backup.backup_id}`, {
+        responseType: "blob",
+      });
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `${backup.backup_id}.tar.gz`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (error) {
+      console.error("Error downloading backup:", error);
+      showMessage("Error downloading backup: " + error.message, "error");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -164,6 +234,29 @@ const Backup = () => {
           }}
         >
           <HeaderWithBackButton title='Backup' onBack={() => navigate(-1)} />
+
+          {/* Add Timeline Info Box */}
+          <Box
+            sx={{
+              width: "80%",
+              margin: "0 auto",
+              mt: 2,
+              p: 2,
+              bgcolor: "info.light",
+              borderRadius: 1,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <Typography variant='body1' color='info.contrastText'>
+              Current Timeline: {currentTimeline || "Loading..."}
+            </Typography>
+            <Typography variant='body2' color='info.contrastText'>
+              Note: Full backup restores continue in the same timeline, while
+              incremental restores create a new timeline
+            </Typography>
+          </Box>
 
           {/* Main Content */}
           <Box
@@ -282,6 +375,7 @@ const Backup = () => {
                         <TableRow>
                           <TableCell>Backup ID</TableCell>
                           <TableCell>Type</TableCell>
+                          <TableCell>Timeline</TableCell>
                           <TableCell>Date</TableCell>
                           <TableCell>Size</TableCell>
                           <TableCell>Actions</TableCell>
@@ -289,13 +383,32 @@ const Backup = () => {
                       </TableHead>
                       <TableBody>
                         {backups.map((backup) => (
-                          <TableRow key={backup.backup_id}>
+                          <TableRow
+                            key={backup.backup_id}
+                            sx={{
+                              pl: backup.backup_type === "INCR" ? 4 : 0,
+                              borderLeft:
+                                backup.backup_type === "INCR"
+                                  ? "2px solid #1976d2"
+                                  : "none",
+                            }}
+                          >
                             <TableCell>{backup.backup_id}</TableCell>
                             <TableCell>
                               <Typography
                                 color={getBackupTypeColor(backup.backup_type)}
                               >
                                 {backup.backup_type}
+                                {backup.wal_lsn && (
+                                  <Typography variant='caption' display='block'>
+                                    WAL Position: {backup.wal_lsn}
+                                  </Typography>
+                                )}
+                              </Typography>
+                            </TableCell>
+                            <TableCell>
+                              <Typography variant='body2'>
+                                Timeline {backup.timeline_id || "N/A"}
                               </Typography>
                             </TableCell>
                             <TableCell>
@@ -305,13 +418,24 @@ const Backup = () => {
                               {formatBytes(backup.total_size)}
                             </TableCell>
                             <TableCell>
-                              <Button
-                                startIcon={<RestoreIcon />}
-                                onClick={() => handleRestoreClick(backup)}
-                                disabled={loading}
-                              >
-                                Restore
-                              </Button>
+                              <Box sx={{ display: "flex", gap: 1 }}>
+                                <Button
+                                  startIcon={<RestoreIcon />}
+                                  onClick={() => handleRestoreClick(backup)}
+                                  disabled={loading}
+                                >
+                                  Restore
+                                </Button>
+                                {backup.backup_type === "FULL" && (
+                                  <Button
+                                    startIcon={<DownloadIcon />}
+                                    onClick={() => handleDownloadBackup(backup)}
+                                    disabled={loading}
+                                  >
+                                    Download
+                                  </Button>
+                                )}
+                              </Box>
                             </TableCell>
                           </TableRow>
                         ))}
@@ -333,11 +457,19 @@ const Backup = () => {
             {selectedBackup?.backup_id}? This will replace all current data with
             the backup data.
             {selectedBackup?.backup_type === "INCR" && (
-              <Box sx={{ mt: 2, color: "warning.main" }}>
-                Note: This is an incremental backup. The restore process will
-                include the base full backup and all incremental backups up to
-                this point.
-              </Box>
+              <>
+                <Box sx={{ mt: 2, color: "warning.main" }}>
+                  Note: This is an incremental backup. The restore process will
+                  include the base full backup and all incremental backups up to
+                  this point.
+                </Box>
+                <Box sx={{ mt: 2, color: "info.main" }}>
+                  Important: Restoring this backup will create a new timeline.
+                  Any existing incremental backups from the current timeline
+                  will become invalid and cannot be restored after this
+                  operation.
+                </Box>
+              </>
             )}
           </DialogContentText>
         </DialogContent>
@@ -349,6 +481,91 @@ const Backup = () => {
             color='primary'
           >
             Restore
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={openDownloadDialog}
+        onClose={() => setOpenDownloadDialog(false)}
+      >
+        <DialogTitle>Download Incremental Backup</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            This is an incremental backup. Please choose your download option:
+            <Box sx={{ mt: 2 }}>
+              <Typography variant='body2' color='warning.main'>
+                Note: Incremental backups require the full backup and all
+                previous incremental backups in the chain to be useful.
+              </Typography>
+            </Box>
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenDownloadDialog(false)}>Cancel</Button>
+          <Button
+            onClick={async () => {
+              setOpenDownloadDialog(false);
+              try {
+                const response = await axios.get(
+                  `/backup/download/${selectedBackup.backup_id}`,
+                  {
+                    responseType: "blob",
+                  }
+                );
+                const url = window.URL.createObjectURL(
+                  new Blob([response.data])
+                );
+                const link = document.createElement("a");
+                link.href = url;
+                link.setAttribute(
+                  "download",
+                  `${selectedBackup.backup_id}.tar.gz`
+                );
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+              } catch (error) {
+                showMessage(
+                  "Error downloading backup: " + error.message,
+                  "error"
+                );
+              }
+            }}
+          >
+            Download Single Backup
+          </Button>
+          <Button
+            onClick={async () => {
+              setOpenDownloadDialog(false);
+              try {
+                const response = await axios.get(
+                  `/backup/download-chain/${selectedBackup.backup_id}`,
+                  {
+                    responseType: "blob",
+                  }
+                );
+                const url = window.URL.createObjectURL(
+                  new Blob([response.data])
+                );
+                const link = document.createElement("a");
+                link.href = url;
+                link.setAttribute(
+                  "download",
+                  `backup_chain_${selectedBackup.backup_id}.tar.gz`
+                );
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+              } catch (error) {
+                showMessage(
+                  "Error downloading backup chain: " + error.message,
+                  "error"
+                );
+              }
+            }}
+          >
+            Download Complete Chain
           </Button>
         </DialogActions>
       </Dialog>
