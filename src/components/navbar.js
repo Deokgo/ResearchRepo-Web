@@ -34,8 +34,6 @@ const Navbar = () => {
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
 
-  const [anchorElDash, setAnchorElDash] = useState(null);
-
   const [open, setOpen] = React.useState(false);
   const anchorRef = React.useRef < HTMLButtonElement > null;
   const navigate = useNavigate();
@@ -129,14 +127,6 @@ const Navbar = () => {
     setAnchorElUser(null);
   };
 
-  const handleOpenDashMenu = (event) => {
-    setAnchorElDash(event.currentTarget);
-  };
-
-  const handleCloseDashMenu = () => {
-    setAnchorElDash(null);
-  };
-
   const handleProfile = () => {
     navigate("/profile");
   };
@@ -167,14 +157,6 @@ const Navbar = () => {
 
   const handleViewAuditLog = () => {
     navigate("/auditlog");
-  };
-
-  const handleMainDash = () => {
-    navigate("/dash/analytics");
-  };
-
-  const handleUserEngagementDash = () => {
-    navigate("/dash/user-engagement");
   };
 
   const handleReports = () => {
@@ -271,19 +253,19 @@ const Navbar = () => {
       ],
       "02": [
         // Director
-        { label: "Dashboard", onClick: handleOpenDashMenu },
+        { label: "Dashboard", onClick: handleReports },
         { label: "Research Tracking", onClick: handleResesearchTrack },
         ...commonItems,
       ],
       "03": [
         // Head Executive
-        { label: "Dashboard", onClick: handleOpenDashMenu },
+        { label: "Dashboard", onClick: handleReports },
         { label: "Research Tracking", onClick: handleResesearchTrack },
         ...commonItems,
       ],
       "04": [
         // College Administrator
-        { label: "Dashboard", onClick: handleOpenDashMenu },
+        { label: "Dashboard", onClick: handleReports },
         ...commonItems,
       ],
       "05": [
@@ -462,17 +444,6 @@ const Navbar = () => {
                     ...buttonSettings,
                     ...(item.isActive ? activeButtonStyle : {}),
                   }}
-                  endIcon={
-                    item.label === "Dashboard" ||
-                    item.label === "System Management" ? (
-                      <KeyboardArrowDownIcon
-                        style={{
-                          color: item.isActive ? "#CA031B" : "red", // Match underline color
-                          fontSize: 30,
-                        }}
-                      />
-                    ) : null
-                  }
                 >
                   {item.label}
                 </Button>
@@ -575,36 +546,6 @@ const Navbar = () => {
             <Typography color='common.white'>Log out</Typography>
           </MenuItem>
         </Menu>
-
-        {/*Dashboard Menu*/}
-        {/* Render Menus Conditionally */}
-        {(!isMobile || !isSizeMobile) &&
-          (user?.role === "02" ||
-            user?.role === "03" ||
-            user?.role === "04") && (
-            <Menu
-              anchorEl={anchorElDash}
-              open={Boolean(anchorElDash)}
-              onClose={handleCloseDashMenu}
-              sx={{ "& .MuiPaper-root": { backgroundColor: "#CA031B" } }}
-            >
-              <MenuItem onClick={handleReports}>
-                <Typography color='common.white'>
-                  Institutional Performance Dashboard
-                </Typography>
-              </MenuItem>
-              <MenuItem onClick={handleMainDash}>
-                <Typography color='common.white'>
-                  SDG Impact Dashboard
-                </Typography>
-              </MenuItem>
-              <MenuItem onClick={handleUserEngagementDash}>
-                <Typography color='common.white'>
-                  User Engagament Dashboard
-                </Typography>
-              </MenuItem>
-            </Menu>
-          )}
       </Toolbar>
       <LoginModal />
     </AppBar>
