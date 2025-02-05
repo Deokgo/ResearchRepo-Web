@@ -13,6 +13,10 @@ import {
   MenuItem,
   InputLabel,
   Select,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import homeBg from "../assets/home_bg.png";
@@ -45,7 +49,14 @@ const Profile = () => {
     useState(false);
   const [colleges, setColleges] = useState([]);
   const [programs, setPrograms] = useState([]);
-  const [initialData, setInitialData] = useState(null);
+  const [initialData, setInitialData] = useState({
+    firstName: "",
+    middleName: "",
+    lastName: "",
+    suffix: "",
+    department: "",
+    program: "",
+  });  
   const navigate = useNavigate();
   const [isOtpModalOpen, setIsOtpModalOpen] = useState(false);
   const [formValues, setFormValues] = useState({
@@ -59,7 +70,14 @@ const Profile = () => {
     role: "",
     institution: "",
   });
-  const [email, setEmail] = useState("user@example.com");
+  const [email, setEmail] = useState(null);
+
+  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
+  const [dialogContent, setDialogContent] = useState({
+    title: "",
+    message: "",
+    confirmAction: null,
+  });
 
   const [passwordValues, setPasswordValues] = useState({
     newPassword: "",
@@ -148,30 +166,19 @@ const Profile = () => {
   const handleSaveUserChanges = async () => {
     try {
       if (!user?.user_id) {
-        alert("User ID not found");
+        setDialogContent({
+          title: "User ID Not Found",
+          message: "We couldn't find your User ID. Please try again.",
+          confirmAction: () => setIsConfirmDialogOpen(false),
+        });
+        setIsConfirmDialogOpen(true);
         return;
       }
-
-      // Extract relevant data from formValues
-      const {
-        firstName,
-        middleName,
-        lastName,
-        suffix,
-        department: college_id,
-        program: program_id,
-      } = formValues;
-
-      // Construct the payload
-      const payload = {
-        first_name: firstName,
-        middle_name: middleName,
-        last_name: lastName,
-        suffix,
-        college_id,
-        program_id,
-      };
-
+  
+      const { firstName, middleName, lastName, suffix, department: college_id, program: program_id } = formValues;
+  
+      const payload = { first_name: firstName, middle_name: middleName, last_name: lastName, suffix, college_id, program_id };
+  
       const hasChanges =
         firstName !== initialData?.firstName ||
         middleName !== initialData?.middleName ||
@@ -179,102 +186,143 @@ const Profile = () => {
         suffix !== initialData?.suffix ||
         college_id !== initialData?.department ||
         program_id !== initialData?.program;
-
+  
       if (!hasChanges) {
-        alert("No changes detected. Please modify your profile before saving.");
+        setDialogContent({
+          title: "No Changes Detected",
+          message: "You haven't made any changes. Please modify your profile before saving.",
+          confirmAction: () => setIsConfirmDialogOpen(false),
+        });
+        setIsConfirmDialogOpen(true);
+        return;
+      }
+  
+      const response = await fetch(`/accounts/update_account/${user.user_id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+  
+      if (response.ok) {
+        const data = await response.json();
+  
+        // Update initialData to reflect saved changes
+        setInitialData({
+          firstName,
+          middleName,
+          lastName,
+          suffix,
+          department: college_id,
+          program: program_id,
+        });
+  
+        setDialogContent({
+          title: "Profile Updated",
+          message: "Your profile has been updated successfully.",
+          confirmAction: () => {
+            setIsConfirmDialogOpen(false);
+            fetchUserData();
+          },
+        });
       } else {
-        // API call
-        const response = await fetch(
-          `/accounts/update_account/${user.user_id}`,
-          {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(payload),
-          }
-        );
-
-        // Handle response
-        if (response.ok) {
-          const data = await response.json();
-          alert("Profile updated successfully.");
-          console.log("Updated data:", data);
-          fetchUserData();
-          handleCloseModal();
-        } else {
-          const errorData = await response.json();
-          alert(
-            `Failed to update profile: ${errorData.message || "Unknown error"}`
-          );
-
-          if (errorData.missing_fields) {
-            console.log("Missing fields:", errorData.missing_fields);
-          }
+        const errorData = await response.json();
+        setDialogContent({
+          title: "Update Failed",
+          message: `Failed to update profile: ${errorData.message || "Unknown error"}`,
+          confirmAction: () => setIsConfirmDialogOpen(false),
+        });
+  
+        if (errorData.missing_fields) {
+          console.log("Missing fields:", errorData.missing_fields);
         }
       }
+  
+      setIsConfirmDialogOpen(true);
     } catch (error) {
       console.error("Error updating profile:", error);
-      alert("An error occurred while updating the profile.");
+      setDialogContent({
+        title: "An Error Occurred",
+        message: "Something went wrong while updating your profile. Please try again later.",
+        confirmAction: () => setIsConfirmDialogOpen(false),
+      });
+      setIsConfirmDialogOpen(true);
     }
-  };
+  };  
 
   const handleSaveNewPassword = async () => {
     const { newPassword, confirmPassword } = passwordValues;
-
+  
     if (!user?.user_id) {
-      alert("User ID not found");
+      setDialogContent({
+        title: "User ID Not Found",
+        message: "We couldn't find your User ID. Please try again.",
+        confirmAction: () => setIsConfirmDialogOpen(false),
+      });
+      setIsConfirmDialogOpen(true);
       return;
     }
-
+  
     // Validate input fields
     if (!newPassword || !confirmPassword) {
-      alert("All fields are required.");
+      setDialogContent({
+        title: "Missing Fields",
+        message: "All fields are required.",
+        confirmAction: () => setIsConfirmDialogOpen(false),
+      });
+      setIsConfirmDialogOpen(true);
       return;
     }
-
+  
     if (newPassword !== confirmPassword) {
-      alert("Passwords do not match.");
+      setDialogContent({
+        title: "Password Mismatch",
+        message: "Passwords do not match. Please check and try again.",
+        confirmAction: () => setIsConfirmDialogOpen(false),
+      });
+      setIsConfirmDialogOpen(true);
       return;
     }
-
+  
     try {
       // Send request to the server
-      const response = await axios.put(
-        `/accounts/update_password/${user.user_id}`,
-        {
-          newPassword,
-          confirmPassword,
-        }
-      );
-
+      const response = await axios.put(`/accounts/update_password/${user.user_id}`, {
+        newPassword,
+        confirmPassword,
+      });
+  
       // Handle server response
       if (response.status === 200) {
-        alert("Password successfully updated.");
-
-        // Reset fields and close modal
-        setPasswordValues({
-          newPassword: "",
-          confirmPassword: "",
+        setDialogContent({
+          title: "Password Updated",
+          message: "Your password has been successfully updated.",
+          confirmAction: () => {
+            setIsConfirmDialogOpen(false);
+            setPasswordValues({
+              newPassword: "",
+              confirmPassword: "",
+            });
+            handleCloseChangePasswordModal();
+          },
         });
-        handleCloseChangePasswordModal();
       } else {
-        // Display server-provided error message
-        alert(response.data.message || "Something went wrong.");
+        setDialogContent({
+          title: "Update Failed",
+          message: response.data.message || "Something went wrong.",
+          confirmAction: () => setIsConfirmDialogOpen(false),
+        });
       }
     } catch (error) {
       console.error("Error updating password:", error);
-
-      // Handle server errors or network issues
-      if (error.response && error.response.data.message) {
-        alert(error.response.data.message);
-      } else {
-        alert(
-          "An error occurred while updating the password. Please try again later."
-        );
-      }
+  
+      setDialogContent({
+        title: "An Error Occurred",
+        message: error.response?.data?.message || "An error occurred while updating the password. Please try again later.",
+        confirmAction: () => setIsConfirmDialogOpen(false),
+      });
     }
-  };
+  
+    setIsConfirmDialogOpen(true);
+  };  
 
   const handleNavigateHome = () => {
     navigate("/main");
@@ -290,15 +338,8 @@ const Profile = () => {
   };
 
   const handleCloseModal = () => {
-    const {
-      firstName,
-      middleName,
-      lastName,
-      suffix,
-      department: college_id,
-      program: program_id,
-    } = formValues;
-
+    const { firstName, middleName, lastName, suffix, department: college_id, program: program_id } = formValues;
+  
     const hasChanges =
       firstName !== initialData?.firstName ||
       middleName !== initialData?.middleName ||
@@ -306,28 +347,30 @@ const Profile = () => {
       suffix !== initialData?.suffix ||
       college_id !== initialData?.department ||
       program_id !== initialData?.program;
-
+  
     if (hasChanges) {
-      const confirmLeave = window.confirm(
-        "You have unsaved changes. Do you want to leave?"
-      );
-      if (confirmLeave) {
-        setIsModalOpen(false);
-      }
+      setDialogContent({
+        title: "Unsaved Changes",
+        message: "You have unsaved changes. Do you want to discard them?",
+        confirmText: "Yes, Discard",
+        cancelText: "No, Keep Editing",
+        confirmAction: () => {
+          setIsConfirmDialogOpen(false);
+          setIsModalOpen(false);
+  
+          // ✅ Reset form values when discarding changes
+          setFormValues(initialData);
+        },
+        cancelAction: () => {
+          setIsConfirmDialogOpen(false);
+          // ✅ Modal remains open (no action on setIsModalOpen)
+        },
+      });
+      setIsConfirmDialogOpen(true);
+    } else {
+      setIsModalOpen(false);
     }
-
-    setIsModalOpen(false);
-
-    // Reset form values to blank
-    setFormValues({
-      firstName: "",
-      middleName: "",
-      lastName: "",
-      suffix: "",
-      department: "",
-      program: "",
-    });
-  };
+  };  
 
   // Fetch all colleges when the modal opens
   useEffect(() => {
@@ -443,7 +486,7 @@ const Profile = () => {
               <Button
                 variant='outlined'
                 startIcon={<EditIcon />}
-                onClick={handleOpenOtpModal}
+                onClick={handleOpenOtpModal} 
                 sx={{
                   fontWeight: 600,
                   flex: "0 1 auto", // Prevents shrinking too much
@@ -803,6 +846,85 @@ const Profile = () => {
               </Box>
             </Box>
           </Modal>
+          <Dialog
+            open={isConfirmDialogOpen}
+            onClose={() => setIsConfirmDialogOpen(false)}
+            PaperProps={{ sx: { borderRadius: "15px", padding: "1rem" } }}
+          >
+            <DialogTitle
+              sx={{
+                fontFamily: "Montserrat, sans-serif",
+                fontWeight: 600,
+                color: "#08397C",
+              }}
+            >
+              {dialogContent.title}
+            </DialogTitle>
+            <DialogContent>
+              <Typography
+                sx={{
+                  fontFamily: "Montserrat, sans-serif",
+                  color: "#666",
+                }}
+              >
+                {dialogContent.message}
+              </Typography>
+            </DialogContent>
+            <DialogActions sx={{ padding: "1rem" }}>
+              {dialogContent.cancelAction ? (
+                // Yes and No buttons
+                <>
+                  <Button
+                    onClick={dialogContent.cancelAction}
+                    sx={{
+                      backgroundColor: "#CA031B",
+                      color: "#FFF",
+                      fontFamily: "Montserrat, sans-serif",
+                      fontWeight: 600,
+                      textTransform: "none",
+                      borderRadius: "100px",
+                      padding: "0.75rem",
+                      "&:hover": { backgroundColor: "#072d61" },
+                    }}
+                  >
+                    No, Keep Editing
+                  </Button>
+                  <Button
+                    onClick={dialogContent.confirmAction}
+                    sx={{
+                      backgroundColor: "#08397C",
+                      color: "#FFF",
+                      fontFamily: "Montserrat, sans-serif",
+                      fontWeight: 600,
+                      textTransform: "none",
+                      borderRadius: "100px",
+                      padding: "0.75rem",
+                      "&:hover": { backgroundColor: "#A30417" },
+                    }}
+                  >
+                    Yes, Discard
+                  </Button>
+                </>
+              ) : (
+                // OK button for simple alerts
+                <Button
+                  onClick={dialogContent.confirmAction}
+                  sx={{
+                    backgroundColor: "#08397C",
+                    color: "#FFF",
+                    fontFamily: "Montserrat, sans-serif",
+                    fontWeight: 600,
+                    textTransform: "none",
+                    borderRadius: "100px",
+                    padding: "0.75rem",
+                    "&:hover": { backgroundColor: "#A30417" },
+                  }}
+                >
+                  OK
+                </Button>
+              )}
+            </DialogActions>
+          </Dialog>
         </Box>
       </Box>
     </>

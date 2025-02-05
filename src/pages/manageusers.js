@@ -24,7 +24,11 @@ import {
   TableRow,
   TableContainer,
   Tooltip,
-  Switch
+  Switch,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import homeBg from "../assets/home_bg.png";
@@ -67,6 +71,12 @@ const ManageUsers = () => {
     suffix: "",
   });
   const [duplicateEmails, setDuplicateEmails] = useState([]);
+  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
+  const [dialogContent, setDialogContent] = useState({
+    title: "",
+    message: "",
+    confirmAction: null,
+  });
 
   const fetchUsers = async () => {
     try {
@@ -82,48 +92,54 @@ const ManageUsers = () => {
     }
   };
 
-  const handleToggleStatus = async (user, researcher_id) => {
-    try {
-        const updatedStatus = user.acc_status === "ACTIVATED" ? "DEACTIVATED" : "ACTIVATED";
-
-        // Ask for confirmation before proceeding
-        const confirmUpdate = window.confirm(
-            `Are you sure you want to change the status to ${updatedStatus}?`
-        );
-
-        if (!confirmUpdate) {
-            // Exit if user cancels the action
-            return;
-        }
-
-        // API call to update the status
-        const response = await fetch(`/accounts/update_status/${researcher_id}`, {
+  const handleToggleStatus = (user, researcher_id) => {
+    const updatedStatus = user.acc_status === "ACTIVATED" ? "DEACTIVATED" : "ACTIVATED";
+  
+    setDialogContent({
+      title: "Confirm Status Change",
+      message: `Are you sure you want to change the status to ${updatedStatus}?`,
+      confirmAction: async () => {
+        try {
+          const response = await fetch(`/accounts/update_status/${researcher_id}`, {
             method: "PUT",
-            headers: {
-                "Content-Type": "application/json",
-            },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ acc_status: updatedStatus }),
-        });
-
-        if (!response.ok) {
-            throw new Error("Failed to update account status");
-        }
-
-        // Update state for the specific user
-        setFilteredUsers((prevUsers) =>
+          });
+  
+          if (!response.ok) throw new Error("Failed to update account status");
+  
+          // Update user status
+          setFilteredUsers((prevUsers) =>
             prevUsers.map((u) =>
-                u.researcher_id === researcher_id
-                    ? { ...u, acc_status: updatedStatus }
-                    : u
+              u.researcher_id === researcher_id ? { ...u, acc_status: updatedStatus } : u
             )
-        );
-
-        console.log(`User ${researcher_id} status updated to ${updatedStatus}`);
-    } catch (error) {
-        console.error("Error updating account status:", error);
-        alert("Failed to update account status. Please try again.");
-    }
-  };
+          );
+  
+          // Show success message with OK button only
+          setDialogContent({
+            title: "Status Updated",
+            message: `The account status has been successfully changed to ${updatedStatus}.`,
+            confirmAction: () => setIsConfirmDialogOpen(false),
+          });
+  
+        } catch (error) {
+          console.error("Error updating account status:", error);
+  
+          // Show error message with OK button only
+          setDialogContent({
+            title: "Update Failed",
+            message: "Failed to update account status. Please try again.",
+            confirmAction: () => setIsConfirmDialogOpen(false),
+          });
+        }
+  
+        setIsConfirmDialogOpen(true);
+      },
+      cancelAction: () => setIsConfirmDialogOpen(false), // Clicking No closes the modal
+    });
+  
+    setIsConfirmDialogOpen(true);
+  };    
 
   useEffect(() => {
     const fetchRoles = async () => {
@@ -1363,6 +1379,85 @@ const ManageUsers = () => {
           </Box>
         </Box>
       </Modal>
+      <Dialog
+            open={isConfirmDialogOpen}
+            onClose={() => setIsConfirmDialogOpen(false)}
+            PaperProps={{ sx: { borderRadius: "15px", padding: "1rem" } }}
+          >
+            <DialogTitle
+              sx={{
+                fontFamily: "Montserrat, sans-serif",
+                fontWeight: 600,
+                color: "#08397C",
+              }}
+            >
+              {dialogContent.title}
+            </DialogTitle>
+            <DialogContent>
+              <Typography
+                sx={{
+                  fontFamily: "Montserrat, sans-serif",
+                  color: "#666",
+                }}
+              >
+                {dialogContent.message}
+              </Typography>
+            </DialogContent>
+            <DialogActions sx={{ padding: "1rem" }}>
+              {dialogContent.cancelAction ? (
+                // Yes and No buttons
+                <>
+                  <Button
+                    onClick={dialogContent.cancelAction}
+                    sx={{
+                      backgroundColor: "#CA031B",
+                      color: "#FFF",
+                      fontFamily: "Montserrat, sans-serif",
+                      fontWeight: 600,
+                      textTransform: "none",
+                      borderRadius: "100px",
+                      padding: "0.75rem",
+                      "&:hover": { backgroundColor: "#072d61" },
+                    }}
+                  >
+                    No
+                  </Button>
+                  <Button
+                    onClick={dialogContent.confirmAction}
+                    sx={{
+                      backgroundColor: "#08397C",
+                      color: "#FFF",
+                      fontFamily: "Montserrat, sans-serif",
+                      fontWeight: 600,
+                      textTransform: "none",
+                      borderRadius: "100px",
+                      padding: "0.75rem",
+                      "&:hover": { backgroundColor: "#A30417" },
+                    }}
+                  >
+                    Yes
+                  </Button>
+                </>
+              ) : (
+                // OK button for simple alerts
+                <Button
+                  onClick={dialogContent.confirmAction}
+                  sx={{
+                    backgroundColor: "#08397C",
+                    color: "#FFF",
+                    fontFamily: "Montserrat, sans-serif",
+                    fontWeight: 600,
+                    textTransform: "none",
+                    borderRadius: "100px",
+                    padding: "0.75rem",
+                    "&:hover": { backgroundColor: "#A30417" },
+                  }}
+                >
+                  OK
+                </Button>
+              )}
+            </DialogActions>
+          </Dialog>
     </>
   );
 };
