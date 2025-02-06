@@ -70,6 +70,7 @@ const ProgDash = () => {
       <Navbar />
       <Box
         sx={{
+          paddingTop: "5rem",
           flexGrow: 1,
           display: "flex",
           flexDirection: "column",
