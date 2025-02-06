@@ -163,6 +163,10 @@ const Navbar = () => {
     navigate("/dash");
   };
 
+  const handleProgDash = () => {
+    navigate("/progdash");
+  };
+
   const handleResesearchTrack = () => {
     navigate("/researchtracking");
   };
@@ -272,7 +276,7 @@ const Navbar = () => {
         // Program Administrator
         {
           label: "Institutional Performance Dashboard",
-          onClick: handleReports,
+          onClick: handleProgDash,
         },
         { label: "Research Tracking", onClick: handleResesearchTrack },
         ...commonItems,

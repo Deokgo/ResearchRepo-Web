@@ -24,6 +24,7 @@ import DisplayResearchInfo from "./pages/displayresearchinfo";
 import DisplayAuditLog from "./pages/auditlog";
 import RoleBasedRoute from "./components/rolebasedroute";
 import DashEmbed from "./pages/DashEmbed";
+import ProgDash from "./pages/ProgDash";
 import SDGdashEmbed from "./pages/SDGdashEmbed";
 import Collection2 from "./pages/collection2";
 import EngageDash from "./pages/EngageDash";
@@ -46,6 +47,7 @@ function App() {
             <Route path='/dash' element={<DashEmbed />} />
             <Route path='/dash/analytics' element={<SDGdashEmbed />} />
             <Route path='/dash/user-engagement' element={<EngageDash />} />
+            <Route path='/progdash' element={<ProgDash />}/>
 
             {/* Common routes (available to all authenticated users) */}
             <Route
