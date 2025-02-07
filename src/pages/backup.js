@@ -23,15 +23,17 @@ import { Virtuoso } from "react-virtuoso";
 import axios from "axios";
 import RestoreIcon from "@mui/icons-material/Restore";
 import BackupIcon from "@mui/icons-material/Backup";
+import UploadIcon from "@mui/icons-material/Upload";
 import { Search } from "@mui/icons-material";
 import { formatBytes, formatDate } from "../utils/format";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
-import BackupTableIcon from '@mui/icons-material/BackupTable';
+import BackupTableIcon from "@mui/icons-material/BackupTable";
 import DialogTitle from "@mui/material/DialogTitle";
 import DownloadIcon from "@mui/icons-material/Download";
+import FileUploader from "../components/FileUploader";
 
 const Backup = () => {
   const navigate = useNavigate();
@@ -48,6 +50,11 @@ const Backup = () => {
   });
   const [currentTimeline, setCurrentTimeline] = useState(null);
   const [openDownloadDialog, setOpenDownloadDialog] = useState(false);
+  const [openUploadDialog, setOpenUploadDialog] = useState(false);
+  const [openUploadWarningDialog, setOpenUploadWarningDialog] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [openSuccessDialog, setOpenSuccessDialog] = useState(false);
+  const [restoreInProgress, setRestoreInProgress] = useState(false);
 
   // Fetch backups from the database
   const fetchBackups = async () => {
@@ -207,6 +214,66 @@ const Backup = () => {
     }
   };
 
+  const handleFileSelect = (event) => {
+    const file = event.target.files[0];
+    if (file && file.name.endsWith(".tar.gz")) {
+      setSelectedFile(file);
+    } else {
+      showMessage("Please select a valid .tar.gz backup file", "error");
+    }
+  };
+
+  const handleFileDelete = () => {
+    setSelectedFile(null);
+  };
+
+  const handleUploadRestore = async () => {
+    if (!selectedFile) {
+      showMessage("Please select a backup file first", "error");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      // Close dialog immediately when restore starts
+      setOpenUploadDialog(false);
+
+      const formData = new FormData();
+      formData.append("backup_file", selectedFile);
+
+      // Show loading dialog
+      setRestoreInProgress(true);
+      showMessage("Restore in progress. Please wait...", "info");
+
+      const response = await axios.post("/backup/restore-from-file", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      showMessage("Backup restored successfully", "success");
+      await Promise.all([fetchBackups(), fetchCurrentTimeline()]);
+      setSelectedFile(null);
+    } catch (error) {
+      console.error("Restore error:", error);
+      showMessage(
+        error.response?.data?.error || "Error restoring backup",
+        "error"
+      );
+    } finally {
+      setLoading(false);
+      setRestoreInProgress(false);
+    }
+  };
+
+  // Add a useEffect to close dialogs when navigating away
+  useEffect(() => {
+    return () => {
+      setOpenUploadDialog(false);
+      setOpenSuccessDialog(false);
+    };
+  }, []);
+
   return (
     <>
       <Box
@@ -304,6 +371,29 @@ const Backup = () => {
               <Box>
                 <Button
                   variant='contained'
+                  color='secondary'
+                  sx={{
+                    backgroundColor: "#A9A9A9",
+                    color: "#FFF",
+                    fontFamily: "Montserrat, sans-serif",
+                    fontWeight: 600,
+                    fontSize: { xs: "0.875rem", md: "0.7rem" },
+                    padding: { xs: "0.5rem 1rem", md: "1.25rem" },
+                    marginLeft: "2rem",
+                    borderRadius: "100px",
+                    maxHeight: "3rem",
+                    "&:hover": {
+                      backgroundColor: "#808080",
+                      color: "#FFF",
+                    },
+                  }}
+                  onClick={() => setOpenUploadWarningDialog(true)}
+                >
+                  <UploadIcon sx={{ pb: "0.15rem" }}></UploadIcon>&nbsp; Restore
+                  Full Backup from File
+                </Button>
+                <Button
+                  variant='contained'
                   color='primary'
                   sx={{
                     backgroundColor: "#CA031B",
@@ -323,7 +413,8 @@ const Backup = () => {
                   }}
                   onClick={() => handleCreateBackup("FULL")}
                 >
-                  <BackupIcon sx={{ pb:"0.15rem" }}></BackupIcon>&nbsp; Full Backup
+                  <BackupIcon sx={{ pb: "0.15rem" }}></BackupIcon>&nbsp; Full
+                  Backup
                 </Button>
                 <Button
                   variant='contained'
@@ -346,7 +437,8 @@ const Backup = () => {
                   }}
                   onClick={() => handleCreateBackup("INCR")}
                 >
-                  <BackupTableIcon sx={{ pb:"0.15rem" }}></BackupTableIcon>&nbsp; Incremental Backup
+                  <BackupTableIcon sx={{ pb: "0.15rem" }}></BackupTableIcon>
+                  &nbsp; Incremental Backup
                 </Button>
               </Box>
             </Box>
@@ -463,11 +555,10 @@ const Backup = () => {
                   include the base full backup and all incremental backups up to
                   this point.
                 </Box>
-                <Box sx={{ mt: 2, color: "info.main" }}>
+                <Box sx={{ mt: 2, color: "red" }}>
                   Important: Restoring this backup will create a new timeline.
-                  Any existing incremental backups from the current timeline
-                  will become invalid and cannot be restored after this
-                  operation.
+                  Any existing backups after the chosen backup's timeline will
+                  become invalid and cannot be restored after this operation.
                 </Box>
               </>
             )}
@@ -568,6 +659,242 @@ const Backup = () => {
             Download Complete Chain
           </Button>
         </DialogActions>
+      </Dialog>
+      <Dialog
+        open={openUploadWarningDialog}
+        onClose={() => setOpenUploadWarningDialog(false)}
+        maxWidth='sm'
+        fullWidth
+      >
+        <DialogTitle>Warning: Restore from Backup File</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            <Box sx={{ mb: 2 }}>
+              <Typography
+                color='error'
+                variant='subtitle1'
+                sx={{
+                  fontWeight: 600,
+                  mb: 1,
+                  fontFamily: "Montserrat, sans-serif",
+                }}
+              >
+                Important! This operation will:
+              </Typography>
+              <ul
+                style={{
+                  marginTop: "8px",
+                  marginBottom: "16px",
+                  paddingLeft: "24px",
+                  fontFamily: "Montserrat, sans-serif",
+                }}
+              >
+                <li>Replace your current database completely</li>
+                <li>Replace all research repository files</li>
+                <li>Cannot be undone once started</li>
+              </ul>
+            </Box>
+            <Typography
+              sx={{
+                mb: 2,
+                fontFamily: "Montserrat, sans-serif",
+                fontSize: "0.875rem",
+              }}
+            >
+              It is strongly recommended to create and download a full backup of
+              your current system before proceeding.
+            </Typography>
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => setOpenUploadWarningDialog(false)}
+            sx={{
+              fontFamily: "Montserrat, sans-serif",
+              textTransform: "none",
+              fontWeight: 600,
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            color='primary'
+            onClick={async () => {
+              try {
+                setLoading(true);
+                // Create full backup
+                const response = await axios.post("/backup/create/FULL");
+                showMessage(response.data.message);
+                await fetchBackups();
+
+                // Get the latest backup ID for download
+                const latestBackup = await axios.get("/backup/list");
+                const fullBackup = latestBackup.data.backups.find(
+                  (b) => b.backup_type === "FULL"
+                );
+
+                if (fullBackup) {
+                  // Download the backup
+                  const downloadResponse = await axios.get(
+                    `/backup/download/${fullBackup.backup_id}`,
+                    {
+                      responseType: "blob",
+                    }
+                  );
+                  const url = window.URL.createObjectURL(
+                    new Blob([downloadResponse.data])
+                  );
+                  const link = document.createElement("a");
+                  link.href = url;
+                  link.setAttribute(
+                    "download",
+                    `${fullBackup.backup_id}.tar.gz`
+                  );
+                  document.body.appendChild(link);
+                  link.click();
+                  link.remove();
+                }
+
+                // Show upload dialog after download
+                setOpenUploadWarningDialog(false);
+                setOpenUploadDialog(true);
+              } catch (error) {
+                showMessage("Error creating backup: " + error.message, "error");
+              } finally {
+                setLoading(false);
+              }
+            }}
+            sx={{
+              fontFamily: "Montserrat, sans-serif",
+              textTransform: "none",
+              fontWeight: 600,
+            }}
+            disabled={loading}
+          >
+            Create and Download Full Backup First
+          </Button>
+          <Button
+            color='warning'
+            onClick={() => {
+              setOpenUploadWarningDialog(false);
+              setOpenUploadDialog(true);
+            }}
+            sx={{
+              fontFamily: "Montserrat, sans-serif",
+              textTransform: "none",
+              fontWeight: 600,
+            }}
+          >
+            Proceed without Backup
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog
+        open={openUploadDialog}
+        onClose={() => setOpenUploadDialog(false)}
+        maxWidth='sm'
+        fullWidth
+      >
+        <DialogTitle sx={{ fontFamily: "Montserrat, sans-serif" }}>
+          Upload Backup File
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText
+            sx={{
+              mb: 2,
+              fontFamily: "Montserrat, sans-serif",
+              fontSize: "0.875rem",
+            }}
+          >
+            Please select a valid backup file (.tar.gz) to restore.
+          </DialogContentText>
+          <FileUploader
+            accept='.tar.gz'
+            onFileSelect={handleFileSelect}
+            onFileDelete={handleFileDelete}
+            selectedFile={selectedFile}
+            disabled={loading}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => {
+              setOpenUploadDialog(false);
+              setSelectedFile(null);
+            }}
+            sx={{
+              fontFamily: "Montserrat, sans-serif",
+              textTransform: "none",
+              fontWeight: 600,
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            color='primary'
+            onClick={handleUploadRestore}
+            disabled={!selectedFile || loading}
+            sx={{
+              fontFamily: "Montserrat, sans-serif",
+              textTransform: "none",
+              fontWeight: 600,
+            }}
+          >
+            Restore
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={openSuccessDialog}
+        onClose={() => setOpenSuccessDialog(false)}
+        maxWidth='sm'
+        fullWidth
+      >
+        <DialogTitle sx={{ fontFamily: "Montserrat, sans-serif" }}>
+          Restore Successful
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText
+            sx={{
+              fontFamily: "Montserrat, sans-serif",
+              fontSize: "0.875rem",
+            }}
+          >
+            The backup has been successfully restored. The system is now ready
+            to use.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => setOpenSuccessDialog(false)}
+            sx={{
+              fontFamily: "Montserrat, sans-serif",
+              textTransform: "none",
+              fontWeight: 600,
+            }}
+          >
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={restoreInProgress} fullWidth maxWidth='sm'>
+        <DialogContent>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              py: 2,
+            }}
+          >
+            <CircularProgress sx={{ mb: 2 }} />
+            <Typography sx={{ fontFamily: "Montserrat, sans-serif" }}>
+              Restore in progress. Please wait...
+            </Typography>
+          </Box>
+        </DialogContent>
       </Dialog>
 
       <Snackbar
