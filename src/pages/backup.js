@@ -14,8 +14,11 @@ import {
   TableHead,
   TableRow,
   Paper,
-  Snackbar,
-  Alert,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
 } from "@mui/material";
 import HeaderWithBackButton from "../components/Header";
 import { useNavigate } from "react-router-dom";
@@ -26,12 +29,7 @@ import BackupIcon from "@mui/icons-material/Backup";
 import UploadIcon from "@mui/icons-material/Upload";
 import { Search } from "@mui/icons-material";
 import { formatBytes, formatDate } from "../utils/format";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
 import BackupTableIcon from "@mui/icons-material/BackupTable";
-import DialogTitle from "@mui/material/DialogTitle";
 import DownloadIcon from "@mui/icons-material/Download";
 import FileUploader from "../components/FileUploader";
 
@@ -43,11 +41,6 @@ const Backup = () => {
   const [loading, setLoading] = useState(true);
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedBackup, setSelectedBackup] = useState(null);
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: "",
-    severity: "success",
-  });
   const [currentTimeline, setCurrentTimeline] = useState(null);
   const [openDownloadDialog, setOpenDownloadDialog] = useState(false);
   const [openUploadDialog, setOpenUploadDialog] = useState(false);
@@ -55,6 +48,14 @@ const Backup = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [openSuccessDialog, setOpenSuccessDialog] = useState(false);
   const [restoreInProgress, setRestoreInProgress] = useState(false);
+  const [openFullBackupDialog, setOpenFullBackupDialog] = useState(false);
+  const [openIncrementalDialog, setOpenIncrementalDialog] = useState(false);
+  const [backupInProgress, setBackupInProgress] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [openRestoreSuccessDialog, setOpenRestoreSuccessDialog] =
+    useState(false);
+  const [openErrorDialog, setOpenErrorDialog] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   // Fetch backups from the database
   const fetchBackups = async () => {
@@ -95,8 +96,8 @@ const Backup = () => {
       backups.filter(
         (backup) =>
           backup.backup_id.toLowerCase().includes(query) ||
-          backup.database_backup_location.toLowerCase().includes(query) ||
-          backup.files_backup_location.toLowerCase().includes(query) ||
+          backup.backup_type.toLowerCase().includes(query) ||
+          String(backup.timeline_id).toLowerCase().includes(query) ||
           new Date(backup.backup_date)
             .toLocaleString()
             .toLowerCase()
@@ -117,33 +118,6 @@ const Backup = () => {
     );
   };
 
-  // Modify handleCreateBackup to include a more specific warning
-  const handleCreateBackup = async (type) => {
-    if (type === "INCR" && !canCreateIncrementalBackup()) {
-      showMessage(
-        "Cannot create incremental backup: No full backup exists in the current timeline. Please create a full backup first.",
-        "warning"
-      );
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const response = await axios.post(`/backup/create/${type}`);
-      showMessage(response.data.message);
-      await fetchBackups();
-    } catch (error) {
-      console.error("Error creating backup:", error);
-      showMessage(
-        error.response?.data?.error ||
-          "Error creating backup: " + error.message,
-        "error"
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
-
   // Handle restore functionality
   const handleRestoreClick = (backup) => {
     setSelectedBackup(backup);
@@ -157,8 +131,7 @@ const Backup = () => {
       const response = await axios.post(
         `/backup/restore/${selectedBackup.backup_id}`
       );
-      showMessage(response.data.message);
-      // Fetch both backups and current timeline after restore
+      setOpenRestoreSuccessDialog(true);
       await Promise.all([fetchBackups(), fetchCurrentTimeline()]);
     } catch (error) {
       console.error("Error restoring backup:", error);
@@ -172,16 +145,9 @@ const Backup = () => {
     return type === "FULL" ? "primary.main" : "secondary.main";
   };
 
-  const handleCloseSnackbar = () => {
-    setSnackbar({ ...snackbar, open: false });
-  };
-
   const showMessage = (message, severity = "success") => {
-    setSnackbar({
-      open: true,
-      message,
-      severity,
-    });
+    setErrorMessage(message);
+    setOpenErrorDialog(true);
   };
 
   // Modify the handleDownloadBackup function
@@ -208,7 +174,10 @@ const Backup = () => {
       link.remove();
     } catch (error) {
       console.error("Error downloading backup:", error);
-      showMessage("Error downloading backup: " + error.message, "error");
+      setErrorMessage(
+        error.response?.data?.error || "Error downloading backup"
+      );
+      setOpenErrorDialog(true);
     } finally {
       setLoading(false);
     }
@@ -229,21 +198,17 @@ const Backup = () => {
 
   const handleUploadRestore = async () => {
     if (!selectedFile) {
-      showMessage("Please select a backup file first", "error");
+      setErrorMessage("Please select a backup file first");
+      setOpenErrorDialog(true);
       return;
     }
 
     try {
       setLoading(true);
-      // Close dialog immediately when restore starts
       setOpenUploadDialog(false);
-
       const formData = new FormData();
       formData.append("backup_file", selectedFile);
-
-      // Show loading dialog
       setRestoreInProgress(true);
-      showMessage("Restore in progress. Please wait...", "info");
 
       const response = await axios.post("/backup/restore-from-file", formData, {
         headers: {
@@ -251,15 +216,13 @@ const Backup = () => {
         },
       });
 
-      showMessage("Backup restored successfully", "success");
+      setOpenRestoreSuccessDialog(true);
       await Promise.all([fetchBackups(), fetchCurrentTimeline()]);
       setSelectedFile(null);
     } catch (error) {
       console.error("Restore error:", error);
-      showMessage(
-        error.response?.data?.error || "Error restoring backup",
-        "error"
-      );
+      setErrorMessage(error.response?.data?.error || "Error restoring backup");
+      setOpenErrorDialog(true);
     } finally {
       setLoading(false);
       setRestoreInProgress(false);
@@ -274,269 +237,366 @@ const Backup = () => {
     };
   }, []);
 
+  // Update the createBackup function
+  const createBackup = async (type) => {
+    try {
+      setBackupInProgress(true);
+      const response = await axios.post(`/backup/create/${type}`);
+
+      setSuccessMessage(
+        `${
+          type === "FULL" ? "Full" : "Incremental"
+        } backup created successfully`
+      );
+      setOpenSuccessDialog(true);
+      await fetchBackups();
+      await fetchCurrentTimeline();
+    } catch (error) {
+      console.error("Backup creation error:", error);
+      setErrorMessage(
+        error.response?.data?.error ||
+          `Error creating ${type.toLowerCase()} backup`
+      );
+      setOpenErrorDialog(true);
+    } finally {
+      setBackupInProgress(false);
+    }
+  };
+
+  // Update the handleIncrementalBackup function
+  const handleIncrementalBackup = async () => {
+    setOpenIncrementalDialog(false);
+    try {
+      // Check if incremental backup is possible
+      if (!canCreateIncrementalBackup()) {
+        setErrorMessage(
+          "Cannot create incremental backup: No full backup exists in the current timeline"
+        );
+        setOpenErrorDialog(true);
+        return;
+      }
+      await createBackup("INCR");
+    } catch (error) {
+      setErrorMessage(
+        error.response?.data?.error || "Error creating incremental backup"
+      );
+      setOpenErrorDialog(true);
+    }
+  };
+
+  // Update the handleFullBackup function
+  const handleFullBackup = async () => {
+    setOpenFullBackupDialog(false);
+    try {
+      await createBackup("FULL");
+    } catch (error) {
+      setErrorMessage(
+        error.response?.data?.error || "Error creating full backup"
+      );
+      setOpenErrorDialog(true);
+    }
+  };
+
   return (
-    <>
+    <Box
+      sx={{
+        margin: 0,
+        padding: 0,
+        height: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        overflow: "hidden",
+      }}
+    >
+      <Navbar />
       <Box
         sx={{
-          margin: 0,
-          padding: 0,
-          height: "100vh",
+          flexGrow: 1,
           display: "flex",
           flexDirection: "column",
+          height: {
+            xs: "calc(100vh - 3.5rem)",
+            sm: "calc(100vh - 4rem)",
+            md: "calc(100vh - 6rem)",
+          },
           overflow: "hidden",
         }}
       >
-        <Navbar />
+        <HeaderWithBackButton title='Backup' onBack={() => navigate(-1)} />
+
+        {/* Add Timeline Info Box */}
         <Box
           sx={{
-            flexGrow: 1,
+            width: "80%",
+            margin: "0 auto",
+            mt: 2,
+            p: 2,
+            bgcolor: "info.light",
+            borderRadius: 1,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <Typography variant='body1' color='info.contrastText'>
+            Current Timeline: {currentTimeline || "Loading..."}
+          </Typography>
+          <Typography variant='body2' color='info.contrastText'>
+            Note: Full backup restores continue in the same timeline, while
+            incremental restores create a new timeline
+          </Typography>
+        </Box>
+
+        {/* Main Content */}
+        <Box
+          sx={{
             display: "flex",
             flexDirection: "column",
-            height: {
-              xs: "calc(100vh - 3.5rem)",
-              sm: "calc(100vh - 4rem)",
-              md: "calc(100vh - 6rem)",
-            },
+            alignItems: "center",
+            flex: 1,
             overflow: "hidden",
           }}
         >
-          <HeaderWithBackButton title='Backup' onBack={() => navigate(-1)} />
-
-          {/* Add Timeline Info Box */}
+          {/* Search Bar and Backup Button */}
           <Box
             sx={{
               width: "80%",
-              margin: "0 auto",
-              mt: 2,
-              p: 2,
-              bgcolor: "info.light",
-              borderRadius: 1,
               display: "flex",
-              alignItems: "center",
+              paddingTop: 3,
+              paddingBottom: 2,
               justifyContent: "space-between",
-            }}
-          >
-            <Typography variant='body1' color='info.contrastText'>
-              Current Timeline: {currentTimeline || "Loading..."}
-            </Typography>
-            <Typography variant='body2' color='info.contrastText'>
-              Note: Full backup restores continue in the same timeline, while
-              incremental restores create a new timeline
-            </Typography>
-          </Box>
-
-          {/* Main Content */}
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
               alignItems: "center",
             }}
           >
-            {/* Search Bar and Backup Button */}
-            <Box
-              sx={{
-                width: "80%",
-                display: "flex",
-                paddingTop: 3,
-                paddingBottom: 2,
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
-              <TextField
-                variant='outlined'
-                placeholder='Search backups'
-                value={searchQuery}
-                onChange={handleSearchChange}
-                sx={{
-                  flex: 1,
-                  "& .MuiInputBase-input": {
-                    fontSize: {
-                      xs: "0.6em",
-                      sm: "0.7rem",
-                      md: "0.8rem",
-                      lg: "0.8rem",
-                    },
-                  },
-                }}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position='start'>
-                      <Search />
-                    </InputAdornment>
-                  ),
-                }}
-              />
-              <Box>
-                <Button
-                  variant='contained'
-                  color='secondary'
-                  sx={{
-                    backgroundColor: "#A9A9A9",
-                    color: "#FFF",
-                    fontFamily: "Montserrat, sans-serif",
-                    fontWeight: 600,
-                    fontSize: { xs: "0.875rem", md: "0.7rem" },
-                    padding: { xs: "0.5rem 1rem", md: "1.25rem" },
-                    marginLeft: "2rem",
-                    borderRadius: "100px",
-                    maxHeight: "3rem",
-                    "&:hover": {
-                      backgroundColor: "#808080",
-                      color: "#FFF",
-                    },
-                  }}
-                  onClick={() => setOpenUploadWarningDialog(true)}
-                >
-                  <UploadIcon sx={{ pb: "0.15rem" }}></UploadIcon>&nbsp; Restore
-                  Full Backup from File
-                </Button>
-                <Button
-                  variant='contained'
-                  color='primary'
-                  sx={{
-                    backgroundColor: "#CA031B",
-                    color: "#FFF",
-                    fontFamily: "Montserrat, sans-serif",
-                    fontWeight: 600,
-                    textTransform: "none",
-                    fontSize: { xs: "0.875rem", md: "1rem" },
-                    padding: { xs: "0.5rem 1rem", md: "1.25rem" },
-                    marginLeft: "2rem",
-                    borderRadius: "100px",
-                    maxHeight: "3rem",
-                    "&:hover": {
-                      backgroundColor: "#A30417",
-                      color: "#FFF",
-                    },
-                  }}
-                  onClick={() => handleCreateBackup("FULL")}
-                >
-                  <BackupIcon sx={{ pb: "0.15rem" }}></BackupIcon>&nbsp; Full
-                  Backup
-                </Button>
-                <Button
-                  variant='contained'
-                  color='primary'
-                  sx={{
-                    backgroundColor: "#08397C",
-                    color: "#FFF",
-                    fontFamily: "Montserrat, sans-serif",
-                    fontWeight: 600,
-                    textTransform: "none",
-                    fontSize: { xs: "0.875rem", md: "1rem" },
-                    padding: { xs: "0.5rem 1rem", md: "1.25rem" },
-                    marginLeft: "2rem",
-                    borderRadius: "100px",
-                    maxHeight: "3rem",
-                    "&:hover": {
-                      backgroundColor: "#072d61",
-                      color: "#FFF",
-                    },
-                  }}
-                  onClick={() => handleCreateBackup("INCR")}
-                >
-                  <BackupTableIcon sx={{ pb: "0.15rem" }}></BackupTableIcon>
-                  &nbsp; Incremental Backup
-                </Button>
-              </Box>
-            </Box>
-
-            {/* Virtuoso Table */}
-            <Box
+            <TextField
+              variant='outlined'
+              placeholder='Search backups'
+              value={searchQuery}
+              onChange={handleSearchChange}
               sx={{
                 flex: 1,
-                backgroundColor: "#F7F9FC",
-                borderRadius: 1,
-                overflow: "hidden",
-                display: "flex",
-                flexDirection: "column",
-                width: "80%",
+                "& .MuiInputBase-input": {
+                  fontSize: {
+                    xs: "0.6em",
+                    sm: "0.7rem",
+                    md: "0.8rem",
+                    lg: "0.8rem",
+                  },
+                },
               }}
-            >
-              {loading ? (
-                <Box sx={{ display: "flex", justifyContent: "center" }}>
-                  <CircularProgress />
-                </Box>
-              ) : (
-                <Box sx={{ flex: 1, overflow: "hidden" }}>
-                  <TableContainer component={Paper}>
-                    <Table>
-                      <TableHead>
-                        <TableRow>
-                          <TableCell>Backup ID</TableCell>
-                          <TableCell>Type</TableCell>
-                          <TableCell>Timeline</TableCell>
-                          <TableCell>Date</TableCell>
-                          <TableCell>Size</TableCell>
-                          <TableCell>Actions</TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {backups.map((backup) => (
-                          <TableRow
-                            key={backup.backup_id}
-                            sx={{
-                              pl: backup.backup_type === "INCR" ? 4 : 0,
-                              borderLeft:
-                                backup.backup_type === "INCR"
-                                  ? "2px solid #1976d2"
-                                  : "none",
-                            }}
-                          >
-                            <TableCell>{backup.backup_id}</TableCell>
-                            <TableCell>
-                              <Typography
-                                color={getBackupTypeColor(backup.backup_type)}
-                              >
-                                {backup.backup_type}
-                                {backup.wal_lsn && (
-                                  <Typography variant='caption' display='block'>
-                                    WAL Position: {backup.wal_lsn}
-                                  </Typography>
-                                )}
-                              </Typography>
-                            </TableCell>
-                            <TableCell>
-                              <Typography variant='body2'>
-                                Timeline {backup.timeline_id || "N/A"}
-                              </Typography>
-                            </TableCell>
-                            <TableCell>
-                              {formatDate(backup.backup_date)}
-                            </TableCell>
-                            <TableCell>
-                              {formatBytes(backup.total_size)}
-                            </TableCell>
-                            <TableCell>
-                              <Box sx={{ display: "flex", gap: 1 }}>
-                                <Button
-                                  startIcon={<RestoreIcon />}
-                                  onClick={() => handleRestoreClick(backup)}
-                                  disabled={loading}
-                                >
-                                  Restore
-                                </Button>
-                                {backup.backup_type === "FULL" && (
-                                  <Button
-                                    startIcon={<DownloadIcon />}
-                                    onClick={() => handleDownloadBackup(backup)}
-                                    disabled={loading}
-                                  >
-                                    Download
-                                  </Button>
-                                )}
-                              </Box>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                </Box>
-              )}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position='start'>
+                    <Search />
+                  </InputAdornment>
+                ),
+              }}
+            />
+            <Box>
+              <Button
+                variant='contained'
+                color='secondary'
+                sx={{
+                  backgroundColor: "#A9A9A9",
+                  color: "#FFF",
+                  fontFamily: "Montserrat, sans-serif",
+                  fontWeight: 600,
+                  fontSize: { xs: "0.875rem", md: "0.7rem" },
+                  padding: { xs: "0.5rem 1rem", md: "1.25rem" },
+                  marginLeft: "2rem",
+                  borderRadius: "100px",
+                  maxHeight: "3rem",
+                  "&:hover": {
+                    backgroundColor: "#808080",
+                    color: "#FFF",
+                  },
+                }}
+                onClick={() => setOpenUploadWarningDialog(true)}
+              >
+                <UploadIcon sx={{ pb: "0.15rem" }}></UploadIcon>&nbsp; Restore
+                Full Backup from File
+              </Button>
+              <Button
+                variant='contained'
+                color='primary'
+                sx={{
+                  backgroundColor: "#CA031B",
+                  color: "#FFF",
+                  fontFamily: "Montserrat, sans-serif",
+                  fontWeight: 600,
+                  textTransform: "none",
+                  fontSize: { xs: "0.875rem", md: "1rem" },
+                  padding: { xs: "0.5rem 1rem", md: "1.25rem" },
+                  marginLeft: "2rem",
+                  borderRadius: "100px",
+                  maxHeight: "3rem",
+                  "&:hover": {
+                    backgroundColor: "#A30417",
+                    color: "#FFF",
+                  },
+                }}
+                onClick={() => setOpenFullBackupDialog(true)}
+              >
+                <BackupIcon sx={{ pb: "0.15rem" }}></BackupIcon>&nbsp; Full
+                Backup
+              </Button>
+              <Button
+                variant='contained'
+                color='primary'
+                sx={{
+                  backgroundColor: "#08397C",
+                  color: "#FFF",
+                  fontFamily: "Montserrat, sans-serif",
+                  fontWeight: 600,
+                  textTransform: "none",
+                  fontSize: { xs: "0.875rem", md: "1rem" },
+                  padding: { xs: "0.5rem 1rem", md: "1.25rem" },
+                  marginLeft: "2rem",
+                  borderRadius: "100px",
+                  maxHeight: "3rem",
+                  "&:hover": {
+                    backgroundColor: "#072d61",
+                    color: "#FFF",
+                  },
+                }}
+                onClick={() => setOpenIncrementalDialog(true)}
+              >
+                <BackupTableIcon sx={{ pb: "0.15rem" }}></BackupTableIcon>
+                &nbsp; Incremental Backup
+              </Button>
             </Box>
+          </Box>
+
+          {/* Scrollable Table Container */}
+          <Box
+            sx={{
+              width: "80%",
+              flex: 1,
+              overflow: "hidden",
+              backgroundColor: "#F7F9FC",
+              borderRadius: 1,
+              marginBottom: "2rem",
+            }}
+          >
+            {loading ? (
+              <Box sx={{ display: "flex", justifyContent: "center", p: 3 }}>
+                <CircularProgress />
+              </Box>
+            ) : (
+              <Box sx={{ flex: 1, overflow: "hidden" }}>
+                <Virtuoso
+                  style={{ height: "calc(100vh - 320px)" }}
+                  totalCount={filteredBackups.length}
+                  components={{
+                    Header: () => (
+                      <Box
+                        sx={{
+                          display: "grid",
+                          gridTemplateColumns: "2fr 1fr 1fr 1.5fr 1fr 1.5fr",
+                          backgroundColor: "#0A438F",
+                          fontSize: {
+                            xs: "0.5rem",
+                            md: "0.75rem",
+                            lg: "0.9rem",
+                          },
+                          color: "#FFF",
+                          padding: "12px 16px",
+                          fontWeight: 700,
+                          position: "sticky",
+                          top: 0,
+                          zIndex: 1000,
+                          alignItems: "center",
+                          gap: "8px",
+                        }}
+                      >
+                        <Box sx={{ textAlign: "center" }}>Backup ID</Box>
+                        <Box sx={{ textAlign: "center" }}>Type</Box>
+                        <Box sx={{ textAlign: "center" }}>Timeline</Box>
+                        <Box sx={{ textAlign: "center" }}>Date</Box>
+                        <Box sx={{ textAlign: "center" }}>Size</Box>
+                        <Box sx={{ textAlign: "center" }}>Actions</Box>
+                      </Box>
+                    ),
+                  }}
+                  itemContent={(index) => {
+                    const backup = filteredBackups[index];
+                    return (
+                      <Box
+                        sx={{
+                          display: "grid",
+                          gridTemplateColumns: "2fr 1fr 1fr 1.5fr 1fr 1.5fr",
+                          padding: "12px 16px",
+                          borderBottom: "1px solid #e0e0e0",
+                          "&:hover": {
+                            backgroundColor: "rgba(0, 0, 0, 0.04)",
+                          },
+                          backgroundColor: "white",
+                          alignItems: "center",
+                          gap: "8px",
+                          minHeight: "52px",
+                        }}
+                      >
+                        <Box
+                          sx={{
+                            textAlign: "center",
+                            whiteSpace: "nowrap",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                          }}
+                        >
+                          {backup.backup_id}
+                        </Box>
+                        <Box sx={{ textAlign: "center" }}>
+                          <Typography
+                            color={getBackupTypeColor(backup.backup_type)}
+                            sx={{ fontWeight: 500 }}
+                          >
+                            {backup.backup_type}
+                          </Typography>
+                        </Box>
+                        <Box sx={{ textAlign: "center" }}>
+                          {backup.timeline_id || "N/A"}
+                        </Box>
+                        <Box sx={{ textAlign: "center" }}>
+                          {formatDate(backup.backup_date)}
+                        </Box>
+                        <Box sx={{ textAlign: "center" }}>
+                          {formatBytes(backup.total_size)}
+                        </Box>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "center",
+                            gap: "8px",
+                          }}
+                        >
+                          <Button
+                            startIcon={<RestoreIcon />}
+                            onClick={() => handleRestoreClick(backup)}
+                            disabled={loading}
+                            size='small'
+                            sx={{ minWidth: "100px" }}
+                          >
+                            Restore
+                          </Button>
+                          {backup.backup_type === "FULL" && (
+                            <Button
+                              startIcon={<DownloadIcon />}
+                              onClick={() => handleDownloadBackup(backup)}
+                              disabled={loading}
+                              size='small'
+                              sx={{ minWidth: "100px" }}
+                            >
+                              Download
+                            </Button>
+                          )}
+                        </Box>
+                      </Box>
+                    );
+                  }}
+                />
+              </Box>
+            )}
           </Box>
         </Box>
       </Box>
@@ -774,7 +834,7 @@ const Backup = () => {
             Create and Download Full Backup First
           </Button>
           <Button
-            color='warning'
+            color='error'
             onClick={() => {
               setOpenUploadWarningDialog(false);
               setOpenUploadDialog(true);
@@ -852,17 +912,11 @@ const Backup = () => {
         fullWidth
       >
         <DialogTitle sx={{ fontFamily: "Montserrat, sans-serif" }}>
-          Restore Successful
+          Backup Created Successfully
         </DialogTitle>
         <DialogContent>
-          <DialogContentText
-            sx={{
-              fontFamily: "Montserrat, sans-serif",
-              fontSize: "0.875rem",
-            }}
-          >
-            The backup has been successfully restored. The system is now ready
-            to use.
+          <DialogContentText sx={{ fontFamily: "Montserrat, sans-serif" }}>
+            {successMessage}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -897,17 +951,183 @@ const Backup = () => {
         </DialogContent>
       </Dialog>
 
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={6000}
-        onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+      <Dialog
+        open={openRestoreSuccessDialog}
+        onClose={() => setOpenRestoreSuccessDialog(false)}
+        maxWidth='sm'
+        fullWidth
       >
-        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity}>
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
-    </>
+        <DialogTitle sx={{ fontFamily: "Montserrat, sans-serif" }}>
+          Restore Successful
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText sx={{ fontFamily: "Montserrat, sans-serif" }}>
+            The backup has been successfully restored. The system is now ready
+            to use.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => setOpenRestoreSuccessDialog(false)}
+            sx={{
+              fontFamily: "Montserrat, sans-serif",
+              textTransform: "none",
+              fontWeight: 600,
+            }}
+          >
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Full Backup Confirmation Dialog */}
+      <Dialog
+        open={openFullBackupDialog}
+        onClose={() => setOpenFullBackupDialog(false)}
+        maxWidth='sm'
+        fullWidth
+      >
+        <DialogTitle sx={{ fontFamily: "Montserrat, sans-serif" }}>
+          Create Full Backup
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText sx={{ fontFamily: "Montserrat, sans-serif" }}>
+            A full backup creates a complete copy of your database and
+            repository files. This type of backup contains all the data needed
+            for a complete restore. It serves as a base for future incremental
+            backups.
+            <br />
+            <br />
+            Would you like to proceed with creating a full backup?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => setOpenFullBackupDialog(false)}
+            sx={{
+              fontFamily: "Montserrat, sans-serif",
+              textTransform: "none",
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleFullBackup}
+            variant='contained'
+            sx={{
+              fontFamily: "Montserrat, sans-serif",
+              textTransform: "none",
+              fontWeight: 600,
+            }}
+          >
+            Create Full Backup
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Incremental Backup Confirmation Dialog */}
+      <Dialog
+        open={openIncrementalDialog}
+        onClose={() => setOpenIncrementalDialog(false)}
+        maxWidth='sm'
+        fullWidth
+      >
+        <DialogTitle sx={{ fontFamily: "Montserrat, sans-serif" }}>
+          Create Incremental Backup
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText sx={{ fontFamily: "Montserrat, sans-serif" }}>
+            An incremental backup only stores the changes made since the last
+            backup. It requires less storage space and is faster to create than
+            a full backup. However, to restore an incremental backup, you'll
+            need the previous full backup and all intermediate incremental
+            backups.
+            <br />
+            <br />
+            Would you like to proceed with creating an incremental backup?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => setOpenIncrementalDialog(false)}
+            sx={{
+              fontFamily: "Montserrat, sans-serif",
+              textTransform: "none",
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleIncrementalBackup}
+            variant='contained'
+            sx={{
+              fontFamily: "Montserrat, sans-serif",
+              textTransform: "none",
+              fontWeight: 600,
+            }}
+          >
+            Create Incremental Backup
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Loading Dialog */}
+      <Dialog open={backupInProgress} fullWidth maxWidth='sm'>
+        <DialogContent>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              py: 2,
+            }}
+          >
+            <CircularProgress sx={{ mb: 2 }} />
+            <Typography sx={{ fontFamily: "Montserrat, sans-serif" }}>
+              Creating backup. Please wait...
+            </Typography>
+          </Box>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={openErrorDialog}
+        onClose={() => setOpenErrorDialog(false)}
+        maxWidth='sm'
+        fullWidth
+      >
+        <DialogTitle
+          sx={{
+            fontFamily: "Montserrat, sans-serif",
+            color: "error.main",
+          }}
+        >
+          Error
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText
+            sx={{
+              fontFamily: "Montserrat, sans-serif",
+              color: "error.main",
+            }}
+          >
+            {errorMessage}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => setOpenErrorDialog(false)}
+            sx={{
+              fontFamily: "Montserrat, sans-serif",
+              textTransform: "none",
+              fontWeight: 600,
+            }}
+          >
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Box>
   );
 };
 
