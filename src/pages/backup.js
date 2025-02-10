@@ -162,23 +162,84 @@ const Backup = () => {
       }
 
       setLoading(true);
-      const response = await axios.get(`/backup/download/${backup.backup_id}`, {
-        responseType: "blob",
+
+      // Use fetch instead of axios for better large file handling
+      const response = await fetch(`/backup/download/${backup.backup_id}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`, // Add if you're using JWT
+        },
       });
-      const url = window.URL.createObjectURL(new Blob([response.data]));
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      // Get the filename from the Content-Disposition header if available
+      const contentDisposition = response.headers.get("Content-Disposition");
+      let filename = `${backup.backup_id}.tar.gz`;
+      if (contentDisposition) {
+        const filenameMatch = contentDisposition.match(
+          /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/
+        );
+        if (filenameMatch && filenameMatch[1]) {
+          filename = filenameMatch[1].replace(/['"]/g, "");
+        }
+      }
+
+      // Create a ReadableStream from the response
+      const reader = response.body.getReader();
+      const contentLength = response.headers.get("Content-Length");
+      let receivedLength = 0;
+      const chunks = [];
+
+      // Read the stream
+      while (true) {
+        const { done, value } = await reader.read();
+
+        if (done) {
+          break;
+        }
+
+        chunks.push(value);
+        receivedLength += value.length;
+
+        // Optional: Add progress indication here if needed
+        if (contentLength) {
+          const progress = (receivedLength / contentLength) * 100;
+          console.log(`Download progress: ${progress.toFixed(2)}%`);
+        }
+      }
+
+      // Combine all chunks into a single Uint8Array
+      const chunksAll = new Uint8Array(receivedLength);
+      let position = 0;
+      for (const chunk of chunks) {
+        chunksAll.set(chunk, position);
+        position += chunk.length;
+      }
+
+      // Create blob and download
+      const blob = new Blob([chunksAll], { type: "application/gzip" });
+      const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.setAttribute("download", `${backup.backup_id}.tar.gz`);
+      link.download = filename;
       document.body.appendChild(link);
       link.click();
-      link.remove();
+
+      // Cleanup
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      setLoading(false);
     } catch (error) {
       console.error("Error downloading backup:", error);
       setErrorMessage(
-        error.response?.data?.error || "Error downloading backup"
+        error.response?.data?.error ||
+          "Error downloading backup: The file may be too large or the connection was interrupted"
       );
       setOpenErrorDialog(true);
-    } finally {
       setLoading(false);
     }
   };
