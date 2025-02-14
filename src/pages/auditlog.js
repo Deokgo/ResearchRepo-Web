@@ -608,7 +608,7 @@ const DisplayAuditLog = () => {
                                   >
                                     <Box sx={{ flex: 1 }}>{log.audit_log}</Box>
                                     <Box sx={{ flex: 2 }}>{log.email}</Box>
-                                    <Box sx={{ flex: 1 }}>{log.role_name}</Box>
+                                    <Box sx={{ flex: 1 }}>{log.role}</Box>
                                     <Box sx={{ flex: 1 }}>{log.operation}</Box>
                                     <Box sx={{ flex: 1 }}>{log.record_id}</Box>
                                     <Box sx={{ flex: 1.5 }}>

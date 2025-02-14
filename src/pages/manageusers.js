@@ -77,6 +77,9 @@ const ManageUsers = () => {
     message: "",
     confirmAction: null,
   });
+  const [openArchiveModal, setOpenArchiveModal] = useState(false);
+  const [archiveType, setArchiveType] = useState('INACTIVE');
+  const [archiveDays, setArchiveDays] = useState(180);
 
   const fetchUsers = async () => {
     try {
@@ -586,7 +589,7 @@ const ManageUsers = () => {
           {allDuplicates
             ? "All emails already exist in the database. No new users will be added."
             : `${duplicateEmails.length} duplicate email${
-                duplicateEmails.length === 1 ? "" : "s"
+                duplicateEmails.length === 1 ? "s" : ""
               } found among the users to be added. 
               ${
                 duplicateEmails.length === 1 ? "This will" : "These will"
@@ -620,6 +623,23 @@ const ManageUsers = () => {
       },
     },
   });
+
+  // Add this function to handle archiving
+  const handleArchive = async () => {
+    try {
+      const response = await axios.post('/accounts/archive_accounts', {
+        archive_type: archiveType,
+        days: archiveDays
+      });
+
+      alert(`${response.data.message}\nArchived ${response.data.count} accounts.`);
+      setOpenArchiveModal(false);
+      fetchUsers(); // Refresh the users list
+    } catch (error) {
+      console.error('Error archiving accounts:', error);
+      alert(error.response?.data?.error || 'Error archiving accounts');
+    }
+  };
 
   return (
     <>
@@ -693,29 +713,44 @@ const ManageUsers = () => {
                   ),
                 }}
               />
-              <Button
-                variant='contained'
-                color='primary'
-                onClick={handleOpenAddModal}
-                sx={{
-                  backgroundColor: "#CA031B",
-                  color: "#FFF",
-                  fontFamily: "Montserrat, sans-serif",
-                  fontWeight: 600,
-                  textTransform: "none",
-                  fontSize: { xs: "0.875rem", md: "1rem" },
-                  padding: { xs: "0.5rem 1rem", md: "1.25rem" },
-                  marginLeft: "2rem",
-                  borderRadius: "100px",
-                  maxHeight: "3rem",
-                  "&:hover": {
-                    backgroundColor: "#A30417",
+              <Box>
+                <Button
+                  variant='contained'
+                  color='primary'
+                  onClick={handleOpenAddModal}
+                  sx={{
+                    backgroundColor: "#CA031B",
                     color: "#FFF",
-                  },
-                }}
-              >
-                <AddIcon></AddIcon>&nbsp;Add Users
-              </Button>
+                    fontFamily: "Montserrat, sans-serif",
+                    fontWeight: 600,
+                    textTransform: "none",
+                    fontSize: { xs: "0.875rem", md: "1rem" },
+                    padding: { xs: "0.5rem 1rem", md: "1.25rem" },
+                    marginLeft: "2rem",
+                    borderRadius: "100px",
+                    maxHeight: "3rem",
+                    "&:hover": {
+                      backgroundColor: "#A30417",
+                      color: "#FFF",
+                    },
+                  }}
+                >
+                  <AddIcon></AddIcon>&nbsp;Add Users
+                </Button>
+                <Button
+                  onClick={() => setOpenArchiveModal(true)}
+                  sx={{
+                    backgroundColor: "#08397C",
+                    color: "#FFF",
+                    marginLeft: "1rem",
+                    "&:hover": {
+                      backgroundColor: "#08397C",
+                    },
+                  }}
+                >
+                  Archive Accounts
+                </Button>
+              </Box>
             </Box>
 
             {/* Virtuoso Table */}
@@ -1458,6 +1493,78 @@ const ManageUsers = () => {
               )}
             </DialogActions>
           </Dialog>
+
+      {/* Archive Modal */}
+      <Modal
+        open={openArchiveModal}
+        onClose={() => setOpenArchiveModal(false)}
+        aria-labelledby="archive-modal"
+      >
+        <Box sx={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: 400,
+          bgcolor: 'background.paper',
+          boxShadow: 24,
+          p: 4,
+          borderRadius: '8px'
+        }}>
+          <Typography variant="h6" component="h2" mb={3}>
+            Archive Accounts
+          </Typography>
+
+          <FormControl fullWidth sx={{ mb: 2 }}>
+            <InputLabel>Archive Type</InputLabel>
+            <Select
+              value={archiveType}
+              onChange={(e) => setArchiveType(e.target.value)}
+              label="Archive Type"
+            >
+              <MenuItem value="INACTIVE">Inactive Accounts</MenuItem>
+              <MenuItem value="DEACTIVATED">Deactivated Accounts</MenuItem>
+            </Select>
+          </FormControl>
+
+          <FormControl fullWidth sx={{ mb: 3 }}>
+            <InputLabel>Days Threshold</InputLabel>
+            <Select
+              value={archiveDays}
+              onChange={(e) => setArchiveDays(e.target.value)}
+              label="Days Threshold"
+            >
+              <MenuItem value={180}>180 days (6 months)</MenuItem>
+              <MenuItem value={365}>365 days (1 year)</MenuItem>
+              <MenuItem value={730}>730 days (2 years)</MenuItem>
+            </Select>
+          </FormControl>
+
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+            <Button
+              onClick={() => setOpenArchiveModal(false)}
+              sx={{
+                backgroundColor: "#08397C",
+                color: "#FFF",
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleArchive}
+              sx={{
+                backgroundColor: "#CA031B",
+                color: "#FFF",
+                "&:hover": {
+                  backgroundColor: "#A30417",
+                }
+              }}
+            >
+              Archive
+            </Button>
+          </Box>
+        </Box>
+      </Modal>
     </>
   );
 };
