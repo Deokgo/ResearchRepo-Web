@@ -28,7 +28,9 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions
+  DialogActions,
+  DialogContentText,
+  CircularProgress,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import homeBg from "../assets/home_bg.png";
@@ -49,12 +51,6 @@ const ManageUsers = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const [openModal, setOpenModal] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [newRole, setNewRole] = useState("");
-  const [roles, setRoles] = useState([]);
-  const [accountStatus, setAccountStatus] = useState("");
-  const [initialData, setInitialData] = useState(null);
-  const [openAddModal, setOpenAddModal] = useState(false);
   const [colleges, setColleges] = useState([]);
   const [programs, setPrograms] = useState([]);
   const [parsedUsers, setParsedUsers] = useState([]);
@@ -78,192 +74,186 @@ const ManageUsers = () => {
     confirmAction: null,
   });
   const [openArchiveModal, setOpenArchiveModal] = useState(false);
-  const [archiveType, setArchiveType] = useState('INACTIVE');
+  const [archiveType, setArchiveType] = useState("INACTIVE");
   const [archiveDays, setArchiveDays] = useState(180);
+  const [openSuccessDialog, setOpenSuccessDialog] = useState(false);
+  const [openErrorDialog, setOpenErrorDialog] = useState(false);
+  const [openArchiveConfirmDialog, setOpenArchiveConfirmDialog] =
+    useState(false);
+  const [archiveInProgress, setArchiveInProgress] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [openWarningDialog, setOpenWarningDialog] = useState(false);
+  const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
+  const [warningMessage, setWarningMessage] = useState("");
+  const [confirmAction, setConfirmAction] = useState(null);
+  const [confirmMessage, setConfirmMessage] = useState("");
+  const [confirmTitle, setConfirmTitle] = useState("");
+  const [roles, setRoles] = useState([]);
 
   const fetchUsers = async () => {
     try {
       setLoading(true);
       const response = await axios.get("/accounts/users");
-      setUsers(response.data.researchers);
-      setFilteredUsers(response.data.researchers);
+
+      // Sort users: ACTIVATED first, then DEACTIVATED
+      const sortedUsers = response.data.researchers.sort((a, b) => {
+        if (a.acc_status === b.acc_status) return 0;
+        return a.acc_status === "ACTIVATED" ? -1 : 1;
+      });
+
+      setUsers(sortedUsers);
+      setFilteredUsers(sortedUsers);
     } catch (error) {
       console.error("Error fetching users:", error);
-      alert("Error fetching users");
+      setErrorMessage("Error fetching users");
+      setOpenErrorDialog(true);
     } finally {
       setLoading(false);
     }
   };
 
   const handleToggleStatus = (user, researcher_id) => {
-    const updatedStatus = user.acc_status === "ACTIVATED" ? "DEACTIVATED" : "ACTIVATED";
-  
+    const updatedStatus =
+      user.acc_status === "ACTIVATED" ? "DEACTIVATED" : "ACTIVATED";
+
     setDialogContent({
       title: "Confirm Status Change",
       message: `Are you sure you want to change the status to ${updatedStatus}?`,
       confirmAction: async () => {
         try {
-          const response = await fetch(`/accounts/update_status/${researcher_id}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ acc_status: updatedStatus }),
-          });
-  
+          const response = await fetch(
+            `/accounts/update_status/${researcher_id}`,
+            {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ acc_status: updatedStatus }),
+            }
+          );
+
           if (!response.ok) throw new Error("Failed to update account status");
-  
-          // Update user status
+
+          // Update user status in the table
           setFilteredUsers((prevUsers) =>
             prevUsers.map((u) =>
-              u.researcher_id === researcher_id ? { ...u, acc_status: updatedStatus } : u
+              u.researcher_id === researcher_id
+                ? { ...u, acc_status: updatedStatus }
+                : u
             )
           );
-  
-          // Show success message with OK button only
-          setDialogContent({
-            title: "Status Updated",
-            message: `The account status has been successfully changed to ${updatedStatus}.`,
-            confirmAction: () => setIsConfirmDialogOpen(false),
-          });
-  
+
+          setSuccessMessage(
+            `Account status successfully changed to ${updatedStatus}`
+          );
+          setOpenSuccessDialog(true);
         } catch (error) {
           console.error("Error updating account status:", error);
-  
-          // Show error message with OK button only
-          setDialogContent({
-            title: "Update Failed",
-            message: "Failed to update account status. Please try again.",
-            confirmAction: () => setIsConfirmDialogOpen(false),
-          });
+          setErrorMessage("Failed to update account status. Please try again.");
+          setOpenErrorDialog(true);
         }
-  
-        setIsConfirmDialogOpen(true);
       },
-      cancelAction: () => setIsConfirmDialogOpen(false), // Clicking No closes the modal
     });
-  
-    setIsConfirmDialogOpen(true);
-  };    
+
+    setOpenConfirmDialog(true);
+  };
+
+  const fetchRoles = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get("/accounts/fetch_roles", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setRoles(response.data.roles);
+    } catch (error) {
+      console.error("Error fetching roles:", error);
+      setErrorMessage(error.response?.data?.message || "Error fetching roles");
+      setOpenErrorDialog(true);
+    }
+  };
+
+  const fetchColleges = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get("/deptprogs/college_depts", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setColleges(response.data.colleges);
+    } catch (error) {
+      console.error("Error fetching colleges:", error);
+      setErrorMessage(
+        error.response?.data?.message || "Error fetching colleges"
+      );
+      setOpenErrorDialog(true);
+    }
+  };
+
+  const handleCollegeChange = async (collegeId) => {
+    setSelectedCollege(collegeId);
+    setSelectedProgram(""); // Reset program selection
+
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get(`/deptprogs/programs/${collegeId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setPrograms(response.data.programs);
+    } catch (error) {
+      console.error("Error fetching programs:", error);
+      setErrorMessage(
+        error.response?.data?.message || "Error fetching programs"
+      );
+      setOpenErrorDialog(true);
+    }
+  };
 
   useEffect(() => {
-    const fetchRoles = async () => {
-      try {
-        const response = await axios.get(`/accounts/fetch_roles`);
-        setRoles(response.data.roles);
-      } catch (error) {
-        console.error("Error fetching roles:", error);
-      }
+    const fetchData = async () => {
+      await Promise.all([fetchUsers(), fetchRoles(), fetchColleges()]);
     };
-
-    const fetchColleges = async () => {
-      try {
-        const response = await axios.get("/deptprogs/college_depts");
-        setColleges(response.data.colleges);
-      } catch (error) {
-        console.error("Error fetching colleges:", error);
-      }
-    };
-
-    Promise.all([fetchRoles(), fetchUsers(), fetchColleges()]);
+    fetchData();
   }, []);
 
   const handleSearchChange = (e) => {
     const query = e.target.value.toLowerCase();
     setSearchQuery(query);
-    setFilteredUsers(
-      users.filter(
-        (user) =>
-          user.email.toLowerCase().includes(query) ||
-          user.researcher_id.toLowerCase().includes(query)
-      )
-    );
-  };
-  const handleOpenModal = (user) => {
-    setSelectedUser(user);
 
-    // Set the initial data for comparison in handleSaveChanges
-    setInitialData({
-      role_name: user.role_name,
-      accountStatus: user.acc_status,
+    // Filter users based on search query
+    const filtered = users.filter(
+      (user) =>
+        user.email.toLowerCase().includes(query) ||
+        user.researcher_id.toLowerCase().includes(query) ||
+        (user.role_name && user.role_name.toLowerCase().includes(query))
+    );
+
+    // Sort users: ACTIVATED first, then DEACTIVATED
+    const sortedUsers = filtered.sort((a, b) => {
+      if (a.acc_status === b.acc_status) return 0; // Keep relative order if status is same
+      return a.acc_status === "ACTIVATED" ? -1 : 1; // ACTIVATED comes first
     });
 
-    // Find and set the role_id for the selected user
-    const matchingRole = roles.find(
-      (role_id) => role_id.role_name === user.role_name
-    );
-    if (matchingRole) {
-      setNewRole(matchingRole.role_id); // Set the newRole state with the role_id
-    } else {
-      setNewRole(""); // Fallback in case no matching role is found
-    }
+    setFilteredUsers(sortedUsers);
+  };
 
-    console.log("Selected User:", user);
-    console.log("Matching Role (if found):", matchingRole);
-
-    setAccountStatus(user.acc_status); // Set account status for the selected user
+  const handleOpenModal = () => {
     setOpenModal(true);
   };
 
   const handleCloseModal = () => {
     setOpenModal(false);
-    setSelectedUser(null);
-  };
-
-  // Function to get role by role_id
-  const getRoleById = (roleId) => {
-    return roles.find((role) => role.role_id === roleId);
-  };
-
-  const handleSaveChanges = async () => {
-    const newRoleName = getRoleById(newRole);
-    console.log("newRoleName:", newRoleName.role_name);
-
-    const hasChanges =
-      newRoleName.role_name !== initialData?.role_name ||
-      accountStatus !== initialData?.accountStatus;
-
-    if (!hasChanges) {
-      alert("No changes detected. Please modify user's details before saving.");
-    } else {
-      updateChanges();
-    }
-  };
-
-  const updateChanges = async () => {
-    try {
-      await axios.put(`/accounts/update_acc/${selectedUser.researcher_id}`, {
-        role_id: newRole, // Corrected key to 'role_id'
-        acc_status: accountStatus,
-      });
-
-      const selectedRole = roles.find((role) => role.role_id === newRole);
-      const roleName = selectedRole ? selectedRole.role_name : "N/A"; // Default to "N/A" if not found
-      console.log("Selected Role Name: ", roleName);
-
-      // Update users state to reflect changes without re-fetching
-      const updatedUsers = users.map((user) =>
-        user.researcher_id === selectedUser.researcher_id
-          ? { ...user, role_name: roleName, acc_status: accountStatus }
-          : user
-      );
-
-      // Update the state to trigger a re-render
-      setUsers(updatedUsers);
-      setFilteredUsers(updatedUsers);
-
-      console.log("New Role ID: ", newRole); // Optional for debugging
-    } catch (error) {
-      console.error("Error saving changes:", error);
-    } finally {
-      setOpenModal(false);
-    }
   };
 
   const handleOpenAddModal = () => {
-    setOpenAddModal(true);
+    setOpenModal(true);
   };
 
   const handleCloseAddModal = () => {
-    setOpenAddModal(false);
+    setOpenModal(false);
     setSelectedRole("");
     setSelectedCollege("");
     setSelectedProgram("");
@@ -375,11 +365,12 @@ const ManageUsers = () => {
         setDuplicateEmails((prev) => [...new Set([...prev, ...newDuplicates])]);
 
         if (newDuplicates.length > 0) {
-          alert(
+          setWarningMessage(
             `Warning: The following emails are duplicates or already exist and will be ignored:\n${newDuplicates.join(
               "\n"
             )}`
           );
+          setOpenWarningDialog(true);
         }
       };
       reader.readAsText(file);
@@ -395,18 +386,6 @@ const ManageUsers = () => {
         user.id === userId ? { ...user, roleId: newRole } : user
       )
     );
-  };
-
-  const handleCollegeChange = async (newCollege) => {
-    setSelectedCollege(newCollege);
-    setSelectedProgram(""); // Reset program when college changes
-
-    try {
-      const response = await axios.get(`/deptprogs/programs/${newCollege}`);
-      setPrograms(response.data.programs);
-    } catch (error) {
-      console.error("Error fetching programs:", error);
-    }
   };
 
   const handleProgramChange = (userId, newProgram) => {
@@ -434,13 +413,15 @@ const ManageUsers = () => {
     try {
       // Validate selections
       if (!selectedRole || !selectedCollege || !selectedProgram) {
-        alert("Please select role, college, and program");
+        setWarningMessage("Please select role, college, and program");
+        setOpenWarningDialog(true);
         return;
       }
 
       // Check if we have any users to add
       if (parsedUsers.length === 0) {
-        alert("Please add at least one user");
+        setWarningMessage("Please add at least one user");
+        setOpenWarningDialog(true);
         return;
       }
 
@@ -468,7 +449,8 @@ const ManageUsers = () => {
         }));
 
       if (enrichedUsers.length === 0) {
-        alert("No valid users to add. All emails are duplicates.");
+        setWarningMessage("No valid users to add. All emails are duplicates.");
+        setOpenWarningDialog(true);
         return;
       }
 
@@ -493,20 +475,25 @@ const ManageUsers = () => {
         window.URL.revokeObjectURL(url);
         document.body.removeChild(a);
 
-        alert("Users added successfully! Downloading credentials file...");
+        setSuccessMessage(
+          "Users added successfully! Downloading credentials file..."
+        );
+        setOpenSuccessDialog(true);
         handleCloseAddModal();
         fetchUsers();
       }
     } catch (error) {
       console.error("Error adding users:", error);
-      alert(error.response?.data?.error || "Error adding users");
+      setErrorMessage(error.response?.data?.error || "Error adding users");
+      setOpenErrorDialog(true);
     }
   };
 
   const handleAddRow = async () => {
     // Check required fields
     if (!manualEntry.email || !manualEntry.firstName || !manualEntry.surname) {
-      alert("Email, First Name, and Surname are required");
+      setWarningMessage("Email, First Name, and Surname are required");
+      setOpenWarningDialog(true);
       return;
     }
 
@@ -515,14 +502,20 @@ const ManageUsers = () => {
       (user) => user.email === manualEntry.email
     );
     if (emailExistsInTable) {
-      alert(`Email ${manualEntry.email} already exists in the current entries`);
+      setWarningMessage(
+        `Email ${manualEntry.email} already exists in the current entries`
+      );
+      setOpenWarningDialog(true);
       return;
     }
 
     // Check if email exists in database
     const isDuplicate = await checkDuplicateEmail(manualEntry.email);
     if (isDuplicate) {
-      alert(`Email ${manualEntry.email} already exists in the database`);
+      setWarningMessage(
+        `Email ${manualEntry.email} already exists in the database`
+      );
+      setOpenWarningDialog(true);
       return;
     }
 
@@ -589,7 +582,7 @@ const ManageUsers = () => {
           {allDuplicates
             ? "All emails already exist in the database. No new users will be added."
             : `${duplicateEmails.length} duplicate email${
-                duplicateEmails.length === 1 ? "s" : ""
+                duplicateEmails.length === 1 ? "" : "s"
               } found among the users to be added. 
               ${
                 duplicateEmails.length === 1 ? "This will" : "These will"
@@ -627,17 +620,32 @@ const ManageUsers = () => {
   // Add this function to handle archiving
   const handleArchive = async () => {
     try {
-      const response = await axios.post('/accounts/archive_accounts', {
+      setArchiveInProgress(true);
+      setOpenArchiveConfirmDialog(false); // Close confirmation dialog
+      setOpenArchiveModal(false); // Close archive modal
+
+      const response = await axios.post("/accounts/archive_accounts", {
         archive_type: archiveType,
-        days: archiveDays
+        days: archiveDays,
       });
 
-      alert(`${response.data.message}\nArchived ${response.data.count} accounts.`);
-      setOpenArchiveModal(false);
-      fetchUsers(); // Refresh the users list
+      if (response.data.count > 0) {
+        setSuccessMessage(
+          `Successfully archived ${response.data.count} accounts. The archive file has been created.`
+        );
+        setOpenSuccessDialog(true);
+        fetchUsers(); // Refresh the users list
+      } else {
+        setWarningMessage("No accounts found matching the archive criteria.");
+        setOpenWarningDialog(true);
+      }
     } catch (error) {
-      console.error('Error archiving accounts:', error);
-      alert(error.response?.data?.error || 'Error archiving accounts');
+      setErrorMessage(
+        error.response?.data?.error || "Error archiving accounts"
+      );
+      setOpenErrorDialog(true);
+    } finally {
+      setArchiveInProgress(false);
     }
   };
 
@@ -668,7 +676,7 @@ const ManageUsers = () => {
           }}
         >
           <HeaderWithBackButton
-            title="Manage Users"
+            title='Manage Users'
             onBack={() => navigate(-1)}
           />
 
@@ -693,7 +701,7 @@ const ManageUsers = () => {
             >
               <TextField
                 variant='outlined'
-                placeholder='Search by User ID or Email'
+                placeholder='Search by User ID, Email or Role'
                 value={searchQuery}
                 onChange={handleSearchChange}
                 sx={createTextFieldStyles()}
@@ -756,13 +764,14 @@ const ManageUsers = () => {
             {/* Virtuoso Table */}
             <Box
               sx={{
-                lex: 1,
+                flex: 1,
                 backgroundColor: "#F7F9FC",
                 borderRadius: 1,
                 overflow: "hidden",
                 display: "flex",
                 flexDirection: "column",
                 width: "80%",
+                maxHeight: "calc(100vh - 20rem)", // Leave consistent space at bottom
               }}
             >
               {loading ? (
@@ -772,7 +781,9 @@ const ManageUsers = () => {
               ) : (
                 <Box sx={{ flex: 1, overflow: "hidden" }}>
                   <Virtuoso
-                    style={{ height: "400px" }}
+                    style={{
+                      height: "calc(100vh - 20rem)", // Match parent height
+                    }}
                     totalCount={filteredUsers.length}
                     components={{
                       Header: () => (
@@ -781,23 +792,25 @@ const ManageUsers = () => {
                             display: "flex",
                             justifyContent: "space-between",
                             backgroundColor: "#0A438F",
-                            fontSize: {
-                              xs: "0.5rem",
-                              md: "0.75rem",
-                              lg: "0.9rem",
-                            },
+                            fontSize: "0.875rem",
                             color: "#FFF",
-                            padding: "10px",
+                            padding: "0.625rem",
                             fontWeight: 700,
                             position: "sticky",
                             top: 0,
                             zIndex: 1000,
                           }}
                         >
-                          <Box sx={{ flex: 1 }}>User ID</Box>
-                          <Box sx={{ flex: 2 }}>Email</Box>
-                          <Box sx={{ flex: 2 }}>Role</Box>
-                          <Box sx={{ flex: 1 }}>Active</Box>
+                          <Box sx={{ flex: 1, fontSize: "0.875rem" }}>
+                            User ID
+                          </Box>
+                          <Box sx={{ flex: 2, fontSize: "0.875rem" }}>
+                            Email
+                          </Box>
+                          <Box sx={{ flex: 2, fontSize: "0.875rem" }}>Role</Box>
+                          <Box sx={{ flex: 1, fontSize: "0.875rem" }}>
+                            Active
+                          </Box>
                         </Box>
                       ),
                     }}
@@ -810,24 +823,36 @@ const ManageUsers = () => {
                             justifyContent: "space-between",
                             padding: "0.5rem",
                             borderBottom: "1px solid #ccc",
-                            fontSize: {
-                              xs: "0.5rem",
-                              md: "0.65rem",
-                              lg: "0.9rem",
+                            fontSize: "0.875rem",
+                            "&:hover": {
+                              backgroundColor: "#f5f5f5",
                             },
                           }}
                         >
-                          <Box sx={{ flex: 1 }}>{user.researcher_id}</Box>
-                          <Box sx={{ flex: 2 }}>{user.email}</Box>
-                          <Box sx={{ flex: 2 }}>{user.role_name || "N/A"}</Box>
-                          <Box sx={{ flex: 1, display: "flex", alignItems: "center" }}>
+                          <Box sx={{ flex: 1, fontSize: "inherit" }}>
+                            {user.researcher_id}
+                          </Box>
+                          <Box sx={{ flex: 2, fontSize: "inherit" }}>
+                            {user.email}
+                          </Box>
+                          <Box sx={{ flex: 2, fontSize: "inherit" }}>
+                            {user.role_name || "N/A"}
+                          </Box>
+                          <Box
+                            sx={{
+                              flex: 1,
+                              display: "flex",
+                              alignItems: "center",
+                            }}
+                          >
                             <Switch
                               checked={user.acc_status === "ACTIVATED"}
-                              onChange={() => handleToggleStatus(user, user.researcher_id)}
-                              color="primary"
+                              onChange={() =>
+                                handleToggleStatus(user, user.researcher_id)
+                              }
+                              color='primary'
+                              size='small'
                             />
-                            <Box sx={{ ml: 1, fontSize: "0.75rem", fontWeight: 600 }}>
-                            </Box>
                           </Box>
                         </Box>
                       );
@@ -836,166 +861,14 @@ const ManageUsers = () => {
                 </Box>
               )}
             </Box>
-            {selectedUser && (
-              <Modal open={openModal} onClose={handleCloseModal}>
-                <Box
-                  sx={{
-                    position: "absolute",
-                    top: "50%",
-                    left: "50%",
-                    transform: "translate(-50%, -50%)",
-                    width: "30rem",
-                    bgcolor: "background.paper",
-                    boxShadow: 24,
-                    p: 5,
-                    borderRadius: "8px",
-                  }}
-                >
-                  <Typography
-                    variant='h3'
-                    color='#08397C'
-                    fontWeight='1000'
-                    mb={4}
-                    sx={{
-                      textAlign: { xs: "left", md: "bottom" },
-                      fontSize: {
-                        xs: "clamp(1rem, 2vw, 1rem)",
-                        sm: "clamp(1.5rem, 3.5vw, 1.5rem)",
-                        md: "clamp(2rem, 4vw, 2.25rem)",
-                      },
-                    }}
-                  >
-                    Edit User
-                  </Typography>
-                  <TextField
-                    label='User ID'
-                    value={selectedUser.researcher_id}
-                    disabled
-                    fullWidth
-                    margin='normal'
-                  />
-                  <TextField
-                    label='Mapúa MCL Live Account'
-                    value={selectedUser.email}
-                    disabled
-                    fullWidth
-                    margin='normal'
-                  />
-                  <FormControl fullWidth margin='normal'>
-                    <InputLabel>Role</InputLabel>
-                    <Select
-                      value={newRole} // This should hold role_id
-                      onChange={(e) => setNewRole(e.target.value)} // Update newRole with role_id
-                      label='Role'
-                      disabled={
-                        selectedUser?.institution !==
-                          "Mapúa Malayan Colleges Laguna" ||
-                        ["01", "02", "03"].includes(selectedUser?.role_id) // Disable for specific role IDs
-                      }
-                    >
-                      {roles
-                        .filter(
-                          (role) =>
-                            !["01", "02", "03"].includes(role.role_id) || // Keep other roles
-                            ["01", "02", "03"].includes(newRole) // Always include if the selected role is restricted
-                        )
-                        .map((role) => (
-                          <MenuItem key={role.role_id} value={role.role_id}>
-                            {role.role_name} {/* Display role_name */}
-                          </MenuItem>
-                        ))}
-                    </Select>
-                  </FormControl>
-                  <FormControl component='fieldset' margin='normal'>
-                    <FormLabel
-                      component='legend'
-                      variant='h6'
-                      fontWeight='700'
-                      sx={{
-                        mb: "0.5rem",
-                        color: "#d40821",
-                        fontSize: { xs: "0.5rem", md: "0.75rem", lg: "0.9rem" },
-                      }}
-                    >
-                      Account Status
-                    </FormLabel>
-                    <RadioGroup
-                      value={accountStatus} // Use state variable here
-                      onChange={(e) => setAccountStatus(e.target.value)}
-                    >
-                      <FormControlLabel
-                        value='ACTIVATED'
-                        control={<Radio />}
-                        label='Activated'
-                      />
-                      <FormControlLabel
-                        value='DEACTIVATED'
-                        control={<Radio />}
-                        label='Deactivated'
-                      />
-                    </RadioGroup>
-                  </FormControl>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      mt: 5,
-                    }}
-                  >
-                    <Button
-                      onClick={handleCloseModal}
-                      sx={{
-                        backgroundColor: "#08397C",
-                        color: "#FFF",
-                        fontFamily: "Montserrat, sans-serif",
-                        fontWeight: 600,
-                        fontSize: { xs: "0.875rem", md: "1rem" },
-                        padding: { xs: "0.5rem 1rem", md: "1.25rem" },
-                        borderRadius: "100px",
-                        maxHeight: "3rem",
-                        textTransform: "none",
-                        "&:hover": {
-                          backgroundColor: "#072d61",
-                        },
-                      }}
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      variant='contained'
-                      color='primary'
-                      onClick={handleSaveChanges}
-                      sx={{
-                        backgroundColor: "#CA031B",
-                        color: "#FFF",
-                        fontFamily: "Montserrat, sans-serif",
-                        fontWeight: 600,
-                        textTransform: "none",
-                        fontSize: { xs: "0.875rem", md: "1rem" },
-                        padding: { xs: "0.5rem 1rem", md: "1.25rem" },
-                        marginLeft: "2rem",
-                        borderRadius: "100px",
-                        maxHeight: "3rem",
-                        "&:hover": {
-                          backgroundColor: "#A30417",
-                          color: "#FFF",
-                        },
-                      }}
-                    >
-                      Save
-                    </Button>
-                  </Box>
-                </Box>
-              </Modal>
-            )}
           </Box>
         </Box>
       </Box>
 
       {/* Add User Modal */}
       <Modal
-        open={openAddModal}
-        onClose={handleCloseAddModal}
+        open={openModal}
+        onClose={handleCloseModal}
         aria-labelledby='add-users-modal'
       >
         <Box
@@ -1028,6 +901,75 @@ const ManageUsers = () => {
             Add Users
           </Typography>
 
+          {/* Required Fields Information */}
+          <Box
+            sx={{
+              mb: 3,
+              p: 2,
+              bgcolor: "#f5f5f5",
+              borderRadius: 1,
+              border: "1px solid #e0e0e0",
+            }}
+          >
+            <Typography
+              variant='subtitle1'
+              sx={{
+                color: "#08397C",
+                fontWeight: 600,
+                mb: 1,
+                fontFamily: "Montserrat, sans-serif",
+              }}
+            >
+              Required CSV Fields:
+            </Typography>
+            <Typography
+              variant='body2'
+              sx={{
+                fontFamily: "Montserrat, sans-serif",
+                "& span": { fontWeight: 600 },
+              }}
+            >
+              • <span>email</span> - Mapúa MCL Live Account (e.g.,
+              jdcruz@live.mcl.edu.ph)
+            </Typography>
+            <Typography
+              variant='body2'
+              sx={{
+                fontFamily: "Montserrat, sans-serif",
+                "& span": { fontWeight: 600 },
+              }}
+            >
+              • <span>first_name</span> - First Name
+            </Typography>
+            <Typography
+              variant='body2'
+              sx={{
+                fontFamily: "Montserrat, sans-serif",
+                "& span": { fontWeight: 600 },
+              }}
+            >
+              • <span>middle_initial (optional)</span> - Middle Initial
+            </Typography>
+            <Typography
+              variant='body2'
+              sx={{
+                fontFamily: "Montserrat, sans-serif",
+                "& span": { fontWeight: 600 },
+              }}
+            >
+              • <span>surname</span> - Surname
+            </Typography>
+            <Typography
+              variant='body2'
+              sx={{
+                fontFamily: "Montserrat, sans-serif",
+                "& span": { fontWeight: 600 },
+              }}
+            >
+              • <span>suffix (optional)</span> - Name suffix (e.g., Jr., III)
+            </Typography>
+          </Box>
+
           {/* Common Dropdowns */}
           <Box sx={{ display: "flex", gap: 2, mb: 3 }}>
             <FormControl sx={{ minWidth: 200 }}>
@@ -1045,7 +987,7 @@ const ManageUsers = () => {
               <Select
                 value={selectedRole}
                 onChange={(e) => setSelectedRole(e.target.value)}
-                label="Role"
+                label='Role'
                 sx={createTextFieldStyles()}
               >
                 {roles
@@ -1068,13 +1010,17 @@ const ManageUsers = () => {
               </Select>
             </FormControl>
             <FormControl sx={{ minWidth: 200 }}>
-              <InputLabel sx={{
-                fontSize: {
-                  xs: "0.75rem",
-                  md: "0.75rem",
-                  lg: "0.8rem",
-                },
-              }}>College</InputLabel>
+              <InputLabel
+                sx={{
+                  fontSize: {
+                    xs: "0.75rem",
+                    md: "0.75rem",
+                    lg: "0.8rem",
+                  },
+                }}
+              >
+                College
+              </InputLabel>
               <Select
                 value={selectedCollege}
                 onChange={(e) => handleCollegeChange(e.target.value)}
@@ -1082,13 +1028,17 @@ const ManageUsers = () => {
                 sx={createTextFieldStyles()}
               >
                 {colleges.map((college) => (
-                  <MenuItem key={college.college_id} value={college.college_id} sx={{
-                    fontSize: {
-                      xs: "0.75rem",
-                      md: "0.75rem",
-                      lg: "0.8rem",
-                    },
-                  }}>
+                  <MenuItem
+                    key={college.college_id}
+                    value={college.college_id}
+                    sx={{
+                      fontSize: {
+                        xs: "0.75rem",
+                        md: "0.75rem",
+                        lg: "0.8rem",
+                      },
+                    }}
+                  >
                     {college.college_name}
                   </MenuItem>
                 ))}
@@ -1096,13 +1046,17 @@ const ManageUsers = () => {
             </FormControl>
 
             <FormControl sx={{ minWidth: 200 }}>
-              <InputLabel sx={{
-                fontSize: {
-                  xs: "0.75rem",
-                  md: "0.75rem",
-                  lg: "0.8rem",
-                },
-              }}>Program</InputLabel>
+              <InputLabel
+                sx={{
+                  fontSize: {
+                    xs: "0.75rem",
+                    md: "0.75rem",
+                    lg: "0.8rem",
+                  },
+                }}
+              >
+                Program
+              </InputLabel>
               <Select
                 value={selectedProgram}
                 onChange={(e) => setSelectedProgram(e.target.value)}
@@ -1111,13 +1065,17 @@ const ManageUsers = () => {
                 sx={createTextFieldStyles()}
               >
                 {programs.map((program) => (
-                  <MenuItem key={program.program_id} value={program.program_id} sx={{
-                    fontSize: {
-                      xs: "0.75rem",
-                      md: "0.75rem",
-                      lg: "0.8rem",
-                    },
-                  }}>
+                  <MenuItem
+                    key={program.program_id}
+                    value={program.program_id}
+                    sx={{
+                      fontSize: {
+                        xs: "0.75rem",
+                        md: "0.75rem",
+                        lg: "0.8rem",
+                      },
+                    }}
+                  >
                     {program.program_name}
                   </MenuItem>
                 ))}
@@ -1363,7 +1321,7 @@ const ManageUsers = () => {
               }}
             >
               <Button
-                onClick={handleCloseAddModal}
+                onClick={handleCloseModal}
                 sx={{
                   backgroundColor: "#08397C",
                   color: "#FFF",
@@ -1415,103 +1373,114 @@ const ManageUsers = () => {
         </Box>
       </Modal>
       <Dialog
-            open={isConfirmDialogOpen}
-            onClose={() => setIsConfirmDialogOpen(false)}
-            PaperProps={{ sx: { borderRadius: "15px", padding: "1rem" } }}
+        open={isConfirmDialogOpen}
+        onClose={() => setIsConfirmDialogOpen(false)}
+        PaperProps={{ sx: { borderRadius: "15px", padding: "1rem" } }}
+      >
+        <DialogTitle
+          sx={{
+            fontFamily: "Montserrat, sans-serif",
+            fontWeight: 600,
+            color: "#08397C",
+          }}
+        >
+          {dialogContent.title}
+        </DialogTitle>
+        <DialogContent>
+          <Typography
+            sx={{
+              fontFamily: "Montserrat, sans-serif",
+              color: "#666",
+            }}
           >
-            <DialogTitle
-              sx={{
-                fontFamily: "Montserrat, sans-serif",
-                fontWeight: 600,
-                color: "#08397C",
-              }}
-            >
-              {dialogContent.title}
-            </DialogTitle>
-            <DialogContent>
-              <Typography
+            {dialogContent.message}
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ padding: "1rem" }}>
+          {dialogContent.cancelAction ? (
+            // Yes and No buttons
+            <>
+              <Button
+                onClick={dialogContent.cancelAction}
                 sx={{
+                  backgroundColor: "#CA031B",
+                  color: "#FFF",
                   fontFamily: "Montserrat, sans-serif",
-                  color: "#666",
+                  fontWeight: 600,
+                  textTransform: "none",
+                  borderRadius: "100px",
+                  padding: "0.75rem",
+                  "&:hover": { backgroundColor: "#072d61" },
                 }}
               >
-                {dialogContent.message}
-              </Typography>
-            </DialogContent>
-            <DialogActions sx={{ padding: "1rem" }}>
-              {dialogContent.cancelAction ? (
-                // Yes and No buttons
-                <>
-                  <Button
-                    onClick={dialogContent.cancelAction}
-                    sx={{
-                      backgroundColor: "#CA031B",
-                      color: "#FFF",
-                      fontFamily: "Montserrat, sans-serif",
-                      fontWeight: 600,
-                      textTransform: "none",
-                      borderRadius: "100px",
-                      padding: "0.75rem",
-                      "&:hover": { backgroundColor: "#072d61" },
-                    }}
-                  >
-                    No
-                  </Button>
-                  <Button
-                    onClick={dialogContent.confirmAction}
-                    sx={{
-                      backgroundColor: "#08397C",
-                      color: "#FFF",
-                      fontFamily: "Montserrat, sans-serif",
-                      fontWeight: 600,
-                      textTransform: "none",
-                      borderRadius: "100px",
-                      padding: "0.75rem",
-                      "&:hover": { backgroundColor: "#A30417" },
-                    }}
-                  >
-                    Yes
-                  </Button>
-                </>
-              ) : (
-                // OK button for simple alerts
-                <Button
-                  onClick={dialogContent.confirmAction}
-                  sx={{
-                    backgroundColor: "#08397C",
-                    color: "#FFF",
-                    fontFamily: "Montserrat, sans-serif",
-                    fontWeight: 600,
-                    textTransform: "none",
-                    borderRadius: "100px",
-                    padding: "0.75rem",
-                    "&:hover": { backgroundColor: "#A30417" },
-                  }}
-                >
-                  OK
-                </Button>
-              )}
-            </DialogActions>
-          </Dialog>
+                No
+              </Button>
+              <Button
+                onClick={dialogContent.confirmAction}
+                sx={{
+                  backgroundColor: "#08397C",
+                  color: "#FFF",
+                  fontFamily: "Montserrat, sans-serif",
+                  fontWeight: 600,
+                  textTransform: "none",
+                  borderRadius: "100px",
+                  padding: "0.75rem",
+                  "&:hover": { backgroundColor: "#A30417" },
+                }}
+              >
+                Yes
+              </Button>
+            </>
+          ) : (
+            // OK button for simple alerts
+            <Button
+              onClick={dialogContent.confirmAction}
+              sx={{
+                backgroundColor: "#08397C",
+                color: "#FFF",
+                fontFamily: "Montserrat, sans-serif",
+                fontWeight: 600,
+                textTransform: "none",
+                borderRadius: "100px",
+                padding: "0.75rem",
+                "&:hover": { backgroundColor: "#A30417" },
+              }}
+            >
+              OK
+            </Button>
+          )}
+        </DialogActions>
+      </Dialog>
 
       {/* Archive Modal */}
       <Modal
         open={openArchiveModal}
         onClose={() => setOpenArchiveModal(false)}
-        aria-labelledby="archive-modal"
+        aria-labelledby='archive-modal'
       >
-        <Box sx={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          width: 400,
-          bgcolor: 'background.paper',
-          boxShadow: 24,
-          p: 4,
-          borderRadius: '8px'
-        }}>
-          <Typography variant="h6" component="h2" mb={3}>
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 400,
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            p: 4,
+            borderRadius: "8px",
+          }}
+        >
+          <Typography
+            variant='h6'
+            component='h2'
+            mb={3}
+            sx={{
+              fontFamily: "Montserrat, sans-serif",
+              fontWeight: 600,
+              color: "#08397C",
+            }}
+          >
             Archive Accounts
           </Typography>
 
@@ -1520,10 +1489,13 @@ const ManageUsers = () => {
             <Select
               value={archiveType}
               onChange={(e) => setArchiveType(e.target.value)}
-              label="Archive Type"
+              label='Archive Type'
             >
-              <MenuItem value="INACTIVE">Inactive Accounts</MenuItem>
-              <MenuItem value="DEACTIVATED">Deactivated Accounts</MenuItem>
+              <MenuItem value='INACTIVE'>Inactive Accounts</MenuItem>
+              <MenuItem value='DEACTIVATED'>Deactivated Accounts</MenuItem>
+              <MenuItem value='ALL'>
+                All Inactive and Deactivated Accounts
+              </MenuItem>
             </Select>
           </FormControl>
 
@@ -1532,7 +1504,7 @@ const ManageUsers = () => {
             <Select
               value={archiveDays}
               onChange={(e) => setArchiveDays(e.target.value)}
-              label="Days Threshold"
+              label='Days Threshold'
             >
               <MenuItem value={180}>180 days (6 months)</MenuItem>
               <MenuItem value={365}>365 days (1 year)</MenuItem>
@@ -1540,24 +1512,33 @@ const ManageUsers = () => {
             </Select>
           </FormControl>
 
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+          <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2 }}>
             <Button
               onClick={() => setOpenArchiveModal(false)}
               sx={{
-                backgroundColor: "#08397C",
+                backgroundColor: "#CA031B",
                 color: "#FFF",
+                fontFamily: "Montserrat, sans-serif",
+                fontWeight: 600,
+                textTransform: "none",
+                borderRadius: "100px",
+                padding: "0.75rem",
+                "&:hover": { backgroundColor: "#A30417" },
               }}
             >
               Cancel
             </Button>
             <Button
-              onClick={handleArchive}
+              onClick={() => setOpenArchiveConfirmDialog(true)}
               sx={{
-                backgroundColor: "#CA031B",
+                backgroundColor: "#08397C",
                 color: "#FFF",
-                "&:hover": {
-                  backgroundColor: "#A30417",
-                }
+                fontFamily: "Montserrat, sans-serif",
+                fontWeight: 600,
+                textTransform: "none",
+                borderRadius: "100px",
+                padding: "0.75rem",
+                "&:hover": { backgroundColor: "#072d61" },
               }}
             >
               Archive
@@ -1565,6 +1546,224 @@ const ManageUsers = () => {
           </Box>
         </Box>
       </Modal>
+
+      {/* Archive Confirmation Dialog */}
+      <Dialog
+        open={openArchiveConfirmDialog}
+        onClose={() => setOpenArchiveConfirmDialog(false)}
+        maxWidth='sm'
+        fullWidth
+      >
+        <DialogTitle sx={{ fontFamily: "Montserrat, sans-serif" }}>
+          Confirm Archive Operation
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText sx={{ fontFamily: "Montserrat, sans-serif" }}>
+            This operation will archive{" "}
+            {archiveType === "ALL"
+              ? "all inactive and deactivated"
+              : archiveType === "INACTIVE"
+              ? "inactive"
+              : "deactivated"}{" "}
+            accounts that have been in that state for {archiveDays} days.
+            <Box sx={{ mt: 2, color: "warning.main" }}>
+              Note: Archived accounts will be removed from the active database
+              but can be restored later using the generated SQL file.
+            </Box>
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => setOpenArchiveConfirmDialog(false)}
+            sx={{
+              fontFamily: "Montserrat, sans-serif",
+              textTransform: "none",
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleArchive}
+            variant='contained'
+            color='primary'
+            sx={{
+              fontFamily: "Montserrat, sans-serif",
+              textTransform: "none",
+              fontWeight: 600,
+            }}
+          >
+            Proceed with Archive
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Archive Progress Dialog */}
+      <Dialog open={archiveInProgress} fullWidth maxWidth='sm'>
+        <DialogContent>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              py: 2,
+            }}
+          >
+            <CircularProgress sx={{ mb: 2 }} />
+            <Typography sx={{ fontFamily: "Montserrat, sans-serif" }}>
+              Archiving accounts. Please wait...
+            </Typography>
+          </Box>
+        </DialogContent>
+      </Dialog>
+
+      {/* Success Dialog */}
+      <Dialog
+        open={openSuccessDialog}
+        onClose={() => setOpenSuccessDialog(false)}
+        maxWidth='sm'
+        fullWidth
+      >
+        <DialogTitle sx={{ fontFamily: "Montserrat, sans-serif" }}>
+          Archive Operation Successful
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText sx={{ fontFamily: "Montserrat, sans-serif" }}>
+            {successMessage}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => setOpenSuccessDialog(false)}
+            sx={{
+              fontFamily: "Montserrat, sans-serif",
+              textTransform: "none",
+              fontWeight: 600,
+            }}
+          >
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Error Dialog */}
+      <Dialog
+        open={openErrorDialog}
+        onClose={() => setOpenErrorDialog(false)}
+        maxWidth='sm'
+        fullWidth
+      >
+        <DialogTitle
+          sx={{
+            fontFamily: "Montserrat, sans-serif",
+            color: "error.main",
+          }}
+        >
+          Error
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText
+            sx={{
+              fontFamily: "Montserrat, sans-serif",
+              color: "error.main",
+            }}
+          >
+            {errorMessage}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => setOpenErrorDialog(false)}
+            sx={{
+              fontFamily: "Montserrat, sans-serif",
+              textTransform: "none",
+              fontWeight: 600,
+            }}
+          >
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Warning Dialog */}
+      <Dialog
+        open={openWarningDialog}
+        onClose={() => setOpenWarningDialog(false)}
+        maxWidth='sm'
+        fullWidth
+      >
+        <DialogTitle
+          sx={{
+            fontFamily: "Montserrat, sans-serif",
+            color: "warning.main",
+          }}
+        >
+          Warning
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText
+            sx={{
+              fontFamily: "Montserrat, sans-serif",
+              whiteSpace: "pre-line", // This preserves line breaks in the message
+            }}
+          >
+            {warningMessage}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => setOpenWarningDialog(false)}
+            sx={{
+              fontFamily: "Montserrat, sans-serif",
+              textTransform: "none",
+              fontWeight: 600,
+            }}
+          >
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Confirmation Dialog */}
+      <Dialog
+        open={openConfirmDialog}
+        onClose={() => setOpenConfirmDialog(false)}
+        maxWidth='sm'
+        fullWidth
+      >
+        <DialogTitle sx={{ fontFamily: "Montserrat, sans-serif" }}>
+          {confirmTitle}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText sx={{ fontFamily: "Montserrat, sans-serif" }}>
+            {confirmMessage}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => setOpenConfirmDialog(false)}
+            sx={{
+              fontFamily: "Montserrat, sans-serif",
+              textTransform: "none",
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={() => {
+              setOpenConfirmDialog(false);
+              confirmAction && confirmAction();
+            }}
+            variant='contained'
+            sx={{
+              fontFamily: "Montserrat, sans-serif",
+              textTransform: "none",
+              fontWeight: 600,
+            }}
+          >
+            Confirm
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };
