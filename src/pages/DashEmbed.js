@@ -240,29 +240,33 @@ const DashEmbed = () => {
               
             </Tabs>
           </Box>
-          <Box 
-            sx={{
-              flexGrow: 1,
-              backgroundColor: "#f5f5f5",
-              padding: 0,
-              margin: 0,
-              height: "100%", // Use remaining height
-              overflow: "hidden",
-            }}
-          >
-            <iframe
-              id="dashboard-iframe"
-              src={selectedUrl}
-              style={{
-                border: "none",
-                width: "100%",
-                height: "100%", // Take full height
-                display: "block",
+            <Box 
+              sx={{ 
+                width: "100%", 
+                height: "100%", 
+                overflow: "hidden", 
+                position: "relative" 
               }}
-              sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
-              title="Dash App"
-            />
-          </Box>
+            >
+              <iframe
+                id="dashboard-iframe"
+                src={selectedUrl}
+                style={{
+                  border: "none",
+                  width: "111%",  // Compensating for scale(0.8)
+                  height: "111%", 
+                  display: "block",
+                  transform: "scale(0.9)",
+                  transformOrigin: "top left",
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                }}
+                sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+                title="Dash App"
+              />
+            </Box>
+
         </Box>
       </Box>
     </>
