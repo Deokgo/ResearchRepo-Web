@@ -117,43 +117,46 @@ const ManageUsers = () => {
     const updatedStatus =
       user.acc_status === "ACTIVATED" ? "DEACTIVATED" : "ACTIVATED";
 
-    setDialogContent({
-      title: "Confirm Status Change",
-      message: `Are you sure you want to change the status to ${updatedStatus}?`,
-      confirmAction: async () => {
-        try {
-          const response = await fetch(
-            `/accounts/update_status/${researcher_id}`,
-            {
-              method: "PUT",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ acc_status: updatedStatus }),
-            }
-          );
+    setConfirmTitle("Confirm Status Change");
+    setConfirmMessage(
+      `Are you sure you want to change the status to ${updatedStatus}?`
+    );
+    setConfirmAction(() => async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await axios.put(
+          `/accounts/update_status/${researcher_id}`,
+          { acc_status: updatedStatus },
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
-          if (!response.ok) throw new Error("Failed to update account status");
+        // Update user status in the table
+        setFilteredUsers((prevUsers) =>
+          prevUsers.map((u) =>
+            u.researcher_id === researcher_id
+              ? { ...u, acc_status: updatedStatus }
+              : u
+          )
+        );
 
-          // Update user status in the table
-          setFilteredUsers((prevUsers) =>
-            prevUsers.map((u) =>
-              u.researcher_id === researcher_id
-                ? { ...u, acc_status: updatedStatus }
-                : u
-            )
-          );
-
-          setSuccessMessage(
-            `Account status successfully changed to ${updatedStatus}`
-          );
-          setOpenSuccessDialog(true);
-        } catch (error) {
-          console.error("Error updating account status:", error);
-          setErrorMessage("Failed to update account status. Please try again.");
-          setOpenErrorDialog(true);
-        }
-      },
+        setSuccessMessage(
+          `Account status successfully changed to ${updatedStatus}`
+        );
+        setOpenSuccessDialog(true);
+      } catch (error) {
+        console.error("Error updating account status:", error);
+        setErrorMessage(
+          error.response?.data?.error ||
+            "Failed to update account status. Please try again."
+        );
+        setOpenErrorDialog(true);
+      }
     });
-
     setOpenConfirmDialog(true);
   };
 
