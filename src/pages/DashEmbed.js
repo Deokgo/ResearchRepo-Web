@@ -14,7 +14,7 @@ const DashEmbed = () => {
   const [dashUrl, setDashUrls] = useState(null);
   const [error, setError] = useState(null);
   const [selectedUrl, setSelectedUrl] = useState(null);
-  const [selectedTab, setSelectedTab] = useState(2);
+  const [selectedTab, setSelectedTab] = useState(1);
   const [expanded, setExpanded] = useState(false); // Track expansion
 
   // Add ref for the menu container
@@ -67,7 +67,17 @@ const DashEmbed = () => {
             setSelectedUrl(urls[0]); // Default to first URL
           } else {
             if (selectedTab === 0) { return; }
-            setSelectedUrl(urls[selectedTab-1]); // Default to first URL
+            if (selectedTab === 2) { 
+              console.log(selectedTab-2);
+              setSelectedUrl(urls[selectedTab-2]); 
+              return; 
+            }
+            if (selectedTab === 3) { 
+              console.log(selectedTab-1);
+              setSelectedUrl(urls[selectedTab-1]); 
+              return; 
+            }
+            setSelectedUrl(urls[selectedTab]); // Default to first URL
           }
           console.log(selectedTab);
         } else {
@@ -180,10 +190,11 @@ const DashEmbed = () => {
                   }
                 }, // Default text color
                 "& .Mui-selected": { 
-                  fontColor: "white",
+                  color: "white !important",  // Force white text
                   fontWeight: "bold",
-                  backgroundColor: "#0C5ACF", // Background color for selected tab
-                }, // Selected tab color
+                  backgroundColor: "#0C5ACF", // Background for selected tab
+                  opacity: 1, // Ensure full opacity
+                },
               }}
             >
               {expanded ? (
@@ -211,7 +222,14 @@ const DashEmbed = () => {
                   sx={{ display: 'flex', alignItems: 'flex-start' }}
                 />
               )}
-              
+
+              <CustomTooltip title="Institutional Performance" placement="right">
+                <Tab 
+                  icon={<TrackChangesIcon sx={{ fontSize: 60, color: "white", padding: "0.9rem" }}/>}
+                  label={expanded ? "Institutional Performance" : ""}
+                  sx={tabSettings}
+                />
+              </CustomTooltip>
               {user?.role !== "05" && (
                 <CustomTooltip title="User Engagement" placement="right">
                   <Tab 
@@ -221,13 +239,6 @@ const DashEmbed = () => {
                   />
                 </CustomTooltip>
               )}
-              <CustomTooltip title="Institutional Performance" placement="right">
-                <Tab 
-                  icon={<TrackChangesIcon sx={{ fontSize: 60, color: "white", padding: "0.9rem" }}/>}
-                  label={expanded ? "Institutional Performance" : ""}
-                  sx={tabSettings}
-                />
-              </CustomTooltip>
               {user?.role !== "05" && (
                 <CustomTooltip title="SDG Impact" placement="right">
                   <Tab 
