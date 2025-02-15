@@ -358,6 +358,57 @@ const Backup = () => {
     }
   };
 
+  const handleCreateAndDownloadBackup = async () => {
+    try {
+      setLoading(true);
+      // Create full backup
+      const response = await axios.post("/backup/create/FULL");
+
+      // Set success message but don't show it yet
+      setSuccessMessage(response.data.message);
+
+      // Get the latest backup ID for download
+      const latestBackup = await axios.get("/backup/list");
+      const fullBackup = latestBackup.data.backups.find(
+        (b) => b.backup_type === "FULL"
+      );
+
+      if (fullBackup) {
+        // Download the backup
+        const downloadResponse = await axios.get(
+          `/backup/download/${fullBackup.backup_id}`,
+          {
+            responseType: "blob",
+          }
+        );
+        const url = window.URL.createObjectURL(
+          new Blob([downloadResponse.data])
+        );
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", `${fullBackup.backup_id}.tar.gz`);
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+
+        // Show success dialog after download completes
+        setOpenSuccessDialog(true);
+      }
+
+      // Show upload dialog after download
+      setOpenUploadWarningDialog(false);
+      setOpenUploadDialog(true);
+      await fetchBackups();
+    } catch (error) {
+      setErrorMessage(
+        error.response?.data?.error || "Error creating backup: " + error.message
+      );
+      setOpenErrorDialog(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Box
       sx={{
@@ -840,51 +891,7 @@ const Backup = () => {
           </Button>
           <Button
             color='primary'
-            onClick={async () => {
-              try {
-                setLoading(true);
-                // Create full backup
-                const response = await axios.post("/backup/create/FULL");
-                showMessage(response.data.message);
-                await fetchBackups();
-
-                // Get the latest backup ID for download
-                const latestBackup = await axios.get("/backup/list");
-                const fullBackup = latestBackup.data.backups.find(
-                  (b) => b.backup_type === "FULL"
-                );
-
-                if (fullBackup) {
-                  // Download the backup
-                  const downloadResponse = await axios.get(
-                    `/backup/download/${fullBackup.backup_id}`,
-                    {
-                      responseType: "blob",
-                    }
-                  );
-                  const url = window.URL.createObjectURL(
-                    new Blob([downloadResponse.data])
-                  );
-                  const link = document.createElement("a");
-                  link.href = url;
-                  link.setAttribute(
-                    "download",
-                    `${fullBackup.backup_id}.tar.gz`
-                  );
-                  document.body.appendChild(link);
-                  link.click();
-                  link.remove();
-                }
-
-                // Show upload dialog after download
-                setOpenUploadWarningDialog(false);
-                setOpenUploadDialog(true);
-              } catch (error) {
-                showMessage("Error creating backup: " + error.message, "error");
-              } finally {
-                setLoading(false);
-              }
-            }}
+            onClick={handleCreateAndDownloadBackup}
             sx={{
               fontFamily: "Montserrat, sans-serif",
               textTransform: "none",
@@ -972,8 +979,10 @@ const Backup = () => {
         maxWidth='sm'
         fullWidth
       >
-        <DialogTitle sx={{ fontFamily: "Montserrat, sans-serif" }}>
-          Backup Created Successfully
+        <DialogTitle
+          sx={{ fontFamily: "Montserrat, sans-serif", color: "success.main" }}
+        >
+          Success
         </DialogTitle>
         <DialogContent>
           <DialogContentText sx={{ fontFamily: "Montserrat, sans-serif" }}>
