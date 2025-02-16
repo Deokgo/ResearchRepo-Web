@@ -93,56 +93,42 @@ const Collection = () => {
 
   const handleResearchItemClick = async (item) => {
     try {
-      const currentTime = Date.now(); // Get the current timestamp
-      const lastViewedTimeKey = `lastViewedTime_${item.research_id}`;
-      const lastViewedTime = parseInt(
-        localStorage.getItem(lastViewedTimeKey),
-        10
-      );
-      const userId = localStorage.getItem("user_id");
+        const currentTime = Date.now();
+        const lastViewedTimeKey = `lastViewedTime_${item.research_id}`;
+        const lastViewedTime = parseInt(localStorage.getItem(lastViewedTimeKey), 10);
+        const userId = localStorage.getItem("user_id");
 
-      // Determine if increment is needed
-      const isIncrement =
-        !lastViewedTime || currentTime - lastViewedTime > 30000;
+        // Navigate to the research details page immediately
+        navigate(`/displayresearchinfo/${item.research_id}`, {
+            state: { id: item.research_id },
+        });
 
-      // Update the view count in the backend
-      const response = await axios.put(
-        `/paper/increment_views/${item.research_id}?is_increment=${isIncrement}`,
-        {
-          user_id: userId,
+        // Check if 30 seconds have passed since last increment
+        if (!lastViewedTime || currentTime - lastViewedTime > 30000) {
+            // Delay incrementing the view count
+            setTimeout(async () => {
+                try {
+                    const response = await axios.put(
+                        `/paper/increment_views/${item.research_id}?is_increment=true`,
+                        { user_id: userId }
+                    );
+
+                    // Save the new timestamp to localStorage
+                    localStorage.setItem(lastViewedTimeKey, Date.now());
+                } catch (error) {
+                    console.error("Error incrementing view count:", error);
+                }
+            }, 30000); // Wait 30 seconds before incrementing
         }
-      );
-
-      // Update the item with new data
-      const updatedItem = {
-        ...item,
-        view_count: response.data.updated_views,
-        download_count: response.data.download_count,
-      };
-
-      // Navigate to the research details page
-      navigate(`/displayresearchinfo/${updatedItem.research_id}`, {
-        state: { id: updatedItem.research_id },
-      });
-
-      // Save the current timestamp to localStorage if incremented
-      if (isIncrement) {
-        localStorage.setItem(lastViewedTimeKey, currentTime);
-      }
     } catch (error) {
-      console.error("Error handling research item click:", {
-        message: error.message,
-        response: error.response?.data,
-        status: error.response?.status,
-        item: item,
-      });
-
-      // Fall back to the original item if an error occurs
-      navigate(`/displayresearchinfo/${item.research_id}`, {
-        state: { id: item.research_id },
-      });
+        console.error("Error handling research item click:", {
+            message: error.message,
+            response: error.response?.data,
+            status: error.response?.status,
+            item: item,
+        });
     }
-  };
+};
 
   const handleCloseModal = () => {
     setSelectedResearchItem(null);
