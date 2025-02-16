@@ -240,8 +240,6 @@ const ManageCollege = () => {
     <>
       <Box
         sx={{
-          margin: 0,
-          padding: 0,
           height: "100vh",
           display: "flex",
           flexDirection: "column",
@@ -270,17 +268,19 @@ const ManageCollege = () => {
           {/*Main Content */}
           <Box
             sx={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
+              flex: 1,
+              padding: 3,
+              overflow: "hidden",
+              ml: 17.5,
+              mr: 17.5,
+              mb: 5
             }}
           >
             {/* Search Bar */}
             <Box
               sx={{
-                width: "80%", // Center search bar and button
+                width: "100%", // Center search bar and button
                 display: "flex",
-                paddingTop: 3,
                 paddingBottom: 2,
                 justifyContent: "space-between",
                 alignItems: "center",
@@ -319,7 +319,7 @@ const ManageCollege = () => {
                   textTransform: "none",
                   fontSize: { xs: "0.875rem", md: "1rem" },
                   padding: { xs: "0.5rem 1rem", md: "1.25rem" },
-                  marginLeft: "2rem",
+                  marginLeft: "1rem",
                   borderRadius: "100px",
                   maxHeight: "3rem",
                   "&:hover": {
@@ -336,13 +336,13 @@ const ManageCollege = () => {
             {/* Virtuoso Table */}
             <Box
               sx={{
-                lex: 1,
+                flex: 1,
                 backgroundColor: "#F7F9FC",
                 borderRadius: 1,
                 overflow: "hidden",
+                height: "90%",
                 display: "flex",
                 flexDirection: "column",
-                width: "80%",
               }}
             >
               {loading ? (
@@ -350,7 +350,6 @@ const ManageCollege = () => {
               ) : (
                 <Box sx={{ flex: 1, overflow: "hidden" }}>
                   <Virtuoso
-                    style={{ height: "400px" }}
                     totalCount={filteredCollege.length}
                     components={{
                       Header: () => (
@@ -373,7 +372,7 @@ const ManageCollege = () => {
                           }}
                         >
                           <Box sx={{ flex: 1 }}>College ID</Box>
-                          <Box sx={{ flex: 3 }}>Name</Box>
+                          <Box sx={{ flex: 2 }}>Name</Box>
                           <Box sx={{ flex: 2 }}>Color Code</Box>
                         </Box>
                       ),
@@ -395,7 +394,7 @@ const ManageCollege = () => {
                           }}
                         >
                           <Box sx={{ flex: 1 }}>{college.college_id}</Box>
-                          <Box sx={{ flex: 3 }}>{college.college_name}</Box>
+                          <Box sx={{ flex: 2 }}>{college.college_name}</Box>
                           <Box sx={{ flex: 2, ml: "3rem" }}>
                             <CircleIcon style={{ color: college.color_code }} />
                           </Box>

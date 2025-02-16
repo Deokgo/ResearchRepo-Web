@@ -67,14 +67,9 @@ const DashEmbed = () => {
             setSelectedUrl(urls[0]); // Default to first URL
           } else {
             if (selectedTab === 0) { return; }
-            if (selectedTab === 2) { 
-              console.log(selectedTab-2);
-              setSelectedUrl(urls[selectedTab-2]); 
-              return; 
-            }
             if (selectedTab === 3) { 
-              console.log(selectedTab-1);
-              setSelectedUrl(urls[selectedTab-1]); 
+              console.log(selectedTab-3);
+              setSelectedUrl(urls[selectedTab-3]); 
               return; 
             }
             setSelectedUrl(urls[selectedTab]); // Default to first URL
@@ -231,19 +226,19 @@ const DashEmbed = () => {
                 />
               </CustomTooltip>
               {user?.role !== "05" && (
-                <CustomTooltip title="User Engagement" placement="right">
+                <CustomTooltip title="SDG Impact" placement="right">
                   <Tab 
-                    icon={<SupervisedUserCircleIcon sx={{ fontSize: 60, color: "white", padding: "0.9rem" }}/>}
-                    label={expanded ? "User Engagement" : ""}
+                    icon={<FlagIcon sx={{ fontSize: 60, color: "white", padding: "0.9rem" }}/>}
+                    label={expanded ? "SDG Impact" : ""}
                     sx={tabSettings}
                   />
                 </CustomTooltip>
               )}
               {user?.role !== "05" && (
-                <CustomTooltip title="SDG Impact" placement="right">
+                <CustomTooltip title="User Engagement" placement="right">
                   <Tab 
-                    icon={<FlagIcon sx={{ fontSize: 60, color: "white", padding: "0.9rem" }}/>}
-                    label={expanded ? "SDG Impact" : ""}
+                    icon={<SupervisedUserCircleIcon sx={{ fontSize: 60, color: "white", padding: "0.9rem" }}/>}
+                    label={expanded ? "User Engagement" : ""}
                     sx={tabSettings}
                   />
                 </CustomTooltip>

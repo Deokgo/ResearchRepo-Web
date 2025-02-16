@@ -287,6 +287,9 @@ const ManageProgram = () => {
               padding: 3,
               overflow: "hidden",
               height: "calc(100% - 48px)",
+              ml: 17.5,
+              mr: 17.5,
+              mb: 5
             }}
           >
             <Grid2
@@ -298,11 +301,11 @@ const ManageProgram = () => {
               }}
             >
               {/* Filters Section */}
-              <Grid2 size={3}>
+              <Grid2 size={4}>
                 <Box
                   sx={{
                     border: "1px solid #0A438F",
-                    height: "90%",
+                    height: "80%",
                     borderRadius: 3,
                     padding: 3,
                     overflowY: "hidden",
@@ -371,7 +374,7 @@ const ManageProgram = () => {
                   </Box>
                 </Box>
               </Grid2>
-              <Grid2 size={9}>
+              <Grid2 size={8}>
                 {/* Search Bar */}
                 <Box
                   sx={{
@@ -427,7 +430,7 @@ const ManageProgram = () => {
                           textTransform: "none",
                           fontSize: { xs: "0.875rem", md: "1rem" },
                           padding: { xs: "0.5rem 1rem", md: "1.25rem" },
-                          marginLeft: "2rem",
+                          marginLeft: "1rem",
                           borderRadius: "100px",
                           maxHeight: "3rem",
                           "&:hover": {
@@ -448,6 +451,7 @@ const ManageProgram = () => {
                         backgroundColor: "#F7F9FC",
                         borderRadius: 1,
                         overflow: "hidden",
+                        height: "90%",
                         display: "flex",
                         flexDirection: "column",
                       }}
@@ -457,7 +461,6 @@ const ManageProgram = () => {
                       ) : (
                         <Box sx={{ flex: 1, overflow: "hidden" }}>
                           <Virtuoso
-                            style={{ height: "400px" }}
                             totalCount={filteredProgram.length}
                             components={{
                               Header: () => (

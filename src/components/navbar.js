@@ -253,7 +253,7 @@ const Navbar = () => {
         { label: "Manage Colleges", onClick: handleManageCollege },
         { label: "Manage Programs", onClick: handleManageProgram },
         { label: "View Audit Logs", onClick: handleViewAuditLog },
-        { label: "Backup", onClick: handleBackup },
+        { label: "Backup and Restore", onClick: handleBackup },
       ],
       "02": [
         // Director
@@ -305,7 +305,7 @@ const Navbar = () => {
       "Manage Colleges": "/managecollege",
       "Manage Programs": "/manageprogram",
       "View Audit Logs": "/auditlog",
-      Backup: "/backup",
+      "Backup and Restore": "/backup",
       "Research Tracking": "/researchtracking",
       "Knowledge Graph": "/knowledgegraph",
       Home: "/home",
