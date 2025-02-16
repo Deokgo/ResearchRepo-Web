@@ -443,7 +443,6 @@ const ManageCollege = () => {
                   value={collegeAbbrv}
                   fullWidth
                   onChange={(e) => setCollegeAbbrv(e.target.value)}
-                  margin='normal'
                   sx={createTextFieldStyles()}
                   InputLabelProps={createInputLabelProps()}
                 />
@@ -558,24 +557,24 @@ const ManageCollege = () => {
                         Unsaved Progress
                     </DialogTitle>
                     <DialogContent>
-                        <Typography
+                      <Typography
                         sx={{
-                            fontFamily: "Montserrat, sans-serif",
-                            color: "#666",
+                          fontFamily: "Montserrat, sans-serif",
+                          color: "#666",
                         }}
                         >
                         You have unsaved progress. Do you want to save your progress?
-                        </Typography>
+                      </Typography>
                     </DialogContent>
                     <DialogActions sx={{ padding: "1rem" }}>
                         <Button
-                        onClick={() => {
-                            setIsConfirmDialogOpen(false);
-                            handlePostModal(); // Set flag to clear fields
-                            setAddModal(false);
-                        }}
-                        sx={{
-                            backgroundColor: "#CA031B",
+                          onClick={() => {
+                              setIsConfirmDialogOpen(false);
+                              handlePostModal(); // Set flag to clear fields
+                              setAddModal(false);
+                          }}
+                          sx={{
+                            backgroundColor: "#08397C",
                             color: "#FFF",
                             fontFamily: "Montserrat, sans-serif",
                             fontWeight: 600,
@@ -586,16 +585,16 @@ const ManageCollege = () => {
                             backgroundColor: "#072d61",
                             },
                         }}
-                        >
-                        Discard
-                        </Button>
-                        <Button
-                        onClick={() => {
-                            setIsConfirmDialogOpen(false);
-                            setAddModal(false);
-                        }}
-                        sx={{
-                            backgroundColor: "#08397C",
+                          >
+                          Discard
+                          </Button>
+                          <Button
+                          onClick={() => {
+                              setIsConfirmDialogOpen(false);
+                              setAddModal(false);
+                          }}
+                          sx={{
+                            backgroundColor: "#CA031B",
                             color: "#FFF",
                             fontFamily: "Montserrat, sans-serif",
                             fontWeight: 600,
@@ -603,12 +602,12 @@ const ManageCollege = () => {
                             borderRadius: "100px",
                             padding: "0.75rem",
                             "&:hover": {
-                            backgroundColor: "#A30417",
-                            },
-                        }}
-                        >
-                        Save Progress
-                        </Button>
+                              backgroundColor: "#A30417",
+                              },
+                          }}
+                          >
+                          Save Progress
+                          </Button>
                     </DialogActions>
                     </Dialog>
 
@@ -629,7 +628,7 @@ const ManageCollege = () => {
                           sx={{
                           fontFamily: "Montserrat, sans-serif",
                           fontWeight: 600,
-                          color: "#08397C",
+                          color: "#008000",
                           display: "flex",
                           alignItems: "center",
                           gap: 1,
