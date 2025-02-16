@@ -43,6 +43,10 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import ErrorIcon from "@mui/icons-material/Error";
 import HeaderWithBackButton from "../components/Header";
+import ArchiveIcon from '@mui/icons-material/Archive';
+import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import WarningIcon from '@mui/icons-material/Warning';
 
 const ManageUsers = () => {
   const [users, setUsers] = useState([]);
@@ -383,34 +387,6 @@ const ManageUsers = () => {
     event.target.value = "";
   };
 
-  const handleRoleChange = (userId, newRole) => {
-    setParsedUsers((users) =>
-      users.map((user) =>
-        user.id === userId ? { ...user, roleId: newRole } : user
-      )
-    );
-  };
-
-  const handleProgramChange = (userId, newProgram) => {
-    setParsedUsers((users) =>
-      users.map((user) =>
-        user.id === userId ? { ...user, programId: newProgram } : user
-      )
-    );
-  };
-
-  const fetchProgramsForCollege = async (collegeId) => {
-    try {
-      const response = await axios.get(`/deptprogs/programs/${collegeId}`);
-      setProgramsByCollege((prev) => ({
-        ...prev,
-        [collegeId]: response.data.programs,
-      }));
-    } catch (error) {
-      console.error("Error fetching programs:", error);
-    }
-  };
-
   // Add this function to handle form submission
   const handleAddUsers = async () => {
     try {
@@ -726,9 +702,9 @@ const ManageUsers = () => {
               />
               <Box>
                 <Button
+                  onClick={handleOpenAddModal}
                   variant='contained'
                   color='primary'
-                  onClick={handleOpenAddModal}
                   sx={{
                     backgroundColor: "#CA031B",
                     color: "#FFF",
@@ -750,16 +726,26 @@ const ManageUsers = () => {
                 </Button>
                 <Button
                   onClick={() => setOpenArchiveModal(true)}
+                  variant='contained'
+                  color='primary'
                   sx={{
                     backgroundColor: "#08397C",
                     color: "#FFF",
+                    fontFamily: "Montserrat, sans-serif",
+                    fontWeight: 600,
+                    textTransform: "none",
+                    fontSize: { xs: "0.875rem", md: "1rem" },
+                    padding: { xs: "0.5rem 1rem", md: "1.25rem" },
                     marginLeft: "1rem",
+                    borderRadius: "100px",
+                    maxHeight: "3rem",
                     "&:hover": {
-                      backgroundColor: "#08397C",
+                      backgroundColor: "#072d61",
+                      color: "#FFF",
                     },
                   }}
                 >
-                  Archive Accounts
+                  <ArchiveIcon></ArchiveIcon>&nbsp;Archive Accounts
                 </Button>
               </Box>
             </Box>
@@ -1467,21 +1453,25 @@ const ManageUsers = () => {
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
-            width: 400,
+            width: "40rem",
             bgcolor: "background.paper",
             boxShadow: 24,
-            p: 4,
+            p: 5,
             borderRadius: "8px",
           }}
         >
           <Typography
-            variant='h6'
-            component='h2'
-            mb={3}
+            variant='h3'
+            color='#08397C'
+            fontWeight='1000'
+            mb={4}
             sx={{
-              fontFamily: "Montserrat, sans-serif",
-              fontWeight: 600,
-              color: "#08397C",
+              textAlign: { xs: "left", md: "bottom" },
+              fontSize: {
+                xs: "clamp(1rem, 2vw, 1rem)",
+                sm: "clamp(1.5rem, 3.5vw, 1.5rem)",
+                md: "clamp(2rem, 4vw, 2.25rem)",
+              },
             }}
           >
             Archive Accounts
@@ -1515,33 +1505,47 @@ const ManageUsers = () => {
             </Select>
           </FormControl>
 
-          <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2 }}>
+          <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
             <Button
+              variant='contained'
+              color='primary'
               onClick={() => setOpenArchiveModal(false)}
+              sx={{
+                backgroundColor: "#08397C",
+                color: "#FFF",
+                fontFamily: "Montserrat, sans-serif",
+                fontWeight: 600,
+                fontSize: { xs: "0.875rem", md: "1rem" },
+                padding: { xs: "0.5rem 1rem", md: "1.25rem" },
+                borderRadius: "100px",
+                maxHeight: "3rem",
+                textTransform: "none",
+                "&:hover": {
+                  backgroundColor: "#072d61",
+                },
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant='contained'
+              color='primary'
+              onClick={() => setOpenArchiveConfirmDialog(true)}
               sx={{
                 backgroundColor: "#CA031B",
                 color: "#FFF",
                 fontFamily: "Montserrat, sans-serif",
                 fontWeight: 600,
                 textTransform: "none",
+                fontSize: { xs: "0.875rem", md: "1rem" },
+                padding: { xs: "0.5rem 1rem", md: "1.25rem" },
+                marginLeft: "1rem",
                 borderRadius: "100px",
-                padding: "0.75rem",
-                "&:hover": { backgroundColor: "#A30417" },
-              }}
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={() => setOpenArchiveConfirmDialog(true)}
-              sx={{
-                backgroundColor: "#08397C",
-                color: "#FFF",
-                fontFamily: "Montserrat, sans-serif",
-                fontWeight: 600,
-                textTransform: "none",
-                borderRadius: "100px",
-                padding: "0.75rem",
-                "&:hover": { backgroundColor: "#072d61" },
+                maxHeight: "3rem",
+                "&:hover": {
+                  backgroundColor: "#A30417",
+                  color: "#FFF",
+                },
               }}
             >
               Archive
@@ -1554,11 +1558,37 @@ const ManageUsers = () => {
       <Dialog
         open={openArchiveConfirmDialog}
         onClose={() => setOpenArchiveConfirmDialog(false)}
-        maxWidth='sm'
-        fullWidth
+        PaperProps={{
+          sx: {
+          borderRadius: "15px",
+          padding: "1rem",
+          },
+        }}
       >
-        <DialogTitle sx={{ fontFamily: "Montserrat, sans-serif" }}>
-          Confirm Archive Operation
+        <DialogTitle 
+          sx={{
+            fontFamily: "Montserrat, sans-serif",
+            fontWeight: 600,
+            color: "#FF6700",
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+          }}
+        >
+          <Box
+            component='span'
+            sx={{
+              backgroundColor: "#FFEAEA",
+              borderRadius: "50%",
+              padding: "8px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <WarningIcon/>
+          </Box>
+          &nbsp;Warning
         </DialogTitle>
         <DialogContent>
           <DialogContentText sx={{ fontFamily: "Montserrat, sans-serif" }}>
@@ -1569,7 +1599,7 @@ const ManageUsers = () => {
               ? "inactive"
               : "deactivated"}{" "}
             accounts that have been in that state for {archiveDays} days.
-            <Box sx={{ mt: 2, color: "warning.main" }}>
+            <Box sx={{ mt: 2, color: "warning.main", fontSize:'0.8rem' }}>
               Note: Archived accounts will be removed from the active database
               but can be restored later using the generated SQL file.
             </Box>
@@ -1577,11 +1607,20 @@ const ManageUsers = () => {
         </DialogContent>
         <DialogActions>
           <Button
+            variant='text'
             onClick={() => setOpenArchiveConfirmDialog(false)}
             sx={{
+              backgroundColor: "#08397C",
+              color: "#FFF",
               fontFamily: "Montserrat, sans-serif",
+              fontWeight: 600,
               textTransform: "none",
-            }}
+              borderRadius: "100px",
+              padding: "0.75rem",
+              "&:hover": {
+              backgroundColor: "#072d61",
+              },
+          }}
           >
             Cancel
           </Button>
@@ -1590,9 +1629,16 @@ const ManageUsers = () => {
             variant='contained'
             color='primary'
             sx={{
+              backgroundColor: "#CA031B",
+              color: "#FFF",
               fontFamily: "Montserrat, sans-serif",
-              textTransform: "none",
               fontWeight: 600,
+              textTransform: "none",
+              borderRadius: "100px",
+              padding: "0.75rem",
+              "&:hover": {
+              backgroundColor: "#A30417",
+              },
             }}
           >
             Proceed with Archive
@@ -1601,7 +1647,13 @@ const ManageUsers = () => {
       </Dialog>
 
       {/* Archive Progress Dialog */}
-      <Dialog open={archiveInProgress} fullWidth maxWidth='sm'>
+      <Dialog open={archiveInProgress}
+        PaperProps={{
+          sx: {
+            borderRadius: "15px",
+            padding: "1rem",
+            },
+        }}>
         <DialogContent>
           <Box
             sx={{
@@ -1623,11 +1675,37 @@ const ManageUsers = () => {
       <Dialog
         open={openSuccessDialog}
         onClose={() => setOpenSuccessDialog(false)}
-        maxWidth='sm'
-        fullWidth
+        PaperProps={{
+          sx: {
+          borderRadius: "15px",
+          padding: "1rem",
+          },
+      }}
       >
-        <DialogTitle sx={{ fontFamily: "Montserrat, sans-serif" }}>
-          Archive Operation Successful
+        <DialogTitle 
+          sx={{
+            fontFamily: "Montserrat, sans-serif",
+            fontWeight: 600,
+            color: "#008000",
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+            }}
+        >
+          <Box
+            component='span'
+            sx={{
+                backgroundColor: "#E8F5E9",
+                borderRadius: "75%",
+                padding: "10px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+            }}
+            >
+            <CheckCircleIcon/>
+          </Box>
+          &nbsp;Archive Operation Successful
         </DialogTitle>
         <DialogContent>
           <DialogContentText sx={{ fontFamily: "Montserrat, sans-serif" }}>
@@ -1638,10 +1716,17 @@ const ManageUsers = () => {
           <Button
             onClick={() => setOpenSuccessDialog(false)}
             sx={{
+              backgroundColor: "#08397C",
+              color: "#FFF",
               fontFamily: "Montserrat, sans-serif",
-              textTransform: "none",
               fontWeight: 600,
-            }}
+              textTransform: "none",
+              borderRadius: "100px",
+              padding: "0.75rem",
+              "&:hover": {
+              backgroundColor: "#072d61",
+              },
+          }}
           >
             Close
           </Button>
@@ -1652,16 +1737,37 @@ const ManageUsers = () => {
       <Dialog
         open={openErrorDialog}
         onClose={() => setOpenErrorDialog(false)}
-        maxWidth='sm'
-        fullWidth
+        PaperProps={{
+          sx: {
+          borderRadius: "15px",
+          padding: "1rem",
+          },
+      }}
       >
         <DialogTitle
           sx={{
             fontFamily: "Montserrat, sans-serif",
-            color: "error.main",
+            fontWeight: 600,
+            color: "#CA031B",
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
           }}
         >
-          Error
+          <Box
+            component='span'
+            sx={{
+              backgroundColor: "#E8F5E9",
+              borderRadius: "50%",
+              padding: "8px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <ErrorIcon/>
+          </Box>
+          &nbsp;Error
         </DialogTitle>
         <DialogContent>
           <DialogContentText
@@ -1677,10 +1783,17 @@ const ManageUsers = () => {
           <Button
             onClick={() => setOpenErrorDialog(false)}
             sx={{
+              backgroundColor: "#08397C",
+              color: "#FFF",
               fontFamily: "Montserrat, sans-serif",
-              textTransform: "none",
               fontWeight: 600,
-            }}
+              textTransform: "none",
+              borderRadius: "100px",
+              padding: "0.75rem",
+              "&:hover": {
+              backgroundColor: "#072d61",
+              },
+          }}
           >
             Close
           </Button>
@@ -1691,16 +1804,37 @@ const ManageUsers = () => {
       <Dialog
         open={openWarningDialog}
         onClose={() => setOpenWarningDialog(false)}
-        maxWidth='sm'
-        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: "15px",
+            padding: "1rem",
+            },
+        }}
       >
         <DialogTitle
           sx={{
             fontFamily: "Montserrat, sans-serif",
-            color: "warning.main",
+            fontWeight: 600,
+            color: "#FF6700",
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
           }}
         >
-          Warning
+          <Box
+            component='span'
+            sx={{
+              backgroundColor: "#FFEAEA",
+              borderRadius: "50%",
+              padding: "8px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <WarningIcon/>
+          </Box>
+          &nbsp;Warning
         </DialogTitle>
         <DialogContent>
           <DialogContentText
@@ -1730,24 +1864,64 @@ const ManageUsers = () => {
       <Dialog
         open={openConfirmDialog}
         onClose={() => setOpenConfirmDialog(false)}
-        maxWidth='sm'
-        fullWidth
+        PaperProps={{
+          sx: {
+          borderRadius: "15px",
+          padding: "1rem",
+          },
+      }}
       >
-        <DialogTitle sx={{ fontFamily: "Montserrat, sans-serif" }}>
-          {confirmTitle}
+        <DialogTitle
+          sx={{
+            fontFamily: "Montserrat, sans-serif",
+            fontWeight: 600,
+            color: "#08397C",
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+            }}
+        >
+          <Box
+            component='span'
+            sx={{
+                backgroundColor: "#E8F5E9",
+                borderRadius: "75%",
+                padding: "10px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+            }}
+            >
+            <PriorityHighIcon/>
+          </Box>
+            &nbsp;Confirm Action
         </DialogTitle>
         <DialogContent>
-          <DialogContentText sx={{ fontFamily: "Montserrat, sans-serif" }}>
-            {confirmMessage}
-          </DialogContentText>
+          <Typography
+            sx={{
+                fontFamily: "Montserrat, sans-serif",
+                color: "#666",
+                mt: 1,
+            }}
+            >
+            Do you want to activate/deactivate this user?
+          </Typography>
         </DialogContent>
-        <DialogActions>
+        <DialogActions sx={{ padding: "1rem" }}>
           <Button
             onClick={() => setOpenConfirmDialog(false)}
             sx={{
+              backgroundColor: "#08397C",
+              color: "#FFF",
               fontFamily: "Montserrat, sans-serif",
+              fontWeight: 600,
               textTransform: "none",
-            }}
+              borderRadius: "100px",
+              padding: "0.75rem",
+              "&:hover": {
+              backgroundColor: "#072d61",
+              },
+          }}
           >
             Cancel
           </Button>
@@ -1758,9 +1932,16 @@ const ManageUsers = () => {
             }}
             variant='contained'
             sx={{
+              backgroundColor: "#CA031B",
+              color: "#FFF",
               fontFamily: "Montserrat, sans-serif",
-              textTransform: "none",
               fontWeight: 600,
+              textTransform: "none",
+              borderRadius: "100px",
+              padding: "0.75rem",
+              "&:hover": {
+              backgroundColor: "#A30417",
+              },
             }}
           >
             Confirm

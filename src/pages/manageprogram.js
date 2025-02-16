@@ -282,7 +282,6 @@ const ManageProgram = () => {
 
           {/* Main content area */}
           <Box
-            ml={5}
             sx={{
               flex: 1,
               padding: 3,
@@ -303,7 +302,7 @@ const ManageProgram = () => {
                 <Box
                   sx={{
                     border: "1px solid #0A438F",
-                    height: "auto",
+                    height: "90%",
                     borderRadius: 3,
                     padding: 3,
                     overflowY: "hidden",
@@ -313,7 +312,7 @@ const ManageProgram = () => {
                 >
                   <Typography
                     variant='h6'
-                    sx={{ mb: 3, fontWeight: "bold", color: "#F40824" }}
+                    sx={{ mb: 2, fontWeight: "bold", color: "#F40824" }}
                   >
                     Filter
                   </Typography>
@@ -330,8 +329,8 @@ const ManageProgram = () => {
                     sx={{
                       display: "flex",
                       flexDirection: "column",
-                      height: "25%",
-                      mb: 2,
+                      height: "75%",
+                      overflowY: "auto",
                       "&::-webkit-scrollbar": {
                         width: "8px",
                       },
@@ -730,7 +729,7 @@ const ManageProgram = () => {
                             borderRadius: "100px",
                             padding: "0.75rem",
                             "&:hover": {
-                            backgroundColor: "#072d61",
+                            backgroundColor: "#A30417",
                             },
                         }}
                         >
@@ -750,7 +749,7 @@ const ManageProgram = () => {
                             borderRadius: "100px",
                             padding: "0.75rem",
                             "&:hover": {
-                            backgroundColor: "#A30417",
+                            backgroundColor: "#072d61",
                             },
                         }}
                         >
@@ -776,13 +775,13 @@ const ManageProgram = () => {
                           sx={{
                           fontFamily: "Montserrat, sans-serif",
                           fontWeight: 600,
-                          color: "#08397C",
+                          color: "#008000",
                           display: "flex",
                           alignItems: "center",
                           gap: 1,
                           }}
                       >
-                          <Box
+                        <Box
                           component='span'
                           sx={{
                               backgroundColor: "#E8F5E9",
@@ -794,7 +793,7 @@ const ManageProgram = () => {
                           }}
                           >
                           <CheckCircleIcon/>
-                          </Box>
+                        </Box>
                           Success
                       </DialogTitle>
                       <DialogContent>
@@ -809,7 +808,7 @@ const ManageProgram = () => {
                           </Typography>
                       </DialogContent>
                       <DialogActions sx={{ padding: "1rem" }}>
-                          <Button
+                        <Button
                           onClick={() => {
                               setIsSuccessDialogOpen(false);
                               handlePostModal();
@@ -828,7 +827,7 @@ const ManageProgram = () => {
                           }}
                           >
                           Close
-                          </Button>
+                        </Button>
                       </DialogActions>
                   </Dialog>
                   {/* Add Duplicate Dialog */}

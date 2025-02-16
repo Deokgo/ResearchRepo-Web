@@ -130,7 +130,7 @@ const AboutUs = () => {
                   variant='body1'
                   sx={{
                     mt: 2,
-                    fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" },
+                    fontSize: { xs: "0.9rem", sm: "0.95rem", md: "1rem" },
                     color: "#001C43",
                   }}
                 >
@@ -160,18 +160,21 @@ const AboutUs = () => {
                 />
               </Grid2>
             </Grid2>
-            <Typography
-              variant='h4'
-              display='flex'
-              justifyContent='center'
-              sx={{
-                fontWeight: 600,
-                color: "#DF031D",
-                m: "3rem",
-              }}
-            >
-              Development Team
-            </Typography>
+            <Box display='flex' justifyContent='center'>
+              <Typography
+                variant='h4'
+                display='flex'
+                justifyContent='center'
+                sx={{
+                  fontWeight: 600,
+                  color: "#DF031D",
+                  m: "3rem",
+                }}
+              >
+                Development Team
+              </Typography>
+            </Box>
+            
             <Grid2 container spacing={3} display='flex' justifyContent='center'>
               {team.map((member) => (
                 <Grid2 key={member.name} xs={12} sm={6} md={4}>

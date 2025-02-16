@@ -124,7 +124,7 @@ const DisplayAuditLog = () => {
     // Filter by Roles
     if (selectedRoles.length > 0) {
       filtered = filtered.filter((log) =>
-        selectedRoles.includes(log.role_name)
+        selectedRoles.includes(log.role)
       );
     }
 

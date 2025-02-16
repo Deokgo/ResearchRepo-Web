@@ -422,7 +422,7 @@ const ResearchThrust = () => {
                               },
                             }}
                           >
-                            Learn More <InfoIcon />
+                            Learn More &nbsp;<InfoIcon />
                           </Button>
                         ) : (
                           <Box>
