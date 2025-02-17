@@ -3,6 +3,7 @@
 import MenuIcon from "@mui/icons-material/Menu";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
 import { isMobile } from "react-device-detect";
 import {
   AppBar,
@@ -16,6 +17,11 @@ import {
   Typography,
   useMediaQuery,
   useTheme,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  DialogContentText,
 } from "@mui/material";
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -36,6 +42,7 @@ const Navbar = () => {
 
   const [open, setOpen] = React.useState(false);
   const anchorRef = React.useRef < HTMLButtonElement > null;
+  const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -182,6 +189,10 @@ const Navbar = () => {
   const handleBackup = () => {
     navigate("/backup");
   };
+
+  const confirmLogout = async () => {
+    setOpenConfirmDialog(true);
+  }
 
   const handleLogout = async () => {
     try {
@@ -511,7 +522,7 @@ const Navbar = () => {
             <MenuItem
               key='Log out'
               onClick={() => {
-                handleLogout();
+                confirmLogout();
                 handleCloseNavMenu();
               }}
             >
@@ -546,11 +557,100 @@ const Navbar = () => {
             <Typography color='common.white'>Help</Typography>
           </MenuItem>
           <Divider />
-          <MenuItem onClick={handleLogout}>
+          <MenuItem onClick={confirmLogout}>
             <Typography color='common.white'>Log out</Typography>
           </MenuItem>
         </Menu>
       </Toolbar>
+
+      {/* Confirmation Dialog */}
+      <Dialog
+        open={openConfirmDialog}
+        onClose={() => setOpenConfirmDialog(false)}
+        PaperProps={{
+          sx: {
+          borderRadius: "15px",
+          padding: "1rem",
+          },
+      }}
+      >
+        <DialogTitle
+          sx={{
+            fontFamily: "Montserrat, sans-serif",
+            fontWeight: 600,
+            color: "#08397C",
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+            }}
+        >
+          <Box
+            component='span'
+            sx={{
+                backgroundColor: "#E8F5E9",
+                borderRadius: "75%",
+                padding: "10px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+            }}
+            >
+            <PriorityHighIcon/>
+          </Box>
+            &nbsp;Confirm Logout
+        </DialogTitle>
+        <DialogContent>
+          <Typography
+            sx={{
+                fontFamily: "Montserrat, sans-serif",
+                color: "#666",
+                mt: 1,
+            }}
+            >
+            Are you sure you want to log out?
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ padding: "1rem" }}>
+          <Button
+            onClick={() => setOpenConfirmDialog(false)}
+            sx={{
+              backgroundColor: "#08397C",
+              color: "#FFF",
+              fontFamily: "Montserrat, sans-serif",
+              fontWeight: 600,
+              textTransform: "none",
+              borderRadius: "100px",
+              padding: "0.75rem",
+              "&:hover": {
+              backgroundColor: "#072d61",
+              },
+          }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={() => {
+              setOpenConfirmDialog(false);
+              handleLogout();
+            }}
+            variant='contained'
+            sx={{
+              backgroundColor: "#CA031B",
+              color: "#FFF",
+              fontFamily: "Montserrat, sans-serif",
+              fontWeight: 600,
+              textTransform: "none",
+              borderRadius: "100px",
+              padding: "0.75rem",
+              "&:hover": {
+              backgroundColor: "#A30417",
+              },
+            }}
+          >
+            Log Out
+          </Button>
+        </DialogActions>
+      </Dialog>
       <LoginModal />
     </AppBar>
   );

@@ -8,6 +8,7 @@ import TrackChangesIcon from '@mui/icons-material/TrackChanges';
 import FlagIcon from '@mui/icons-material/Flag';
 import SupervisedUserCircleIcon from '@mui/icons-material/SupervisedUserCircle';
 import { useAuth } from "../context/AuthContext";
+import newBG from "../assets/vertical_bar_bg.jpg";
 
 const DashEmbed = () => {
   const { user } = useAuth();
@@ -168,27 +169,30 @@ const DashEmbed = () => {
               scrollButtons={false}
               orientation="vertical"
               value={selectedTab}
-              onChange={handleTabChange}  // <-- Updated here
+              onChange={handleTabChange}
               sx={{ 
                 borderRight: 1, 
                 borderColor: "divider", 
-                width: expanded ? 350 : 90.5, // Expand width
-                transition: "width 0.1s ease-in-out", // Smooth animation
-                backgroundColor: "#08397C", 
+                width: expanded ? 350 : 90.5, 
+                transition: "width 0.1s ease-in-out", 
+                backgroundColor: "#08397C", // Base background color
+                backgroundImage: `linear-gradient(rgba(8, 57, 124, 0.65), rgba(8, 57, 124, 0.65)), url(${newBG})`,  
+                backgroundSize: "cover",  
+                backgroundRepeat: "no-repeat",  
+                backgroundPosition: "center",  
                 "& .MuiTab-root": { 
-                  color: "lightgrey", 
+                  color: "white", 
                   minHeight: 60 ,
-                  justifyContent: expanded ? "flex-start" : "center", // Align left when expanded
+                  justifyContent: expanded ? "flex-start" : "center", 
                   "&:hover": { 
-                    backgroundColor: "#0A4DA2", // Change background on hover
-                    color: "white", // Change text color on hover
+                    backgroundColor: "rgba(10, 77, 162, 0.8)", 
+                    color: "white",
                   }
-                }, // Default text color
+                }, 
                 "& .Mui-selected": { 
-                  color: "white !important",  // Force white text
+                  color: "white !important",
                   fontWeight: "bold",
-                  backgroundColor: "#0C5ACF", // Background for selected tab
-                  opacity: 1, // Ensure full opacity
+                  backgroundColor: "rgba(12, 90, 207, 0.8)",
                 },
               }}
             >

@@ -2,6 +2,7 @@ import React from "react";
 import { Box, IconButton, Typography } from "@mui/material";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import homeBg from "../assets/home_bg.png";
+import newBG from "../assets/new_header_bg.png";
 
 const HeaderWithBackButton = ({ title, onBack, backgroundImage }) => {
   return (
@@ -28,7 +29,7 @@ const HeaderWithBackButton = ({ title, onBack, backgroundImage }) => {
         },
       }}
     >
-      {homeBg && (
+      {newBG && (
         <Box
           sx={{
             position: "absolute",
@@ -36,7 +37,7 @@ const HeaderWithBackButton = ({ title, onBack, backgroundImage }) => {
             left: 0,
             right: 0,
             bottom: 0,
-            backgroundImage: `url(${homeBg})`,
+            backgroundImage: `url(${newBG})`,
             backgroundSize: "cover",
             opacity: 0.25,
             zIndex: 1,
