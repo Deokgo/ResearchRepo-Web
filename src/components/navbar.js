@@ -4,6 +4,8 @@ import MenuIcon from "@mui/icons-material/Menu";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
+import LogoutIcon from '@mui/icons-material/Logout';
+import LoginIcon from '@mui/icons-material/Login';
 import { isMobile } from "react-device-detect";
 import {
   AppBar,
@@ -21,7 +23,7 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  DialogContentText,
+  ListItemIcon,
 } from "@mui/material";
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -226,36 +228,58 @@ const Navbar = () => {
     }
   };
 
-  const mobileMenuItems = user
-    ? [
-        //{ label: "Home", onClick: handleNavigateHome },
-        { label: "Collections", onClick: handleCollection },
-        { label: "Knowledge Graph", onClick: handleKnowledgeGraph },
-        { label: "Research Thrusts", onClick: handleResearchThrust },
-        { label: "Profile", onClick: handleProfile },
-        { label: "About Us", onClick: handleAboutUs },
-        { label: "Help", onClick: handleHelp },
-      ]
-    : [
-        { label: "Home", onClick: handleNavigateHome },
-        { label: "Log in", onClick: handleLogin },
-      ];
+  // Helper function to get path from label
+  const getPathFromLabel = (label) => {
+    const pathMap = {
+      Collections: "/collection",
+      "Research Thrusts": "/researchthrust",
+      Dashboard: "/dash",
+      "Manage Users": "/manage-users",
+      "Manage Colleges": "/managecollege",
+      "Manage Programs": "/manageprogram",
+      "View Audit Logs": "/auditlog",
+      "Backup and Restore": "/backup",
+      "Research Tracking": "/researchtracking",
+      "Knowledge Graph": "/knowledgegraph",
+      Home: "/home",
+      "Institutional Performance Dashboard": "/progdash",
+      "About Us": "/aboutus",
+      Help: "/help",
+    };
+    return pathMap[label] || "/";
+  };
 
   // Define which menu items are available for each role
-  const getNavbarItems = () => {
-    if (!user) return [];
+  const getNavbarItems = (forMobile = false) => {
+    if (!user) return forMobile ? [
+      { label: "Home", onClick: handleNavigateHome },
+      { label: "Log in", onClick: handleLogin }
+    ] : [];
+  
+    const commonItems = [];
 
-    // Common items for all roles
-    const commonItems = [
-      { label: "Collections", onClick: handleCollection },
-      { label: "Research Thrusts", onClick: handleResearchThrust },
-    ];
-
-    if (isMobile || isSizeMobile) {
-      // On mobile, only return common items
+    if (user.role !== "01") {
+      commonItems.push(
+        { label: "Collections", onClick: handleCollection },
+        { label: "Research Thrusts", onClick: handleResearchThrust }
+      );
+    }
+    
+    // For mobile view, add these common items
+    if (forMobile) {
+      commonItems.push(
+        { label: "Profile", onClick: handleProfile },
+        { label: "About Us", onClick: handleAboutUs },
+        { label: "Help", onClick: handleHelp},
+      );
+    }
+  
+    // If mobile or size is mobile and we want mobile items
+    if ((isMobile || isSizeMobile) && !forMobile) {
+      // On mobile, only return common items for desktop view
       return commonItems;
     }
-
+  
     // Role-specific items
     const roleSpecificItems = {
       "01": [
@@ -265,6 +289,7 @@ const Navbar = () => {
         { label: "Manage Programs", onClick: handleManageProgram },
         { label: "View Audit Logs", onClick: handleViewAuditLog },
         { label: "Backup and Restore", onClick: handleBackup },
+        ...commonItems,
       ],
       "02": [
         // Director
@@ -295,35 +320,20 @@ const Navbar = () => {
       "06": [
         // Researcher
         ...commonItems,
+        { label: "About Us", onClick: handleAboutUs },
+        { label: "Help", onClick: handleHelp},
       ],
     };
 
-    return (
-      roleSpecificItems[user.role]?.map((item) => ({
-        ...item,
-        isActive: location.pathname === getPathFromLabel(item.label),
-      })) || commonItems
-    );
+    const items = roleSpecificItems[user.role]?.map((item) => ({
+      ...item,
+      isActive: location.pathname === getPathFromLabel(item.label),
+    })) || commonItems;
+  
+    return items;
   };
 
-  // Helper function to get path from label
-  const getPathFromLabel = (label) => {
-    const pathMap = {
-      Collections: "/collection",
-      "Research Thrusts": "/researchthrust",
-      Dashboard: "/dash",
-      "Manage Users": "/manage-users",
-      "Manage Colleges": "/managecollege",
-      "Manage Programs": "/manageprogram",
-      "View Audit Logs": "/auditlog",
-      "Backup and Restore": "/backup",
-      "Research Tracking": "/researchtracking",
-      "Knowledge Graph": "/knowledgegraph",
-      Home: "/home",
-      "Institutional Performance Dashboard": "/progdash"
-    };
-    return pathMap[label] || "/";
-  };
+  const mobileMenuItems = getNavbarItems(true);
 
   return (
     <AppBar
@@ -446,8 +456,16 @@ const Navbar = () => {
               <Button onClick={handleResearchThrust} sx={buttonSettings}>
                 Research Thrusts
               </Button>
-              <Button onClick={handleLogin} sx={buttonSettings}>
-                Log in
+              <Button 
+                onClick={handleLogin} 
+                sx={{
+                  ...buttonSettings, 
+                  color: "#CA031B", 
+                  fontSize: "1rem", 
+                  fontWeight: 600 
+                }}
+              >
+                <LoginIcon/>&nbsp;Log in
               </Button>
             </Box>
           ) : (
@@ -519,16 +537,23 @@ const Navbar = () => {
               </MenuItem>
             ))}
 
-            <Divider sx={{ borderColor: "#FFF" }} />
-            <MenuItem
-              key='Log out'
-              onClick={() => {
-                confirmLogout();
-                handleCloseNavMenu();
-              }}
-            >
-              <Typography textAlign='center'>Log out</Typography>
-            </MenuItem>
+            {isLoggedIn && (
+              <>
+                <Divider sx={{ borderColor: "#FFF" }} />
+                <MenuItem
+                  key='Log out'
+                  onClick={() => {
+                    confirmLogout();
+                    handleCloseNavMenu();
+                  }}
+                >
+                  <ListItemIcon>
+                      <LogoutIcon sx={{ color: "#FFF" }} />
+                  </ListItemIcon>
+                  <Typography textAlign='center' sx={{ color: "#FFF", fontWeight: 800 }}>Log out</Typography>
+                </MenuItem>
+              </>
+            )}
           </Menu>
         </Box>
 
@@ -548,19 +573,38 @@ const Navbar = () => {
           onClose={handleCloseUserMenu}
           sx={{ "& .MuiPaper-root": { backgroundColor: "#CA031B" } }}
         >
-          <MenuItem onClick={handleProfile}>
-            <Typography color='common.white'>Profile</Typography>
-          </MenuItem>
-          <MenuItem onClick={handleAboutUs}>
-            <Typography color='common.white'>About Us</Typography>
-          </MenuItem>
-          <MenuItem onClick={handleHelp}>
-            <Typography color='common.white'>Help</Typography>
-          </MenuItem>
-          <Divider />
-          <MenuItem onClick={confirmLogout}>
-            <Typography color='common.white'>Log out</Typography>
-          </MenuItem>
+          { user?.role === "06" ? (
+            <>
+              <MenuItem onClick={handleProfile}>
+                <Typography color='common.white'>Profile</Typography>
+              </MenuItem>
+              <Divider />
+              <MenuItem onClick={confirmLogout}>
+                <Typography color='common.white'>Log out</Typography>
+              </MenuItem>
+            </>
+            
+          ) : (
+            <>
+              <MenuItem onClick={handleProfile}>
+                <Typography color='common.white'>Profile</Typography>
+              </MenuItem>
+              <MenuItem onClick={handleAboutUs}>
+                <Typography color='common.white'>About Us</Typography>
+              </MenuItem>
+              <MenuItem onClick={handleHelp}>
+                <Typography color='common.white'>Help</Typography>
+              </MenuItem>
+              <Divider />
+              <MenuItem onClick={confirmLogout}>
+                <ListItemIcon>
+                    <LogoutIcon sx={{ color: "#FFF" }} />
+                </ListItemIcon>
+                <Typography textAlign='center' sx={{ color: "#FFF", fontWeight: 800 }}>Log out</Typography>
+              </MenuItem>
+            </>
+          )} 
+          
         </Menu>
       </Toolbar>
 

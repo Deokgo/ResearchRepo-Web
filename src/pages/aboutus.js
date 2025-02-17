@@ -73,7 +73,7 @@ const AboutUs = () => {
           <HeaderWithBackButton title='About Us' onBack={() => navigate(-1)} />
 
           {/* Content Section */}
-          <Box sx={{ flexGrow: 1, p: { xs: 3, md: 8 } }}>
+          <Box sx={{ flexGrow: 1, p: { xs: 7, md: 15 } }}>
             <Grid2 container spacing={4} mb={15}>
               {/* Left Column */}
               <Grid2
