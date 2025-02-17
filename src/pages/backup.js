@@ -32,10 +32,10 @@ import { formatBytes, formatDate } from "../utils/format";
 import BackupTableIcon from "@mui/icons-material/BackupTable";
 import DownloadIcon from "@mui/icons-material/Download";
 import FileUploader from "../components/FileUploader";
-import WarningIcon from '@mui/icons-material/Warning';
-import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import FileCopyIcon from '@mui/icons-material/FileCopy';
+import WarningIcon from "@mui/icons-material/Warning";
+import PriorityHighIcon from "@mui/icons-material/PriorityHigh";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import FileCopyIcon from "@mui/icons-material/FileCopy";
 
 const Backup = () => {
   const navigate = useNavigate();
@@ -139,7 +139,15 @@ const Backup = () => {
       await Promise.all([fetchBackups(), fetchCurrentTimeline()]);
     } catch (error) {
       console.error("Error restoring backup:", error);
-      showMessage("Error restoring backup: " + error.message, "error");
+      // Handle integrity check failures specifically
+      if (error.response?.data?.error?.includes("integrity check failed")) {
+        showMessage(
+          "Backup integrity check failed. The backup files may have been corrupted or tampered with.",
+          "error"
+        );
+      } else {
+        showMessage("Error restoring backup: " + error.message, "error");
+      }
     } finally {
       setLoading(false);
     }
@@ -286,7 +294,16 @@ const Backup = () => {
       setSelectedFile(null);
     } catch (error) {
       console.error("Restore error:", error);
-      setErrorMessage(error.response?.data?.error || "Error restoring backup");
+      // Handle integrity check failures specifically
+      if (error.response?.data?.error?.includes("integrity check failed")) {
+        setErrorMessage(
+          "Backup integrity check failed. The backup file may have been corrupted or tampered with."
+        );
+      } else {
+        setErrorMessage(
+          error.response?.data?.error || "Error restoring backup"
+        );
+      }
       setOpenErrorDialog(true);
     } finally {
       setLoading(false);
@@ -438,7 +455,10 @@ const Backup = () => {
           overflow: "hidden",
         }}
       >
-        <HeaderWithBackButton title='Backup and Restore' onBack={() => navigate(-1)} />
+        <HeaderWithBackButton
+          title='Backup and Restore'
+          onBack={() => navigate(-1)}
+        />
 
         {/* Add Timeline Info Box */}
         <Box
@@ -716,75 +736,42 @@ const Backup = () => {
         </Box>
       </Box>
 
-      <Dialog open={openDialog} onClose={() => setOpenDialog(false)} 
+      <Dialog
+        open={openDialog}
+        onClose={() => setOpenDialog(false)}
         PaperProps={{
           sx: {
             borderRadius: "15px",
             padding: "1rem",
           },
         }}
-        >
+      >
         <DialogTitle
           sx={{
             fontFamily: "Montserrat, sans-serif",
             fontWeight: 600,
             color: "#08397C",
-            display: "flex",
-            alignItems: "center",
-            gap: 1,
           }}
         >
-          <Box
-            component='span'
-            sx={{
-                backgroundColor: "#E8F5E9",
-                borderRadius: "75%",
-                padding: "10px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-            }}
-            >
-            <PriorityHighIcon/>
-          </Box>
-            &nbsp;Confirm Restore
+          Confirm Restore
         </DialogTitle>
         <DialogContent>
-          <DialogContentText sx={{ fontFamily: "Montserrat, sans-serif", fontSize:'1rem' }}>
-            Are you sure you want to restore from backup{" "}
-            <strong>{selectedBackup?.backup_id}</strong>? This will replace all current data with
-            the backup data.
-            {selectedBackup?.backup_type === "INCR" && (
-              <>
-                <Box sx={{ mt: 2, color: "warning.main", fontFamily: "Montserrat, sans-serif", fontSize:'0.85rem' }}>
-                  Note: This is an incremental backup. The restore process will
-                  include the base full backup and all incremental backups up to
-                  this point.
-                </Box>
-                <Box sx={{ mt: 2, color: "red", fontFamily: "Montserrat, sans-serif", fontSize:'0.85rem' }}>
-                  Important: Restoring this backup will create a new timeline.
-                  Any existing backups after the chosen backup's timeline will
-                  become invalid and cannot be restored after this operation.
-                </Box>
-              </>
-            )}
+          <DialogContentText sx={{ fontFamily: "Montserrat, sans-serif" }}>
+            Are you sure you want to restore{" "}
+            {selectedBackup && selectedBackup.backup_id}? This will replace all
+            current data with the backup data from{" "}
+            {selectedBackup && formatDate(selectedBackup.backup_date)}.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button 
-            variant='text'
+          <Button
             onClick={() => setOpenDialog(false)}
             sx={{
               color: "#08397C",
               fontFamily: "Montserrat, sans-serif",
               fontWeight: 600,
               textTransform: "none",
-              borderRadius: "100px",
-              padding: "0.75rem",
-              "&:hover": {
-              color: "#072d61",
-              },
-          }}
+            }}
           >
             Cancel
           </Button>
@@ -797,10 +784,8 @@ const Backup = () => {
               fontFamily: "Montserrat, sans-serif",
               fontWeight: 600,
               textTransform: "none",
-              borderRadius: "100px",
-              padding: "0.75rem",
               "&:hover": {
-              backgroundColor: "#A30417",
+                backgroundColor: "#A30417",
               },
             }}
           >
@@ -901,7 +886,7 @@ const Backup = () => {
           sx: {
             borderRadius: "15px",
             padding: "1rem",
-            },
+          },
         }}
       >
         <DialogTitle
@@ -925,7 +910,7 @@ const Backup = () => {
               justifyContent: "center",
             }}
           >
-            <WarningIcon/>
+            <WarningIcon />
           </Box>
           &nbsp;Warning: Restore from Backup File
         </DialogTitle>
@@ -949,7 +934,7 @@ const Backup = () => {
                   marginBottom: "16px",
                   paddingLeft: "24px",
                   fontFamily: "Montserrat, sans-serif",
-                  fontSize: "0.75rem"
+                  fontSize: "0.75rem",
                 }}
               >
                 <li>Replace your current database completely</li>
@@ -964,7 +949,8 @@ const Backup = () => {
                 fontSize: "0.875rem",
               }}
             >
-              It is strongly recommended to generate full backup first before proceeding.
+              It is strongly recommended to generate full backup first before
+              proceeding.
             </Typography>
           </DialogContentText>
         </DialogContent>
@@ -980,9 +966,9 @@ const Backup = () => {
               borderRadius: "100px",
               padding: "0.75rem",
               "&:hover": {
-              color: "#072d61",
+                color: "#072d61",
               },
-          }}
+            }}
           >
             Cancel
           </Button>
@@ -998,9 +984,9 @@ const Backup = () => {
               borderRadius: "100px",
               padding: "0.75rem",
               "&:hover": {
-              backgroundColor: "#072d61",
+                backgroundColor: "#072d61",
               },
-          }}
+            }}
             disabled={loading}
           >
             Generate Full Backup
@@ -1020,7 +1006,7 @@ const Backup = () => {
               borderRadius: "100px",
               padding: "0.75rem",
               "&:hover": {
-              backgroundColor: "#A30417",
+                backgroundColor: "#A30417",
               },
             }}
           >
@@ -1036,7 +1022,7 @@ const Backup = () => {
           sx: {
             borderRadius: "15px",
             padding: "1rem",
-            },
+          },
         }}
       >
         <DialogTitle
@@ -1060,7 +1046,7 @@ const Backup = () => {
               justifyContent: "center",
             }}
           >
-            <FileCopyIcon/>
+            <FileCopyIcon />
           </Box>
           &nbsp;Upload Backup File
         </DialogTitle>
@@ -1097,9 +1083,9 @@ const Backup = () => {
               borderRadius: "100px",
               padding: "0.75rem",
               "&:hover": {
-              color: "#072d61",
+                color: "#072d61",
               },
-          }}
+            }}
           >
             Cancel
           </Button>
@@ -1117,7 +1103,7 @@ const Backup = () => {
               borderRadius: "100px",
               padding: "0.75rem",
               "&:hover": {
-              backgroundColor: "#A30417",
+                backgroundColor: "#A30417",
               },
             }}
           >
@@ -1131,8 +1117,8 @@ const Backup = () => {
         onClose={() => setOpenSuccessDialog(false)}
         PaperProps={{
           sx: {
-          borderRadius: "15px",
-          padding: "1rem",
+            borderRadius: "15px",
+            padding: "1rem",
           },
         }}
       >
@@ -1157,13 +1143,13 @@ const Backup = () => {
               justifyContent: "center",
             }}
           >
-            <CheckCircleIcon/>
+            <CheckCircleIcon />
           </Box>
           &nbsp;Success
         </DialogTitle>
         <DialogContent>
           <DialogContentText sx={{ fontFamily: "Montserrat, sans-serif" }}>
-          {successMessage}
+            {successMessage}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -1178,7 +1164,7 @@ const Backup = () => {
               borderRadius: "100px",
               padding: "0.75rem",
               "&:hover": {
-              backgroundColor: "#072d61",
+                backgroundColor: "#072d61",
               },
             }}
           >
@@ -1187,13 +1173,13 @@ const Backup = () => {
         </DialogActions>
       </Dialog>
 
-      <Dialog 
-        open={restoreInProgress} 
+      <Dialog
+        open={restoreInProgress}
         PaperProps={{
           sx: {
             borderRadius: "15px",
             padding: "1rem",
-            },
+          },
         }}
       >
         <DialogContent>
@@ -1220,10 +1206,10 @@ const Backup = () => {
           sx: {
             borderRadius: "15px",
             padding: "1rem",
-            },
+          },
         }}
       >
-        <DialogTitle 
+        <DialogTitle
           sx={{
             fontFamily: "Montserrat, sans-serif",
             fontWeight: 600,
@@ -1244,7 +1230,7 @@ const Backup = () => {
               justifyContent: "center",
             }}
           >
-            <CheckCircleIcon/>
+            <CheckCircleIcon />
           </Box>
           &nbsp;Restore Successful
         </DialogTitle>
@@ -1267,7 +1253,7 @@ const Backup = () => {
               padding: "0.75rem",
               "&:hover": {
                 backgroundColor: "#072d61",
-                },
+              },
             }}
           >
             Close
@@ -1281,96 +1267,8 @@ const Backup = () => {
         onClose={() => setOpenFullBackupDialog(false)}
         PaperProps={{
           sx: {
-          borderRadius: "15px",
-          padding: "1rem",
-          },
-        }}
-      >
-        <DialogTitle 
-          sx={{
-            fontFamily: "Montserrat, sans-serif",
-            fontWeight: 600,
-            color: "#08397C",
-            display: "flex",
-            alignItems: "center",
-            gap: 1,
-          }}
-        >
-          <Box
-            component='span'
-            sx={{
-                backgroundColor: "#E8F5E9",
-                borderRadius: "75%",
-                padding: "10px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-            }}
-            >
-            <PriorityHighIcon/>
-          </Box>
-            &nbsp;Create Full Backup
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText sx={{ fontFamily: "Montserrat, sans-serif", fontSize:'0.8rem'}}>
-            A full backup creates a complete copy of your database and
-            repository files. This type of backup contains all the data needed
-            for a complete restore. It serves as a base for future incremental
-            backups.
-            <br />
-            <br />
-          </DialogContentText>
-          <Box sx={{ mt: 2, color: "#08397C", fontFamily: "Montserrat, sans-serif", fontSize:'1rem' }}>
-              Would you like to proceed with creating a full backup?
-          </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button
-            variant='text'
-            onClick={() => setOpenFullBackupDialog(false)}
-            sx={{
-              color: "#08397C",
-              fontFamily: "Montserrat, sans-serif",
-              fontWeight: 600,
-              textTransform: "none",
-              borderRadius: "100px",
-              padding: "0.75rem",
-              "&:hover": {
-              color: "#072d61",
-              },
-          }}
-          >
-            Cancel
-          </Button>
-          <Button
-            onClick={handleFullBackup}
-            variant='contained'
-            sx={{
-              backgroundColor: "#CA031B",
-              color: "#FFF",
-              fontFamily: "Montserrat, sans-serif",
-              fontWeight: 600,
-              textTransform: "none",
-              borderRadius: "100px",
-              padding: "0.75rem",
-              "&:hover": {
-              backgroundColor: "#A30417",
-              },
-            }}
-          >
-            Create Full Backup
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* Incremental Backup Confirmation Dialog */}
-      <Dialog
-        open={openIncrementalDialog}
-        onClose={() => setOpenIncrementalDialog(false)}
-        PaperProps={{
-          sx: {
-          borderRadius: "15px",
-          padding: "1rem",
+            borderRadius: "15px",
+            padding: "1rem",
           },
         }}
       >
@@ -1387,20 +1285,119 @@ const Backup = () => {
           <Box
             component='span'
             sx={{
-                backgroundColor: "#E8F5E9",
-                borderRadius: "75%",
-                padding: "10px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
+              backgroundColor: "#E8F5E9",
+              borderRadius: "75%",
+              padding: "10px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
             }}
-            >
-            <PriorityHighIcon/>
+          >
+            <PriorityHighIcon />
           </Box>
-            &nbsp;Create Incremental Backup
+          &nbsp;Create Full Backup
         </DialogTitle>
         <DialogContent>
-          <DialogContentText sx={{ fontFamily: "Montserrat, sans-serif", fontSize:'0.8rem' }}>
+          <DialogContentText
+            sx={{ fontFamily: "Montserrat, sans-serif", fontSize: "0.8rem" }}
+          >
+            A full backup creates a complete copy of your database and
+            repository files. This type of backup contains all the data needed
+            for a complete restore. It serves as a base for future incremental
+            backups.
+            <br />
+            <br />
+          </DialogContentText>
+          <Box
+            sx={{
+              mt: 2,
+              color: "#08397C",
+              fontFamily: "Montserrat, sans-serif",
+              fontSize: "1rem",
+            }}
+          >
+            Would you like to proceed with creating a full backup?
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            variant='text'
+            onClick={() => setOpenFullBackupDialog(false)}
+            sx={{
+              color: "#08397C",
+              fontFamily: "Montserrat, sans-serif",
+              fontWeight: 600,
+              textTransform: "none",
+              borderRadius: "100px",
+              padding: "0.75rem",
+              "&:hover": {
+                color: "#072d61",
+              },
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleFullBackup}
+            variant='contained'
+            sx={{
+              backgroundColor: "#CA031B",
+              color: "#FFF",
+              fontFamily: "Montserrat, sans-serif",
+              fontWeight: 600,
+              textTransform: "none",
+              borderRadius: "100px",
+              padding: "0.75rem",
+              "&:hover": {
+                backgroundColor: "#A30417",
+              },
+            }}
+          >
+            Create Full Backup
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Incremental Backup Confirmation Dialog */}
+      <Dialog
+        open={openIncrementalDialog}
+        onClose={() => setOpenIncrementalDialog(false)}
+        PaperProps={{
+          sx: {
+            borderRadius: "15px",
+            padding: "1rem",
+          },
+        }}
+      >
+        <DialogTitle
+          sx={{
+            fontFamily: "Montserrat, sans-serif",
+            fontWeight: 600,
+            color: "#08397C",
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+          }}
+        >
+          <Box
+            component='span'
+            sx={{
+              backgroundColor: "#E8F5E9",
+              borderRadius: "75%",
+              padding: "10px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <PriorityHighIcon />
+          </Box>
+          &nbsp;Create Incremental Backup
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText
+            sx={{ fontFamily: "Montserrat, sans-serif", fontSize: "0.8rem" }}
+          >
             An incremental backup only stores the changes made since the last
             backup. It requires less storage space and is faster to create than
             a full backup. However, to restore an incremental backup, you'll
@@ -1409,7 +1406,14 @@ const Backup = () => {
             <br />
             <br />
           </DialogContentText>
-          <Box sx={{ mt: 2, color: "#08397C", fontFamily: "Montserrat, sans-serif", fontSize:'1rem' }}>
+          <Box
+            sx={{
+              mt: 2,
+              color: "#08397C",
+              fontFamily: "Montserrat, sans-serif",
+              fontSize: "1rem",
+            }}
+          >
             Would you like to proceed with creating an incremental backup?
           </Box>
         </DialogContent>
@@ -1425,9 +1429,9 @@ const Backup = () => {
               borderRadius: "100px",
               padding: "0.75rem",
               "&:hover": {
-              color: "#072d61",
+                color: "#072d61",
               },
-          }}
+            }}
           >
             Cancel
           </Button>
@@ -1443,7 +1447,7 @@ const Backup = () => {
               borderRadius: "100px",
               padding: "0.75rem",
               "&:hover": {
-              backgroundColor: "#A30417",
+                backgroundColor: "#A30417",
               },
             }}
           >
@@ -1464,7 +1468,9 @@ const Backup = () => {
             }}
           >
             <CircularProgress sx={{ mb: 2 }} />
-            <Typography sx={{ color: "#08397C", fontFamily: "Montserrat, sans-serif" }}>
+            <Typography
+              sx={{ color: "#08397C", fontFamily: "Montserrat, sans-serif" }}
+            >
               Creating backup. Please wait...
             </Typography>
           </Box>
