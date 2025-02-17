@@ -483,18 +483,20 @@ const Profile = () => {
                 mb: "1.5rem",
               }}
             >
-              <Button
-                variant='outlined'
-                startIcon={<EditIcon />}
-                onClick={handleOpenOtpModal} 
-                sx={{
-                  fontWeight: 600,
-                  flex: "0 1 auto", // Prevents shrinking too much
-                  minWidth: "120px", // Ensures a consistent minimum width
-                }}
-              >
-                Change Password
-              </Button>
+              {userData && userData.account && userData.account.role_name !== "System Administrator" && (
+                <Button
+                  variant='outlined'
+                  startIcon={<EditIcon />}
+                  onClick={handleOpenOtpModal}
+                  sx={{
+                    fontWeight: 600,
+                    flex: "0 1 auto", // Prevents shrinking too much
+                    minWidth: "120px", // Ensures a consistent minimum width
+                  }}
+                >
+                  Change Password
+                </Button>
+              )}
 
               {/* OTP Modal */}
               <OtpModal
