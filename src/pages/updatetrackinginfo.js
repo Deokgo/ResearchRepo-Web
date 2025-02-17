@@ -14,9 +14,10 @@ import {
   Divider,
   CircularProgress,
   Dialog,
-  DialogTitle,
-  DialogContent,
   DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
@@ -28,6 +29,7 @@ import AddSubmission from "../components/addsubmission";
 import AddPublish from "../components/addpublish";
 import { toast } from "react-hot-toast";
 import { fetchAndCacheFilterData } from "../utils/trackCache";
+import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
 
 const UpdateTrackingInfo = ({ route, navigate }) => {
   const navpage = useNavigate();
@@ -35,12 +37,12 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
   const { id } = location.state || {}; // Default to an empty object if state is undefined
   const [data, setData] = useState(null); // Start with null to represent no data
   const [loading, setLoading] = useState(true); // Track loading state
+  const [header, setHeader] = useState("Update Tracking Info");
 
   const [pubData, setPubData] = useState(null);
   const [initialValues, setInitialValues] = useState(null);
 
   const [publicationFormat, setPublicationFormat] = useState("");
-
   const [conferenceTitle, setConferenceTitle] = useState("");
 
   const { isAddSubmitModalOpen, openAddSubmitModal, closeAddSubmitModal } = useModalContext();
@@ -49,6 +51,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isPullOut, setIsPullOut] = useState(false);
   const [isSuccessDialogOpen, setIsSuccessDialogOpen] = useState(false);
+  const [openConfirmPulloutDialog, setOpenConfirmPulloutDialog] = useState(false);
 
   ///////////////////// PUBLICATION DATA RETRIEVAL //////////////////////
 
@@ -79,6 +82,10 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
 
           setInitialValues(initialData);
           console.log(initialData);
+
+          if (initialData.status === "PUBLISHED"){
+            setHeader("Research Publication Details");
+          } 
 
           // Set current values
           setPublicationFormat(initialData.journal);
@@ -146,6 +153,9 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
   ///////////////////// TRACKING PART //////////////////////
   const [refreshTimeline, setRefreshTimeline] = useState(false); // Track refresh state
 
+  const confirmPullOut = async () => {
+    setOpenConfirmPulloutDialog(true);
+  }
   // Handle pull out status update
   const handlePullOut = async (newStatus) => {
     try {
@@ -286,7 +296,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
           }}
         >
           <HeaderWithBackButton
-            title='Update Tracking Info'
+            title={header}
             onBack={() => navpage(-1)}
           />
 
@@ -919,7 +929,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                       sx={{
                       fontFamily: "Montserrat, sans-serif",
                       fontWeight: 600,
-                      color: "#08397C",
+                      color: "#008000",
                       display: "flex",
                       alignItems: "center",
                       gap: 1,
@@ -973,6 +983,85 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                       </Button>
                   </DialogActions>
                 </Dialog>
+
+                <Dialog
+                  open={openConfirmPulloutDialog}
+                  onClose={() => setOpenConfirmPulloutDialog(false)}
+                  PaperProps={{
+                    sx: {
+                    borderRadius: "15px",
+                    padding: "1rem",
+                    },
+                  }}
+                >
+                  <DialogTitle 
+                    sx={{
+                      fontFamily: "Montserrat, sans-serif",
+                      fontWeight: 600,
+                      color: "#08397C",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                    }}
+                  >
+                    <Box
+                      component='span'
+                      sx={{
+                          backgroundColor: "#E8F5E9",
+                          borderRadius: "75%",
+                          padding: "10px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                      }}
+                      >
+                      <PriorityHighIcon/>
+                    </Box>
+                      &nbsp;Confirm Pull Out
+                  </DialogTitle>
+                  <DialogContent>
+                    <DialogContentText sx={{ fontFamily: "Montserrat, sans-serif" }}>
+                      Are you sure you want to pull out this research output?
+                    </DialogContentText>
+                  </DialogContent>
+                  <DialogActions>
+                    <Button
+                      onClick={() => setOpenConfirmPulloutDialog(false)}
+                      variant='text'
+                      sx={{
+                        color: "#08397C",
+                        fontFamily: "Montserrat, sans-serif",
+                        fontWeight: 600,
+                        textTransform: "none",
+                        borderRadius: "100px",
+                        padding: "0.75rem",
+                        "&:hover": {
+                        color: "#072d61",
+                        },
+                    }}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      onClick={handlePullOut}
+                      variant='contained'
+                      sx={{
+                        backgroundColor: "#CA031B",
+                        color: "#FFF",
+                        fontFamily: "Montserrat, sans-serif",
+                        fontWeight: 600,
+                        textTransform: "none",
+                        borderRadius: "100px",
+                        padding: "0.75rem",
+                        "&:hover": {
+                        backgroundColor: "#A30417",
+                        },
+                      }}
+                    >
+                      Pull Out Paper
+                    </Button>
+                  </DialogActions>
+                </Dialog>
               </Grid2>
 
               {/* Right-side Timeline Section*/}
@@ -1006,11 +1095,11 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                     }}
                   />
                 </Box>
-                { initialValues?.status === "SUBMITTED" || initialValues?.status === "ACCEPTED" && (
+                { (initialValues?.status === "ACCEPTED" || initialValues?.status === "SUBMITTED") && (
                   <Button
                     variant='contained'
                     color='primary'
-                    onClick={handlePullOut}
+                    onClick={confirmPullOut}
                     sx={{
                       backgroundColor: "#08397C",
                       color: "#FFF",

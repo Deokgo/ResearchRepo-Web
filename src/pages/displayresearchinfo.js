@@ -41,6 +41,7 @@ import sdgGoalsData from "../data/sdgGoals.json";
 import { useAuth } from "../context/AuthContext";
 import { filterCache, fetchAndCacheFilterData } from "../utils/filterCache";
 import HeaderWithBackButton from "../components/Header";
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 const DisplayResearchInfo = () => {
   const [users, setUsers] = useState([]);
@@ -53,6 +54,7 @@ const DisplayResearchInfo = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [newRole, setNewRole] = useState("");
   const [loading, setLoading] = useState(true); // Track loading state
+  const [header, setHeader] = useState("Research Information");
 
   const [conferenceTitle, setConferenceTitle] = useState("");
   const [singleCountry, setSingleCountry] = useState("");
@@ -318,6 +320,7 @@ const DisplayResearchInfo = () => {
 
   const handleEdit = async (item) => {
     try {
+      setHeader("Edit Research Information")
       // Temporarily disable change detection while setting up initial data
       setHasChanges(false);
 
@@ -544,6 +547,7 @@ const DisplayResearchInfo = () => {
       setEditableData(null);
       setFile(null);
       setExtendedAbstract(null);
+      setHeader("Research Information");
     }
   };
 
@@ -611,6 +615,7 @@ const DisplayResearchInfo = () => {
       setEditableData(null);
       setFile(null);
       setExtendedAbstract(null);
+      setHeader("Research Information");
 
       // Refresh the data
       const refreshResponse = await axios.get(
@@ -840,7 +845,7 @@ const DisplayResearchInfo = () => {
           }}
         >
           <HeaderWithBackButton
-            title='Research Information'
+            title={header}
             onBack={() => navigate(-1)}
           />
 
@@ -2007,18 +2012,48 @@ const DisplayResearchInfo = () => {
       <Dialog
         open={showCancelDialog}
         onClose={() => setShowCancelDialog(false)}
-        aria-labelledby='cancel-dialog-title'
-        aria-describedby='cancel-dialog-description'
+        PaperProps={{
+          sx: {
+          borderRadius: "15px",
+          padding: "1rem",
+          },
+      }}
       >
-        <DialogTitle id='cancel-dialog-title'>{"Discard Changes?"}</DialogTitle>
+        <DialogTitle
+            sx={{
+            fontFamily: "Montserrat, sans-serif",
+            fontWeight: 600,
+            color: "#08397C",
+            }}
+        >
+            Unsaved Changes
+        </DialogTitle>
         <DialogContent>
-          <DialogContentText id='cancel-dialog-description'>
+          <Typography
+            sx={{
+                fontFamily: "Montserrat, sans-serif",
+                color: "#666",
+            }}
+            >
             You have unsaved changes. Are you sure you want to cancel editing?
             All changes will be lost.
-          </DialogContentText>
+            </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setShowCancelDialog(false)} color='primary'>
+          <Button onClick={() => setShowCancelDialog(false)}
+            sx={{
+              backgroundColor: "#08397C",
+              color: "#FFF",
+              fontFamily: "Montserrat, sans-serif",
+              fontWeight: 600,
+              textTransform: "none",
+              borderRadius: "100px",
+              padding: "0.75rem",
+              "&:hover": {
+              backgroundColor: "#072d61",
+              },
+          }}
+          >
             Continue Editing
           </Button>
           <Button
@@ -2029,7 +2064,18 @@ const DisplayResearchInfo = () => {
               setFile(null);
               setExtendedAbstract(null);
             }}
-            color='error'
+            sx={{
+              backgroundColor: "#CA031B",
+              color: "#FFF",
+              fontFamily: "Montserrat, sans-serif",
+              fontWeight: 600,
+              textTransform: "none",
+              borderRadius: "100px",
+              padding: "0.75rem",
+              "&:hover": {
+              backgroundColor: "#A30417",
+              },
+          }}
             autoFocus
           >
             Discard Changes
@@ -2043,35 +2089,35 @@ const DisplayResearchInfo = () => {
         onClose={() => setIsSuccessDialogOpen(false)}
         PaperProps={{
           sx: {
-            borderRadius: "15px",
-            padding: "1rem",
+          borderRadius: "15px",
+          padding: "1rem",
           },
-        }}
+      }}
       >
         <DialogTitle
           sx={{
             fontFamily: "Montserrat, sans-serif",
             fontWeight: 600,
-            color: "#08397C",
+            color: "#008000",
             display: "flex",
             alignItems: "center",
             gap: 1,
-          }}
+            }}
         >
-          <Box
+            <Box
             component='span'
             sx={{
-              backgroundColor: "#E8F5E9",
-              borderRadius: "50%",
-              padding: "8px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
+                backgroundColor: "#E8F5E9",
+                borderRadius: "75%",
+                padding: "10px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
             }}
-          >
-            ✓
-          </Box>
-          Success
+            >
+            <CheckCircleIcon/>
+            </Box>
+            Success
         </DialogTitle>
         <DialogContent>
           <Typography
@@ -2094,10 +2140,11 @@ const DisplayResearchInfo = () => {
               fontWeight: 600,
               textTransform: "none",
               borderRadius: "100px",
+              padding: "0.75rem",
               "&:hover": {
-                backgroundColor: "#072d61",
+              backgroundColor: "#072d61",
               },
-            }}
+          }}
           >
             Close
           </Button>

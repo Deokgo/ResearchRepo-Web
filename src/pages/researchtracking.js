@@ -5,6 +5,7 @@ import Footer from "../components/footer";
 import {
   Box,
   TextField,
+  Button,
   Typography,
   Paper,
   Pagination,
@@ -432,6 +433,14 @@ const ResearchTracking = () => {
     setOtherSectionsVisible(!isMobile);
   }, [isMobile]);
 
+  const handleResetFilters = () => {
+    setSelectedColleges([]);
+    setSelectedPrograms([]);
+    setSliderValue([dateRange[0], dateRange[1]]);
+  };
+
+  const [expandedAccordion, setExpandedAccordion] = useState(null);
+
   return (
     <>
       <Box
@@ -482,10 +491,10 @@ const ResearchTracking = () => {
                   <Box
                     sx={{
                       border: "1px solid #0A438F",
-                      height: "100%",
+                      height: "90%",
                       borderRadius: 3,
                       padding: 3,
-                      overflow: "hidden",
+                      overflow: "auto",
                       display: "flex",
                       flexDirection: "column",
                     }}
@@ -547,31 +556,23 @@ const ResearchTracking = () => {
                       </Box>
                     </Box>
 
-                    <Accordion defaultExpanded>
+                    <Accordion 
+                      expanded={expandedAccordion === "college"} 
+                      onChange={() => setExpandedAccordion(expandedAccordion === "college" ? null : "college")}
+                    >
                       <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                        <Typography
-                          sx={{
-                            color: "#08397C",
-                            fontSize: {
-                              xs: "0.5rem",
-                              md: "0.5rem",
-                              lg: "0.9rem",
-                            },
-                          }}
-                        >
+                        <Typography sx={{ color: "#08397C", fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" } }}>
                           College
                         </Typography>
                       </AccordionSummary>
                       <AccordionDetails>
-                        <Box sx={{ maxHeight: "200px", overflow: "auto" }}>
+                        <Box sx={{ maxHeight: "125px", overflow: "auto", display: "flex", flexDirection: "column" }}>
                           {colleges.map((college) => (
                             <FormControlLabel
                               key={college.college_id}
                               control={
                                 <Checkbox
-                                  checked={selectedColleges.includes(
-                                    String(college.college_id)
-                                  )}
+                                  checked={selectedColleges.includes(String(college.college_id))}
                                   onChange={handleCollegeChange}
                                   value={college.college_id}
                                 />
@@ -579,11 +580,7 @@ const ResearchTracking = () => {
                               label={college.college_name}
                               sx={{
                                 "& .MuiTypography-root": {
-                                  fontSize: {
-                                    xs: "0.5rem",
-                                    md: "0.75rem",
-                                    lg: "0.9rem",
-                                  },
+                                  fontSize: { xs: "0.5rem", md: "0.75rem", lg: "0.9rem" },
                                 },
                               }}
                             />
@@ -592,31 +589,23 @@ const ResearchTracking = () => {
                       </AccordionDetails>
                     </Accordion>
 
-                    <Accordion>
+                    <Accordion 
+                      expanded={expandedAccordion === "program"} 
+                      onChange={() => setExpandedAccordion(expandedAccordion === "program" ? null : "program")}
+                    >
                       <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                        <Typography
-                          sx={{
-                            color: "#08397C",
-                            fontSize: {
-                              xs: "0.5rem",
-                              md: "0.5rem",
-                              lg: "0.9rem",
-                            },
-                          }}
-                        >
+                        <Typography sx={{ color: "#08397C", fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" } }}>
                           Program
                         </Typography>
                       </AccordionSummary>
                       <AccordionDetails>
-                        <Box sx={{ maxHeight: "200px", overflow: "auto" }}>
+                        <Box sx={{ maxHeight: "125px", overflow: "auto", display: "flex", flexDirection: "column" }}>
                           {programs.map((program) => (
                             <FormControlLabel
                               key={program.program_id}
                               control={
                                 <Checkbox
-                                  checked={selectedPrograms.includes(
-                                    program.program_name
-                                  )}
+                                  checked={selectedPrograms.includes(program.program_name)}
                                   onChange={handleProgramChange}
                                   value={program.program_name}
                                 />
@@ -624,11 +613,7 @@ const ResearchTracking = () => {
                               label={program.program_name}
                               sx={{
                                 "& .MuiTypography-root": {
-                                  fontSize: {
-                                    xs: "0.5rem",
-                                    md: "0.75rem",
-                                    lg: "0.9rem",
-                                  },
+                                  fontSize: { xs: "0.5rem", md: "0.75rem", lg: "0.9rem" },
                                 },
                               }}
                             />
@@ -636,7 +621,30 @@ const ResearchTracking = () => {
                         </Box>
                       </AccordionDetails>
                     </Accordion>
+
                   </Box>
+                  <Button
+                    onClick={handleResetFilters}
+                    variant='outlined'
+                    sx={{
+                      color: "#08397C",
+                      border: "1px solid #08397C",
+                      fontFamily: "Montserrat, sans-serif",
+                      fontWeight: 600,
+                      textTransform: "none",
+                      fontSize: { xs: "0.80rem", md: "0.85rem", lg: "0.9rem" },
+                      width: "100%",
+                      marginTop: "1rem",
+                      padding: "0.5rem",
+                      borderRadius: "100px",
+                      "&:hover": {
+                        backgroundColor: "#072d61",
+                        color: "#FFF",
+                      },
+                    }}
+                  >
+                    Reset Filter
+                  </Button>
                 </Grid2>
               )}
 

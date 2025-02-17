@@ -320,6 +320,7 @@ const Navbar = () => {
       "Research Tracking": "/researchtracking",
       "Knowledge Graph": "/knowledgegraph",
       Home: "/home",
+      "Institutional Performance Dashboard": "/progdash"
     };
     return pathMap[label] || "/";
   };

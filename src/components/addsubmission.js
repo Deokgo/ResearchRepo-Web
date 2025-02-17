@@ -678,7 +678,7 @@ const AddSubmission = () => {
                         borderRadius: "100px",
                         padding: "0.75rem",
                         "&:hover": {
-                        backgroundColor: "#072d61",
+                        backgroundColor: "#A30417",
                         },
                     }}
                     >
@@ -698,7 +698,7 @@ const AddSubmission = () => {
                         borderRadius: "100px",
                         padding: "0.75rem",
                         "&:hover": {
-                        backgroundColor: "#A30417",
+                        backgroundColor: "#072d61",
                         },
                     }}
                     >
@@ -724,7 +724,7 @@ const AddSubmission = () => {
                     sx={{
                     fontFamily: "Montserrat, sans-serif",
                     fontWeight: 600,
-                    color: "#08397C",
+                    color: "#008000",
                     display: "flex",
                     alignItems: "center",
                     gap: 1,

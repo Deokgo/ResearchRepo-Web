@@ -540,7 +540,7 @@ const AddPublish = () => {
                         borderRadius: "100px",
                         padding: "0.75rem",
                         "&:hover": {
-                        backgroundColor: "#072d61",
+                        backgroundColor: "#A30417",
                         },
                     }}
                     >
@@ -560,7 +560,7 @@ const AddPublish = () => {
                         borderRadius: "100px",
                         padding: "0.75rem",
                         "&:hover": {
-                        backgroundColor: "#A30417",
+                        backgroundColor: "#072d61",
                         },
                     }}
                     >
@@ -583,7 +583,7 @@ const AddPublish = () => {
                     sx={{
                     fontFamily: "Montserrat, sans-serif",
                     fontWeight: 600,
-                    color: "#08397C",
+                    color: "#008000",
                     display: "flex",
                     alignItems: "center",
                     gap: 1,
@@ -612,7 +612,7 @@ const AddPublish = () => {
                         mt: 1,
                     }}
                     >
-                    Research output had been published successfully.
+                    Research output has been published successfully.
                     </Typography>
                 </DialogContent>
                 <DialogActions sx={{ padding: "1rem" }}>
