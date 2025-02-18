@@ -852,7 +852,7 @@ const DisplayResearchInfo = () => {
           {/*Main Content */}
           <Box
             sx={{
-              padding: 6,
+              padding: 5,
               width: "100%", // Ensure the container stretches across the full width
             }}
           >
@@ -887,8 +887,8 @@ const DisplayResearchInfo = () => {
                               color: "#08397C",
                               fontSize: {
                                 xs: "clamp(1rem, 2vw, 1rem)",
-                                sm: "clamp(1.5rem, 3.5vw, 1.5rem)",
-                                md: "clamp(2rem, 4vw, 2.25rem)",
+                                sm: "clamp(1.25rem, 3.5vw, 1.25rem)",
+                                md: "clamp(2rem, 4vw, 2rem)",
                               },
                             }}
                           >
@@ -897,11 +897,11 @@ const DisplayResearchInfo = () => {
                           <Typography
                             variant='h6'
                             sx={{
-                              mb: "0.5rem",
+                              mb: "0.25rem",
                               fontSize: {
-                                xs: "clamp(1rem, 2vw, 1rem)",
-                                sm: "clamp(1rem, 3.5vw, 1rem)",
-                                md: "clamp(1.25rem, 4vw, 1.5rem)",
+                                xs: "clamp(0.9rem, 2vw, 0.9rem)",
+                                sm: "clamp(0.9rem, 3.5vw, 0.9rem)",
+                                md: "clamp(1rem, 4vw, 1rem)",
                               },
                             }}
                             alignSelf='center'
@@ -916,12 +916,11 @@ const DisplayResearchInfo = () => {
                           <Typography
                             variant='h7'
                             sx={{
-                              mb: "1rem",
                               color: "#8B8B8B",
                               fontSize: {
-                                xs: "clamp(0.75rem, 2vw, 0.75rem)",
-                                sm: "clamp(0.75rem, 3.5vw, 1rem)",
-                                md: "clamp(0.75rem, 4vw, 1rem)",
+                                xs: "clamp(0.8rem, 2vw, 0.8rem)",
+                                sm: "clamp(0.85rem, 3.5vw, 0.85rem)",
+                                md: "clamp(0.9rem, 4vw, 0.9rem)",
                               },
                             }}
                             alignSelf='center'
@@ -940,6 +939,7 @@ const DisplayResearchInfo = () => {
                             alignItems='center'
                             justifyContent='space-between'
                             gap={3}
+                            mr="1rem"
                           >
                             {user?.role === "05" && (
                               <Button
@@ -1042,7 +1042,7 @@ const DisplayResearchInfo = () => {
                               variant='h6'
                               fontWeight='700'
                               sx={{
-                                mb: "1rem",
+                                mb: "0.5rem",
                                 fontSize: {
                                   xs: "0.75rem",
                                   md: "0.75rem",
@@ -1058,9 +1058,9 @@ const DisplayResearchInfo = () => {
                                 fontSize: {
                                   xs: "0.6rem",
                                   md: "0.7rem",
-                                  lg: "0.9rem",
+                                  lg: "0.8rem",
                                 },
-                                mb: "2rem",
+                                mb: "1.5rem",
                               }}
                             >
                               {Array.isArray(item.research_areas) &&
@@ -1074,7 +1074,7 @@ const DisplayResearchInfo = () => {
                               variant='h6'
                               fontWeight='700'
                               sx={{
-                                mb: "1rem",
+                                mb: "0.5rem",
                                 fontSize: {
                                   xs: "0.75rem",
                                   md: "0.75rem",
@@ -1090,7 +1090,7 @@ const DisplayResearchInfo = () => {
                                 fontSize: {
                                   xs: "0.6rem",
                                   md: "0.7rem",
-                                  lg: "0.9rem",
+                                  lg: "0.8rem",
                                 },
                               }}
                             >
@@ -1102,8 +1102,8 @@ const DisplayResearchInfo = () => {
                               variant='h6'
                               fontWeight='700'
                               sx={{
-                                mt: "2rem",
-                                mb: "1rem",
+                                mt: "1.5rem",
+                                mb: "0.5rem",
                                 fontSize: {
                                   xs: "0.75rem",
                                   md: "0.75rem",
@@ -1119,7 +1119,7 @@ const DisplayResearchInfo = () => {
                                 fontSize: {
                                   xs: "0.6rem",
                                   md: "0.7rem",
-                                  lg: "0.9rem",
+                                  lg: "0.8rem",
                                 },
                               }}
                             >
@@ -1142,14 +1142,14 @@ const DisplayResearchInfo = () => {
                                 width: "100%",
                                 bgcolor: "#f0f0f0",
                                 borderRadius: 2,
-                                padding: 3,
+                                padding: 2.5,
                                 height: "auto",
                               }}
                             >
                               <Typography
                                 variant='h7'
                                 sx={{
-                                  mb: "1rem",
+                                  mb: "0.5rem",
                                   fontSize: {
                                     xs: "0.6rem",
                                     md: "0.65rem",
@@ -1163,7 +1163,7 @@ const DisplayResearchInfo = () => {
                               <Typography
                                 variant='h7'
                                 sx={{
-                                  mb: "1rem",
+                                  mb: "0.5rem",
                                   fontSize: {
                                     xs: "0.6rem",
                                     md: "0.65rem",
@@ -1176,7 +1176,7 @@ const DisplayResearchInfo = () => {
                               <Typography
                                 variant='body1'
                                 sx={{
-                                  mb: "1rem",
+                                  mb: "0.5rem",
                                   fontSize: {
                                     xs: "0.6rem",
                                     md: "0.65rem",
@@ -1192,7 +1192,7 @@ const DisplayResearchInfo = () => {
                               <Typography
                                 variant='body1'
                                 sx={{
-                                  mb: "1rem",
+                                  mb: "0.5rem",
                                   fontSize: {
                                     xs: "0.5rem",
                                     md: "0.65rem",
@@ -1212,7 +1212,7 @@ const DisplayResearchInfo = () => {
                               <Typography
                                 variant='body1'
                                 sx={{
-                                  mb: "1rem",
+                                  mb: "0.5rem",
                                   fontSize: {
                                     xs: "0.5rem",
                                     md: "0.65rem",
@@ -1225,7 +1225,7 @@ const DisplayResearchInfo = () => {
                               <Typography
                                 variant='body1'
                                 sx={{
-                                  mb: "1rem",
+                                  mb: "0.5rem",
                                   fontSize: {
                                     xs: "0.5rem",
                                     md: "0.65rem",
@@ -1239,7 +1239,7 @@ const DisplayResearchInfo = () => {
                               <Typography
                                 variant='body1'
                                 sx={{
-                                  mb: "1rem",
+                                  mb: "0.5rem",
                                   fontSize: {
                                     xs: "0.5rem",
                                     md: "0.65rem",

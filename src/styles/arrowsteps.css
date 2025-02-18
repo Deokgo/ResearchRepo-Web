@@ -1,14 +1,12 @@
 .arrow-container {
     display: flex;
     align-items: center;
-    margin: 20px;
+    margin: 5px;
   }
   
   .arrow {
     position: relative;
     width: 100%; /* Adjust the width as needed */
-    padding: 20px 0; /* Adjust padding */
-    margin-right: -10px; /* Overlap the arrows */
     color: white;
     text-align: center;
     cursor: pointer;
@@ -41,6 +39,6 @@
   
   .label {
     margin-top: 8px;
-    font-size: 14px;
+    font-size: 12px;
   }
   

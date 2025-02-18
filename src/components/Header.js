@@ -11,10 +11,10 @@ const HeaderWithBackButton = ({ title, onBack, backgroundImage }) => {
         position: "relative",
         width: "100%",
         height: {
-          xs: "clamp(2rem, 3vh, 3rem)",
-          sm: "clamp(3rem, 8vh, 4rem)",
-          md: "clamp(3rem, 14vh, 4rem)",
-          lg: "clamp(4rem, 20vh, 5rem)",
+          xs: "clamp(2rem, 3vh, 2rem)",
+          sm: "clamp(3rem, 8vh, 2.75rem)",
+          md: "clamp(3rem, 14vh, 2.75rem)",
+          lg: "clamp(4rem, 20vh, 3.25rem)",
         },
         backgroundColor: "#0A438F",
         backgroundSize: "cover",
@@ -52,8 +52,8 @@ const HeaderWithBackButton = ({ title, onBack, backgroundImage }) => {
             height: "inherit",
             transform: {
               xs: "scale(0.8)",
-              sm: "scale(1)",
-              md: "scale(1.2)",
+              sm: "scale(0.9)",
+              md: "scale(1)",
             },
           }}
         >
@@ -66,12 +66,11 @@ const HeaderWithBackButton = ({ title, onBack, backgroundImage }) => {
             fontFamily: "Montserrat, sans-serif",
             fontWeight: 800,
             fontSize: {
-              xs: "clamp(1rem, 2vw, 1rem)",
-              sm: "clamp(1.5rem, 3.5vw, 1.5rem)",
-              md: "clamp(2rem, 4vw, 2.25rem)",
+              xs: "clamp(1rem, 2vw, 1.25rem)",
+              sm: "clamp(1.25rem, 3.5vw, 1.25rem)",
+              md: "clamp(1.75rem, 4vw, 1.50rem)",
             },
             color: "#FFF",
-            lineHeight: 1.25,
             alignSelf: "center",
             zIndex: 2,
           }}

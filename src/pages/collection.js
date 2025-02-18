@@ -66,7 +66,7 @@ const Collection = () => {
   const [publicationFormats, setPublicationFormats] = useState([]);
   const [selectedResearchItem, setSelectedResearchItem] = useState(null);
   const [response, setReponse] = useState(null);
-  const itemsPerPage = 5;
+  const itemsPerPage = 10;
   const { isAddPaperModalOpen, openAddPaperModal, closeAddPaperModal } =
     useModalContext();
   const { user } = useAuth();
@@ -270,16 +270,25 @@ const Collection = () => {
       }
 
       if (searchQuery) {
-        const query = searchQuery.toLowerCase();
-        filtered = filtered.filter((item) => {
-          const titleMatch = item.title.toLowerCase().includes(query);
-          const authorMatch = item.authors.some(
-            (author) =>
-              author.name.toLowerCase().includes(query) ||
-              author.email.toLowerCase().includes(query)
-          );
-          return titleMatch || authorMatch;
-        });
+        try {
+          const query = searchQuery.toLowerCase();
+          filtered = filtered.filter((item) => {
+            try {
+              const titleMatch = item.title?.toLowerCase().includes(query) ?? false;
+              const authorMatch = item.authors?.some(
+                (author) =>
+                  author.name?.toLowerCase().includes(query) ||
+                  author.email?.toLowerCase().includes(query)
+              ) ?? false;
+      
+              return titleMatch || authorMatch;
+            } catch (error) {
+              return false; // Skip this item if an error occurs
+            }
+          });
+        } catch (error) {
+          return false;
+        }
       }
 
       setFilteredResearch(filtered);
@@ -301,7 +310,7 @@ const Collection = () => {
 
   // Handle change in search query
   const handleSearchChange = (e) => {
-    setSearchQuery(e.target.value.toLowerCase());
+    setSearchQuery(e.target.value);
   };
 
   // Function to fetch the year range dynamically
@@ -476,7 +485,7 @@ const Collection = () => {
                   <Box
                     sx={{
                       border: "1px solid #0A438F",
-                      height: "90%",
+                      height: "80%",
                       borderRadius: 3,
                       padding: 3,
                       overflow: "auto",
@@ -608,7 +617,6 @@ const Collection = () => {
                       </AccordionDetails>
                     </Accordion>
 
-
                     <Accordion
                       expanded={expandedAccordion === "format"}
                       onChange={() => setExpandedAccordion(expandedAccordion === "format" ? null : "format")}
@@ -683,7 +691,7 @@ const Collection = () => {
               )}
 
               {/* Research List Section */}
-              <Grid2 size={otherSectionsVisible ? 6 : 12}>
+              <Grid2 size={otherSectionsVisible ? 9 : 12}>
                 <Box
                   sx={{
                     height: "100%",
@@ -702,23 +710,37 @@ const Collection = () => {
                       sx={{
                         display: "flex",
                         gap: 2,
-                        mb: 2,
+                        mb: 1,
                       }}
                     >
                       <TextField
-                        variant='outlined'
-                        placeholder='Search by Title or Authors'
+                        variant="outlined"
+                        placeholder="Search by Title or Authors"
                         value={searchQuery}
                         onChange={handleSearchChange}
-                        sx={{ flex: 2 }}
+                        sx={{
+                          flex: 2,
+                          "& .MuiInputBase-input": {
+                            fontSize: {
+                              xs: "0.5rem",
+                              md: "0.75rem",
+                              lg: "1rem",
+                            },
+                          },
+                          "& .MuiInputBase-input::placeholder": {
+                            fontSize: "0.85rem", // Adjust placeholder font size
+                            color: "rgba(0, 0, 0, 0.5)", // Optional: Adjust placeholder color
+                          },
+                        }}
                         InputProps={{
                           startAdornment: (
-                            <InputAdornment position='start'>
+                            <InputAdornment position="start">
                               <Search />
                             </InputAdornment>
                           ),
                         }}
                       />
+
                       {!isMobile && user?.role === "05" && (
                         <Button
                           variant='contained'
@@ -765,7 +787,7 @@ const Collection = () => {
                               <Box
                                 key={researchItem.research_id}
                                 sx={{
-                                  p: 3,
+                                  p: 2,
                                   cursor: "pointer",
                                   minHeight: "calc((100% - 48px) / 5)",
                                   display: "flex",
@@ -783,7 +805,7 @@ const Collection = () => {
                                 <Typography
                                   variant='h6'
                                   sx={{
-                                    mb: 1,
+                                    mb: 0.8,
                                     fontSize: {
                                       xs: "0.5rem",
                                       md: "0.75rem",
@@ -797,7 +819,6 @@ const Collection = () => {
                                 <Typography
                                   variant='body2'
                                   sx={{
-                                    mb: 0.5,
                                     color: "#666",
                                     fontSize: {
                                       xs: "0.5rem",
@@ -853,57 +874,61 @@ const Collection = () => {
                 </Box>
               </Grid2>
 
-              {/* Knowledge Graph Section */}
-              {!isMobile && (
-                <Grid2
-                  size={{ xs: 12, sm: 6, md: 3 }}
-                  sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    marginBottom: "1rem",
-                  }}
-                >
-                  <Box
+              {/* Knowledge Graph Section 
+
+                {!isMobile && (
+                  <Grid2
+                    size={{ xs: 12, sm: 6, md: 3 }}
                     sx={{
-                      width: "100%",
-                      height: "100%", // Ensures Box takes full height
-                      border: "1px solid #ccc",
-                      borderRadius: 3,
-                      position: "relative", // For child positioning
-                      overflow: "hidden", // Prevents content overflow
-                      boxSizing: "border-box", // Ensures padding is included in dimensions
-                      padding: "0.5rem 1rem 1rem 0.5rem", // top, right, bottom, left
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      marginBottom: "1rem",
                     }}
                   >
-                    <iframe
-                      src='http://localhost:5000/collectionkg'
-                      style={{
-                        width: "100%", // Adjusts to parent size
-                        height: "100%", // Adjusts to parent size
-                        border: "none", // Removes border
-                        display: "block", // Prevents inline-block spacing
-                        margin: 0, // Removes default iframe margin
-                        padding: 0, // Removes default iframe padding
-                        overflow: "hidden", // Prevents content overflow inside iframe
-                      }}
-                      scrolling='no' // Removes the scrollbar
-                    />
                     <Box
-                      onClick={handleNavigateKnowledgeGraph}
                       sx={{
-                        position: "absolute",
-                        top: 0,
-                        left: 0,
                         width: "100%",
-                        height: "100%",
-                        cursor: "pointer",
-                        backgroundColor: "transparent", // No visual interference
+                        height: "100%", // Ensures Box takes full height
+                        border: "1px solid #ccc",
+                        borderRadius: 3,
+                        position: "relative", // For child positioning
+                        overflow: "hidden", // Prevents content overflow
+                        boxSizing: "border-box", // Ensures padding is included in dimensions
+                        padding: "0.5rem 1rem 1rem 0.5rem", // top, right, bottom, left
                       }}
-                    />
-                  </Box>
-                </Grid2>
-              )}
+                    >
+                      <iframe
+                        src='http://localhost:5000/collectionkg'
+                        style={{
+                          width: "100%", // Adjusts to parent size
+                          height: "100%", // Adjusts to parent size
+                          border: "none", // Removes border
+                          display: "block", // Prevents inline-block spacing
+                          margin: 0, // Removes default iframe margin
+                          padding: 0, // Removes default iframe padding
+                          overflow: "hidden", // Prevents content overflow inside iframe
+                        }}
+                        scrolling='no' // Removes the scrollbar
+                      />
+                      <Box
+                        onClick={handleNavigateKnowledgeGraph}
+                        sx={{
+                          position: "absolute",
+                          top: 0,
+                          left: 0,
+                          width: "100%",
+                          height: "100%",
+                          cursor: "pointer",
+                          backgroundColor: "transparent", // No visual interference
+                        }}
+                      />
+                    </Box>
+                  </Grid2>
+                )}
+              
+              */}
+              
             </Grid2>
           </Box>
         </Box>

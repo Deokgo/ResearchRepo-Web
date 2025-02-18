@@ -234,6 +234,7 @@ const Navbar = () => {
       Collections: "/collection",
       "Research Thrusts": "/researchthrust",
       Dashboard: "/dash",
+      "Knowledge Graph": "/knowledgegraph",
       "Manage Users": "/manage-users",
       "Manage Colleges": "/managecollege",
       "Manage Programs": "/manageprogram",
@@ -261,16 +262,17 @@ const Navbar = () => {
     if (user.role !== "01") {
       commonItems.push(
         { label: "Collections", onClick: handleCollection },
-        { label: "Research Thrusts", onClick: handleResearchThrust }
       );
     }
     
     // For mobile view, add these common items
     if (forMobile) {
-      commonItems.push(
-        { label: "About Us", onClick: handleAboutUs },
-        { label: "Help", onClick: handleHelp},
-      );
+      if (user.role !== "06") {
+        commonItems.push(
+          { label: "About Us", onClick: handleAboutUs },
+          { label: "Help", onClick: handleHelp},
+        );
+      } 
     }
   
     // If mobile or size is mobile and we want mobile items
@@ -293,6 +295,7 @@ const Navbar = () => {
       "02": [
         // Director
         { label: "Dashboard", onClick: handleReports },
+        { label: "Knowledge Graph", onClick: handleKnowledgeGraph },
         { label: "Research Tracking", onClick: handleResesearchTrack },
         ...commonItems,
       ],
@@ -304,6 +307,7 @@ const Navbar = () => {
       "04": [
         // College Administrator
         { label: "Dashboard", onClick: handleReports },
+        { label: "Knowledge Graph", onClick: handleKnowledgeGraph },
         ...commonItems,
       ],
       "05": [
@@ -318,6 +322,8 @@ const Navbar = () => {
       "06": [
         // Researcher
         ...commonItems,
+        { label: "About Us", onClick: handleAboutUs },
+        { label: "Help", onClick: handleHelp},
       ],
     };
 

@@ -27,20 +27,27 @@ const ArrowSteps = ({ steps, onStepClick }) => {
           key={index}
           className="arrow"
           style={{
+            width: "100%",  // Adjust arrow width
+            height: "80px", // Adjust arrow height
             backgroundColor:
-              clickedIndices.includes(index) // Check if the step is clicked
-                ? step.activeColor // Set active color for clicked steps
-                : hoveredIndex === index // Set hover color when hovered
+              clickedIndices.includes(index)
+                ? step.activeColor
+                : hoveredIndex === index
                 ? step.hoverColor
-                : step.color, // Default color
+                : step.color,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            borderRadius: "8px", // Optional: round corners
+            transition: "background-color 0.3s",
           }}
           onMouseEnter={() => handleMouseEnter(index)}
           onMouseLeave={handleMouseLeave}
           onClick={() => handleStepClick(step, index)}
         >
-          <div className="icon-badge-container">
-            <i className={`fas ${step.icon}`}></i>
-            <span className="badge">
+          <div className="icon-badge-container" style={{ display: "flex", alignItems: "center" }}>
+            <i className={`fas ${step.icon}`} style={{ fontSize: "30px", marginRight: "6px" }}></i>
+            <span className="badge" style={{ fontSize: "14px", width: "27px", height: "24px", lineHeight: "15px" }}>
               {step.badge >= 100 ? "99+" : step.badge}
             </span>
           </div>

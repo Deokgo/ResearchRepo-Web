@@ -52,8 +52,6 @@ const ResearchTracking = () => {
   // Add navigate hook at the top with other hooks
   const navigate = useNavigate();
 
-  // Define rowsPerPage constant
-  const rowsPerPage = 5; // or whatever number you want to use
 
   // Then declare all state variables
   const [users, setUsers] = useState([]);
@@ -92,7 +90,7 @@ const ResearchTracking = () => {
   const debouncedColleges = useDebounce(selectedColleges, 300);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5; // Or whatever number you prefer
+  const itemsPerPage = 10; // Or whatever number you prefer
 
   const steps = [
     {
@@ -411,8 +409,7 @@ const ResearchTracking = () => {
   };
 
   const handleSearchChange = (e) => {
-    const query = e.target.value.toLowerCase();
-    setSearchQuery(query);
+    setSearchQuery(e.target.value);
   };
 
   const handleKey = (key) => {
@@ -482,7 +479,7 @@ const ResearchTracking = () => {
           >
             <Grid2
               container
-              spacing={4}
+              spacing={3}
               sx={{ height: "100%", flexWrap: "nowrap" }}
             >
               {/* Filter Section (Left) */}
@@ -491,7 +488,7 @@ const ResearchTracking = () => {
                   <Box
                     sx={{
                       border: "1px solid #0A438F",
-                      height: "90%",
+                      height: "80%",
                       borderRadius: 3,
                       padding: 3,
                       overflow: "auto",
@@ -658,7 +655,6 @@ const ResearchTracking = () => {
                   className='App'
                   style={{
                     width: "100%", // Full width
-                    transform: "scale(0.8)", // Reduce size
                     transformOrigin: "center", // Keep alignment
                   }}
                 >
@@ -681,24 +677,16 @@ const ResearchTracking = () => {
                     onChange={handleSearchChange}
                     sx={{
                       flex: 2,
-                      // Responsive font size
                       "& .MuiInputBase-input": {
                         fontSize: {
-                          xs: "0.75rem", // Mobile
-                          sm: "0.85rem", // Small devices
-                          md: "0.9rem", // Medium devices
-                          lg: "1rem", // Large devices
+                          xs: "0.5rem",
+                          md: "0.75rem",
+                          lg: "1rem",
                         },
-                        // Adjust input height
-                        padding: {
-                          xs: "8px 12px", // Mobile
-                          md: "12px 14px", // Larger screens
-                        },
-                        // Optional: adjust overall height
-                        height: {
-                          xs: "15px", // Mobile
-                          md: "25px", // Larger screens
-                        },
+                      },
+                      "& .MuiInputBase-input::placeholder": {
+                        fontSize: "0.85rem", // Adjust placeholder font size
+                        color: "rgba(0, 0, 0, 0.5)", // Optional: Adjust placeholder color
                       },
                     }}
                     InputProps={{
@@ -723,15 +711,15 @@ const ResearchTracking = () => {
                     }}
                   >
                     <Typography
-                      padding={5}
+                      padding={3.5}
                       variant='h6'
                       sx={{
                         justifyContent: "center",
                         color: "#8B8B8B",
-                        fontSize: { xs: "0.75rem", md: "0.75rem", lg: "1rem" },
+                        fontSize: { xs: "0.75rem", md: "0.8rem", lg: "0.95rem" },
                       }}
                     >
-                      {filteredResearch.length} results found
+                      <strong>{filteredResearch.length}</strong> results found
                     </Typography>
                   </Box>
                 </Box>
@@ -773,7 +761,7 @@ const ResearchTracking = () => {
                                 <Typography
                                   variant='h6'
                                   sx={{
-                                    mb: 1,
+                                    mb: 0.8,
                                     fontSize: {
                                       xs: "0.5rem",
                                       md: "0.75rem",
@@ -788,7 +776,6 @@ const ResearchTracking = () => {
                                   variant='body2'
                                   color='textSecondary'
                                   sx={{
-                                    mb: 0.5,
                                     color: "#666",
                                     fontSize: {
                                       xs: "0.5rem",
@@ -797,11 +784,11 @@ const ResearchTracking = () => {
                                     },
                                   }}
                                 >
-                                  Status: {paper.status} | Authors:{" "}
+                                  <strong>Status:</strong>&nbsp;{paper.status} | <strong>Authors:</strong>&nbsp;
                                   {paper.authors
                                     .map((author) => author.name)
                                     .join(", ")}{" "}
-                                  | Last Updated: {paper.timestamp}
+                                  | <strong>Last Updated:</strong>&nbsp;{paper.timestamp}
                                 </Typography>
                               </Box>
                             )}

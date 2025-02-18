@@ -92,7 +92,7 @@ const LoginModal = () => {
           navigate("/manage-users");
           break;
         case "02":
-          navigate("/researchtracking");
+          navigate("/dash");
           break;
         case "03":
           navigate("/dash");
@@ -101,7 +101,7 @@ const LoginModal = () => {
           navigate("/dash");
           break;
         case "05":
-          navigate("/progdash");
+          navigate("/researchtracking");
           break;
         case "06":
           navigate("/collection");
