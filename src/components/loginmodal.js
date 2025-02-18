@@ -92,13 +92,17 @@ const LoginModal = () => {
           navigate("/manage-users");
           break;
         case "02":
-        case "03":
           navigate("/researchtracking");
+          break;
+        case "03":
+          navigate("/dash");
           break;
         case "04":
           navigate("/dash");
           break;
         case "05":
+          navigate("/progdash");
+          break;
         case "06":
           navigate("/collection");
           break;

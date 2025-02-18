@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, IconButton, Typography } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import homeBg from "../assets/home_bg.png";
 import newBG from "../assets/new_header_bg.png";
@@ -45,10 +45,11 @@ const HeaderWithBackButton = ({ title, onBack, backgroundImage }) => {
         />
       )}
       <Box sx={{ display: "flex", ml: "5rem", zIndex: 3 }}>
-        <IconButton
+        <Button
           onClick={onBack}
           sx={{
             color: "#fff",
+            height: "inherit",
             transform: {
               xs: "scale(0.8)",
               sm: "scale(1)",
@@ -57,7 +58,7 @@ const HeaderWithBackButton = ({ title, onBack, backgroundImage }) => {
           }}
         >
           <ArrowBackIosIcon />
-        </IconButton>
+        </Button>
         <Typography
           variant='h3'
           sx={{

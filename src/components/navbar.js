@@ -268,7 +268,6 @@ const Navbar = () => {
     // For mobile view, add these common items
     if (forMobile) {
       commonItems.push(
-        { label: "Profile", onClick: handleProfile },
         { label: "About Us", onClick: handleAboutUs },
         { label: "Help", onClick: handleHelp},
       );
@@ -300,7 +299,6 @@ const Navbar = () => {
       "03": [
         // Head Executive
         { label: "Dashboard", onClick: handleReports },
-        { label: "Research Tracking", onClick: handleResesearchTrack },
         ...commonItems,
       ],
       "04": [
@@ -320,8 +318,6 @@ const Navbar = () => {
       "06": [
         // Researcher
         ...commonItems,
-        { label: "About Us", onClick: handleAboutUs },
-        { label: "Help", onClick: handleHelp},
       ],
     };
 
@@ -482,7 +478,17 @@ const Navbar = () => {
                   {item.label}
                 </Button>
               ))}
-              <IconButton
+              <Divider
+                orientation='vertical'
+                flexItem
+                sx={{
+                  borderColor: "#CA031B",
+                  height: { xs: "2rem", md: "2rem" },
+                  borderWidth: { xs: "1px", sm: "1px", md: "2px" },
+                  alignSelf: "center",
+                }}
+              />
+              <Button
                 onClick={handleOpenUserMenu}
                 sx={{
                   color: "#CA031B",
@@ -490,7 +496,24 @@ const Navbar = () => {
                 }}
               >
                 <AccountCircleIcon fontSize='inherit' />
-              </IconButton>
+                <Typography
+                  variant="h6"
+                  sx={{
+                    alignSelf: "center",
+                    fontFamily: "Montserrat, sans-serif",
+                    ml: 1,
+                    color: "#001C43",
+                    fontSize: {
+                        xs: "0.55em",
+                        sm: "0.6rem",
+                        md: "0.65rem",
+                        lg: "0.7rem",
+                      },
+                    }}
+                  >
+                    <strong style={{ fontSize: "0.8rem" }}>{user?.first_name} {user?.last_name}</strong> <br /> {user?.role_name}
+                  </Typography>
+              </Button>
             </Box>
           )}
         </Box>
@@ -508,7 +531,7 @@ const Navbar = () => {
           </IconButton>
 
           <Menu
-            id='menu-appbar'
+            id="menu-appbar"
             anchorEl={anchorElNav}
             anchorOrigin={{
               vertical: "bottom",
@@ -521,14 +544,52 @@ const Navbar = () => {
             }}
             open={Boolean(anchorElNav)}
             onClose={handleCloseNavMenu}
-            sx={{ "& .MuiPaper-root": { backgroundColor: "#CA031B" } }}
+            onSelect={handleCloseNavMenu}
+            sx={{
+              "& .MuiPaper-root": {
+                backgroundColor: "#CA031B",
+                width: "auto", // Adjust width as needed
+              },
+            }}
           >
+            {isLoggedIn && (
+              <>
+                <Button
+                  onClick={handleProfile}
+                  sx={{
+                    color: "#FFF",
+                    fontSize: { xs: "2rem", md: "2rem", lg: "3rem" },
+                    paddingLeft: 2,
+                    paddingRight: 2
+                  }}
+                >
+                  <AccountCircleIcon fontSize='inherit' />
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      fontFamily: "Montserrat, sans-serif",
+                      ml: 1,
+                      color: "#FFF",
+                      fontSize: {
+                        xs: "0.55em",
+                        sm: "0.6rem",
+                        md: "0.65rem",
+                        lg: "0.7rem",
+                      },
+                    }}
+                  >
+                    <strong style={{ fontSize: "0.8rem" }}>{user?.first_name} {user?.last_name}</strong> <br /> {user?.role_name}
+                  </Typography>
+                </Button>
+                <Divider sx={{ borderColor: "#FFFFF" }} />
+              </>
+            )}
             {mobileMenuItems.map((menuItem, index) => (
               <MenuItem
                 key={index}
                 onClick={() => {
                   menuItem.onClick();
-                  handleCloseNavMenu();
+                  handleCloseNavMenu(); // Close the menu
                 }}
               >
                 <Typography textAlign='center' sx={{ color: "#FFF" }}>
@@ -537,21 +598,23 @@ const Navbar = () => {
               </MenuItem>
             ))}
 
+
             {isLoggedIn && (
               <>
-                <Divider sx={{ borderColor: "#FFF" }} />
+                <Divider sx={{ borderColor: "#FFFFF" }} />
                 <MenuItem
                   key='Log out'
                   onClick={() => {
-                    confirmLogout();
-                    handleCloseNavMenu();
+                    handleCloseNavMenu(); // Ensure the menu closes
+                    confirmLogout(); 
                   }}
                 >
                   <ListItemIcon>
-                      <LogoutIcon sx={{ color: "#FFF" }} />
+                    <LogoutIcon sx={{ color: "#FFF" }} />
                   </ListItemIcon>
                   <Typography textAlign='center' sx={{ color: "#FFF", fontWeight: 800 }}>Log out</Typography>
                 </MenuItem>
+
               </>
             )}
           </Menu>
@@ -561,16 +624,17 @@ const Navbar = () => {
         <Menu
           anchorEl={anchorElUser}
           anchorOrigin={{
-            vertical: "top",
-            horizontal: "right",
+            vertical: "bottom",
+            horizontal: "center",
           }}
           keepMounted
           transformOrigin={{
             vertical: "top",
-            horizontal: "right",
+            horizontal: "center",
           }}
           open={Boolean(anchorElUser)}
           onClose={handleCloseUserMenu}
+          onClick={handleCloseUserMenu}
           sx={{ "& .MuiPaper-root": { backgroundColor: "#CA031B" } }}
         >
           { user?.role === "06" ? (
