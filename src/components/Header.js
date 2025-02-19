@@ -27,6 +27,7 @@ const HeaderWithBackButton = ({ title, onBack, backgroundImage }) => {
           sm: "3rem",
           md: "4rem",
         },
+        overflow: "hidden",
       }}
     >
       {newBG && (

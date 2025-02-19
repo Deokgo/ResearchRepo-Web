@@ -1,12 +1,18 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Navbar from "../components/navbar";
-import { Box } from "@mui/material";
+import { Box, Tabs, Tab } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import HeaderWithBackButton from "../components/Header";
+import { useAuth } from "../context/AuthContext";
 
 const KnowledgeGraph = () => {
   const navigate = useNavigate();
   const iframeRef = useRef(null);
+  const { user } = useAuth();
+  const [activeTab, setActiveTab] = useState(0);
+
+  // Check if user has permission to see tabs
+  const showTabs = user?.role === "02" || user?.role === "04"; // Director or College Admin
 
   useEffect(() => {
     const handleMessage = (event) => {
@@ -32,6 +38,10 @@ const KnowledgeGraph = () => {
     };
   }, [navigate]);
 
+  const handleTabChange = (event, newValue) => {
+    setActiveTab(newValue);
+  };
+
   return (
     <Box sx={{ margin: 0, padding: 0 }}>
       <Navbar />
@@ -52,6 +62,28 @@ const KnowledgeGraph = () => {
           title='Knowledge Graph'
           onBack={() => navigate(-1)}
         />
+        {showTabs && (
+          <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+            <Tabs
+              value={activeTab}
+              onChange={handleTabChange}
+              sx={{
+                "& .MuiTab-root": {
+                  color: "#666",
+                  "&.Mui-selected": {
+                    color: "#0A438F",
+                  },
+                },
+                "& .MuiTabs-indicator": {
+                  backgroundColor: "#0A438F",
+                },
+              }}
+            >
+              <Tab label='SDG/Research Area' />
+              <Tab label='Program-Keywords' />
+            </Tabs>
+          </Box>
+        )}
         <Box
           sx={{
             flexGrow: 1,
@@ -61,10 +93,12 @@ const KnowledgeGraph = () => {
         >
           <iframe
             ref={iframeRef}
-            src='http://localhost:5000/knowledgegraph'
+            src={`http://localhost:5000/knowledgegraph${
+              activeTab === 1 ? "/research-network" : ""
+            }?role=${user?.role || ""}`}
             style={{
               width: "100%",
-              height: "100%",
+              height: showTabs ? "calc(100% - 96px)" : "calc(100% - 48px)", // Adjust height for tabs
               border: "none",
             }}
             title='Knowledge Graph'
