@@ -140,15 +140,15 @@ const DashEmbed = () => {
   };
 
   const tabSettings = {
-    fontSize: '1rem', // Adjust label font size
+    fontSize: {
+      sm: "0.7rem",
+      md: "0.7rem",
+      lg: "0.9rem",
+    },
     display: 'flex',
     flexDirection: 'row', // Make sure items flow horizontally
     alignItems: 'center', // Center items vertically
     justifyContent: 'flex-start', // Start from the left
-    padding: '12px', // Add some padding
-    '& .MuiTab-iconWrapper': {
-      marginRight: 0, // Remove default icon margin
-    }
   }
 
   return (
@@ -163,7 +163,7 @@ const DashEmbed = () => {
       >
         <Navbar />
         
-        <Box sx={{ display: "flex", height: "100vh", paddingTop: "5rem" }}>
+        <Box sx={{ display: "flex", height: "100vh", paddingTop: "3.5rem" }}>
           <Box ref={menuRef} sx={{ display: "flex", height: "100vh" }}>
             <Tabs
               scrollButtons={false}
@@ -171,9 +171,8 @@ const DashEmbed = () => {
               value={selectedTab}
               onChange={handleTabChange}
               sx={{ 
-                borderRight: 1, 
                 borderColor: "divider", 
-                width: expanded ? 350 : 90.5, 
+                width: expanded ? 350 : 75, 
                 transition: "width 0.1s ease-in-out", 
                 backgroundColor: "#08397C", // Base background color
                 backgroundImage: `linear-gradient(rgba(8, 57, 124, 0.65), rgba(8, 57, 124, 0.65)), url(${newBG})`,  
@@ -206,16 +205,16 @@ const DashEmbed = () => {
                     cursor: 'pointer', // Add this line
                     textAlign: "start",
                     fontSize: {
-                      xs: "clamp(1rem, 2vw, 0.6rem)",
-                      sm: "clamp(1.5rem, 3.5vw, 0.7rem)",
-                      md: "clamp(2rem, 4vw, 0.8rem)",
+                      sm: "1.25rem",
+                      md: "1.5rem",
+                      lg: "1.75rem",
                     },
                   }}
                 >
                   <MenuIcon sx={{ fontSize: 25, color: "white" }}/>&nbsp;Dashboard
                 </Typography>
               ) : (
-                <Tab icon={<MenuIcon sx={{ fontSize: 50, color: "white", padding: "0.5rem" }} />} 
+                <Tab icon={<MenuIcon sx={{ fontSize: 50, color: "white", padding: "0.75rem", marginRight: "0.75rem"  }} />} 
                   label={expanded ? "Menu" : ""} 
                   onClick={handleMenuClick} 
                   sx={{ display: 'flex', alignItems: 'flex-start' }}
@@ -224,7 +223,7 @@ const DashEmbed = () => {
 
               <CustomTooltip title="Institutional Performance" placement="right">
                 <Tab 
-                  icon={<TrackChangesIcon sx={{ fontSize: 60, color: "white", padding: "0.9rem" }}/>}
+                  icon={<TrackChangesIcon sx={{ fontSize: 60, color: "white", padding: "0.9rem", marginRight: "0.75rem" }}/>}
                   label={expanded ? "Institutional Performance" : ""}
                   sx={tabSettings}
                 />
@@ -232,7 +231,7 @@ const DashEmbed = () => {
               {user?.role !== "05" && (
                 <CustomTooltip title="SDG Impact" placement="right">
                   <Tab 
-                    icon={<FlagIcon sx={{ fontSize: 60, color: "white", padding: "0.9rem" }}/>}
+                    icon={<FlagIcon sx={{ fontSize: 60, color: "white", padding: "0.9rem", marginRight: "0.75rem" }}/>}
                     label={expanded ? "SDG Impact" : ""}
                     sx={tabSettings}
                   />
@@ -241,7 +240,7 @@ const DashEmbed = () => {
               {user?.role !== "05" && (
                 <CustomTooltip title="User Engagement" placement="right">
                   <Tab 
-                    icon={<SupervisedUserCircleIcon sx={{ fontSize: 60, color: "white", padding: "0.9rem" }}/>}
+                    icon={<SupervisedUserCircleIcon sx={{ fontSize: 60, color: "white", padding: "0.9rem", marginRight: "0.75rem" }}/>}
                     label={expanded ? "User Engagement" : ""}
                     sx={tabSettings}
                   />
@@ -276,7 +275,6 @@ const DashEmbed = () => {
                 title="Dash App"
               />
             </Box>
-
         </Box>
       </Box>
     </>

@@ -23,9 +23,9 @@ const HeaderWithBackButton = ({ title, onBack, backgroundImage }) => {
         alignItems: "center",
         zIndex: 1,
         marginTop: {
-          xs: "4rem",
-          sm: "4.5rem",
-          md: "5rem",
+          xs: "3rem",
+          sm: "3rem",
+          md: "4rem",
         },
       }}
     >

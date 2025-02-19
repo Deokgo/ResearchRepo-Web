@@ -2,7 +2,6 @@
 
 import MenuIcon from "@mui/icons-material/Menu";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
 import LogoutIcon from '@mui/icons-material/Logout';
 import LoginIcon from '@mui/icons-material/Login';
@@ -25,7 +24,7 @@ import {
   DialogActions,
   ListItemIcon,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import navLogo from "../assets/MMCL_Logo_Nav.png";
 import LoginModal from "./loginmodal";
@@ -82,20 +81,9 @@ const Navbar = () => {
     fontFamily: "Montserrat, sans-serif",
     fontWeight: 600,
     fontSize: {
-      xs: "0.25rem",
       sm: "0.25rem",
-      md: "0.60rem",
-      lg: "0.75rem",
-    },
-    marginRight: {
-      xs: "0.75rem",
-      sm: "0.50rem",
-      md: "0.25rem",
-    },
-    padding: {
-      xs: "0rem 0.25rem",
-      sm: "0.25rem 0.5rem",
-      md: "0.25rem 0.5rem",
+      md: "0.5rem",
+      lg: "0.6rem",
     },
     "&:hover": {
       backgroundColor: "rgba(202, 3, 27, 0.04)",
@@ -262,6 +250,7 @@ const Navbar = () => {
     if (user.role !== "01") {
       commonItems.push(
         { label: "Collections", onClick: handleCollection },
+        { label: "Knowledge Graph", onClick: handleKnowledgeGraph },
       );
     }
     
@@ -295,7 +284,6 @@ const Navbar = () => {
       "02": [
         // Director
         { label: "Dashboard", onClick: handleReports },
-        { label: "Knowledge Graph", onClick: handleKnowledgeGraph },
         { label: "Research Tracking", onClick: handleResesearchTrack },
         ...commonItems,
       ],
@@ -307,7 +295,6 @@ const Navbar = () => {
       "04": [
         // College Administrator
         { label: "Dashboard", onClick: handleReports },
-        { label: "Knowledge Graph", onClick: handleKnowledgeGraph },
         ...commonItems,
       ],
       "05": [
@@ -335,6 +322,25 @@ const Navbar = () => {
     return items;
   };
 
+  useEffect(() => {
+    let prevRatio = window.devicePixelRatio;
+  
+    const handleZoomChange = () => {
+      if (window.devicePixelRatio !== prevRatio) {
+        handleCloseNavMenu();
+        handleCloseUserMenu();
+        prevRatio = window.devicePixelRatio;
+      }
+    };
+  
+    window.addEventListener("resize", handleZoomChange);
+  
+    return () => {
+      window.removeEventListener("resize", handleZoomChange);
+    };
+  }, []);
+  
+
   const mobileMenuItems = getNavbarItems(true);
 
   return (
@@ -343,9 +349,9 @@ const Navbar = () => {
       sx={{
         backgroundColor: "#FFF",
         height: {
-          xs: "4rem",
-          sm: "4.5rem",
-          md: "5rem",
+          xs: "3rem",
+          sm: "3.5rem",
+          md: "4rem",
         },
         zIndex: theme.zIndex.appBar,
       }}
@@ -371,8 +377,8 @@ const Navbar = () => {
             onClick={null}
             sx={{
               p: 0,
-              width: { xs: "3rem", sm: "3.5rem", md: "4rem", lg: "5rem" },
-              height: { xs: "3rem", sm: "3.5rem", md: "4rem", lg: "5rem" },
+              width: { xs: "3rem", sm: "3rem", md: "3.5rem", lg: "3.75rem" },
+              height: "100%",
             }}
           >
             <img
@@ -393,7 +399,7 @@ const Navbar = () => {
               mx: { xs: 1.5, md: 2 },
               borderColor: "#CA031B",
               height: { xs: "2rem", md: "2rem" },
-              borderWidth: { xs: "1px", sm: "1px", md: "2px" },
+              borderWidth: { xs: "1px", sm: "1px", md: "1.5px" },
               alignSelf: "center",
             }}
           />
@@ -413,10 +419,10 @@ const Navbar = () => {
                 fontWeight: 600,
                 color: "#CA031B",
                 fontSize: {
-                  xs: "0.7rem",
-                  sm: "0.75rem",
-                  md: "0.75rem",
-                  lg: "1rem",
+                  sm: "0.5rem",
+                  sm: "0.6rem",
+                  md: "0.7rem",
+                  lg: "0.8rem",
                 },
               }}
             >
@@ -429,10 +435,10 @@ const Navbar = () => {
                 fontWeight: 600,
                 color: "#001C43",
                 fontSize: {
-                  xs: "0.7rem",
-                  sm: "0.75rem",
-                  md: "0.75rem",
-                  lg: "1rem",
+                  sm: "0.5rem",
+                  sm: "0.6rem",
+                  md: "0.7rem",
+                  lg: "0.8rem",
                 },
                 lineHeight: { xs: "1.2", md: "1.2" },
               }}
@@ -464,14 +470,14 @@ const Navbar = () => {
                   ...buttonSettings, 
                   color: "#CA031B", 
                   fontSize: "1rem", 
-                  fontWeight: 600 
+                  fontWeight: 700 
                 }}
               >
                 <LoginIcon/>&nbsp;Log in
               </Button>
             </Box>
           ) : (
-            <Box sx={{ display: "flex", gap: 2 }}>
+            <Box sx={{ display: "flex", gap: 1 }}>
               {getNavbarItems().map((item, index) => (
                 <Button
                   key={index}
@@ -488,9 +494,10 @@ const Navbar = () => {
                 orientation='vertical'
                 flexItem
                 sx={{
+                  ml: 1,
                   borderColor: "#CA031B",
                   height: { xs: "2rem", md: "2rem" },
-                  borderWidth: { xs: "1px", sm: "1px", md: "2px" },
+                  borderWidth: { xs: "1px", sm: "1px", md: "1.5px" },
                   alignSelf: "center",
                 }}
               />
@@ -498,7 +505,7 @@ const Navbar = () => {
                 onClick={handleOpenUserMenu}
                 sx={{
                   color: "#CA031B",
-                  fontSize: { xs: "2rem", md: "2rem", lg: "3rem" },
+                  fontSize: { xs: "2rem", md: "2rem", lg: "2.5rem" },
                 }}
               >
                 <AccountCircleIcon fontSize='inherit' />
@@ -510,14 +517,14 @@ const Navbar = () => {
                     ml: 1,
                     color: "#001C43",
                     fontSize: {
-                        xs: "0.55em",
-                        sm: "0.6rem",
-                        md: "0.65rem",
-                        lg: "0.7rem",
-                      },
+                      sm: "0.3rem",
+                      md: "0.4rem",
+                      lg: "0.5rem",
+                    },
                     }}
                   >
-                    <strong style={{ fontSize: "0.8rem" }}>{user?.first_name} {user?.last_name}</strong> <br /> {user?.role_name}
+                    <strong style={{ fontSize: "0.7rem" }}>{user?.first_name} {user?.last_name}</strong> <br /> 
+                    {user?.role_name} <br />  {(user?.role === "04" || user?.role === "05" || user?.role === "06") && (<>{user?.college} - {user?.program}</>)}
                   </Typography>
               </Button>
             </Box>
@@ -531,7 +538,7 @@ const Navbar = () => {
             aria-controls='menu-appbar'
             aria-haspopup='true'
             onClick={handleOpenNavMenu}
-            sx={{ color: "#CA031B" }}
+            sx={{ color: "#CA031B", pb: "1rem" }}
           >
             <MenuIcon />
           </IconButton>
@@ -584,7 +591,8 @@ const Navbar = () => {
                       },
                     }}
                   >
-                    <strong style={{ fontSize: "0.8rem" }}>{user?.first_name} {user?.last_name}</strong> <br /> {user?.role_name}
+                    <strong style={{ fontSize: "0.8rem" }}>{user?.first_name} {user?.last_name}</strong> <br /> 
+                    {user?.role_name} {(user?.role === "04" || user?.role === "05" || user?.role === "06") && (<>| {user?.college} - {user?.program}</>)}
                   </Typography>
                 </Button>
                 <Divider sx={{ borderColor: "#FFFFF" }} />
@@ -598,7 +606,14 @@ const Navbar = () => {
                   handleCloseNavMenu(); // Close the menu
                 }}
               >
-                <Typography textAlign='center' sx={{ color: "#FFF" }}>
+                <Typography textAlign='center' 
+                sx={{ 
+                  fontSize: {
+                    sm: "0.7rem",
+                    md: "0.9rem",
+                    lg: "1rem",
+                  },
+                  color: "#FFF" }}>
                   {menuItem.label}
                 </Typography>
               </MenuItem>
@@ -646,31 +661,31 @@ const Navbar = () => {
           { user?.role === "06" ? (
             <>
               <MenuItem onClick={handleProfile}>
-                <Typography color='common.white'>Profile</Typography>
+                <Typography color='common.white' sx={{fontSize: { sm: "0.7rem", md: "0.9rem", lg: "1rem" }}}>Profile</Typography>
               </MenuItem>
               <Divider />
               <MenuItem onClick={confirmLogout}>
-                <Typography color='common.white'>Log out</Typography>
+                <Typography color='common.white' sx={{fontSize: { sm: "0.7rem", md: "0.9rem", lg: "1rem" }}}>Log out</Typography>
               </MenuItem>
             </>
             
           ) : (
             <>
               <MenuItem onClick={handleProfile}>
-                <Typography color='common.white'>Profile</Typography>
+                <Typography color='common.white' sx={{fontSize: { sm: "0.7rem", md: "0.9rem", lg: "1rem" }}}>Profile</Typography>
               </MenuItem>
               <MenuItem onClick={handleAboutUs}>
-                <Typography color='common.white'>About Us</Typography>
+                <Typography color='common.white' sx={{fontSize: { sm: "0.7rem", md: "0.9rem", lg: "1rem" }}}>About Us</Typography>
               </MenuItem>
               <MenuItem onClick={handleHelp}>
-                <Typography color='common.white'>Help</Typography>
+                <Typography color='common.white' sx={{fontSize: { sm: "0.7rem", md: "0.9rem", lg: "1rem" }}}>Help</Typography>
               </MenuItem>
               <Divider />
               <MenuItem onClick={confirmLogout}>
                 <ListItemIcon>
                     <LogoutIcon sx={{ color: "#FFF" }} />
                 </ListItemIcon>
-                <Typography textAlign='center' sx={{ color: "#FFF", fontWeight: 800 }}>Log out</Typography>
+                <Typography textAlign='center' sx={{ color: "#FFF", fontWeight: 800, fontSize: { sm: "0.7rem", md: "0.9rem", lg: "1rem" } }}>Log out</Typography>
               </MenuItem>
             </>
           )} 

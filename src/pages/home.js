@@ -3,7 +3,8 @@ import homeBg from "../assets/home_bg.png";
 import { useNavigate } from "react-router-dom";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
-import placeholderImage from "../assets/placeholder_image.png";
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
+import InfoIcon from '@mui/icons-material/Info';
 import CAS from "../assets/CAS.jpg";
 import CCIS from "../assets/CCIS.jpg";
 import CHS from "../assets/CHS.jpg";
@@ -17,6 +18,7 @@ import LoginModal from "../components/loginmodal";
 import SignupModal from "../components/signupmodal";
 import PasswordResetModal from "../components/passresetmodal";
 import DummyKG from "../assets/dummy_kg.png";
+import { isMobile } from "react-device-detect";
 import {
   Box,
   Button,
@@ -29,10 +31,8 @@ import {
 import { useModalContext } from "../context/modalcontext";
 
 const Home = () => {
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
-  const isMobile = useMediaQuery("(max-width:600px)");
+  const isSizeMobile = useMediaQuery("(max-width:600px)");
   const { openLoginModal, openSignupModal, openPassresetModal } =
     useModalContext();
 
@@ -117,12 +117,49 @@ const Home = () => {
     dots: true,
     infinite: true,
     speed: 1000,
-    slidesToShow: 1,
+    slidesToShow: (isMobile || isSizeMobile ? 3 : 1),
     slidesToScroll: 1,
     autoplay: true,
     autoplaySpeed: 4000,
     nextArrow: <NextArrow />,
     prevArrow: <PrevArrow />,
+  };
+
+  const darkenColor = (color, percent) => {
+    const num = parseInt(color.replace("#", ""), 16);
+    const amt = Math.round(255 * percent);
+    const R = (num >> 16) - amt;
+    const G = ((num >> 8) & 0x00ff) - amt;
+    const B = (num & 0x0000ff) - amt;
+    return `rgb(${Math.max(R, 0)}, ${Math.max(G, 0)}, ${Math.max(B, 0)})`;
+  };
+  
+
+  const buttonStyle = (bgColor) => ({
+    backgroundColor: bgColor,
+    color: "#FFF",
+    fontFamily: "Montserrat, sans-serif",
+    fontWeight: 600,
+    textTransform: "none",
+    fontSize: { xs: "0.875rem", md: "1rem" },
+    margin: "1rem",
+    padding: "0.4rem 1.2rem",
+    borderRadius: "100px",
+    transition: "all 0.3s ease-in-out",
+    "&:hover": {
+      backgroundColor: darkenColor(bgColor, 0.15), // Slightly darker shade
+      transform: "scale(1.05)", // Slight enlargement on hover
+    },
+  });
+
+  const textStyle = {
+    fontFamily: "Montserrat, sans-serif",
+    fontWeight: 300,
+    fontSize: { xs: "0.8rem", md: "1rem" },
+    color: "#F0F0F0",
+    textAlign: "center",
+    mt: 3,
+    px: 2,
   };
 
   const handleReadMore = () => {
@@ -131,32 +168,22 @@ const Home = () => {
 
   return (
     <>
-      <Box
-        sx={{
-          margin: 0,
-          padding: 0,
-          minHeight: "100vh",
-          display: "flex",
-          flexDirection: "column",
-          paddingTop: {
-            xs: "3rem",
-            sm: "4.5rem",
-            md: "5rem",
-          },
-        }}
-      >
+      <Box sx={{ minHeight: "100vh", display: "flex", flexDirection: "column", justifyContent: "center" }}>
         <Navbar />
+        <Box m={4}>
+            
+          </Box>
         <Box
           sx={{
-            position: "relative",
+            flexGrow: 1,
+            gap: 7,
             display: "flex",
             flexDirection: { xs: "column", md: "row" },
-            gap: 4,
-            flexGrow: 1,
-            backgroundPosition: "center",
-            height: { xs: "calc(100vh - 3rem)", md: "calc(100vh - 5rem)" },
             backgroundColor: "#0A438F",
-            padding: "5rem 2rem",
+            padding: { xs: "3rem 1rem", md: "5rem 3rem" },
+            alignItems: (isMobile && isSizeMobile ? "center" : "center"),
+            justifyContent: (isMobile && isSizeMobile ? "center" : "flex-end"),
+            position: "relative",
           }}
         >
           <Box
@@ -168,20 +195,18 @@ const Home = () => {
               bottom: 0,
               backgroundImage: `url(${homeBg})`,
               backgroundSize: "cover",
-              opacity: 0.25,
+              opacity: 0.2,
               zIndex: 1,
             }}
           />
           <Box
             sx={{
               position: "relative",
-              width: { xs: "100%", md: "60%" },
               zIndex: 2,
+              width: { xs: "90%", md: "60%" },
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
-              gap: 4,
-              mt: { xs: 2, md: 0 },
             }}
           >
             <Box
@@ -191,21 +216,14 @@ const Home = () => {
                 "& .slick-list": {
                   width: "100%",
                 },
-                "& .slick-slide": {
-                  padding: { xs: "0.25rem", md: "1rem 12px" },
-                },
-                "& .slick-track": {
-                  display: "flex",
-                  alignItems: "center",
-                },
                 "& .slick-dots": {
-                  bottom: { xs: "-30px", md: "-40px" },
+                  bottom: (isSizeMobile || isSizeMobile? { xs: "-20px", md: "-30px" } : { xs: "-10px", md: "-20px" }),
                 },
               }}
             >
               <Slider {...settings}>
                 {departments.map((department) => (
-                  <Box key={department.id} sx={{ px: 2 }}>
+                  <Box key={department.id} sx={{ px: 4 }}>
                     <Paper
                       elevation={3}
                       sx={{
@@ -213,13 +231,14 @@ const Home = () => {
                         display: "flex",
                         flexDirection: "column",
                         alignItems: "center",
-                        justifyContent: "end",
+                        justifyContent: "flex-end",
                         backgroundImage: `url(${department.image})`,
                         backgroundSize: "cover",
                         backgroundPosition: "center",
-                        height: { xs: "300px", md: "30rem" },
+                        height: { xs: "275px", md: "370px" },
                         width: "100%",
                         position: "relative",
+                        borderRadius: "12px",
                       }}
                     >
                       <Box
@@ -228,8 +247,10 @@ const Home = () => {
                           bottom: 0,
                           left: 0,
                           right: 0,
-                          backgroundColor: "rgba(256,256,256,0.1)",
-                          padding: 2,
+                          backgroundColor: "rgba(0,0,0,0.3)",
+                          padding: 1.5,
+                          borderBottomLeftRadius: "12px",
+                          borderBottomRightRadius: "12px",
                         }}
                       >
                         <Typography
@@ -238,8 +259,14 @@ const Home = () => {
                             fontWeight: 600,
                             fontFamily: "Montserrat, sans-serif",
                             color: "#FFF",
-                            lineHeight: 1.2,
+                            lineHeight: 1,
                             textShadow: "1px 1px 2px rgba(0,0,0,0.5)",
+                            fontSize: {
+                              xs: "0.7em",
+                              sm: "0.8rem",
+                              md: "0.9rem",
+                              lg: "1rem",
+                            },
                           }}
                         >
                           {department.name}
@@ -250,85 +277,32 @@ const Home = () => {
                 ))}
               </Slider>
             </Box>
-            <Box
-              sx={{
-                display: "flex",
-                gap: { xs: 2, md: 4 },
-                justifyContent: "center",
-                mt: { xs: 4, md: 2 },
-              }}
-            >
-              <Button
-                variant='contained'
-                onClick={handleReadMore}
-                sx={{
-                  backgroundColor: "#001C43",
-                  color: "#FFF",
-                  fontFamily: "Montserrat, sans-serif",
-                  fontWeight: 600,
-                  textTransform: "none",
-                  fontSize: { xs: "0.875rem", md: "1rem" },
-                  padding: { xs: "0.5rem 1rem", md: "1.5rem" },
-                  borderRadius: "100px",
-                  maxHeight: "3rem",
-                }}
-              >
-                Read More
-              </Button>
-              <Button
-                variant='contained'
-                onClick={openLoginModal}
-                sx={{
-                  backgroundColor: "#CA031B",
-                  color: "#FFF",
-                  fontFamily: "Montserrat, sans-serif",
-                  fontWeight: 600,
-                  textTransform: "none",
-                  fontSize: { xs: "0.875rem", md: "1rem" },
-                  padding: { xs: "0.5rem 1rem", md: "1.5rem" },
-                  borderRadius: "100px",
-                  maxHeight: "3rem",
-                }}
-              >
-                Get Started
-              </Button>
-            </Box>
+            <Box sx={{ display: "flex", gap: 2, justifyContent: "center", mt: 2 }}>
+            <Button variant="contained" onClick={handleReadMore} sx={buttonStyle("#001C43")}>
+              <InfoIcon sx={{ fontSize: { xs: "0.8rem", md: "1.25rem" } }}/> &nbsp;Read More
+            </Button>
+            <Button variant="contained" onClick={openLoginModal} sx={buttonStyle("#CA031B")}>
+              Get Started <KeyboardArrowRightIcon sx={{ fontSize: { xs: "1rem", md: "1.5rem" } }}/>
+            </Button>
+          </Box>
           </Box>
           <Box
             sx={{
               position: "relative",
-              width: { xs: "100%", md: "40%" },
               zIndex: 2,
-              display: { xs: "none", md: "flex" },
+              width: {xs: "50%", md: "40%"},
+              display: "flex",
               flexDirection: "column",
               alignItems: "center",
-              mt: { xs: 2 },
             }}
           >
             <img
               src={DummyKG}
               alt='Dummy Knowledge Graph'
-              style={{
-                width: "100%",
-                height: "auto",
-                objectFit: "contain",
-                maxHeight: "500px",
-              }}
+              style={{ width: "100%", maxHeight: "100%", objectFit: "contain" }}
             />
-            <Typography
-              variant='body1'
-              sx={{
-                fontFamily: "Montserrat, sans-serif",
-                fontWeight: 300,
-                fontSize: { xs: "1rem", md: "1.1rem" },
-                color: "#F0F0F0",
-                textAlign: "center",
-                mt: 3,
-                px: 2,
-              }}
-            >
-              A research platform for researchers, built by Mapúa MCL
-              researchers
+            <Typography variant="body1" sx={textStyle}>
+              A research platform for researchers, built by Mapúa MCL researchers.
             </Typography>
           </Box>
         </Box>
