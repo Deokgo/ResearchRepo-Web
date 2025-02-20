@@ -44,6 +44,7 @@ import HeaderWithBackButton from "../components/Header";
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 const DisplayResearchInfo = () => {
+  const userId = localStorage.getItem("user_id");
   const [users, setUsers] = useState([]);
   const navigate = useNavigate();
   const location = useLocation();
@@ -105,6 +106,23 @@ const DisplayResearchInfo = () => {
   const [hasChanges, setHasChanges] = useState(false);
 
   const [isSuccessDialogOpen, setIsSuccessDialogOpen] = useState(false);
+
+  useEffect(() => {
+    if (!id) return;
+
+    const timer = setTimeout(async () => {
+        try {
+            await axios.put(
+                `/paper/increment_views/${id}?is_increment=true`,
+                { user_id: userId }
+            );
+        } catch (error) {
+            console.error("Error incrementing view count:", error);
+        }
+    }, 30000); // 30 seconds delay
+
+    return () => clearTimeout(timer); // Clears the timer if user leaves before 30s
+}, [id, userId]);
 
   const handleChange = (field, value) => {
     setEditableData((prev) => {
@@ -991,7 +1009,7 @@ const DisplayResearchInfo = () => {
                                   },
                                 }}
                               >
-                                {item.download_count} Downloads
+                                {item.download_count} Download(s)
                               </Typography>
                             </Stack>
                             <Stack direction='row' alignItems='center' gap={1}>
@@ -1015,7 +1033,7 @@ const DisplayResearchInfo = () => {
                                   },
                                 }}
                               >
-                                {item.view_count} Views
+                                {item.view_count} View(s)
                               </Typography>
                             </Stack>
                           </Stack>

@@ -100,10 +100,10 @@ const ManageUsers = () => {
       setLoading(true);
       const response = await axios.get("/accounts/users");
 
-      // Sort users: ACTIVATED first, then DEACTIVATED
+      // Sort users: ACTIVE first, then INACTIVE
       const sortedUsers = response.data.researchers.sort((a, b) => {
         if (a.acc_status === b.acc_status) return 0;
-        return a.acc_status === "ACTIVATED" ? -1 : 1;
+        return a.acc_status === "ACTIVE" ? -1 : 1;
       });
 
       setUsers(sortedUsers);
@@ -119,7 +119,7 @@ const ManageUsers = () => {
 
   const handleToggleStatus = (user, researcher_id) => {
     const updatedStatus =
-      user.acc_status === "ACTIVATED" ? "DEACTIVATED" : "ACTIVATED";
+      user.acc_status === "ACTIVE" ? "INACTIVE" : "ACTIVE";
 
     setConfirmTitle("Confirm Status Change");
     setConfirmMessage(
@@ -238,10 +238,10 @@ const ManageUsers = () => {
         (user.role_name && user.role_name.toLowerCase().includes(query))
     );
 
-    // Sort users: ACTIVATED first, then DEACTIVATED
+    // Sort users: ACTIVE first, then INACTIVE
     const sortedUsers = filtered.sort((a, b) => {
       if (a.acc_status === b.acc_status) return 0; // Keep relative order if status is same
-      return a.acc_status === "ACTIVATED" ? -1 : 1; // ACTIVATED comes first
+      return a.acc_status === "ACTIVE" ? -1 : 1; // ACTIVE comes first
     });
 
     setFilteredUsers(sortedUsers);
@@ -835,7 +835,7 @@ const ManageUsers = () => {
                             }}
                           >
                             <Switch
-                              checked={user.acc_status === "ACTIVATED"}
+                              checked={user.acc_status === "ACTIVE"}
                               onChange={() =>
                                 handleToggleStatus(user, user.researcher_id)
                               }
@@ -1904,7 +1904,7 @@ const ManageUsers = () => {
                 mt: 1,
             }}
             >
-            Do you want to activate/deactivate this user?
+            Do you want to change the account status of this user?
           </Typography>
         </DialogContent>
         <DialogActions sx={{ padding: "1rem" }}>
