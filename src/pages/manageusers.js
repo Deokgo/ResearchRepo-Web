@@ -603,10 +603,7 @@ const ManageUsers = () => {
       setOpenArchiveConfirmDialog(false); // Close confirmation dialog
       setOpenArchiveModal(false); // Close archive modal
 
-      const response = await axios.post("/accounts/archive_accounts", {
-        archive_type: archiveType,
-        days: archiveDays,
-      });
+      const response = await axios.post("/accounts/archive_accounts");
 
       if (response.data.count > 0) {
         setSuccessMessage(
@@ -725,7 +722,7 @@ const ManageUsers = () => {
                   <AddIcon></AddIcon>&nbsp;Add Users
                 </Button>
                 <Button
-                  onClick={() => setOpenArchiveModal(true)}
+                  onClick={() => setOpenArchiveConfirmDialog(true)}
                   variant='contained'
                   color='primary'
                   sx={{
@@ -1592,13 +1589,7 @@ const ManageUsers = () => {
         </DialogTitle>
         <DialogContent>
           <DialogContentText sx={{ fontFamily: "Montserrat, sans-serif" }}>
-            This operation will archive{" "}
-            {archiveType === "ALL"
-              ? "all inactive and deactivated"
-              : archiveType === "INACTIVE"
-              ? "inactive"
-              : "deactivated"}{" "}
-            accounts that have been in that state for {archiveDays} days.
+            This operation will archive inactive accounts that have been in that state for 2 years.
             <Box sx={{ mt: 2, color: "warning.main", fontSize:'0.8rem' }}>
               Note: Archived accounts will be removed from the active database
               but can be restored later using the generated SQL file.
