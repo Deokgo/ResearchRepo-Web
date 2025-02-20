@@ -49,7 +49,6 @@ const useDebounce = (value, delay) => {
 const Collection = () => {
   const navigate = useNavigate();
   const isMobile = useMediaQuery("(max-width:600px)"); // Checks if the screen is 600px or smaller (mobile)
-  const [userDepartment, setUserDepartment] = useState(null);
   const [research, setResearch] = useState([]);
   const [colleges, setColleges] = useState([]);
   const [programs, setPrograms] = useState([]);
@@ -73,9 +72,6 @@ const Collection = () => {
   const [otherSectionsVisible, setOtherSectionsVisible] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const debouncedColleges = useDebounce(selectedColleges, 300);
-  const handleNavigateKnowledgeGraph = () => {
-    navigate("/knowledgegraph");
-  };
 
   // Fetch publication formats from the API
   useEffect(() => {
@@ -91,12 +87,35 @@ const Collection = () => {
     fetchPublicationFormats();
   }, []);
 
-  const handleResearchItemClick = (item) => {
+  const handleResearchItemClick = async (item) => {
     try {
-        // Navigate to the research details page
+        const currentTime = Date.now();
+        const lastViewedTimeKey = `lastViewedTime_${item.research_id}`;
+        const lastViewedTime = parseInt(localStorage.getItem(lastViewedTimeKey), 10);
+        const userId = localStorage.getItem("user_id");
+
+        // Navigate to the research details page immediately
         navigate(`/displayresearchinfo/${item.research_id}`, {
             state: { id: item.research_id },
         });
+
+        // Check if 30 seconds have passed since last increment
+        if (!lastViewedTime || currentTime - lastViewedTime > 30000) {
+            // Delay incrementing the view count
+            setTimeout(async () => {
+                try {
+                    const response = await axios.put(
+                        `/paper/increment_views/${item.research_id}?is_increment=true`,
+                        { user_id: userId }
+                    );
+
+                    // Save the new timestamp to localStorage
+                    localStorage.setItem(lastViewedTimeKey, Date.now());
+                } catch (error) {
+                    console.error("Error incrementing view count:", error);
+                }
+            }, 30000); // Wait 30 seconds before incrementing
+        }
     } catch (error) {
         console.error("Error handling research item click:", {
             message: error.message,
@@ -105,12 +124,7 @@ const Collection = () => {
             item: item,
         });
     }
-  };
-
-
-  const handleCloseModal = () => {
-    setSelectedResearchItem(null);
-  };
+};
 
   const getUserId = () => {
     const userId = localStorage.getItem("user_id");
@@ -122,7 +136,6 @@ const Collection = () => {
       try {
         const response = await axios.get(`/accounts/users/${userId}`);
         const data = response.data;
-        setUserDepartment(data.researcher.college_id);
       } catch (error) {
         console.error("Error fetching user data:", error);
       }
@@ -132,7 +145,21 @@ const Collection = () => {
   const fetchAllResearchData = async () => {
     try {
       const response = await axios.get(`/dataset/fetch_ordered_dataset`);
-      const fetchedResearch = response.data.dataset;
+      let fetchedResearch = response.data.dataset;
+  
+      // Apply automatic filtering based on user college/program
+      if (user?.role === "04" || user?.role === "05") {
+        setSelectedColleges(user?.college);
+        fetchedResearch = fetchedResearch.filter(
+          (item) => item.college_id === user?.college
+        );
+        if (user?.role === "05"){
+          fetchedResearch = fetchedResearch.filter(
+            (item) => item.program_id === user?.program
+          );
+        }
+      }
+  
       setResearch(fetchedResearch);
       setFilteredResearch(fetchedResearch);
     } catch (error) {
@@ -349,52 +376,6 @@ const Collection = () => {
     currentPage * itemsPerPage
   );
 
-  const handleViewManuscript = async (researchItem) => {
-    const { research_id } = researchItem;
-    if (research_id) {
-      try {
-        // Make the API request to get the PDF as a Blob
-        const response = await axios.get(
-          `/paper/view_manuscript/${research_id}`,
-          {
-            responseType: "blob",
-          }
-        );
-
-        // Create a URL for the Blob and open it in a new tab
-        const blob = new Blob([response.data], { type: "application/pdf" });
-        const url = window.URL.createObjectURL(blob);
-        window.open(url, "_blank");
-
-        // Increment the download count after successfully displaying the Blob
-        const userId = localStorage.getItem("user_id");
-        const incrementResponse = await axios.put(
-          `/paper/increment_downloads/${research_id}`,
-          {
-            user_id: userId,
-          }
-        );
-
-        // Update the download count in the researchItem object
-        const updatedItem = {
-          ...researchItem,
-          download_count: incrementResponse.data.updated_downloads,
-        };
-        setSelectedResearchItem(updatedItem);
-      } catch (error) {
-        console.error("Error handling manuscript:", {
-          message: error.message,
-          response: error.response?.data,
-          status: error.response?.status,
-          item: researchItem,
-        });
-        alert("Failed to retrieve the manuscript. Please try again.");
-      }
-    } else {
-      alert("No manuscript available for this research.");
-    }
-  };
-
   useEffect(() => {
     // If the screen is mobile, hide the other sections
     setOtherSectionsVisible(!isMobile);
@@ -529,71 +510,80 @@ const Collection = () => {
                       </Box>
                     </Box>
 
-                    <Accordion
-                      expanded={expandedAccordion === "college"}
-                      onChange={() => setExpandedAccordion(expandedAccordion === "college" ? null : "college")}
-                    >
-                      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                        <Typography sx={{ color: "#08397C", fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" } }}>
-                          College
-                        </Typography>
-                      </AccordionSummary>
-                      <AccordionDetails>
-                        <Box sx={{ maxHeight: "125px", overflow: "auto", display: "flex", flexDirection: "column" }}>
-                          {colleges.map((college) => (
-                            <FormControlLabel
-                              key={college.college_id}
-                              control={
-                                <Checkbox
-                                  checked={selectedColleges.includes(String(college.college_id))}
-                                  onChange={handleCollegeChange}
-                                  value={college.college_id}
+                    {user?.role !== "04" && (
+                      <>
+                      {user?.role !== "05" && (
+                        <Accordion
+                          expanded={expandedAccordion === "college"}
+                          onChange={() => setExpandedAccordion(expandedAccordion === "college" ? null : "college")}
+                        >
+                          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                            <Typography sx={{ color: "#08397C", fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" } }}>
+                              College
+                            </Typography>
+                          </AccordionSummary>
+                          <AccordionDetails>
+                            <Box sx={{ maxHeight: "125px", overflow: "auto", display: "flex", flexDirection: "column" }}>
+                              {colleges.map((college) => (
+                                <FormControlLabel
+                                  key={college.college_id}
+                                  control={
+                                    <Checkbox
+                                      checked={selectedColleges.includes(String(college.college_id))}
+                                      onChange={handleCollegeChange}
+                                      value={college.college_id}
+                                    />
+                                  }
+                                  label={college.college_name}
+                                  sx={{
+                                    "& .MuiTypography-root": {
+                                      fontSize: { xs: "0.5rem", md: "0.75rem", lg: "0.9rem" },
+                                    },
+                                  }}
                                 />
-                              }
-                              label={college.college_name}
-                              sx={{
-                                "& .MuiTypography-root": {
-                                  fontSize: { xs: "0.5rem", md: "0.75rem", lg: "0.9rem" },
-                                },
-                              }}
-                            />
-                          ))}
-                        </Box>
-                      </AccordionDetails>
-                    </Accordion>
+                              ))}
+                            </Box>
+                          </AccordionDetails>
+                        </Accordion>
+                      )}
+                      </>
+                    )}
 
-                    <Accordion
-                      expanded={expandedAccordion === "program"}
-                      onChange={() => setExpandedAccordion(expandedAccordion === "program" ? null : "program")}
-                    >
-                      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                        <Typography sx={{ color: "#08397C", fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" } }}>
-                          Program
-                        </Typography>
-                      </AccordionSummary>
-                      <AccordionDetails>
-                        <Box sx={{ maxHeight: "125px", overflow: "auto", display: "flex", flexDirection: "column" }}>
-                          {programs.map((program) => (
-                            <FormControlLabel
-                              key={program.program_id}
-                              control={
-                                <Checkbox
-                                  checked={selectedPrograms.includes(program.program_name)}
-                                  onChange={handleProgramChange}
-                                  value={program.program_name}
-                                />
-                              }
-                              label={program.program_name}
-                              sx={{
-                                "& .MuiTypography-root": {
-                                  fontSize: { xs: "0.5rem", md: "0.75rem", lg: "0.9rem" },
-                                },
-                              }}
-                            />
-                          ))}
-                        </Box>
-                      </AccordionDetails>
-                    </Accordion>
+                    {user?.role !== "05" && (
+                      <Accordion
+                        expanded={expandedAccordion === "program"}
+                        onChange={() => setExpandedAccordion(expandedAccordion === "program" ? null : "program")}
+                      >
+                        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                          <Typography sx={{ color: "#08397C", fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" } }}>
+                            Program
+                          </Typography>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                          <Box sx={{ maxHeight: "125px", overflow: "auto", display: "flex", flexDirection: "column" }}>
+                            {programs.map((program) => (
+                              <FormControlLabel
+                                key={program.program_id}
+                                control={
+                                  <Checkbox
+                                    checked={selectedPrograms.includes(program.program_name)}
+                                    onChange={handleProgramChange}
+                                    value={program.program_name}
+                                  />
+                                }
+                                label={program.program_name}
+                                sx={{
+                                  "& .MuiTypography-root": {
+                                    fontSize: { xs: "0.5rem", md: "0.75rem", lg: "0.9rem" },
+                                  },
+                                }}
+                              />
+                            ))}
+                          </Box>
+                        </AccordionDetails>
+                      </Accordion>
+                    )}
+                    
 
                     <Accordion
                       expanded={expandedAccordion === "format"}
