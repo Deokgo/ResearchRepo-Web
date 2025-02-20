@@ -435,7 +435,7 @@ const Backup = () => {
       sx={{
         margin: 0,
         padding: 0,
-        height: "100vh",
+        height: "100%",
         display: "flex",
         flexDirection: "column",
         overflow: "hidden",
@@ -447,11 +447,7 @@ const Backup = () => {
           flexGrow: 1,
           display: "flex",
           flexDirection: "column",
-          height: {
-            xs: "calc(100vh - 3.5rem)",
-            sm: "calc(100vh - 4rem)",
-            md: "calc(100vh - 6rem)",
-          },
+          height: "calc(100% - 6rem)",
           overflow: "hidden",
         }}
       >
@@ -465,8 +461,8 @@ const Backup = () => {
           sx={{
             width: "80%",
             margin: "0 auto",
-            mt: 2,
-            p: 2,
+            mt: 1,
+            p: 1,
             bgcolor: "info.light",
             borderRadius: 1,
             display: "flex",
@@ -474,10 +470,10 @@ const Backup = () => {
             justifyContent: "space-between",
           }}
         >
-          <Typography variant='body1' color='info.contrastText'>
+          <Typography sx={{fontSize: { xs: "0.7rem", md: "0.8rem", lg: "0.9rem" },}} color='info.contrastText'>
             Current Timeline: {currentTimeline || "Loading..."}
           </Typography>
-          <Typography variant='body2' color='info.contrastText'>
+          <Typography sx={{fontSize: { xs: "0.7rem", md: "0.8rem", lg: "0.9rem" },}} color='info.contrastText'>
             Note: Full backup restores continue in the same timeline, while
             incremental restores create a new timeline
           </Typography>
@@ -498,7 +494,7 @@ const Backup = () => {
             sx={{
               width: "80%",
               display: "flex",
-              paddingTop: 3,
+              paddingTop: 2,
               paddingBottom: 2,
               justifyContent: "space-between",
               alignItems: "center",
@@ -506,7 +502,7 @@ const Backup = () => {
           >
             <TextField
               variant='outlined'
-              placeholder='Search backups'
+              placeholder='Search Backups'
               value={searchQuery}
               onChange={handleSearchChange}
               sx={{
@@ -523,7 +519,14 @@ const Backup = () => {
               InputProps={{
                 startAdornment: (
                   <InputAdornment position='start'>
-                    <Search />
+                    <Search
+                      sx={{
+                        fontSize: {
+                          xs: "1rem", // Mobile
+                          md: "1.25rem", // Larger screens
+                        },
+                      }}
+                    />
                   </InputAdornment>
                 ),
               }}
@@ -537,7 +540,7 @@ const Backup = () => {
                   fontFamily: "Montserrat, sans-serif",
                   fontWeight: 600,
                   textTransform: "none",
-                  fontSize: { xs: "0.875rem", md: "1rem" },
+                  fontSize: { xs: "0.7rem", md: "0.85rem" },
                   padding: { xs: "0.5rem 1rem", md: "1.25rem" },
                   marginLeft: "1rem",
                   borderRadius: "100px",
@@ -560,7 +563,7 @@ const Backup = () => {
                   fontFamily: "Montserrat, sans-serif",
                   fontWeight: 600,
                   textTransform: "none",
-                  fontSize: { xs: "0.875rem", md: "1rem" },
+                  fontSize: { xs: "0.7rem", md: "0.85rem" },
                   padding: { xs: "0.5rem 1rem", md: "1.25rem" },
                   marginLeft: "1rem",
                   borderRadius: "100px",
@@ -584,7 +587,7 @@ const Backup = () => {
                   fontFamily: "Montserrat, sans-serif",
                   fontWeight: 600,
                   textTransform: "none",
-                  fontSize: { xs: "0.875rem", md: "1rem" },
+                  fontSize: { xs: "0.7rem", md: "0.85rem" },
                   padding: { xs: "0.5rem 1rem", md: "1.25rem" },
                   marginLeft: "1rem",
                   borderRadius: "100px",
@@ -627,7 +630,7 @@ const Backup = () => {
                       <Box
                         sx={{
                           display: "grid",
-                          gridTemplateColumns: "2fr 1fr 1fr 1.5fr 1fr 1.5fr",
+                          gridTemplateColumns: "2fr 1.2fr 1.1fr 1.5fr 1fr 2fr",
                           backgroundColor: "#0A438F",
                           fontSize: {
                             xs: "0.5rem",
@@ -635,7 +638,7 @@ const Backup = () => {
                             lg: "0.9rem",
                           },
                           color: "#FFF",
-                          padding: "12px 16px",
+                          padding: "8px 14px",
                           fontWeight: 700,
                           position: "sticky",
                           top: 0,
@@ -660,7 +663,12 @@ const Backup = () => {
                         sx={{
                           display: "grid",
                           gridTemplateColumns: "2fr 1fr 1fr 1.5fr 1fr 1.5fr",
-                          padding: "12px 16px",
+                          padding: "8px 14px",
+                          fontSize: {
+                            xs: "0.5rem",
+                            md: "0.75rem",
+                            lg: "0.9rem",
+                          },
                           borderBottom: "1px solid #e0e0e0",
                           "&:hover": {
                             backgroundColor: "rgba(0, 0, 0, 0.04)",

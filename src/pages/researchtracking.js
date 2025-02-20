@@ -30,6 +30,7 @@ import axios from "axios";
 import { filterCache, fetchAndCacheFilterData } from "../utils/filterCache";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import HeaderWithBackButton from "../components/Header";
+import { useAuth } from "../context/AuthContext";
 
 // First, define the useDebounce hook
 const useDebounce = (value, delay) => {
@@ -78,6 +79,7 @@ const ResearchTracking = () => {
   const [selectedStatus, setSelectedStatus] = useState([]);
   const isMobile = useMediaQuery("(max-width:600px)"); // Checks if the screen is 600px or smaller (mobile)
   const [otherSectionsVisible, setOtherSectionsVisible] = useState(true);
+  const { user } = useAuth();
 
   const [badgeValues, setBadgeValues] = useState({
     total_ready: 0,
@@ -208,7 +210,20 @@ const ResearchTracking = () => {
   const fetchAllResearchData = async () => {
     try {
       const response = await axios.get(`/dataset/fetch_dataset`);
-      const fetchedResearch = response.data.dataset;
+      let fetchedResearch = response.data.dataset;
+  
+      // Apply automatic filtering based on user college/program
+      if (user?.role === "04" || user?.role === "05") {
+        setSelectedColleges(user?.college);
+        fetchedResearch = fetchedResearch.filter(
+          (item) => item.college_id === user?.college
+        );
+        if (user?.role === "05"){
+          fetchedResearch = fetchedResearch.filter(
+            (item) => item.program_id === user?.program
+          );
+        }
+      }
       setResearch(fetchedResearch);
       setFilteredResearch(fetchedResearch);
     } catch (error) {
@@ -553,72 +568,76 @@ const ResearchTracking = () => {
                       </Box>
                     </Box>
 
-                    <Accordion 
-                      expanded={expandedAccordion === "college"} 
-                      onChange={() => setExpandedAccordion(expandedAccordion === "college" ? null : "college")}
-                    >
-                      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                        <Typography sx={{ color: "#08397C", fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" } }}>
-                          College
-                        </Typography>
-                      </AccordionSummary>
-                      <AccordionDetails>
-                        <Box sx={{ maxHeight: "125px", overflow: "auto", display: "flex", flexDirection: "column" }}>
-                          {colleges.map((college) => (
-                            <FormControlLabel
-                              key={college.college_id}
-                              control={
-                                <Checkbox
-                                  checked={selectedColleges.includes(String(college.college_id))}
-                                  onChange={handleCollegeChange}
-                                  value={college.college_id}
+                    {user?.role === "02" && (
+                      <>
+                        <Accordion 
+                          expanded={expandedAccordion === "college"} 
+                          onChange={() => setExpandedAccordion(expandedAccordion === "college" ? null : "college")}
+                        >
+                          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                            <Typography sx={{ color: "#08397C", fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" } }}>
+                              College
+                            </Typography>
+                          </AccordionSummary>
+                          <AccordionDetails>
+                            <Box sx={{ maxHeight: "125px", overflow: "auto", display: "flex", flexDirection: "column" }}>
+                              {colleges.map((college) => (
+                                <FormControlLabel
+                                  key={college.college_id}
+                                  control={
+                                    <Checkbox
+                                      checked={selectedColleges.includes(String(college.college_id))}
+                                      onChange={handleCollegeChange}
+                                      value={college.college_id}
+                                    />
+                                  }
+                                  label={college.college_name}
+                                  sx={{
+                                    "& .MuiTypography-root": {
+                                      fontSize: { xs: "0.5rem", md: "0.75rem", lg: "0.9rem" },
+                                    },
+                                  }}
                                 />
-                              }
-                              label={college.college_name}
-                              sx={{
-                                "& .MuiTypography-root": {
-                                  fontSize: { xs: "0.5rem", md: "0.75rem", lg: "0.9rem" },
-                                },
-                              }}
-                            />
-                          ))}
-                        </Box>
-                      </AccordionDetails>
-                    </Accordion>
+                              ))}
+                            </Box>
+                          </AccordionDetails>
+                        </Accordion>
 
-                    <Accordion 
-                      expanded={expandedAccordion === "program"} 
-                      onChange={() => setExpandedAccordion(expandedAccordion === "program" ? null : "program")}
-                    >
-                      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                        <Typography sx={{ color: "#08397C", fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" } }}>
-                          Program
-                        </Typography>
-                      </AccordionSummary>
-                      <AccordionDetails>
-                        <Box sx={{ maxHeight: "125px", overflow: "auto", display: "flex", flexDirection: "column" }}>
-                          {programs.map((program) => (
-                            <FormControlLabel
-                              key={program.program_id}
-                              control={
-                                <Checkbox
-                                  checked={selectedPrograms.includes(program.program_name)}
-                                  onChange={handleProgramChange}
-                                  value={program.program_name}
+                        <Accordion 
+                          expanded={expandedAccordion === "program"} 
+                          onChange={() => setExpandedAccordion(expandedAccordion === "program" ? null : "program")}
+                        >
+                          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                            <Typography sx={{ color: "#08397C", fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" } }}>
+                              Program
+                            </Typography>
+                          </AccordionSummary>
+                          <AccordionDetails>
+                            <Box sx={{ maxHeight: "125px", overflow: "auto", display: "flex", flexDirection: "column" }}>
+                              {programs.map((program) => (
+                                <FormControlLabel
+                                  key={program.program_id}
+                                  control={
+                                    <Checkbox
+                                      checked={selectedPrograms.includes(program.program_name)}
+                                      onChange={handleProgramChange}
+                                      value={program.program_name}
+                                    />
+                                  }
+                                  label={program.program_name}
+                                  sx={{
+                                    "& .MuiTypography-root": {
+                                      fontSize: { xs: "0.5rem", md: "0.75rem", lg: "0.9rem" },
+                                    },
+                                  }}
                                 />
-                              }
-                              label={program.program_name}
-                              sx={{
-                                "& .MuiTypography-root": {
-                                  fontSize: { xs: "0.5rem", md: "0.75rem", lg: "0.9rem" },
-                                },
-                              }}
-                            />
-                          ))}
-                        </Box>
-                      </AccordionDetails>
-                    </Accordion>
-
+                              ))}
+                            </Box>
+                          </AccordionDetails>
+                        </Accordion>
+                      </>
+                    )}
+                  
                   </Box>
                   <Button
                     onClick={handleResetFilters}

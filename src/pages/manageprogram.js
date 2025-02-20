@@ -255,7 +255,7 @@ const ManageProgram = () => {
         sx={{
           margin: 0,
           padding: 0,
-          height: "100vh",
+          height: "100%",
           display: "flex",
           flexDirection: "column",
           overflow: "hidden",
@@ -267,11 +267,7 @@ const ManageProgram = () => {
             flexGrow: 1,
             display: "flex",
             flexDirection: "column",
-            height: {
-              xs: "calc(100vh - 3.5rem)",
-              sm: "calc(100vh - 4rem)",
-              md: "calc(100vh - 6rem)",
-            },
+            height: "calc(100% - 6rem)",
             overflow: "hidden",
           }}
         >
