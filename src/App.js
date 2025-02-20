@@ -43,10 +43,6 @@ function App() {
             <Route path='/home' element={<Home />} />
             <Route path='/readmore' element={<ReadMore />} />
             <Route path='/researchthrust' element={<ResearchThrust />} />
-            <Route path='/dash' element={<DashEmbed />} />
-            <Route path='/dash/analytics' element={<SDGdashEmbed />} />
-            <Route path='/dash/user-engagement' element={<EngageDash />} />
-            <Route path='/progdash' element={<ProgDash />} />
 
             {/* Common routes (available to all authenticated users) */}
             <Route
@@ -153,17 +149,29 @@ function App() {
               }
             />
 
-            {/* College Administrator only routes */}
+            {/* College, Head and RPCO Administrator only routes */}
             <Route
               path='/dash'
               element={
                 <PrivateRoute>
-                  <RoleBasedRoute allowedRoles={["04", "05", "02"]}>
+                  <RoleBasedRoute allowedRoles={["04", "02", "03"]}>
                     <DashEmbed />
                   </RoleBasedRoute>
                 </PrivateRoute>
               }
             />
+
+            <Route
+              path='/progdash'
+              element={
+                <PrivateRoute>
+                  <RoleBasedRoute allowedRoles={["05"]}>
+                    <DashEmbed />
+                  </RoleBasedRoute>
+                </PrivateRoute>
+              }
+            />
+
             <Route
               path='/publication'
               element={
