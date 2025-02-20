@@ -43,18 +43,14 @@ const KnowledgeGraph = () => {
   };
 
   return (
-    <Box sx={{ margin: 0, padding: 0 }}>
+    <Box>
       <Navbar />
       <Box
         sx={{
           flexGrow: 1,
           display: "flex",
           flexDirection: "column",
-          height: {
-            xs: "calc(100vh - 3.5rem)",
-            sm: "calc(100vh - 4rem)",
-            md: "calc(100vh - 6rem)",
-          },
+          height: '100vh',
           overflow: "hidden",
         }}
       >
@@ -72,15 +68,17 @@ const KnowledgeGraph = () => {
                   color: "#666",
                   "&.Mui-selected": {
                     color: "#0A438F",
+                    fontWeight: 700
                   },
                 },
                 "& .MuiTabs-indicator": {
                   backgroundColor: "#0A438F",
                 },
+                pl: 4,
               }}
             >
-              <Tab label='SDG/Research Area' />
-              <Tab label='Program-Keywords' />
+              <Tab label='SDG/Research Area' sx={{ pl:5, pr:5 }}/>
+              <Tab label='Program-Keywords' sx={{ pl:5, pr:5 }}/>
             </Tabs>
           </Box>
         )}
@@ -98,8 +96,8 @@ const KnowledgeGraph = () => {
             }?role=${user?.role || ""}`}
             style={{
               width: "100%",
-              height: showTabs ? "calc(100% - 96px)" : "calc(100% - 48px)", // Adjust height for tabs
-              border: "none",
+              height: "calc(100% + 30px)", // Adjust height for tabs
+              border: "none"
             }}
             title='Knowledge Graph'
           />

@@ -112,9 +112,9 @@ const DashEmbed = () => {
       [`& .MuiTooltip-tooltip`]: {
         backgroundColor: "#08397C",
         color: "white",
-        fontSize: "1rem",
+        fontSize: "0.9rem",
         borderRadius: "8px",
-        padding: "8px 12px",
+        padding: "4px 8px",
         maxWidth: "100%", // Set a maximum width for the tooltip
         textAlign: "center", // Center-align text
         boxShadow: theme.shadows[3],
@@ -172,7 +172,7 @@ const DashEmbed = () => {
               onChange={handleTabChange}
               sx={{ 
                 borderColor: "divider", 
-                width: expanded ? 350 : 75, 
+                width: expanded ? 340 : 75, 
                 transition: "width 0.1s ease-in-out", 
                 backgroundColor: "#08397C", // Base background color
                 backgroundImage: `linear-gradient(rgba(8, 57, 124, 0.65), rgba(8, 57, 124, 0.65)), url(${newBG})`,  
@@ -211,7 +211,7 @@ const DashEmbed = () => {
                     },
                   }}
                 >
-                  <MenuIcon sx={{ fontSize: 25, color: "white" }}/>&nbsp;Dashboard
+                  <MenuIcon sx={{ fontSize: 30, color: "white", pt: 1}}/>&nbsp;Dashboard
                 </Typography>
               ) : (
                 <Tab icon={<MenuIcon sx={{ fontSize: 50, color: "white", padding: "0.75rem", marginRight: "0.75rem"  }} />} 
@@ -223,7 +223,7 @@ const DashEmbed = () => {
 
               <CustomTooltip title="Institutional Performance" placement="right">
                 <Tab 
-                  icon={<TrackChangesIcon sx={{ fontSize: 60, color: "white", padding: "0.9rem", marginRight: "0.75rem" }}/>}
+                  icon={<TrackChangesIcon sx={{ fontSize: 55, color: "white", padding: "0.9rem", marginRight: "0.75rem" }}/>}
                   label={expanded ? "Institutional Performance" : ""}
                   sx={tabSettings}
                 />
@@ -231,7 +231,7 @@ const DashEmbed = () => {
               {user?.role !== "05" && (
                 <CustomTooltip title="SDG Impact" placement="right">
                   <Tab 
-                    icon={<FlagIcon sx={{ fontSize: 60, color: "white", padding: "0.9rem", marginRight: "0.75rem" }}/>}
+                    icon={<FlagIcon sx={{ fontSize: 55, color: "white", padding: "0.9rem", marginRight: "0.75rem" }}/>}
                     label={expanded ? "SDG Impact" : ""}
                     sx={tabSettings}
                   />
@@ -240,7 +240,7 @@ const DashEmbed = () => {
               {user?.role !== "05" && (
                 <CustomTooltip title="User Engagement" placement="right">
                   <Tab 
-                    icon={<SupervisedUserCircleIcon sx={{ fontSize: 60, color: "white", padding: "0.9rem", marginRight: "0.75rem" }}/>}
+                    icon={<SupervisedUserCircleIcon sx={{ fontSize: 55, color: "white", padding: "0.9rem", marginRight: "0.75rem" }}/>}
                     label={expanded ? "User Engagement" : ""}
                     sx={tabSettings}
                   />

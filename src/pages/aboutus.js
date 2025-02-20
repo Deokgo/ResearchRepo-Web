@@ -51,10 +51,9 @@ const AboutUs = () => {
         sx={{
           margin: 0,
           padding: 0,
-          height: "100vh",
+          height: "100%",
           display: "flex",
           flexDirection: "column",
-          justifyContent: "center",
         }}
       >
         <Navbar />
@@ -63,18 +62,14 @@ const AboutUs = () => {
             flexGrow: 1,
             display: "flex",
             flexDirection: "column",
-            height: {
-              xs: "calc(100vh - 3.5rem)",
-              sm: "calc(100vh - 4rem)",
-              md: "calc(100vh - 6rem)",
-            },
+            height: "calc(100% - 6rem)"
           }}
         >
           <HeaderWithBackButton title='About Us' onBack={() => navigate(-1)} />
 
           {/* Content Section */}
-          <Box sx={{ flexGrow: 1, p: { xs: 7, md: 15 } }}>
-            <Grid2 container spacing={4} mb={15}>
+          <Box sx={{ flexGrow: 1, p: { xs: 7, md: 8 } }}>
+            <Grid2 container spacing={4} mb={15} ml={5}>
               {/* Left Column */}
               <Grid2
                 size={{ xs: 12, md: 6 }}

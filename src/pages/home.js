@@ -170,7 +170,7 @@ const Home = () => {
     <>
       <Box sx={{ minHeight: "100vh", display: "flex", flexDirection: "column", justifyContent: "center" }}>
         <Navbar />
-        <Box m={4}>
+        <Box m={3}>
             
           </Box>
         <Box

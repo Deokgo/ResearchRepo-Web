@@ -464,16 +464,27 @@ const Navbar = () => {
               <Button onClick={handleResearchThrust} sx={buttonSettings}>
                 Research Thrusts
               </Button>
+              <Divider
+                orientation='vertical'
+                flexItem
+                sx={{
+                  ml: 1,
+                  borderColor: "#CA031B",
+                  height: { xs: "0.8rem", md: "1rem" },
+                  borderWidth: { xs: "1px", sm: "1px", md: "1.5px" },
+                  alignSelf: "center",
+                }}
+              />
               <Button 
                 onClick={handleLogin} 
                 sx={{
                   ...buttonSettings, 
                   color: "#CA031B", 
-                  fontSize: "1rem", 
+                  fontSize: "0.7rem", 
                   fontWeight: 700 
                 }}
               >
-                <LoginIcon/>&nbsp;Log in
+                <LoginIcon/>&nbsp; Log in
               </Button>
             </Box>
           ) : (

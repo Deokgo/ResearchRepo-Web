@@ -473,7 +473,7 @@ const Collection = () => {
           >
             <Grid2
               container
-              spacing={4}
+              spacing={3}
               sx={{
                 height: "100%",
                 flexWrap: "nowrap",
