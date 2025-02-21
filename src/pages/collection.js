@@ -89,33 +89,10 @@ const Collection = () => {
 
   const handleResearchItemClick = async (item) => {
     try {
-        const currentTime = Date.now();
-        const lastViewedTimeKey = `lastViewedTime_${item.research_id}`;
-        const lastViewedTime = parseInt(localStorage.getItem(lastViewedTimeKey), 10);
-        const userId = localStorage.getItem("user_id");
-
         // Navigate to the research details page immediately
         navigate(`/displayresearchinfo/${item.research_id}`, {
             state: { id: item.research_id },
         });
-
-        // Check if 30 seconds have passed since last increment
-        if (!lastViewedTime || currentTime - lastViewedTime > 30000) {
-            // Delay incrementing the view count
-            setTimeout(async () => {
-                try {
-                    const response = await axios.put(
-                        `/paper/increment_views/${item.research_id}?is_increment=true`,
-                        { user_id: userId }
-                    );
-
-                    // Save the new timestamp to localStorage
-                    localStorage.setItem(lastViewedTimeKey, Date.now());
-                } catch (error) {
-                    console.error("Error incrementing view count:", error);
-                }
-            }, 30000); // Wait 30 seconds before incrementing
-        }
     } catch (error) {
         console.error("Error handling research item click:", {
             message: error.message,
@@ -124,7 +101,8 @@ const Collection = () => {
             item: item,
         });
     }
-};
+  };
+
 
   const getUserId = () => {
     const userId = localStorage.getItem("user_id");
