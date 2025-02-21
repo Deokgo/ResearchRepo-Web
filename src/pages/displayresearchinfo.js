@@ -41,7 +41,7 @@ import sdgGoalsData from "../data/sdgGoals.json";
 import { useAuth } from "../context/AuthContext";
 import { filterCache, fetchAndCacheFilterData } from "../utils/filterCache";
 import HeaderWithBackButton from "../components/Header";
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
 const DisplayResearchInfo = () => {
   const userId = localStorage.getItem("user_id");
@@ -111,18 +111,17 @@ const DisplayResearchInfo = () => {
     if (!id) return;
 
     const timer = setTimeout(async () => {
-        try {
-            await axios.put(
-                `/paper/increment_views/${id}?is_increment=true`,
-                { user_id: userId }
-            );
-        } catch (error) {
-            console.error("Error incrementing view count:", error);
-        }
+      try {
+        await axios.put(`/paper/increment_views/${id}?is_increment=true`, {
+          user_id: userId,
+        });
+      } catch (error) {
+        console.error("Error incrementing view count:", error);
+      }
     }, 30000); // 30 seconds delay
 
     return () => clearTimeout(timer); // Clears the timer if user leaves before 30s
-}, [id, userId]);
+  }, [id, userId]);
 
   const handleChange = (field, value) => {
     setEditableData((prev) => {
@@ -338,7 +337,7 @@ const DisplayResearchInfo = () => {
 
   const handleEdit = async (item) => {
     try {
-      setHeader("Edit Research Information")
+      setHeader("Edit Research Information");
       // Temporarily disable change detection while setting up initial data
       setHasChanges(false);
 
@@ -860,10 +859,7 @@ const DisplayResearchInfo = () => {
             overflow: "hidden",
           }}
         >
-          <HeaderWithBackButton
-            title={header}
-            onBack={() => navigate(-1)}
-          />
+          <HeaderWithBackButton title={header} onBack={() => navigate(-1)} />
 
           {/*Main Content */}
           <Box
@@ -955,7 +951,7 @@ const DisplayResearchInfo = () => {
                             alignItems='center'
                             justifyContent='space-between'
                             gap={3}
-                            mr="1rem"
+                            mr='1rem'
                           >
                             {user?.role === "05" && (
                               <Button
@@ -1201,9 +1197,9 @@ const DisplayResearchInfo = () => {
                                 }}
                               >
                                 <strong>Adviser:</strong>{" "}
-                                {item.adviser && item.adviser.name
-                                  ? `${item.adviser.name}`
-                                  : "No adviser"}
+                                {(item.adviser?.name &&
+                                  item.adviser.name.trim()) ||
+                                  "No adviser"}
                               </Typography>
                               <Typography
                                 variant='body1'
@@ -2030,33 +2026,34 @@ const DisplayResearchInfo = () => {
         onClose={() => setShowCancelDialog(false)}
         PaperProps={{
           sx: {
-          borderRadius: "15px",
-          padding: "1rem",
+            borderRadius: "15px",
+            padding: "1rem",
           },
-      }}
+        }}
       >
         <DialogTitle
-            sx={{
+          sx={{
             fontFamily: "Montserrat, sans-serif",
             fontWeight: 600,
             color: "#08397C",
-            }}
+          }}
         >
-            Unsaved Changes
+          Unsaved Changes
         </DialogTitle>
         <DialogContent>
           <Typography
             sx={{
-                fontFamily: "Montserrat, sans-serif",
-                color: "#666",
+              fontFamily: "Montserrat, sans-serif",
+              color: "#666",
             }}
-            >
+          >
             You have unsaved changes. Are you sure you want to cancel editing?
             All changes will be lost.
-            </Typography>
+          </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setShowCancelDialog(false)}
+          <Button
+            onClick={() => setShowCancelDialog(false)}
             sx={{
               backgroundColor: "#08397C",
               color: "#FFF",
@@ -2066,9 +2063,9 @@ const DisplayResearchInfo = () => {
               borderRadius: "100px",
               padding: "0.75rem",
               "&:hover": {
-              backgroundColor: "#072d61",
+                backgroundColor: "#072d61",
               },
-          }}
+            }}
           >
             Continue Editing
           </Button>
@@ -2089,9 +2086,9 @@ const DisplayResearchInfo = () => {
               borderRadius: "100px",
               padding: "0.75rem",
               "&:hover": {
-              backgroundColor: "#A30417",
+                backgroundColor: "#A30417",
               },
-          }}
+            }}
             autoFocus
           >
             Discard Changes
@@ -2105,10 +2102,10 @@ const DisplayResearchInfo = () => {
         onClose={() => setIsSuccessDialogOpen(false)}
         PaperProps={{
           sx: {
-          borderRadius: "15px",
-          padding: "1rem",
+            borderRadius: "15px",
+            padding: "1rem",
           },
-      }}
+        }}
       >
         <DialogTitle
           sx={{
@@ -2118,22 +2115,22 @@ const DisplayResearchInfo = () => {
             display: "flex",
             alignItems: "center",
             gap: 1,
-            }}
+          }}
         >
-            <Box
+          <Box
             component='span'
             sx={{
-                backgroundColor: "#E8F5E9",
-                borderRadius: "75%",
-                padding: "10px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
+              backgroundColor: "#E8F5E9",
+              borderRadius: "75%",
+              padding: "10px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
             }}
-            >
-            <CheckCircleIcon/>
-            </Box>
-            Success
+          >
+            <CheckCircleIcon />
+          </Box>
+          Success
         </DialogTitle>
         <DialogContent>
           <Typography
@@ -2158,9 +2155,9 @@ const DisplayResearchInfo = () => {
               borderRadius: "100px",
               padding: "0.75rem",
               "&:hover": {
-              backgroundColor: "#072d61",
+                backgroundColor: "#072d61",
               },
-          }}
+            }}
           >
             Close
           </Button>
