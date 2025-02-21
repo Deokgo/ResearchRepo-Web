@@ -166,7 +166,7 @@ function App() {
               element={
                 <PrivateRoute>
                   <RoleBasedRoute allowedRoles={["05"]}>
-                    <DashEmbed />
+                    <ProgDash />
                   </RoleBasedRoute>
                 </PrivateRoute>
               }
