@@ -302,7 +302,7 @@ const ResearchThrust = () => {
         sx={{
           margin: 0,
           padding: 0,
-          height: "100vh",
+          height: "100%",
           display: "flex",
           flexDirection: "column",
         }}
@@ -313,11 +313,7 @@ const ResearchThrust = () => {
             flexGrow: 1,
             display: "flex",
             flexDirection: "column",
-            height: {
-              xs: "calc(100vh - 3.5rem)",
-              sm: "calc(100vh - 4rem)",
-              md: "calc(100vh - 6rem)",
-            },
+            height: "calc(100% - 6rem)",
           }}
         >
           <HeaderWithBackButton
@@ -367,9 +363,9 @@ const ResearchThrust = () => {
                             },
                             fontWeight: 700,
                             fontSize: {
-                              xs: "0.75rem",
-                              md: "0.95rem",
-                              lg: "1.3rem",
+                              xs: "0.8rem",
+                              md: "0.9rem",
+                              lg: "1.2rem",
                             },
                             fontFamily: "Montserrat, sans-serif",
                             color: "#CA031B",
@@ -390,9 +386,9 @@ const ResearchThrust = () => {
                               lg: "1rem",
                             },
                             fontSize: {
-                              xs: "0.65rem",
-                              md: "0.85rem",
-                              lg: "1rem",
+                              xs: "0.7rem",
+                              md: "0.8rem",
+                              lg: "0.9rem",
                             },
                           }}
                         >
@@ -413,9 +409,9 @@ const ResearchThrust = () => {
                                 lg: "1rem",
                               },
                               fontSize: {
-                                xs: "0.5rem",
-                                md: "0.75rem",
-                                lg: "1rem",
+                                xs: "0.7rem",
+                                md: "0.8rem",
+                                lg: "0.8rem",
                               },
                               "&:hover": {
                                 color: "#072d61",

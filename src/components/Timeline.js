@@ -66,7 +66,7 @@ export default function DynamicTimeline({ researchId, refresh }) {
                 {index < events.length - 1 && <TimelineConnector />}
               </TimelineSeparator>
               <TimelineContent>
-                <div>{event.status}</div>
+                <div style={{ color: (index === events.length - 1 ? "red" : "#08397C"), fontWeight: 550 }}>{event.status}</div>
                 <div style={{ fontSize: "0.8rem", color: "#888" }}>
                   {event.time}
                 </div>

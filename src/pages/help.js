@@ -27,9 +27,6 @@ import { useModalContext } from "../context/modalcontext";
 import HeaderWithBackButton from "../components/Header";
 
 const Help = () => {
-  const [userData, setUserData] = useState(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const { user, logout } = useAuth();
   const isLoggedIn = !!user;
   const navigate = useNavigate();
@@ -45,45 +42,44 @@ const Help = () => {
     {
       id: 1,
       question: "How to change my password?",
-      answer:
-        "To change password, (1) go to the [user icon] on the upper-right corner. A user menu \
-        will open, select [profile]. (2) Under the profile tab, select [change password]. A small window \
-        will pop up to your screen, kindly input your old password and new password. For confirmation \
-        purposes, you need enter the new password twice. (3) The click submit.",
+      answer: (
+        <>
+          <strong>To change password:</strong> <br />
+          (1) Go to the [user icon] on the upper-right corner. A user menu will open, select [profile]. <br />
+          (2) Under the profile tab, select [change password]. A small window will pop up to your screen, kindly input your old password and new password. For confirmation purposes, you need enter the new password twice. <br />
+          (3) The click submit.
+        </>
+      ),
     },
     {
       id: 2,
-      question: "How to change my password?",
+      question: "Can I still log in again If I didn't log in for a long time?",
       answer:
-        "To change password, (1) go to the [user icon] on the upper-right corner. A user menu \
-            will open, select [profile]. (2) Under the profile tab, select [change password]. A small window \
-            will pop up to your screen, kindly input your old password and new password. For confirmation \
-            purposes, you need enter the new password twice. (3) The click submit.",
+        "Yes, you can still log in to your account as long as it has been active within the last six months \
+        from your recent login. If more than six months have passed since your last login, your account \
+        will be automatically inactive or require additional steps to regain access. If you experience any \
+        issues, we recommend reaching out to our support team for assistance.",
     },
     {
       id: 3,
-      question: "How to change my password?",
-      answer:
-        "To change password, (1) go to the [user icon] on the upper-right corner. A user menu \
-            will open, select [profile]. (2) Under the profile tab, select [change password]. A small window \
-            will pop up to your screen, kindly input your old password and new password. For confirmation \
-            purposes, you need enter the new password twice. (3) The click submit.",
+      question: "How to regain access to my inactive account?",
+      answer: (
+        <>
+        <strong>If you experience any issues, please contact our support team for assistance:</strong> <br />
+          📧 Email: support@example.com <br />
+          📞 Phone: +69 (02) 0123-4567 <br />
+          💬 Live Chat: Visit our support page
+        </>
+      ),
     },
   ];
 
   // State to track which accordion is currently expanded
   const [expandedPanel, setExpandedPanel] = useState(false);
-  const [expandedPanelProgram, setExpandedPanelProgram] = useState(false);
 
   // Handler for accordion expansion
   const handleAccordionChange = (panel) => (event, isExpanded) => {
     setExpandedPanel(isExpanded ? panel : false);
-    setExpandedPanelProgram(false);
-  };
-
-  // Handler for accordion expansion
-  const handleAccordionChangeProgram = (panel) => (event, isExpanded) => {
-    setExpandedPanelProgram(isExpanded ? panel : false);
   };
 
   return (
@@ -114,7 +110,7 @@ const Help = () => {
           <Box
             sx={{
               display: "flex",
-              padding: 5,
+              padding: 3,
               marginLeft: 5,
               marginRight: 5,
               justifyContent: "space-around",
@@ -129,7 +125,7 @@ const Help = () => {
               <Typography
                 variant='body1'
                 sx={{
-                  m: 3,
+                  m: 2,
                   fontWeight: 400,
                   fontSize: { xs: "0.7rem", sm: "0.8rem", md: "1rem" },
                   color: "#001C43",
@@ -146,7 +142,7 @@ const Help = () => {
                 {faqs.map((faq) => (
                   <Box
                     key={faq.id}
-                    sx={{ m: { xs: "0.5rem", md: "0.75rem", lg: "1rem" } }}
+                    sx={{ m: { xs: "0.5rem", md: "0.75rem", lg: "0.9rem" } }}
                   >
                     <Accordion
                       expanded={expandedPanel === faq.id}
@@ -163,9 +159,9 @@ const Help = () => {
                             },
                             fontWeight: 700,
                             fontSize: {
-                              xs: "0.75rem",
-                              md: "0.95rem",
-                              lg: "1.3rem",
+                              xs: "0.8rem",
+                              md: "0.9rem",
+                              lg: "1.2rem",
                             },
                             fontFamily: "Montserrat, sans-serif",
                             color: "#CA031B",
@@ -186,9 +182,9 @@ const Help = () => {
                               lg: "1rem",
                             },
                             fontSize: {
-                              xs: "0.65rem",
-                              md: "0.85rem",
-                              lg: "1rem",
+                              xs: "0.7rem",
+                              md: "0.8rem",
+                              lg: "0.9rem",
                             },
                           }}
                         >

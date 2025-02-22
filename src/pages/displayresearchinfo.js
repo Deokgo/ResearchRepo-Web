@@ -1220,7 +1220,7 @@ const DisplayResearchInfo = () => {
                                       .join("; ")
                                   : "No panel members"}
                               </Typography>
-                              <Divider variant='middle' sx={{ mb: "1rem" }} />
+                              <Divider variant='middle' sx={{ mb: "1rem", mt: "0.5rem" }} />
                               <Typography
                                 variant='body1'
                                 sx={{
@@ -1966,8 +1966,8 @@ const DisplayResearchInfo = () => {
                                 color: "#FFF",
                                 fontFamily: "Montserrat, sans-serif",
                                 fontWeight: 600,
-                                fontSize: { xs: "0.875rem", md: "1rem" },
-                                padding: { xs: "0.5rem 1rem", md: "1.25rem" },
+                                fontSize: { xs: "0.875rem", md: "0.9rem" },
+                                padding: { xs: "0.5rem 1rem", md: "0.5rem 0.8rem" },
                                 borderRadius: "100px",
                                 maxHeight: "3rem",
                                 textTransform: "none",
@@ -1990,8 +1990,8 @@ const DisplayResearchInfo = () => {
                                 fontFamily: "Montserrat, sans-serif",
                                 fontWeight: 600,
                                 textTransform: "none",
-                                fontSize: { xs: "0.875rem", md: "1rem" },
-                                padding: { xs: "0.5rem 1rem", md: "1.25rem" },
+                                fontSize: { xs: "0.875rem", md: "0.9rem" },
+                                padding: { xs: "0.5rem 1rem", md: "0.5rem 0.8rem" },
                                 borderRadius: "100px",
                                 maxHeight: "3rem",
                                 "&:hover": {

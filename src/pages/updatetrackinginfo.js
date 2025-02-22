@@ -37,7 +37,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
   const { id } = location.state || {}; // Default to an empty object if state is undefined
   const [data, setData] = useState(null); // Start with null to represent no data
   const [loading, setLoading] = useState(true); // Track loading state
-  const [header, setHeader] = useState("Update Tracking Info");
+  const [header, setHeader] = useState("Update Tracking Status");
 
   const [pubData, setPubData] = useState(null);
   const [initialValues, setInitialValues] = useState(null);
@@ -84,7 +84,11 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
           console.log(initialData);
 
           if (initialData.status === "PUBLISHED"){
-            setHeader("Research Publication Details");
+            setHeader("Published Research Details");
+          } 
+
+          if (initialData.status === "PULLOUT"){
+            setHeader("Research Details");
           } 
 
           // Set current values
@@ -277,7 +281,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
         sx={{
           margin: 0,
           padding: 0,
-          height: "100vh",
+          height: "100%",
           display: "flex",
           flexDirection: "column",
         }}
@@ -288,11 +292,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
             flexGrow: 1,
             display: "flex",
             flexDirection: "column",
-            height: {
-              xs: "calc(100vh - 3.5rem)",
-              sm: "calc(100vh - 4rem)",
-              md: "calc(100vh - 6rem)",
-            },
+            height: "calc(100% - 6rem)",
           }}
         >
           <HeaderWithBackButton
@@ -369,8 +369,8 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                     width: "90%",
                                     fontSize: {
                                       xs: "clamp(1rem, 2vw, 1rem)",
-                                      sm: "clamp(1.5rem, 3.5vw, 1.5rem)",
-                                      md: "clamp(2rem, 4vw, 2rem)",
+                                      sm: "clamp(1.25rem, 3.5vw, 1.25rem)",
+                                      md: "clamp(1.75rem, 4vw, 1.75rem)",
                                     },
                                   }}
                                 >
@@ -392,7 +392,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                     fontSize: {
                                       xs: "clamp(0.7rem, 2vw, 0.7rem)",
                                       sm: "clamp(0.8rem, 3.5vw, 0.8rem)",
-                                      md: "clamp(1rem, 4vw, 1rem)",
+                                      md: "clamp(0.9rem, 4vw, 0.9rem)",
                                     },
                                   }}
                                   alignSelf='left'
@@ -783,13 +783,9 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                           fontFamily: "Montserrat, sans-serif",
                                           fontWeight: 500,
                                           textTransform: "none",
-                                          fontSize: {
-                                            xs: "0.75rem",
-                                            md: "0.9rem",
-                                            lg: "1rem",
-                                          },
+                                          fontSize: { xs: "0.875rem", md: "0.9rem" },
+                                          padding: { xs: "0.5rem 1rem", md: "0.5rem 0.8rem" },
                                           width: "40%",
-                                          padding: "0.5rem",
                                           borderRadius: "100px",
                                           "&:hover": {
                                             backgroundColor: "#072d61",
@@ -1106,9 +1102,8 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                       fontFamily: "Montserrat, sans-serif",
                       fontWeight: 600,
                       textTransform: "none",
-                      fontSize: { xs: "0.65rem", md: "0.8rem", lg: "1rem" },
+                      fontSize: { xs: "0.875rem", md: "0.9rem" },
                       marginTop: "1rem",
-                      padding: "0.5rem",
                       borderRadius: "100px",
                       "&:hover": {
                         backgroundColor: "#072d61",
@@ -1122,8 +1117,8 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                         Pulling out...
                       </Box>
                     ) : (
-                        <Typography display='flex' justifyContent='center'>
-                          <RemoveCircleIcon/> &nbsp; <strong>PULL OUT PAPER</strong>
+                        <Typography display='flex' justifyContent='center' sx={{fontSize: { xs: "0.875rem", md: "0.9rem" } }}>
+                          <RemoveCircleIcon sx={{fontSize: { xs: "0.9rem", md: "1.2rem", xs: "1.2rem" } }}/> &nbsp; <strong>PULL OUT PAPER</strong>
                         </Typography>
                     )}
                   </Button>

@@ -25,7 +25,7 @@ import { useModalContext } from "../context/modalcontext";
 import FileUploader from "./FileUploader";
 import sdgGoalsData from "../data/sdgGoals.json";
 import { useAuth } from "../context/AuthContext";
-import AutorenewIcon from "@mui/icons-material/Autorenew";
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { filterCache, fetchAndCacheFilterData } from "../utils/filterCache";
 import { toast } from "react-hot-toast";
 import { debounce } from "lodash";
@@ -1468,8 +1468,8 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
               color: "#FFF",
               fontFamily: "Montserrat, sans-serif",
               fontWeight: 600,
-              fontSize: { xs: "0.875rem", md: "1rem" },
-              padding: { xs: "0.5rem 1rem", md: "1.25rem" },
+              fontSize: { xs: "0.875rem", md: "0.9rem" },
+              padding: { xs: "0.5rem 1rem", md: "0.5rem 0.8rem" },
               borderRadius: "100px",
               maxHeight: "3rem",
               textTransform: "none",
@@ -1489,8 +1489,8 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
               fontFamily: "Montserrat, sans-serif",
               fontWeight: 600,
               textTransform: "none",
-              fontSize: { xs: "0.875rem", md: "1rem" },
-              padding: { xs: "0.5rem 1rem", md: "1.25rem" },
+              fontSize: { xs: "0.875rem", md: "0.9rem" },
+              padding: { xs: "0.5rem 1rem", md: "0.5rem 0.8rem" },
               borderRadius: "100px",
               maxHeight: "3rem",
               "&:hover": {
@@ -1537,76 +1537,79 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
           </Box>
         )}
 
+        {/* Save Progress */}
         <Dialog
           open={isConfirmDialogOpen}
           onClose={() => setIsConfirmDialogOpen(false)}
           PaperProps={{
-            sx: {
+              sx: {
               borderRadius: "15px",
               padding: "1rem",
-            },
+              },
           }}
-        >
+          >
           <DialogTitle
-            sx={{
+              sx={{
               fontFamily: "Montserrat, sans-serif",
               fontWeight: 600,
               color: "#08397C",
-            }}
+              }}
           >
-            Unsaved Progress
+              Unsaved Progress
           </DialogTitle>
           <DialogContent>
-            <Typography
+              <Typography
               sx={{
-                fontFamily: "Montserrat, sans-serif",
-                color: "#666",
+                  fontFamily: "Montserrat, sans-serif",
+                  color: "#666",
               }}
-            >
+              >
               You have unsaved progress. Do you want to save your progress?
-            </Typography>
+              </Typography>
           </DialogContent>
           <DialogActions sx={{ padding: "1rem" }}>
-            <Button
+              <Button
               onClick={() => {
                 setIsConfirmDialogOpen(false);
                 setShouldClearFields(true); // Set flag to clear fields
                 closeAddPaperModal();
               }}
               sx={{
-                backgroundColor: "#CA031B",
-                color: "#FFF",
-                fontFamily: "Montserrat, sans-serif",
-                fontWeight: 600,
-                textTransform: "none",
-                borderRadius: "100px",
-                "&:hover": {
-                  backgroundColor: "#072d61",
-                },
+                  backgroundColor: "#CA031B",
+                  color: "#FFF",
+                  fontFamily: "Montserrat, sans-serif",
+                  fontWeight: 600,
+                  textTransform: "none",
+                  borderRadius: "100px",
+                  padding: "0.75rem",
+                  "&:hover": {
+                  backgroundColor: "#A30417",
+                  },
               }}
-            >
+              >
               Discard
-            </Button>
-            <Button
+              </Button>
+              <Button
               onClick={() => {
                 setIsConfirmDialogOpen(false);
                 setShouldClearFields(false); // Don't clear fields
                 closeAddPaperModal();
               }}
               sx={{
-                backgroundColor: "#08397C",
-                color: "#FFF",
-                fontFamily: "Montserrat, sans-serif",
-                fontWeight: 600,
-                textTransform: "none",
-                borderRadius: "100px",
-                "&:hover": {
-                  backgroundColor: "#A30417",
-                },
+                  backgroundColor: "#08397C",
+                  color: "#FFF",
+                  fontFamily: "Montserrat, sans-serif",
+                  fontWeight: 600,
+                  textTransform: "none",
+                  borderRadius: "100px",
+                  padding: "0.75rem",
+                  "&:hover": {
+                  backgroundColor: "#072d61",
+                  },
               }}
-            >
+              >
               Save Progress
-            </Button>
+              </Button>
           </DialogActions>
         </Dialog>
 
@@ -1616,36 +1619,36 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
           onClose={handleSuccessClose}
           PaperProps={{
             sx: {
-              borderRadius: "15px",
-              padding: "1rem",
+            borderRadius: "15px",
+            padding: "1rem",
             },
-          }}
+        }}
         >
           <DialogTitle
             sx={{
-              fontFamily: "Montserrat, sans-serif",
-              fontWeight: 600,
-              color: "#08397C",
-              display: "flex",
-              alignItems: "center",
-              gap: 1,
+            fontFamily: "Montserrat, sans-serif",
+            fontWeight: 600,
+            color: "#008000",
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
             }}
-          >
+        >
             <Box
-              component='span'
-              sx={{
+            component='span'
+            sx={{
                 backgroundColor: "#E8F5E9",
-                borderRadius: "50%",
-                padding: "8px",
+                borderRadius: "75%",
+                padding: "10px",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-              }}
+            }}
             >
-              ✓
+            <CheckCircleIcon/>
             </Box>
             Success
-          </DialogTitle>
+        </DialogTitle>
           <DialogContent>
             <Typography
               sx={{
@@ -1667,10 +1670,11 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
                 fontWeight: 600,
                 textTransform: "none",
                 borderRadius: "100px",
+                padding: "0.75rem",
                 "&:hover": {
-                  backgroundColor: "#072d61",
+                backgroundColor: "#072d61",
                 },
-              }}
+            }}
             >
               Close
             </Button>

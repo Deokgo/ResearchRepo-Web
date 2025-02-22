@@ -249,19 +249,31 @@ const AddPublish = () => {
   return (
     <>
     {/* Update Publication Modal */}
-    <Modal open={isAddPublishModalOpen} onClose={isSubmitting ? undefined : handleBack}>
+    <Modal 
+      open={isAddPublishModalOpen} 
+      onClose={isSubmitting ? undefined : handleBack}
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        overflow: "auto",
+      }}
+      >
         <Box
-            sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: "40rem",
+          sx={{
             bgcolor: "background.paper",
             boxShadow: 24,
             p: 5,
-            borderRadius: "8px",
-            }}
+            borderRadius: 2,
+            width: "auto",
+            margin: "2rem",
+            maxHeight: "90vh",
+            overflowY: "auto",
+            position: "relative",
+            "&:focus": {
+              outline: "none",
+            },
+          }}
         >
             <Typography
             variant='h3'

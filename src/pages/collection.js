@@ -699,7 +699,7 @@ const Collection = () => {
                             textTransform: "none",
                             fontSize: { xs: "0.875rem", md: "1rem" },
                             padding: { xs: "0.5rem 1rem", md: "1.25rem" },
-                            marginLeft: "2rem",
+                            marginLeft: "1rem",
                             borderRadius: "100px",
                             maxHeight: "3rem",
                             "&:hover": {

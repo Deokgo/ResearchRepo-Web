@@ -685,12 +685,16 @@ const Navbar = () => {
               <MenuItem onClick={handleProfile}>
                 <Typography color='common.white' sx={{fontSize: { sm: "0.7rem", md: "0.9rem", lg: "1rem" }}}>Profile</Typography>
               </MenuItem>
-              <MenuItem onClick={handleAboutUs}>
-                <Typography color='common.white' sx={{fontSize: { sm: "0.7rem", md: "0.9rem", lg: "1rem" }}}>About Us</Typography>
-              </MenuItem>
-              <MenuItem onClick={handleHelp}>
-                <Typography color='common.white' sx={{fontSize: { sm: "0.7rem", md: "0.9rem", lg: "1rem" }}}>Help</Typography>
-              </MenuItem>
+              { user?.role !== "01" && (
+                <>
+                  <MenuItem onClick={handleAboutUs}>
+                    <Typography color='common.white' sx={{fontSize: { sm: "0.7rem", md: "0.9rem", lg: "1rem" }}}>About Us</Typography>
+                  </MenuItem>
+                  <MenuItem onClick={handleHelp}>
+                    <Typography color='common.white' sx={{fontSize: { sm: "0.7rem", md: "0.9rem", lg: "1rem" }}}>Help</Typography>
+                  </MenuItem>
+                </>
+              )}
               <Divider />
               <MenuItem onClick={confirmLogout}>
                 <ListItemIcon>

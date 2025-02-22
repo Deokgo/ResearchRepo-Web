@@ -164,30 +164,6 @@ const ResearchTracking = () => {
     }
   };
 
-  const fetchProgramsByCollege = async (collegeIds) => {
-    setIsLoading(true);
-    try {
-      if (collegeIds.length > 0) {
-        const cached = filterCache.get();
-        if (cached) {
-          const filteredPrograms = cached.programs.filter((program) =>
-            collegeIds.includes(String(program.college_id))
-          );
-          setPrograms(filteredPrograms);
-        }
-      } else {
-        const cached = filterCache.get();
-        setPrograms(cached.programs);
-      }
-    } catch (error) {
-      console.error("Error fetching programs by college:", error);
-      setPrograms(allPrograms);
-      setSelectedPrograms([]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const getUserId = () => {
     const userId = localStorage.getItem("user_id");
     return userId;
