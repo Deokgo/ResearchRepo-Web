@@ -1309,8 +1309,8 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
                   error={attemptedSubmit && !!formErrors.sdgs}
                   helperText={
                     attemptedSubmit
-                      ? formErrors.sdgs || "Select one or more SDG goals"
-                      : "Select one or more SDG goals"
+                      ? formErrors.sdgs || "Select one or more SDGs"
+                      : "Select one or more SDGs"
                   }
                   InputLabelProps={{
                     ...params.InputLabelProps,
@@ -1364,8 +1364,8 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
               helperText={
                 attemptedSubmit
                   ? formErrors.abstract ||
-                    "Type at least 3 characters to search and select author/s"
-                  : "Type at least 3 characters to search and select author/s"
+                    "Please provide the abstract for the paper"
+                  : "Please provide the abstract for the paper"
               }
               sx={createTextFieldStyles()}
               InputLabelProps={{
@@ -1396,8 +1396,8 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
                     error={attemptedSubmit && !!formErrors.researchAreas}
                     helperText={
                       attemptedSubmit
-                        ? formErrors.researchAreas || "Select research areas"
-                        : "Select research areas"
+                        ? formErrors.researchAreas || "Select one or more research areas"
+                        : "Select one or more research areas"
                     }
                     sx={createTextFieldStyles()}
                     InputLabelProps={{

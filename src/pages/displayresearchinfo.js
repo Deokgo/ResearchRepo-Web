@@ -1640,7 +1640,7 @@ const DisplayResearchInfo = () => {
                                   label='SDG Goals'
                                   required
                                   variant='outlined'
-                                  helperText='Select one or more SDG goals'
+                                  helperText='Select one or more SDGs'
                                   sx={createTextFieldStyles()}
                                   InputLabelProps={createInputLabelProps()}
                                 />
