@@ -32,6 +32,7 @@ const OtpModal = ({
 
   // Fetch OTP on modal open
   useEffect(() => {
+    console.log("OtpModal Props:", { email, open, isPasswordReset });
     if (!open) return;
 
     // Only start the timer, don't send OTP (it's already sent by SignupModal)
@@ -110,25 +111,37 @@ const OtpModal = ({
   };
 
   const resendOtp = async () => {
-    if (resendLoading) return;
-
+    if (resendLoading) {
+      console.log("Resend already in progress, exiting...");
+      return;
+    }
+  
     setResendLoading(true);
     setResendClicked(true);
+  
+  
     try {
-      await axios.post(OTP_GENERATE_API, {
+      const response = await axios.post(OTP_GENERATE_API, {
         email,
-        isPasswordReset: false, // This is for signup
+        isPasswordReset: isPasswordReset,
       });
+  
+      console.log("OTP resend response:", response.data);
+  
       setErrorMessage("");
       startTimer();
     } catch (error) {
+      console.error("Error resending OTP:", error);
+  
       setErrorMessage(
         error.response?.data?.error || "Failed to resend OTP. Please try again."
       );
     } finally {
+      console.log("Resetting resendLoading...");
       setResendLoading(false);
     }
   };
+  
 
   const formatTime = (seconds) => {
     const minutes = Math.floor(seconds / 60);

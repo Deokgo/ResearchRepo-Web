@@ -413,10 +413,28 @@ const Profile = () => {
   const handleOpenChangePasswordModal = () => {
     setIsChangePasswordModalOpen(true);
   };
+  
 
-  const handleOpenOtpModal = () => {
-    setIsOtpModalOpen(true);
+  const handleOpenOtpModal = async () => {
+    try {
+      const otpResponse = await axios.post("/auth/send_otp", {
+        email: email, // Ensure email is correctly defined
+        isPasswordReset: true, // Ensure it is explicitly set
+      });
+  
+      if (otpResponse.status === 200) {
+        setIsOtpModalOpen(true);
+      } else {
+        console.warn("Unexpected response status:", otpResponse.status);
+      }
+    } catch (error) {
+      console.error("Error sending OTP:", error.response?.data || error.message);
+    } finally {
+      setIsOtpModalOpen(true); // Ensure modal opens even if OTP fails
+    }
   };
+  
+  
 
   const handleCloseOtpModal = () => {
     setIsOtpModalOpen(false);
@@ -502,6 +520,7 @@ const Profile = () => {
                 open={isOtpModalOpen}
                 onClose={handleCloseOtpModal}
                 onVerify={handleOtpVerificationSuccess}
+                isPasswordReset={true}
               />
 
               <Button
