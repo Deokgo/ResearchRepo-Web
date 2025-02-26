@@ -18,11 +18,11 @@ import {
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
-import axios from "axios";
+import api from "../services/api";
 import AutoCompleteTextBox from "../components/Intellibox";
 import FileUploader from "../components/FileUploader";
 import { useModalContext } from "../context/modalcontext";
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { toast } from "react-hot-toast";
 import { fetchAndCacheFilterData } from "../utils/trackCache";
 
@@ -43,7 +43,8 @@ const AddPublish = () => {
   const [datePublished, setDatePublished] = useState("");
   const [finalSubmitted, setFinalSubmitted] = useState(null);
 
-  const { isAddPublishModalOpen, closeAddPublishModal, openAddPublishModal } = useModalContext();
+  const { isAddPublishModalOpen, closeAddPublishModal, openAddPublishModal } =
+    useModalContext();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
@@ -55,7 +56,7 @@ const AddPublish = () => {
   useEffect(() => {
     const fetchPublication = async () => {
       try {
-        const response = await axios.get(`/track/publication/${id}`);
+        const response = await api.get(`/track/publication/${id}`);
 
         if (response.data.dataset && response.data.dataset.length > 0) {
           const fetched_data = response.data.dataset;
@@ -75,7 +76,6 @@ const AddPublish = () => {
           setPublicationTitle(initialData.publication_name);
           setPublicationFormat(initialData.journal);
           setDatePresentation(initialData.conference_date);
-
         }
       } catch (error) {
         console.error("Error fetching publication data:", error);
@@ -85,7 +85,6 @@ const AddPublish = () => {
 
     fetchPublication();
   }, [id]);
-
 
   ///////////////////// STATUS UPDATE PUBLICATION //////////////////////
   const onSelectFileHandlerFS = (e) => {
@@ -98,13 +97,10 @@ const AddPublish = () => {
 
   const handleBack = () => {
     if (isSubmitting) {
-        return;
+      return;
     }
     let hasChanges;
-    hasChanges =
-      indexingStatus ||
-      datePublished ||
-      finalSubmitted;
+    hasChanges = indexingStatus || datePublished || finalSubmitted;
 
     if (hasChanges) {
       setIsConfirmDialogOpen(true);
@@ -118,10 +114,10 @@ const AddPublish = () => {
     // Validate required fields
     // Determine required fields based on publicationFormat
     let requiredFields = {
-        "Indexing Status" : indexingStatus,
-        "Date of Publication" : datePublished,
-        "Final Submitted Copy" : finalSubmitted
-    }
+      "Indexing Status": indexingStatus,
+      "Date of Publication": datePublished,
+      "Final Submitted Copy": finalSubmitted,
+    };
 
     const missingFields = Object.entries(requiredFields)
       .filter(([_, value]) => {
@@ -139,10 +135,10 @@ const AddPublish = () => {
     approvedDate.setHours(0, 0, 0, 0);
     today.setHours(0, 0, 0, 0);
 
-    if (missingFields.length > 0){
-        return true;
-    } 
-    
+    if (missingFields.length > 0) {
+      return true;
+    }
+
     return false;
   };
 
@@ -151,10 +147,10 @@ const AddPublish = () => {
       const missingFields = checkOtherFields();
 
       if (missingFields) {
-         alert(
+        alert(
           `Please fill in all required fields: ${missingFields.join(", ")}`
         );
-           return;
+        return;
       }
 
       setIsSubmitting(true);
@@ -175,20 +171,19 @@ const AddPublish = () => {
       }
 
       // Send the conference data
-      const response = await axios.post(`/track/form/published/${id}`, formData, {
+      const response = await api.post(`/track/form/published/${id}`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
 
       setIsSuccessDialogOpen(true);
-      
-      } catch (error) {
-          toast.error(error.response?.data?.error || "Error publishing");
-          console.error("Error:", error);
-      } finally {
-          setIsSubmitting(false);
-      }
+    } catch (error) {
+      toast.error(error.response?.data?.error || "Error publishing");
+      console.error("Error:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   ///////////////////// PRE-POST MODAL HANDLING //////////////////////
@@ -248,16 +243,16 @@ const AddPublish = () => {
 
   return (
     <>
-    {/* Update Publication Modal */}
-    <Modal 
-      open={isAddPublishModalOpen} 
-      onClose={isSubmitting ? undefined : handleBack}
-      sx={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        overflow: "auto",
-      }}
+      {/* Update Publication Modal */}
+      <Modal
+        open={isAddPublishModalOpen}
+        onClose={isSubmitting ? undefined : handleBack}
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          overflow: "auto",
+        }}
       >
         <Box
           sx={{
@@ -275,167 +270,168 @@ const AddPublish = () => {
             },
           }}
         >
-            <Typography
+          <Typography
             variant='h3'
             color='#08397C'
             fontWeight='1000'
             mb={3}
             sx={{
-                textAlign: { xs: "left", md: "bottom" },
-                fontSize: {
+              textAlign: { xs: "left", md: "bottom" },
+              fontSize: {
                 xs: "clamp(1rem, 2vw, 1rem)",
                 sm: "clamp(1.5rem, 3.5vw, 1.5rem)",
                 md: "clamp(2rem, 4vw, 2.25rem)",
-                },
+              },
             }}
-            >
+          >
             Publish {selectedFormatName}
-            </Typography>
-            { publicationFormat === "PC" && (
-              <AutoCompleteTextBox
-                fullWidth
-                data={pub_names}
-                label='Publication Title'
-                id='publication-name'
-                value={publicationTitle}
-                onItemSelected={(value) => setPublicationTitle(value)} // Update state when a suggestion is selected
-                sx={{
-                    ...createTextFieldStyles(),
-                    "& .MuiInputLabel-root": {
-                    fontSize: {
-                        xs: "0.75rem",
-                        md: "0.75rem",
-                        lg: "0.8rem",
-                    },
-                    },
-                    ...(publicationFormat === "JL" && {
-                    pointerEvents: "none",
-                    opacity: 0.7
-                    })
-                }}
-                InputLabelProps={createInputLabelProps()}
-                placeholder='ex: PLOS One'
-              />
-            )}
-            { publicationFormat === 'JL' && (
-              <TextField
-                fullWidth
-                label='Publication Title'
-                variant='outlined'
-                margin='dense'
-                disabled
-                value={publicationTitle}
-                sx={createTextFieldStyles()}
-                InputLabelProps={createInputLabelProps()}
-              />
-            )}
-            <FormControl fullWidth variant='outlined' margin='dense'>
-            <InputLabel
-                sx={{
-                fontSize: {
+          </Typography>
+          {publicationFormat === "PC" && (
+            <AutoCompleteTextBox
+              fullWidth
+              data={pub_names}
+              label='Publication Title'
+              id='publication-name'
+              value={publicationTitle}
+              onItemSelected={(value) => setPublicationTitle(value)} // Update state when a suggestion is selected
+              sx={{
+                ...createTextFieldStyles(),
+                "& .MuiInputLabel-root": {
+                  fontSize: {
                     xs: "0.75rem",
                     md: "0.75rem",
                     lg: "0.8rem",
+                  },
                 },
-                }}
+                ...(publicationFormat === "JL" && {
+                  pointerEvents: "none",
+                  opacity: 0.7,
+                }),
+              }}
+              InputLabelProps={createInputLabelProps()}
+              placeholder='ex: PLOS One'
+            />
+          )}
+          {publicationFormat === "JL" && (
+            <TextField
+              fullWidth
+              label='Publication Title'
+              variant='outlined'
+              margin='dense'
+              disabled
+              value={publicationTitle}
+              sx={createTextFieldStyles()}
+              InputLabelProps={createInputLabelProps()}
+            />
+          )}
+          <FormControl fullWidth variant='outlined' margin='dense'>
+            <InputLabel
+              sx={{
+                fontSize: {
+                  xs: "0.75rem",
+                  md: "0.75rem",
+                  lg: "0.8rem",
+                },
+              }}
             >
-                Indexing Status
+              Indexing Status
             </InputLabel>
             <Select
-                label='Indexing Status'
-                sx={createTextFieldStyles()}
-                value={indexingStatus}
-                onChange={(e) => setIndexingStatus(e.target.value)}
+              label='Indexing Status'
+              sx={createTextFieldStyles()}
+              value={indexingStatus}
+              onChange={(e) => setIndexingStatus(e.target.value)}
             >
-                <MenuItem
+              <MenuItem
                 value=''
                 disabled
                 sx={{
-                    fontSize: {
+                  fontSize: {
                     xs: "0.75rem",
                     md: "0.75rem",
                     lg: "0.8rem",
-                    },
+                  },
                 }}
-                >
+              >
                 Select indexing status
-                </MenuItem>
-                <MenuItem
+              </MenuItem>
+              <MenuItem
                 value='SCOPUS'
                 sx={{
-                    fontSize: {
+                  fontSize: {
                     xs: "0.75rem",
                     md: "0.75rem",
                     lg: "0.8rem",
-                    },
+                  },
                 }}
-                >
+              >
                 Scopus
-                </MenuItem>
-                <MenuItem
+              </MenuItem>
+              <MenuItem
                 value='NON-SCOPUS'
                 sx={{
-                    fontSize: {
+                  fontSize: {
                     xs: "0.75rem",
                     md: "0.75rem",
                     lg: "0.8rem",
-                    },
+                  },
                 }}
-                >
+              >
                 Non-Scopus
-                </MenuItem>
+              </MenuItem>
             </Select>
-            </FormControl>
-            <TextField
-                fullWidth
-                label='Date of Publication'
-                variant='outlined'
-                type='date'
-                margin='dense'
-                value={
-                    datePublished
-                    ? new Date(datePublished).toLocaleDateString(
-                        "en-CA"
-                        )
-                    : ""
-                }
-                onChange={(e) => setDatePublished(e.target.value)}
-                inputProps={{
-                    min: publicationFormat === 'PC' ? initialValues?.conference_date : initialValues?.date_submitted,
-                    max: new Date(new Date().setDate(new Date().getDate())).toISOString().split('T')[0] // Sets tomorrow as the minimum date
-                }}
-                sx={createTextFieldStyles()}
-                InputLabelProps={{
-                    ...createInputLabelProps(),
-                    shrink: true,
-                }}
-            />
-            <Grid2 size={3} padding={3}>
+          </FormControl>
+          <TextField
+            fullWidth
+            label='Date of Publication'
+            variant='outlined'
+            type='date'
+            margin='dense'
+            value={
+              datePublished
+                ? new Date(datePublished).toLocaleDateString("en-CA")
+                : ""
+            }
+            onChange={(e) => setDatePublished(e.target.value)}
+            inputProps={{
+              min:
+                publicationFormat === "PC"
+                  ? initialValues?.conference_date
+                  : initialValues?.date_submitted,
+              max: new Date(new Date().setDate(new Date().getDate()))
+                .toISOString()
+                .split("T")[0], // Sets tomorrow as the minimum date
+            }}
+            sx={createTextFieldStyles()}
+            InputLabelProps={{
+              ...createInputLabelProps(),
+              shrink: true,
+            }}
+          />
+          <Grid2 size={3} padding={3}>
             <Typography variant='body2' sx={{ mb: 1 }}>
-                <strong>Upload Final Submitted Copy *</strong>
+              <strong>Upload Final Submitted Copy *</strong>
             </Typography>
-            <FormControl
-                fullWidth
-            >
-                <FileUploader
+            <FormControl fullWidth>
+              <FileUploader
                 onFileSelect={onSelectFileHandlerFS}
                 onFileDelete={onDeleteFileHandlerFS}
                 selectedFile={finalSubmitted}
                 required
                 sx={{ width: "100%" }}
-                />
+              />
             </FormControl>
-            </Grid2>
-            <Box
+          </Grid2>
+          <Box
             sx={{
-                display: "flex",
-                mt: 3,
-                gap: 2,
+              display: "flex",
+              mt: 3,
+              gap: 2,
             }}
-            >
+          >
             <Button
-                onClick={handleBack}
-                sx={{
+              onClick={handleBack}
+              sx={{
                 backgroundColor: "#08397C",
                 color: "#FFF",
                 fontFamily: "Montserrat, sans-serif",
@@ -446,18 +442,18 @@ const AddPublish = () => {
                 maxHeight: "3rem",
                 textTransform: "none",
                 "&:hover": {
-                    backgroundColor: "#072d61",
+                  backgroundColor: "#072d61",
                 },
-                }}
+              }}
             >
-                Cancel
+              Cancel
             </Button>
             <Button
-                variant='contained'
-                color='primary'
-                onClick={handleEditPublication}
-                disabled={checkOtherFields() || isSubmitting}
-                sx={{
+              variant='contained'
+              color='primary'
+              onClick={handleEditPublication}
+              disabled={checkOtherFields() || isSubmitting}
+              sx={{
                 backgroundColor: "#CA031B",
                 color: "#FFF",
                 fontFamily: "Montserrat, sans-serif",
@@ -468,25 +464,25 @@ const AddPublish = () => {
                 borderRadius: "100px",
                 maxHeight: "3rem",
                 "&:hover": {
-                    backgroundColor: "#A30417",
-                    color: "#FFF",
+                  backgroundColor: "#A30417",
+                  color: "#FFF",
                 },
-                }}
+              }}
             >
-                {isSubmitting ? (
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                    <CircularProgress size={20} color='#08397C' />
-                    Publishing...
-                    </Box>
-                ) : (
-                    "Publish"
-                )}
+              {isSubmitting ? (
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                  <CircularProgress size={20} color='#08397C' />
+                  Publishing...
+                </Box>
+              ) : (
+                "Publish"
+              )}
             </Button>
           </Box>
-            {/* Add loading overlay */}
-            {isSubmitting && (
+          {/* Add loading overlay */}
+          {isSubmitting && (
             <Box
-                sx={{
+              sx={{
                 position: "absolute",
                 top: 0,
                 left: 0,
@@ -497,161 +493,164 @@ const AddPublish = () => {
                 alignItems: "center",
                 justifyContent: "center",
                 zIndex: 9999,
-                }}
+              }}
             >
-                <Box sx={{ textAlign: "center" }}>
+              <Box sx={{ textAlign: "center" }}>
                 <CircularProgress />
-                <Typography sx={{ mt: 2, fontSize: "1.25rem" }}>Publishing...</Typography>
-                </Box>
+                <Typography sx={{ mt: 2, fontSize: "1.25rem" }}>
+                  Publishing...
+                </Typography>
+              </Box>
             </Box>
-            )}
+          )}
 
-            {/* Save Progress */}
-            <Dialog
-                open={isConfirmDialogOpen}
-                onClose={() => setIsConfirmDialogOpen(false)}
-                PaperProps={{
-                    sx: {
-                    borderRadius: "15px",
-                    padding: "1rem",
-                    },
+          {/* Save Progress */}
+          <Dialog
+            open={isConfirmDialogOpen}
+            onClose={() => setIsConfirmDialogOpen(false)}
+            PaperProps={{
+              sx: {
+                borderRadius: "15px",
+                padding: "1rem",
+              },
+            }}
+          >
+            <DialogTitle
+              sx={{
+                fontFamily: "Montserrat, sans-serif",
+                fontWeight: 600,
+                color: "#08397C",
+              }}
+            >
+              Unsaved Progress
+            </DialogTitle>
+            <DialogContent>
+              <Typography
+                sx={{
+                  fontFamily: "Montserrat, sans-serif",
+                  color: "#666",
                 }}
-                >
-                <DialogTitle
-                    sx={{
-                    fontFamily: "Montserrat, sans-serif",
-                    fontWeight: 600,
-                    color: "#08397C",
-                    }}
-                >
-                    Unsaved Progress
-                </DialogTitle>
-                <DialogContent>
-                    <Typography
-                    sx={{
-                        fontFamily: "Montserrat, sans-serif",
-                        color: "#666",
-                    }}
-                    >
-                    You have unsaved progress. Do you want to save your progress?
-                    </Typography>
-                </DialogContent>
-                <DialogActions sx={{ padding: "1rem" }}>
-                    <Button
-                    onClick={() => {
-                        setIsConfirmDialogOpen(false);
-                        handleFormCleanup(); // Set flag to clear fields
-                        closeAddPublishModal();
-                    }}
-                    sx={{
-                        backgroundColor: "#CA031B",
-                        color: "#FFF",
-                        fontFamily: "Montserrat, sans-serif",
-                        fontWeight: 600,
-                        textTransform: "none",
-                        borderRadius: "100px",
-                        padding: "0.75rem",
-                        "&:hover": {
-                        backgroundColor: "#A30417",
-                        },
-                    }}
-                    >
-                    Discard
-                    </Button>
-                    <Button
-                    onClick={() => {
-                        setIsConfirmDialogOpen(false);
-                        closeAddPublishModal();
-                    }}
-                    sx={{
-                        backgroundColor: "#08397C",
-                        color: "#FFF",
-                        fontFamily: "Montserrat, sans-serif",
-                        fontWeight: 600,
-                        textTransform: "none",
-                        borderRadius: "100px",
-                        padding: "0.75rem",
-                        "&:hover": {
-                        backgroundColor: "#072d61",
-                        },
-                    }}
-                    >
-                    Save Progress
-                    </Button>
-                </DialogActions>
-                </Dialog>
+              >
+                You have unsaved progress. Do you want to save your progress?
+              </Typography>
+            </DialogContent>
+            <DialogActions sx={{ padding: "1rem" }}>
+              <Button
+                onClick={() => {
+                  setIsConfirmDialogOpen(false);
+                  handleFormCleanup(); // Set flag to clear fields
+                  closeAddPublishModal();
+                }}
+                sx={{
+                  backgroundColor: "#CA031B",
+                  color: "#FFF",
+                  fontFamily: "Montserrat, sans-serif",
+                  fontWeight: 600,
+                  textTransform: "none",
+                  borderRadius: "100px",
+                  padding: "0.75rem",
+                  "&:hover": {
+                    backgroundColor: "#A30417",
+                  },
+                }}
+              >
+                Discard
+              </Button>
+              <Button
+                onClick={() => {
+                  setIsConfirmDialogOpen(false);
+                  closeAddPublishModal();
+                }}
+                sx={{
+                  backgroundColor: "#08397C",
+                  color: "#FFF",
+                  fontFamily: "Montserrat, sans-serif",
+                  fontWeight: 600,
+                  textTransform: "none",
+                  borderRadius: "100px",
+                  padding: "0.75rem",
+                  "&:hover": {
+                    backgroundColor: "#072d61",
+                  },
+                }}
+              >
+                Save Progress
+              </Button>
+            </DialogActions>
+          </Dialog>
 
-                {/* Add Success Dialog */}
-                <Dialog
-                open={isSuccessDialogOpen}
-                PaperProps={{
-                    sx: {
-                    borderRadius: "15px",
-                    padding: "1rem",
-                    },
+          {/* Add Success Dialog */}
+          <Dialog
+            open={isSuccessDialogOpen}
+            PaperProps={{
+              sx: {
+                borderRadius: "15px",
+                padding: "1rem",
+              },
+            }}
+          >
+            <DialogTitle
+              sx={{
+                fontFamily: "Montserrat, sans-serif",
+                fontWeight: 600,
+                color: "#008000",
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+              }}
+            >
+              <Box
+                component='span'
+                sx={{
+                  backgroundColor: "#E8F5E9",
+                  borderRadius: "75%",
+                  padding: "10px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
                 }}
-                >
-                <DialogTitle
-                    sx={{
-                    fontFamily: "Montserrat, sans-serif",
-                    fontWeight: 600,
-                    color: "#008000",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 1,
-                    }}
-                >
-                    <Box
-                    component='span'
-                    sx={{
-                        backgroundColor: "#E8F5E9",
-                        borderRadius: "75%",
-                        padding: "10px",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                    }}
-                    >
-                    <CheckCircleIcon/>
-                    </Box>
-                    Success
-                </DialogTitle>
-                <DialogContent>
-                    <Typography
-                    sx={{
-                        fontFamily: "Montserrat, sans-serif",
-                        color: "#666",
-                        mt: 1,
-                    }}
-                    >
-                    Research output has been published successfully.
-                    </Typography>
-                </DialogContent>
-                <DialogActions sx={{ padding: "1rem" }}>
-                    <Button
-                    onClick={() => {
-                        setIsSuccessDialogOpen(false);
-                        handleFormCleanup();
-                        navigate(0); }}
-                    sx={{
-                        backgroundColor: "#08397C",
-                        color: "#FFF",
-                        fontFamily: "Montserrat, sans-serif",
-                        fontWeight: 600,
-                        textTransform: "none",
-                        borderRadius: "100px",
-                        padding: "0.75rem",
-                        "&:hover": {
-                        backgroundColor: "#072d61",
-                        },
-                    }}
-                    >
-                    Close
-                    </Button>
-                </DialogActions>
-            </Dialog>
+              >
+                <CheckCircleIcon />
+              </Box>
+              Success
+            </DialogTitle>
+            <DialogContent>
+              <Typography
+                sx={{
+                  fontFamily: "Montserrat, sans-serif",
+                  color: "#666",
+                  mt: 1,
+                }}
+              >
+                Research output has been published successfully.
+              </Typography>
+            </DialogContent>
+            <DialogActions sx={{ padding: "1rem" }}>
+              <Button
+                onClick={() => {
+                  setIsSuccessDialogOpen(false);
+                  handleFormCleanup();
+                  navigate(0);
+                }}
+                sx={{
+                  backgroundColor: "#08397C",
+                  color: "#FFF",
+                  fontFamily: "Montserrat, sans-serif",
+                  fontWeight: 600,
+                  textTransform: "none",
+                  borderRadius: "100px",
+                  padding: "0.75rem",
+                  "&:hover": {
+                    backgroundColor: "#072d61",
+                  },
+                }}
+              >
+                Close
+              </Button>
+            </DialogActions>
+          </Dialog>
         </Box>
-    </Modal>
+      </Modal>
     </>
   );
 };

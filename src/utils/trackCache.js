@@ -1,4 +1,4 @@
-import axios from 'axios';
+import api from "../services/api";
 
 class FilterCache {
   constructor() {
@@ -8,7 +8,7 @@ class FilterCache {
       countries: [],
       cities: [],
       publicationNames: [],
-      publicationFormats: []
+      publicationFormats: [],
     };
     this.CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
   }
@@ -20,7 +20,7 @@ class FilterCache {
   set(data) {
     this.cache = {
       ...data,
-      expiryTime: Date.now() + this.CACHE_DURATION
+      expiryTime: Date.now() + this.CACHE_DURATION,
     };
   }
 
@@ -35,7 +35,7 @@ class FilterCache {
       countries: [],
       cities: [],
       publicationNames: [],
-      publicationFormats: []
+      publicationFormats: [],
     };
   }
 }
@@ -52,12 +52,14 @@ export const fetchAndCacheFilterData = async () => {
         conferencesResponse,
         publicationsResponse,
         pubFormatsResponse,
-        countriesResponse
+        countriesResponse,
       ] = await Promise.all([
-        axios.get('/track/fetch_data/conference'),
-        axios.get('/track/data_fetcher/publications/publication_name'),
-        axios.get('/track/fetch_data/pub_format'),
-        axios.get('https://countriesnow.space/api/v0.1/countries', { withCredentials: false })
+        api.get("/track/fetch_data/conference"),
+        api.get("/track/data_fetcher/publications/publication_name"),
+        api.get("/track/fetch_data/pub_format"),
+        api.get("https://countriesnow.space/api/v0.1/countries", {
+          withCredentials: false,
+        }),
       ]);
 
       // Process conference venues
@@ -65,18 +67,18 @@ export const fetchAndCacheFilterData = async () => {
         .map((conf) => {
           if (conf.conference_venue) {
             const [city, country] = conf.conference_venue
-              .split(',')
-              .map(part => part.trim());
+              .split(",")
+              .map((part) => part.trim());
             return { city, country };
           }
           return null;
         })
-        .filter(venue => venue !== null);
+        .filter((venue) => venue !== null);
 
       // Extract unique conference titles
       const conferenceTitles = conferencesResponse.data
-        .map(conf => conf.conference_title)
-        .filter(title => title);
+        .map((conf) => conf.conference_title)
+        .filter((title) => title);
 
       // Process and cache the data
       filterCache.set({
@@ -85,13 +87,13 @@ export const fetchAndCacheFilterData = async () => {
         publicationFormats: pubFormatsResponse.data,
         countries: countriesResponse.data.data,
         venues,
-        cities: venues.map(venue => venue.city)
+        cities: venues.map((venue) => venue.city),
       });
     }
 
     return filterCache.get();
   } catch (error) {
-    console.error('Error fetching filter data:', error);
+    console.error("Error fetching filter data:", error);
     throw error;
   }
 };

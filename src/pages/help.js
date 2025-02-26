@@ -20,7 +20,6 @@ import homeBg from "../assets/home_bg.png";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import InfoIcon from "@mui/icons-material/Info";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useModalContext } from "../context/modalcontext";
@@ -45,8 +44,12 @@ const Help = () => {
       answer: (
         <>
           <strong>To change password:</strong> <br />
-          (1) Go to the [user icon] on the upper-right corner. A user menu will open, select [profile]. <br />
-          (2) Under the profile tab, select [change password]. A small window will pop up to your screen, kindly input your old password and new password. For confirmation purposes, you need enter the new password twice. <br />
+          (1) Go to the [user icon] on the upper-right corner. A user menu will
+          open, select [profile]. <br />
+          (2) Under the profile tab, select [change password]. A small window
+          will pop up to your screen, kindly input your old password and new
+          password. For confirmation purposes, you need enter the new password
+          twice. <br />
           (3) The click submit.
         </>
       ),
@@ -65,7 +68,11 @@ const Help = () => {
       question: "How to regain access to my inactive account?",
       answer: (
         <>
-        <strong>If you experience any issues, please contact our support team for assistance:</strong> <br />
+          <strong>
+            If you experience any issues, please contact our support team for
+            assistance:
+          </strong>{" "}
+          <br />
           📧 Email: support@example.com <br />
           📞 Phone: +69 (02) 0123-4567 <br />
           💬 Live Chat: Visit our support page

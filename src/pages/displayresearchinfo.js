@@ -34,7 +34,7 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import { useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import homeBg from "../assets/home_bg.png";
-import axios from "axios";
+import api from "../services/api";
 import FileUploader from "../components/FileUploader";
 import EditIcon from "@mui/icons-material/Edit";
 import sdgGoalsData from "../data/sdgGoals.json";
@@ -112,7 +112,7 @@ const DisplayResearchInfo = () => {
 
     const timer = setTimeout(async () => {
       try {
-        await axios.put(`/paper/increment_views/${id}?is_increment=true`, {
+        await api.put(`/paper/increment_views/${id}?is_increment=true`, {
           user_id: userId,
         });
       } catch (error) {
@@ -152,7 +152,7 @@ const DisplayResearchInfo = () => {
     if (id) {
       const fetchData = async () => {
         try {
-          const response = await axios.get(
+          const response = await api.get(
             `/dataset/fetch_ordered_dataset/${id}`
           );
           const fetchedDataset = response.data.dataset || []; // Use empty array if dataset is undefined
@@ -175,7 +175,7 @@ const DisplayResearchInfo = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get("/accounts/users");
+        const response = await api.get("/accounts/users");
         const fetchedUsers = response.data.researchers;
         setUsers(fetchedUsers);
       } catch (error) {
@@ -196,7 +196,7 @@ const DisplayResearchInfo = () => {
 
     if (research_id) {
       try {
-        const response = await axios.get(
+        const response = await api.get(
           `/paper/view_manuscript/${research_id}`,
           {
             responseType: "blob",
@@ -223,7 +223,7 @@ const DisplayResearchInfo = () => {
 
     if (research_id) {
       try {
-        const response = await axios.get(
+        const response = await api.get(
           `/paper/view_extended_abstract/${research_id}`,
           {
             responseType: "blob",
@@ -236,7 +236,7 @@ const DisplayResearchInfo = () => {
 
         // Increment the download count
         const userId = localStorage.getItem("user_id");
-        const incrementResponse = await axios.put(
+        const incrementResponse = await api.put(
           `/paper/increment_downloads/${research_id}`,
           {
             user_id: userId,
@@ -271,7 +271,7 @@ const DisplayResearchInfo = () => {
   useEffect(() => {
     const fetchStatus = async () => {
       try {
-        const response = await axios.get(`/track/next_status/${id}`); // Replace with your API endpoint
+        const response = await api.get(`/track/next_status/${id}`); // Replace with your API endpoint
         console.log("API Response:", response.data); // Log the raw response (string)
 
         setStatus(response.data); // Directly set the response if it's a string
@@ -298,7 +298,7 @@ const DisplayResearchInfo = () => {
   const handleStatusUpdate = async (newStatus) => {
     try {
       // Make the status update request
-      const response = await axios.post(`/track/research_status/${id}`, {
+      const response = await api.post(`/track/research_status/${id}`, {
         status: newStatus,
       });
 
@@ -307,7 +307,7 @@ const DisplayResearchInfo = () => {
         setRefreshTimeline((prev) => !prev);
 
         // Fetch the next available status
-        const nextStatusResponse = await axios.get(`/track/next_status/${id}`);
+        const nextStatusResponse = await api.get(`/track/next_status/${id}`);
         setStatus(nextStatusResponse.data);
       }
     } catch (err) {
@@ -453,7 +453,7 @@ const DisplayResearchInfo = () => {
       } else {
         await fetchDeptProg();
         if (item.college_id) {
-          const response = await axios.get(
+          const response = await api.get(
             `/deptprogs/programs/${item.college_id}`
           );
           setPrograms(response.data.programs);
@@ -615,7 +615,7 @@ const DisplayResearchInfo = () => {
       }
 
       // Make the API call
-      const response = await axios.put(
+      const response = await api.put(
         `/paper/update_paper/${editableData.research_id}`,
         formData,
         {
@@ -635,7 +635,7 @@ const DisplayResearchInfo = () => {
       setHeader("Research Information");
 
       // Refresh the data
-      const refreshResponse = await axios.get(
+      const refreshResponse = await api.get(
         `/dataset/fetch_ordered_dataset/${id}`
       );
       setData({ dataset: refreshResponse.data.dataset || [] });
@@ -688,7 +688,7 @@ const DisplayResearchInfo = () => {
     } else {
       // Fallback to API call if cache is missing
       try {
-        const response = await axios.get(
+        const response = await api.get(
           `/deptprogs/programs/${selectedCollegeId}`
         );
         setPrograms(response.data.programs);
@@ -701,7 +701,7 @@ const DisplayResearchInfo = () => {
   const handleAuthorSearch = async (query) => {
     if (query.length > 2) {
       try {
-        const response = await axios.get("/accounts/search_user", {
+        const response = await api.get("/accounts/search_user", {
           params: { query },
         });
         setAuthorOptions(response.data.users);
@@ -714,7 +714,7 @@ const DisplayResearchInfo = () => {
   const handleAdviserSearch = async (query) => {
     if (query.length > 2) {
       try {
-        const response = await axios.get("/accounts/search_user", {
+        const response = await api.get("/accounts/search_user", {
           params: { query },
         });
         setAdviserOptions(response.data.users);
@@ -727,7 +727,7 @@ const DisplayResearchInfo = () => {
   const handlePanelSearch = async (query) => {
     if (query.length > 2) {
       try {
-        const response = await axios.get("/accounts/search_user", {
+        const response = await api.get("/accounts/search_user", {
           params: { query },
         });
         setPanelOptions(response.data.users);
@@ -1220,7 +1220,10 @@ const DisplayResearchInfo = () => {
                                       .join("; ")
                                   : "No panel members"}
                               </Typography>
-                              <Divider variant='middle' sx={{ mb: "1rem", mt: "0.5rem" }} />
+                              <Divider
+                                variant='middle'
+                                sx={{ mb: "1rem", mt: "0.5rem" }}
+                              />
                               <Typography
                                 variant='body1'
                                 sx={{
@@ -1967,7 +1970,10 @@ const DisplayResearchInfo = () => {
                                 fontFamily: "Montserrat, sans-serif",
                                 fontWeight: 600,
                                 fontSize: { xs: "0.875rem", md: "0.9rem" },
-                                padding: { xs: "0.5rem 1rem", md: "0.5rem 0.8rem" },
+                                padding: {
+                                  xs: "0.5rem 1rem",
+                                  md: "0.5rem 0.8rem",
+                                },
                                 borderRadius: "100px",
                                 maxHeight: "3rem",
                                 textTransform: "none",
@@ -1991,7 +1997,10 @@ const DisplayResearchInfo = () => {
                                 fontWeight: 600,
                                 textTransform: "none",
                                 fontSize: { xs: "0.875rem", md: "0.9rem" },
-                                padding: { xs: "0.5rem 1rem", md: "0.5rem 0.8rem" },
+                                padding: {
+                                  xs: "0.5rem 1rem",
+                                  md: "0.5rem 0.8rem",
+                                },
                                 borderRadius: "100px",
                                 maxHeight: "3rem",
                                 "&:hover": {

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import api from "../services/api";
 import {
   Modal,
   Box,
@@ -39,7 +39,7 @@ const PasswordResetModal = () => {
     boxShadow: 24,
     p: 5,
     borderRadius: "8px",
-    textAlign: 'center'
+    textAlign: "center",
   };
 
   const handleEmailSubmit = async (e) => {
@@ -49,7 +49,7 @@ const PasswordResetModal = () => {
 
     try {
       // First check if email exists
-      const checkResponse = await axios.get(
+      const checkResponse = await api.get(
         `/accounts/check_email?email=${formValues.email}`
       );
 
@@ -59,7 +59,7 @@ const PasswordResetModal = () => {
       }
 
       // If email exists, send OTP
-      await axios.post("/auth/send_otp", {
+      await api.post("/auth/send_otp", {
         email: formValues.email,
         isPasswordReset: true,
       });
@@ -93,7 +93,7 @@ const PasswordResetModal = () => {
     }
 
     try {
-      const response = await axios.post("/auth/reset_password", {
+      const response = await api.post("/auth/reset_password", {
         email: formValues.email,
         newPassword: formValues.newPassword,
       });
@@ -124,7 +124,7 @@ const PasswordResetModal = () => {
   return (
     <>
       <Modal open={isPassresetModalOpen} onClose={closePassresetModal}>
-        <Box 
+        <Box
           sx={{
             ...modalStyle,
             maxHeight: "90vh", // Limit the modal height to 90% of the viewport height
@@ -148,18 +148,18 @@ const PasswordResetModal = () => {
             Mapúa MCL Research Repository
           </Typography>
           <Typography
-           variant='h2'
-           color='#F40824'
-           fontWeight='700'
-           paddingBottom={3}
-           sx={{
-             textAlign: { xs: "center", md: "bottom" },
-             fontSize: {
-               xs: "clamp(1rem, 2vw, 1rem)",
-               sm: "clamp(1.5rem, 3.5vw, 1.5rem)",
-               md: "clamp(2.5rem, 3vw, 2.5rem)",
-             },
-           }}
+            variant='h2'
+            color='#F40824'
+            fontWeight='700'
+            paddingBottom={3}
+            sx={{
+              textAlign: { xs: "center", md: "bottom" },
+              fontSize: {
+                xs: "clamp(1rem, 2vw, 1rem)",
+                sm: "clamp(1.5rem, 3.5vw, 1.5rem)",
+                md: "clamp(2.5rem, 3vw, 2.5rem)",
+              },
+            }}
           >
             Password Reset
           </Typography>
@@ -295,10 +295,10 @@ const PasswordResetModal = () => {
                     borderRadius: "100px",
                     maxHeight: "3rem",
                     "&:hover": {
-                        backgroundColor: "#A30417",
-                        color: "#FFF",
+                      backgroundColor: "#A30417",
+                      color: "#FFF",
                     },
-                    }}
+                  }}
                 >
                   {loading ? "Updating..." : "Update Password"}
                 </Button>

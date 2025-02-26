@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Button, CircularProgress } from "@mui/material";
-import axios from "axios";
 
 const StatusUpdateButton = ({
   apiUrl,
@@ -56,11 +55,12 @@ const StatusUpdateButton = ({
         }}
       >
         {loading ? (
-            <CircularProgress size={24} color='inherit' />
-          ) : (
-            statusToUpdate === "COMPLETED" ? "COMPLETED" : `Update Status to: ${statusToUpdate}`
-          )}
-
+          <CircularProgress size={24} color='inherit' />
+        ) : statusToUpdate === "COMPLETED" ? (
+          "COMPLETED"
+        ) : (
+          `Update Status to: ${statusToUpdate}`
+        )}
       </Button>
       {success && (
         <div style={{ color: "green", marginTop: "1rem" }}>

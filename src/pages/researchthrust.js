@@ -20,7 +20,7 @@ import homeBg from "../assets/home_bg.png";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import InfoIcon from "@mui/icons-material/Info";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import axios from "axios";
+import api from "../services/api";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useModalContext } from "../context/modalcontext";
@@ -418,7 +418,8 @@ const ResearchThrust = () => {
                               },
                             }}
                           >
-                            Learn More &nbsp;<InfoIcon />
+                            Learn More &nbsp;
+                            <InfoIcon />
                           </Button>
                         ) : (
                           <Box>

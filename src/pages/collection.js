@@ -16,7 +16,7 @@ import React, { useEffect, useState } from "react";
 import Navbar from "../components/navbar";
 import { Search } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../services/api";
 import { Virtuoso } from "react-virtuoso";
 import { useModalContext } from "../context/modalcontext";
 import AddPaperModal from "../components/addpapermodal";
@@ -27,7 +27,7 @@ import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import HeaderWithBackButton from "../components/Header";
-import AddIcon from '@mui/icons-material/Add';
+import AddIcon from "@mui/icons-material/Add";
 
 // Debounce function to limit rapid state updates
 const useDebounce = (value, delay) => {
@@ -77,7 +77,7 @@ const Collection = () => {
   useEffect(() => {
     const fetchPublicationFormats = async () => {
       try {
-        const response = await axios.get("/paper/publication_format");
+        const response = await api.get("/paper/publication_format");
         setPublicationFormats(response.data.publication_formats);
       } catch (error) {
         console.error("Error fetching publication formats:", error);
@@ -89,20 +89,19 @@ const Collection = () => {
 
   const handleResearchItemClick = async (item) => {
     try {
-        // Navigate to the research details page immediately
-        navigate(`/displayresearchinfo/${item.research_id}`, {
-            state: { id: item.research_id },
-        });
+      // Navigate to the research details page immediately
+      navigate(`/displayresearchinfo/${item.research_id}`, {
+        state: { id: item.research_id },
+      });
     } catch (error) {
-        console.error("Error handling research item click:", {
-            message: error.message,
-            response: error.response?.data,
-            status: error.response?.status,
-            item: item,
-        });
+      console.error("Error handling research item click:", {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+        item: item,
+      });
     }
   };
-
 
   const getUserId = () => {
     const userId = localStorage.getItem("user_id");
@@ -112,7 +111,7 @@ const Collection = () => {
     const userId = getUserId();
     if (userId) {
       try {
-        const response = await axios.get(`/accounts/users/${userId}`);
+        const response = await api.get(`/accounts/users/${userId}`);
         const data = response.data;
       } catch (error) {
         console.error("Error fetching user data:", error);
@@ -122,22 +121,22 @@ const Collection = () => {
 
   const fetchAllResearchData = async () => {
     try {
-      const response = await axios.get(`/dataset/fetch_ordered_dataset`);
+      const response = await api.get(`/dataset/fetch_ordered_dataset`);
       let fetchedResearch = response.data.dataset;
-  
+
       // Apply automatic filtering based on user college/program
       if (user?.role === "04" || user?.role === "05") {
         setSelectedColleges(user?.college);
         fetchedResearch = fetchedResearch.filter(
           (item) => item.college_id === user?.college
         );
-        if (user?.role === "05"){
+        if (user?.role === "05") {
           fetchedResearch = fetchedResearch.filter(
             (item) => item.program_id === user?.program
           );
         }
       }
-  
+
       setResearch(fetchedResearch);
       setFilteredResearch(fetchedResearch);
     } catch (error) {
@@ -182,100 +181,138 @@ const Collection = () => {
                 debouncedColleges.includes(String(program.college_id))
               );
 
-        // Add any selected programs that aren't in the filtered list
-        const selectedProgramObjects = cached.programs.filter((program) =>
-          selectedPrograms.includes(program.program_name)
-        );
+        // Only proceed with selected programs if cached.programs exists
+        if (cached.programs) {
+          // Add any selected programs that aren't in the filtered list
+          const selectedProgramObjects = cached.programs.filter((program) =>
+            selectedPrograms.includes(program.program_name)
+          );
 
-        // Combine and remove duplicates
-        filteredPrograms = [
-          ...new Map(
-            [...filteredPrograms, ...selectedProgramObjects].map((program) => [
-              program.program_name,
-              program,
-            ])
-          ).values(),
-        ];
+          // Combine and remove duplicates
+          filteredPrograms = [
+            ...new Map(
+              [...filteredPrograms, ...selectedProgramObjects].map(
+                (program) => [program.program_name, program]
+              )
+            ).values(),
+          ];
+        }
 
-        setPrograms(filteredPrograms);
+        setPrograms(filteredPrograms || []);
+      } else {
+        // If cache is empty or invalid, set empty programs array
+        setPrograms([]);
+
+        // Optionally, you could fetch the data here
+        // fetchAndCacheFilterData().then(data => {
+        //   if (data) setPrograms(data.programs || []);
+        // });
       }
     }
   }, [debouncedColleges, isLoading, selectedPrograms]);
 
   useEffect(() => {
     const applyFilters = () => {
-      let filtered = [...research];
-
-      // Handle college and program filtering
-      if (selectedColleges.length > 0 || selectedPrograms.length > 0) {
-        filtered = filtered.filter((item) => {
-          // Check if item matches any selected program
-          const matchesProgram =
-            selectedPrograms.length > 0 &&
-            selectedPrograms.includes(item.program_name);
-
-          // Check if item's college is selected
-          const matchesCollege =
-            selectedColleges.length > 0 &&
-            selectedColleges.includes(String(item.college_id));
-
-          // Show items that either:
-          // 1. Match any selected program (regardless of college), OR
-          // 2. Belong to a selected college (if no program from that college is selected)
-          return (
-            matchesProgram ||
-            (matchesCollege &&
-              !selectedPrograms.some((prog) => {
-                // Find the college of this selected program
-                const programCollege = programs.find(
-                  (p) => p.program_name === prog
-                )?.college_id;
-                // Only apply college filter if no program from this college is selected
-                return String(programCollege) === String(item.college_id);
-              }))
-          );
+      try {
+        console.log("Applying filters with:", {
+          researchCount: research?.length,
+          selectedColleges,
+          selectedPrograms,
+          sliderValue,
+          selectedFormats,
+          searchQuery,
         });
-      }
 
-      // Apply remaining filters
-      if (sliderValue[0] !== dateRange[0] || sliderValue[1] !== dateRange[1]) {
-        filtered = filtered.filter(
-          (item) => item.year >= sliderValue[0] && item.year <= sliderValue[1]
-        );
-      }
-
-      if (selectedFormats.length > 0) {
-        filtered = filtered.filter((item) =>
-          selectedFormats.some(
-            (format) => format.toLowerCase() === item.journal.toLowerCase()
-          )
-        );
-      }
-
-      if (searchQuery) {
-        try {
-          const query = searchQuery.toLowerCase();
-          filtered = filtered.filter((item) => {
-            try {
-              const titleMatch = item.title?.toLowerCase().includes(query) ?? false;
-              const authorMatch = item.authors?.some(
-                (author) =>
-                  author.name?.toLowerCase().includes(query) ||
-                  author.email?.toLowerCase().includes(query)
-              ) ?? false;
-      
-              return titleMatch || authorMatch;
-            } catch (error) {
-              return false; // Skip this item if an error occurs
-            }
-          });
-        } catch (error) {
-          return false;
+        if (!research) {
+          console.log("No research data available");
+          setFilteredResearch([]);
+          return;
         }
-      }
 
-      setFilteredResearch(filtered);
-      setCurrentPage(1);
+        let filtered = [...research];
+        console.log("Initial filtered count:", filtered.length);
+
+        // Handle college and program filtering
+        if (selectedColleges.length > 0 || selectedPrograms.length > 0) {
+          filtered = filtered.filter((item) => {
+            // Check if item matches any selected program
+            const matchesProgram =
+              selectedPrograms.length > 0 &&
+              selectedPrograms.includes(item.program_name);
+
+            // Check if item's college is selected
+            const matchesCollege =
+              selectedColleges.length > 0 &&
+              selectedColleges.includes(String(item.college_id));
+
+            // Show items that either:
+            // 1. Match any selected program (regardless of college), OR
+            // 2. Belong to a selected college (if no program from that college is selected)
+            return (
+              matchesProgram ||
+              (matchesCollege &&
+                !selectedPrograms.some((prog) => {
+                  // Find the college of this selected program
+                  const programCollege = programs.find(
+                    (p) => p.program_name === prog
+                  )?.college_id;
+                  // Only apply college filter if no program from this college is selected
+                  return String(programCollege) === String(item.college_id);
+                }))
+            );
+          });
+          console.log("After college/program filter:", filtered.length);
+        }
+
+        // Apply remaining filters
+        if (
+          sliderValue[0] !== dateRange[0] ||
+          sliderValue[1] !== dateRange[1]
+        ) {
+          filtered = filtered.filter(
+            (item) => item.year >= sliderValue[0] && item.year <= sliderValue[1]
+          );
+        }
+
+        if (selectedFormats.length > 0) {
+          filtered = filtered.filter((item) =>
+            selectedFormats.some(
+              (format) => format.toLowerCase() === item.journal.toLowerCase()
+            )
+          );
+        }
+
+        if (searchQuery) {
+          try {
+            const query = searchQuery.toLowerCase();
+            filtered = filtered.filter((item) => {
+              try {
+                const titleMatch =
+                  item.title?.toLowerCase().includes(query) ?? false;
+                const authorMatch =
+                  item.authors?.some(
+                    (author) =>
+                      author.name?.toLowerCase().includes(query) ||
+                      author.email?.toLowerCase().includes(query)
+                  ) ?? false;
+
+                return titleMatch || authorMatch;
+              } catch (error) {
+                return false; // Skip this item if an error occurs
+              }
+            });
+          } catch (error) {
+            return false;
+          }
+        }
+
+        console.log("Final filtered count:", filtered.length);
+        setFilteredResearch(filtered);
+        setCurrentPage(1);
+      } catch (error) {
+        console.error("Error applying filters:", error);
+        setFilteredResearch([]);
+      }
     };
 
     const timeoutId = setTimeout(applyFilters, 300);
@@ -300,17 +337,18 @@ const Collection = () => {
   useEffect(() => {
     async function fetchDateRange() {
       try {
-        const response = await axios.get("/dataset/fetch_date_range"); // API endpoint
-        const { min_year, max_year } = response.data.date_range;
-
-        // Update the date range and initialize the slider values
-        setDateRange([min_year, max_year]);
-        setSliderValue([min_year, max_year]);
+        console.log("Fetching date range...");
+        const response = await api.get("/dataset/fetch_date_range");
+        console.log("Date range response:", response.data);
+        if (response.data && response.data.date_range) {
+          const { min_year, max_year } = response.data.date_range;
+          setDateRange([min_year, max_year]);
+          setSliderValue([min_year, max_year]);
+        }
       } catch (error) {
         console.error("Failed to fetch date range:", error);
       }
     }
-
     fetchDateRange();
   }, []);
 
@@ -367,7 +405,7 @@ const Collection = () => {
   };
 
   const [expandedAccordion, setExpandedAccordion] = useState(null);
-  
+
   return (
     <>
       <Box
@@ -490,61 +528,111 @@ const Collection = () => {
 
                     {user?.role !== "04" && (
                       <>
-                      {user?.role !== "05" && (
-                        <Accordion
-                          expanded={expandedAccordion === "college"}
-                          onChange={() => setExpandedAccordion(expandedAccordion === "college" ? null : "college")}
-                        >
-                          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                            <Typography sx={{ color: "#08397C", fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" } }}>
-                              College
-                            </Typography>
-                          </AccordionSummary>
-                          <AccordionDetails>
-                            <Box sx={{ maxHeight: "125px", overflow: "auto", display: "flex", flexDirection: "column" }}>
-                              {colleges.map((college) => (
-                                <FormControlLabel
-                                  key={college.college_id}
-                                  control={
-                                    <Checkbox
-                                      checked={selectedColleges.includes(String(college.college_id))}
-                                      onChange={handleCollegeChange}
-                                      value={college.college_id}
-                                    />
-                                  }
-                                  label={college.college_name}
-                                  sx={{
-                                    "& .MuiTypography-root": {
-                                      fontSize: { xs: "0.5rem", md: "0.75rem", lg: "0.9rem" },
-                                    },
-                                  }}
-                                />
-                              ))}
-                            </Box>
-                          </AccordionDetails>
-                        </Accordion>
-                      )}
+                        {user?.role !== "05" && (
+                          <Accordion
+                            expanded={expandedAccordion === "college"}
+                            onChange={() =>
+                              setExpandedAccordion(
+                                expandedAccordion === "college"
+                                  ? null
+                                  : "college"
+                              )
+                            }
+                          >
+                            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                              <Typography
+                                sx={{
+                                  color: "#08397C",
+                                  fontSize: {
+                                    xs: "0.5rem",
+                                    md: "0.5rem",
+                                    lg: "0.9rem",
+                                  },
+                                }}
+                              >
+                                College
+                              </Typography>
+                            </AccordionSummary>
+                            <AccordionDetails>
+                              <Box
+                                sx={{
+                                  maxHeight: "125px",
+                                  overflow: "auto",
+                                  display: "flex",
+                                  flexDirection: "column",
+                                }}
+                              >
+                                {colleges.map((college) => (
+                                  <FormControlLabel
+                                    key={college.college_id}
+                                    control={
+                                      <Checkbox
+                                        checked={selectedColleges.includes(
+                                          String(college.college_id)
+                                        )}
+                                        onChange={handleCollegeChange}
+                                        value={college.college_id}
+                                      />
+                                    }
+                                    label={college.college_name}
+                                    sx={{
+                                      "& .MuiTypography-root": {
+                                        fontSize: {
+                                          xs: "0.5rem",
+                                          md: "0.75rem",
+                                          lg: "0.9rem",
+                                        },
+                                      },
+                                    }}
+                                  />
+                                ))}
+                              </Box>
+                            </AccordionDetails>
+                          </Accordion>
+                        )}
                       </>
                     )}
 
                     {user?.role !== "05" && (
                       <Accordion
                         expanded={expandedAccordion === "program"}
-                        onChange={() => setExpandedAccordion(expandedAccordion === "program" ? null : "program")}
+                        onChange={() =>
+                          setExpandedAccordion(
+                            expandedAccordion === "program" ? null : "program"
+                          )
+                        }
                       >
                         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                          <Typography sx={{ color: "#08397C", fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" } }}>
+                          <Typography
+                            sx={{
+                              color: "#08397C",
+                              fontSize: {
+                                xs: "0.5rem",
+                                md: "0.5rem",
+                                lg: "0.9rem",
+                              },
+                            }}
+                          >
                             Program
                           </Typography>
                         </AccordionSummary>
                         <AccordionDetails>
-                          <Box sx={{ maxHeight: "125px", overflow: "auto", display: "flex", flexDirection: "column" }}>
+                          <Box
+                            sx={{
+                              maxHeight: "125px",
+                              overflow: "auto",
+                              display: "flex",
+                              flexDirection: "column",
+                            }}
+                          >
                             {programs.map((program) => (
                               <FormControlLabel
                                 key={program.program_id}
                                 control={
                                   <Checkbox
-                                    checked={selectedPrograms.includes(program.program_name)}
+                                    checked={selectedPrograms.includes(
+                                      program.program_name
+                                    )}
                                     onChange={handleProgramChange}
                                     value={program.program_name}
                                   />
@@ -552,7 +640,11 @@ const Collection = () => {
                                 label={program.program_name}
                                 sx={{
                                   "& .MuiTypography-root": {
-                                    fontSize: { xs: "0.5rem", md: "0.75rem", lg: "0.9rem" },
+                                    fontSize: {
+                                      xs: "0.5rem",
+                                      md: "0.75rem",
+                                      lg: "0.9rem",
+                                    },
                                   },
                                 }}
                               />
@@ -561,11 +653,14 @@ const Collection = () => {
                         </AccordionDetails>
                       </Accordion>
                     )}
-                    
 
                     <Accordion
                       expanded={expandedAccordion === "format"}
-                      onChange={() => setExpandedAccordion(expandedAccordion === "format" ? null : "format")}
+                      onChange={() =>
+                        setExpandedAccordion(
+                          expandedAccordion === "format" ? null : "format"
+                        )
+                      }
                     >
                       <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                         <Typography
@@ -582,7 +677,14 @@ const Collection = () => {
                         </Typography>
                       </AccordionSummary>
                       <AccordionDetails>
-                        <Box sx={{ maxHeight: "125px", overflow: "auto", display: "flex", flexDirection: "column" }}>
+                        <Box
+                          sx={{
+                            maxHeight: "125px",
+                            overflow: "auto",
+                            display: "flex",
+                            flexDirection: "column",
+                          }}
+                        >
                           {publicationFormats.map((format) => (
                             <FormControlLabel
                               key={format.id}
@@ -660,8 +762,8 @@ const Collection = () => {
                       }}
                     >
                       <TextField
-                        variant="outlined"
-                        placeholder="Search by Title or Authors"
+                        variant='outlined'
+                        placeholder='Search by Title or Authors'
                         value={searchQuery}
                         onChange={handleSearchChange}
                         sx={{
@@ -680,7 +782,7 @@ const Collection = () => {
                         }}
                         InputProps={{
                           startAdornment: (
-                            <InputAdornment position="start">
+                            <InputAdornment position='start'>
                               <Search />
                             </InputAdornment>
                           ),
@@ -874,7 +976,6 @@ const Collection = () => {
                 )}
               
               */}
-              
             </Grid2>
           </Box>
         </Box>

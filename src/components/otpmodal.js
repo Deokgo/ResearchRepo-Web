@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import axios from "axios";
+import api from "../services/api";
 import {
   Modal,
   Box,
@@ -64,8 +64,8 @@ const OtpModal = ({
     setOtp(e.target.value);
   };
 
-   // Handles digit input
-   const handleChange = (index, e) => {
+  // Handles digit input
+  const handleChange = (index, e) => {
     const value = e.target.value.replace(/\D/, ""); // Allow only numbers
     if (!value) return;
 
@@ -101,7 +101,10 @@ const OtpModal = ({
 
     setLoading(true);
     try {
-      const verifyResponse = await axios.post(OTP_VERIFY_API, { email, otp: otpCode });
+      const verifyResponse = await api.post(OTP_VERIFY_API, {
+        email,
+        otp: otpCode,
+      });
 
       if (verifyResponse.status === 200) {
         setIsVerified(true);
@@ -109,7 +112,7 @@ const OtpModal = ({
         // Check if formData prop exists (for signup case)
         if (formData !== null) {
           try {
-            const signupResponse = await axios.post("/auth/signup", formData);
+            const signupResponse = await api.post("/auth/signup", formData);
             if (
               signupResponse.status === 200 ||
               signupResponse.status === 201
@@ -148,24 +151,23 @@ const OtpModal = ({
       console.log("Resend already in progress, exiting...");
       return;
     }
-  
+
     setResendLoading(true);
     setResendClicked(true);
-  
-  
+
     try {
-      const response = await axios.post(OTP_GENERATE_API, {
+      const response = await api.post(OTP_GENERATE_API, {
         email,
         isPasswordReset: isPasswordReset,
       });
-  
+
       console.log("OTP resend response:", response.data);
-  
+
       setErrorMessage("");
       startTimer();
     } catch (error) {
       console.error("Error resending OTP:", error);
-  
+
       setErrorMessage(
         error.response?.data?.error || "Failed to resend OTP. Please try again."
       );
@@ -174,7 +176,6 @@ const OtpModal = ({
       setResendLoading(false);
     }
   };
-  
 
   const formatTime = (seconds) => {
     const minutes = Math.floor(seconds / 60);
@@ -198,31 +199,34 @@ const OtpModal = ({
           textAlign: "center", // Center all text inside this Box
         }}
       >
-        <Typography 
-        variant='h2'
-            color='#08397C'
-            fontWeight='700'
-            sx={{
-              py: 0.5,
-              pb: 1.5,
-              textAlign: { xs: "center", md: "bottom" },
-              fontSize: {
-                xs: "clamp(1rem, 2vw, 1rem)",
-                sm: "clamp(1.5rem, 3.5vw, 1.5rem)",
-                md: "clamp(2rem, 4vw, 2rem)",
-              },
-            }}>
+        <Typography
+          variant='h2'
+          color='#08397C'
+          fontWeight='700'
+          sx={{
+            py: 0.5,
+            pb: 1.5,
+            textAlign: { xs: "center", md: "bottom" },
+            fontSize: {
+              xs: "clamp(1rem, 2vw, 1rem)",
+              sm: "clamp(1.5rem, 3.5vw, 1.5rem)",
+              md: "clamp(2rem, 4vw, 2rem)",
+            },
+          }}
+        >
           Verify your Email Address
         </Typography>
-        <Typography 
-        sx={{
-          fontFamily: "Montserrat, sans-serif",
-          color: "#666",
-          mt: 1,
-      }}>
-          Please enter the 6-digit verification code that was sent to <strong>{email}</strong>
+        <Typography
+          sx={{
+            fontFamily: "Montserrat, sans-serif",
+            color: "#666",
+            mt: 1,
+          }}
+        >
+          Please enter the 6-digit verification code that was sent to{" "}
+          <strong>{email}</strong>
         </Typography>
-        <Box display="flex" justifyContent="center" gap={1} mt={2}>
+        <Box display='flex' justifyContent='center' gap={1} mt={2}>
           {otp.map((digit, index) => (
             <TextField
               key={index}
@@ -230,27 +234,34 @@ const OtpModal = ({
               value={digit}
               onChange={(e) => handleChange(index, e)}
               onKeyDown={(e) => handleKeyDown(index, e)}
-              variant="outlined"
+              variant='outlined'
               inputProps={{
                 maxLength: 1,
-                style: { textAlign: "center", fontSize: "1.5rem", fontWeight: 600 },
+                style: {
+                  textAlign: "center",
+                  fontSize: "1.5rem",
+                  fontWeight: 600,
+                },
               }}
               sx={{ width: "4rem" }}
             />
           ))}
         </Box>
         {!isVerified && (
-          <Typography 
-          sx={{
-            fontFamily: "Montserrat, sans-serif",
-            fontSize: {
-              xs: "0.75rem",
-              md: "0.75rem",
-              lg: "0.8rem",
+          <Typography
+            sx={{
+              fontFamily: "Montserrat, sans-serif",
+              fontSize: {
+                xs: "0.75rem",
+                md: "0.75rem",
+                lg: "0.8rem",
               },
-            color: "#F40824",
-            mt: 1,
-          }}>Resend verification code in <strong>{formatTime(timer)}</strong></Typography>
+              color: "#F40824",
+              mt: 1,
+            }}
+          >
+            Resend verification code in <strong>{formatTime(timer)}</strong>
+          </Typography>
         )}
 
         {isVerified && (
@@ -290,9 +301,9 @@ const OtpModal = ({
                 maxHeight: "3rem",
                 textTransform: "none",
                 "&:hover": {
-                    backgroundColor: "#072d61",
+                  backgroundColor: "#072d61",
                 },
-                }}
+              }}
             >
               {loading ? "Verifying..." : "Verify OTP"}
             </Button>
@@ -330,10 +341,10 @@ const OtpModal = ({
               borderRadius: "100px",
               maxHeight: "3rem",
               "&:hover": {
-                  backgroundColor: "#A30417",
-                  color: "#FFF",
+                backgroundColor: "#A30417",
+                color: "#FFF",
               },
-              }}
+            }}
           >
             {resendLoading ? "Resending..." : "Resend OTP"}
           </Button>
@@ -359,9 +370,9 @@ const OtpModal = ({
             borderRadius: "100px",
             maxHeight: "3rem",
             "&:hover": {
-                color: "#A30417",
+              color: "#A30417",
             },
-            }}
+          }}
         >
           Close
         </Button>

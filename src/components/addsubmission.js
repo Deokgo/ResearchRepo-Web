@@ -18,14 +18,19 @@ import {
   DialogActions,
 } from "@mui/material";
 import { useLocation } from "react-router-dom";
-import axios from "axios";
+import api from "../services/api";
 import AutoCompleteTextBox from "../components/Intellibox";
 import InfoIcon from "@mui/icons-material/Info";
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import Tooltip from "@mui/material/Tooltip";
 import { useModalContext } from "../context/modalcontext";
 import { toast } from "react-hot-toast";
-import { fetchAndCacheFilterData, getCitiesForCountry, searchCountries, searchCities } from "../utils/trackCache";
+import {
+  fetchAndCacheFilterData,
+  getCitiesForCountry,
+  searchCountries,
+  searchCities,
+} from "../utils/trackCache";
 
 const AddSubmission = () => {
   const location = useLocation();
@@ -51,7 +56,8 @@ const AddSubmission = () => {
   const [countrySearchText, setCountrySearchText] = useState("");
   const [citySearchText, setCitySearchText] = useState("");
 
-  const { isAddSubmitModalOpen, closeAddSubmitModal, openAddSubmitModal } = useModalContext();
+  const { isAddSubmitModalOpen, closeAddSubmitModal, openAddSubmitModal } =
+    useModalContext();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
@@ -78,7 +84,7 @@ const AddSubmission = () => {
     loadInitialData();
   }, []);
 
-    ///////////////////// COUNTRY AND CITY API RETRIEVAL //////////////////////
+  ///////////////////// COUNTRY AND CITY API RETRIEVAL //////////////////////
   useEffect(() => {
     if (countriesAPI.length > 0 && conferenceVenues.length > 0) {
       // Get unique countries from conference venues
@@ -116,7 +122,7 @@ const AddSubmission = () => {
     }
   };
 
-   // Modified country selection handling
+  // Modified country selection handling
   const handleCountryChange = (event, newValue) => {
     setSingleCity("");
     setSingleCountry(newValue);
@@ -126,27 +132,24 @@ const AddSubmission = () => {
     }
   };
 
-
   ///////////////////// STATUS UPDATE PUBLICATION //////////////////////
   const handleBack = () => {
     if (isSubmitting) {
-        return;
+      return;
     }
     let hasChanges;
-    hasChanges =
-      publicationFormat ||
-      dateSubmitted;
+    hasChanges = publicationFormat || dateSubmitted;
 
-    if (publicationFormat === 'PC'){
-        hasChanges = 
-            hasChanges || 
-            conferenceTitle ||
-            singleCountry ||
-            singleCity || 
-            datePresentation;
+    if (publicationFormat === "PC") {
+      hasChanges =
+        hasChanges ||
+        conferenceTitle ||
+        singleCountry ||
+        singleCity ||
+        datePresentation;
     } else {
-        hasChanges = hasChanges || publicationTitle;
-    }     
+      hasChanges = hasChanges || publicationTitle;
+    }
 
     if (hasChanges) {
       setIsConfirmDialogOpen(true);
@@ -160,19 +163,21 @@ const AddSubmission = () => {
     // Validate required fields
     // Determine required fields based on publicationFormat
     let requiredFields = {
-        "Publication Type": publicationFormat,
-        "Date of Submission": dateSubmitted
+      "Publication Type": publicationFormat,
+      "Date of Submission": dateSubmitted,
     };
 
     if (publicationFormat === "PC") {
-      requiredFields = {...requiredFields,
+      requiredFields = {
+        ...requiredFields,
         "Conference Title": conferenceTitle,
         Country: singleCountry,
         City: singleCity,
         "Date of Presentation": datePresentation,
       };
     } else {
-      requiredFields = {...requiredFields,
+      requiredFields = {
+        ...requiredFields,
         "Publication Title": publicationTitle,
       };
     }
@@ -192,10 +197,10 @@ const AddSubmission = () => {
     approvedDate.setHours(0, 0, 0, 0);
     today.setHours(0, 0, 0, 0);
 
-    if (missingFields.length > 0){
-        return true;
-    } 
-    
+    if (missingFields.length > 0) {
+      return true;
+    }
+
     return false;
   };
 
@@ -209,7 +214,7 @@ const AddSubmission = () => {
         );
         return;
       }
-      
+
       setIsSubmitting(true);
 
       const formData = new FormData();
@@ -228,19 +233,20 @@ const AddSubmission = () => {
       formData.append("conference_date", datePresentation);
 
       // Send the conference data
-      const response = await axios.post(`/track/form/submitted/${id}`, formData, {
+      const response = await api.post(`/track/form/submitted/${id}`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
 
       setIsSuccessDialogOpen(true);
-
     } catch (error) {
-        toast.error(error.response?.data?.error || "Error submitting publication");
-        console.error("Error:", error);
-      } finally {
-        setIsSubmitting(false);
+      toast.error(
+        error.response?.data?.error || "Error submitting publication"
+      );
+      console.error("Error:", error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -289,10 +295,13 @@ const AddSubmission = () => {
 
   return (
     <>
-    {/* Add Publication Modal */}
-    <Modal open={isAddSubmitModalOpen} onClose={isSubmitting ? undefined : handleBack}>
+      {/* Add Publication Modal */}
+      <Modal
+        open={isAddSubmitModalOpen}
+        onClose={isSubmitting ? undefined : handleBack}
+      >
         <Box
-            sx={{
+          sx={{
             position: "absolute",
             top: "50%",
             left: "50%",
@@ -302,75 +311,75 @@ const AddSubmission = () => {
             boxShadow: 24,
             p: 5,
             borderRadius: "8px",
-            }}
+          }}
         >
-            <Typography
+          <Typography
             variant='h3'
             color='#08397C'
             fontWeight='1000'
             mb={3}
             sx={{
-                textAlign: { xs: "left", md: "bottom" },
-                fontSize: {
+              textAlign: { xs: "left", md: "bottom" },
+              fontSize: {
                 xs: "clamp(1rem, 2vw, 1rem)",
                 sm: "clamp(1.5rem, 3.5vw, 1.5rem)",
                 md: "clamp(2rem, 4vw, 2.25rem)",
-                },
+              },
             }}
-            >
+          >
             Submit Publication
-            </Typography>
-            <FormControl fullWidth variant='outlined' margin='dense'>
+          </Typography>
+          <FormControl fullWidth variant='outlined' margin='dense'>
             <InputLabel
-                sx={{
+              sx={{
                 fontSize: {
-                    xs: "0.75rem",
-                    md: "0.75rem",
-                    lg: "0.8rem",
+                  xs: "0.75rem",
+                  md: "0.75rem",
+                  lg: "0.8rem",
                 },
-                }}
+              }}
             >
-                Publication Type
+              Publication Type
             </InputLabel>
             <Select
-                label='Publication Type'
-                sx={createTextFieldStyles()} // Assuming this is a custom style function
-                value={publicationFormat || ""}
-                onChange={handleChange} // Call handleChange when user selects an option
+              label='Publication Type'
+              sx={createTextFieldStyles()} // Assuming this is a custom style function
+              value={publicationFormat || ""}
+              onChange={handleChange} // Call handleChange when user selects an option
             >
-                <MenuItem
+              <MenuItem
                 value=''
                 disabled
                 sx={{
-                    fontSize: {
+                  fontSize: {
                     xs: "0.75rem",
                     md: "0.75rem",
                     lg: "0.8rem",
-                    },
+                  },
                 }}
-                >
+              >
                 Select type
-                </MenuItem>
-                {publicationFormats.map((format) => (
+              </MenuItem>
+              {publicationFormats.map((format) => (
                 <MenuItem
-                    key={format.pub_format_id}
-                    value={format.pub_format_id}
-                    sx={{
+                  key={format.pub_format_id}
+                  value={format.pub_format_id}
+                  sx={{
                     fontSize: {
-                        xs: "0.75rem",
-                        md: "0.75rem",
-                        lg: "0.8rem",
+                      xs: "0.75rem",
+                      md: "0.75rem",
+                      lg: "0.8rem",
                     },
-                    }}
+                  }}
                 >
-                    {format.pub_format_name}
+                  {format.pub_format_name}
                 </MenuItem>
-                ))}
+              ))}
             </Select>
-            </FormControl>
-            {publicationFormat === "JL" && (
+          </FormControl>
+          {publicationFormat === "JL" && (
             <Box>
-                <AutoCompleteTextBox
+              <AutoCompleteTextBox
                 fullWidth
                 data={pub_names}
                 value={publicationTitle}
@@ -378,24 +387,24 @@ const AddSubmission = () => {
                 id='publication-name'
                 onItemSelected={(value) => setPublicationTitle(value)} // Update state when a suggestion is selected
                 sx={{
-                    ...createTextFieldStyles(),
-                    "& .MuiInputLabel-root": {
+                  ...createTextFieldStyles(),
+                  "& .MuiInputLabel-root": {
                     fontSize: {
-                        xs: "0.75rem",
-                        md: "0.75rem",
-                        lg: "0.8rem",
+                      xs: "0.75rem",
+                      md: "0.75rem",
+                      lg: "0.8rem",
                     },
-                    },
+                  },
                 }}
                 InputLabelProps={createInputLabelProps()}
                 placeholder='ex: PLOS One'
-                />
+              />
             </Box>
-            )}
-            
-            {publicationFormat === "PC" && (
+          )}
+
+          {publicationFormat === "PC" && (
             <Box>
-                <AutoCompleteTextBox
+              <AutoCompleteTextBox
                 fullWidth
                 data={conf_title}
                 label='Conference Title'
@@ -403,19 +412,19 @@ const AddSubmission = () => {
                 id='conf-name'
                 onItemSelected={(value) => setConferenceTitle(value)}
                 sx={{
-                    ...createTextFieldStyles(),
-                    "& .MuiInputLabel-root": {
+                  ...createTextFieldStyles(),
+                  "& .MuiInputLabel-root": {
                     fontSize: {
-                        xs: "0.75rem",
-                        md: "0.75rem",
-                        lg: "0.8rem",
+                      xs: "0.75rem",
+                      md: "0.75rem",
+                      lg: "0.8rem",
                     },
-                    },
+                  },
                 }}
                 InputLabelProps={createInputLabelProps()}
                 placeholder='ex: Proceedings of the International Conference on Artificial Intelligence'
-                />
-                <TextField
+              />
+              <TextField
                 fullWidth
                 label='Date of Presentation'
                 variant='outlined'
@@ -424,144 +433,145 @@ const AddSubmission = () => {
                 value={datePresentation}
                 onChange={(e) => setDatePresentation(e.target.value)}
                 inputProps={{
-                    min: new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().split('T')[0] // Sets tomorrow as the minimum date
+                  min: new Date(new Date().setDate(new Date().getDate() + 1))
+                    .toISOString()
+                    .split("T")[0], // Sets tomorrow as the minimum date
                 }}
                 sx={createTextFieldStyles()}
                 InputLabelProps={{
-                    ...createInputLabelProps(),
-                    shrink: true,
+                  ...createInputLabelProps(),
+                  shrink: true,
                 }}
-                />
-                <Grid2 container spacing={4}>
+              />
+              <Grid2 container spacing={4}>
                 <Grid2 size={6}>
-                    <Box
+                  <Box
                     sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 1,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
                     }}
-                    >
+                  >
                     <Autocomplete
-                        fullWidth
-                        options={
+                      fullWidth
+                      options={
                         countrySearchText
-                            ? countriesAPI.map((c) => c.country)
-                            : countries
-                                .filter((c) =>
+                          ? countriesAPI.map((c) => c.country)
+                          : countries
+                              .filter((c) =>
                                 conferenceVenues.some(
-                                    (v) => v.country === c.country
+                                  (v) => v.country === c.country
                                 )
-                                )
-                                .map((c) => c.country)
-                        }
-                        value={singleCountry}
-                        onChange={handleCountryChange}
-                        onInputChange={(event, newInputValue) => {
+                              )
+                              .map((c) => c.country)
+                      }
+                      value={singleCountry}
+                      onChange={handleCountryChange}
+                      onInputChange={(event, newInputValue) => {
                         setCountrySearchText(newInputValue);
-                        }}
-                        renderInput={(params) => (
+                      }}
+                      renderInput={(params) => (
                         <TextField
-                            {...params}
-                            label='Country'
-                            margin='dense'
-                            sx={createTextFieldStyles()}
-                            InputLabelProps={createInputLabelProps()}
+                          {...params}
+                          label='Country'
+                          margin='dense'
+                          sx={createTextFieldStyles()}
+                          InputLabelProps={createInputLabelProps()}
                         />
-                        )}
+                      )}
                     />
                     <Tooltip
-                        title="Can't find your country? Type to search from all available countries"
-                        placement='right'
+                      title="Can't find your country? Type to search from all available countries"
+                      placement='right'
                     >
-                        <InfoIcon
+                      <InfoIcon
                         sx={{
-                            color: "#08397C",
-                            fontSize: "1.2rem",
-                            cursor: "help",
+                          color: "#08397C",
+                          fontSize: "1.2rem",
+                          cursor: "help",
                         }}
-                        />
+                      />
                     </Tooltip>
-                    </Box>
+                  </Box>
                 </Grid2>
                 <Grid2 size={6}>
-                    <Box
+                  <Box
                     sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 1,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
                     }}
-                    >
+                  >
                     <Autocomplete
-                        fullWidth
-                        options={
+                      fullWidth
+                      options={
                         citySearchText
-                            ? countries.find(
-                                (c) => c.country === singleCountry
-                            )?.cities || []
-                            : Cities
-                        }
-                        value={singleCity}
-                        onChange={(event, newValue) => {
+                          ? countries.find((c) => c.country === singleCountry)
+                              ?.cities || []
+                          : Cities
+                      }
+                      value={singleCity}
+                      onChange={(event, newValue) => {
                         setSingleCity(newValue);
-                        }}
-                        onInputChange={(event, newInputValue) => {
+                      }}
+                      onInputChange={(event, newInputValue) => {
                         setCitySearchText(newInputValue);
-                        }}
-                        disabled={!singleCountry}
-                        renderInput={(params) => (
+                      }}
+                      disabled={!singleCountry}
+                      renderInput={(params) => (
                         <TextField
-                            {...params}
-                            label='City'
-                            margin='dense'
-                            sx={createTextFieldStyles()}
-                            InputLabelProps={createInputLabelProps()}
+                          {...params}
+                          label='City'
+                          margin='dense'
+                          sx={createTextFieldStyles()}
+                          InputLabelProps={createInputLabelProps()}
                         />
-                        )}
+                      )}
                     />
                     <Tooltip
-                        title="Can't find your city? Type to search from all available cities"
-                        placement='right'
+                      title="Can't find your city? Type to search from all available cities"
+                      placement='right'
                     >
-                        <InfoIcon
+                      <InfoIcon
                         sx={{
-                            color: "#08397C",
-                            fontSize: "1.2rem",
-                            cursor: "help",
+                          color: "#08397C",
+                          fontSize: "1.2rem",
+                          cursor: "help",
                         }}
-                        />
+                      />
                     </Tooltip>
-                    </Box>
+                  </Box>
                 </Grid2>
-                </Grid2>
+              </Grid2>
             </Box>
-            )}
-            <TextField
-                fullWidth
-                label='Date of Submission'
-                variant='outlined'
-                type='date' 
-                margin='dense'
-                value={dateSubmitted}
-                onChange={(e) => setDateSubmitted(e.target.value)}
-                inputProps={{
-                max: new Date().toISOString().split('T')[0] // This sets today as the maximum date
-                }}
-                sx={createTextFieldStyles()}
-                InputLabelProps={{
-                ...createInputLabelProps(),
-                shrink: true,
-                }}
-            />
-            <Box
-            sx={{
-                display: "flex",
-                mt: 3,
-                gap: 2,
+          )}
+          <TextField
+            fullWidth
+            label='Date of Submission'
+            variant='outlined'
+            type='date'
+            margin='dense'
+            value={dateSubmitted}
+            onChange={(e) => setDateSubmitted(e.target.value)}
+            inputProps={{
+              max: new Date().toISOString().split("T")[0], // This sets today as the maximum date
             }}
-            >
+            sx={createTextFieldStyles()}
+            InputLabelProps={{
+              ...createInputLabelProps(),
+              shrink: true,
+            }}
+          />
+          <Box
+            sx={{
+              display: "flex",
+              mt: 3,
+              gap: 2,
+            }}
+          >
             <Button
-                onClick={handleBack}
-                sx={{
+              onClick={handleBack}
+              sx={{
                 backgroundColor: "#08397C",
                 color: "#FFF",
                 fontFamily: "Montserrat, sans-serif",
@@ -572,18 +582,18 @@ const AddSubmission = () => {
                 maxHeight: "3rem",
                 textTransform: "none",
                 "&:hover": {
-                    backgroundColor: "#072d61",
+                  backgroundColor: "#072d61",
                 },
-                }}
+              }}
             >
-                Cancel
+              Cancel
             </Button>
             <Button
-                variant='contained'
-                color='primary'
-                onClick={handleSavePublication}
-                disabled={checkFields() || isSubmitting}
-                sx={{
+              variant='contained'
+              color='primary'
+              onClick={handleSavePublication}
+              disabled={checkFields() || isSubmitting}
+              sx={{
                 backgroundColor: "#CA031B",
                 color: "#FFF",
                 fontFamily: "Montserrat, sans-serif",
@@ -594,25 +604,25 @@ const AddSubmission = () => {
                 borderRadius: "100px",
                 maxHeight: "3rem",
                 "&:hover": {
-                    backgroundColor: "#A30417",
-                    color: "#FFF",
+                  backgroundColor: "#A30417",
+                  color: "#FFF",
                 },
-                }}
+              }}
             >
-                {isSubmitting ? (
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                    <CircularProgress size={20} color='#08397C' />
-                    Submitting Publication...
-                    </Box>
-                ) : (
-                    "Submit"
-                )}
+              {isSubmitting ? (
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                  <CircularProgress size={20} color='#08397C' />
+                  Submitting Publication...
+                </Box>
+              ) : (
+                "Submit"
+              )}
             </Button>
           </Box>
-            {/* Add loading overlay */}
-            {isSubmitting && (
+          {/* Add loading overlay */}
+          {isSubmitting && (
             <Box
-                sx={{
+              sx={{
                 position: "absolute",
                 top: 0,
                 left: 0,
@@ -623,162 +633,166 @@ const AddSubmission = () => {
                 alignItems: "center",
                 justifyContent: "center",
                 zIndex: 9999,
-                }}
+              }}
             >
-                <Box sx={{ textAlign: "center" }}>
+              <Box sx={{ textAlign: "center" }}>
                 <CircularProgress />
-                <Typography sx={{ mt: 2, fontSize: "1.25rem" }}>Submitting Publication...</Typography>
-                </Box>
+                <Typography sx={{ mt: 2, fontSize: "1.25rem" }}>
+                  Submitting Publication...
+                </Typography>
+              </Box>
             </Box>
-            )}
+          )}
 
-            {/* Save Progress */}
-            <Dialog
-                open={isConfirmDialogOpen}
-                onClose={() => setIsConfirmDialogOpen(false)}
-                PaperProps={{
-                    sx: {
-                    borderRadius: "15px",
-                    padding: "1rem",
-                    },
+          {/* Save Progress */}
+          <Dialog
+            open={isConfirmDialogOpen}
+            onClose={() => setIsConfirmDialogOpen(false)}
+            PaperProps={{
+              sx: {
+                borderRadius: "15px",
+                padding: "1rem",
+              },
+            }}
+          >
+            <DialogTitle
+              sx={{
+                fontFamily: "Montserrat, sans-serif",
+                fontWeight: 600,
+                color: "#08397C",
+              }}
+            >
+              Unsaved Progress
+            </DialogTitle>
+            <DialogContent>
+              <Typography
+                sx={{
+                  fontFamily: "Montserrat, sans-serif",
+                  color: "#666",
                 }}
-                >
-                <DialogTitle
-                    sx={{
-                    fontFamily: "Montserrat, sans-serif",
-                    fontWeight: 600,
-                    color: "#08397C",
-                    }}
-                >
-                    Unsaved Progress
-                </DialogTitle>
-                <DialogContent>
-                    <Typography
-                    sx={{
-                        fontFamily: "Montserrat, sans-serif",
-                        color: "#666",
-                    }}
-                    >
-                    You have unsaved progress. Do you want to save your progress?
-                    </Typography>
-                </DialogContent>
-                <DialogActions sx={{ padding: "1rem" }}>
-                    <Button
-                    onClick={() => {
-                        setIsConfirmDialogOpen(false);
-                        handleFormCleanup(); // Set flag to clear fields
-                        closeAddSubmitModal();
-                    }}
-                    sx={{
-                        backgroundColor: "#CA031B",
-                        color: "#FFF",
-                        fontFamily: "Montserrat, sans-serif",
-                        fontWeight: 600,
-                        textTransform: "none",
-                        borderRadius: "100px",
-                        padding: "0.75rem",
-                        "&:hover": {
-                        backgroundColor: "#A30417",
-                        },
-                    }}
-                    >
-                    Discard
-                    </Button>
-                    <Button
-                    onClick={() => {
-                        setIsConfirmDialogOpen(false);
-                        closeAddSubmitModal();
-                    }}
-                    sx={{
-                        backgroundColor: "#08397C",
-                        color: "#FFF",
-                        fontFamily: "Montserrat, sans-serif",
-                        fontWeight: 600,
-                        textTransform: "none",
-                        borderRadius: "100px",
-                        padding: "0.75rem",
-                        "&:hover": {
-                        backgroundColor: "#072d61",
-                        },
-                    }}
-                    >
-                    Save Progress
-                    </Button>
-                </DialogActions>
-                </Dialog>
+              >
+                You have unsaved progress. Do you want to save your progress?
+              </Typography>
+            </DialogContent>
+            <DialogActions sx={{ padding: "1rem" }}>
+              <Button
+                onClick={() => {
+                  setIsConfirmDialogOpen(false);
+                  handleFormCleanup(); // Set flag to clear fields
+                  closeAddSubmitModal();
+                }}
+                sx={{
+                  backgroundColor: "#CA031B",
+                  color: "#FFF",
+                  fontFamily: "Montserrat, sans-serif",
+                  fontWeight: 600,
+                  textTransform: "none",
+                  borderRadius: "100px",
+                  padding: "0.75rem",
+                  "&:hover": {
+                    backgroundColor: "#A30417",
+                  },
+                }}
+              >
+                Discard
+              </Button>
+              <Button
+                onClick={() => {
+                  setIsConfirmDialogOpen(false);
+                  closeAddSubmitModal();
+                }}
+                sx={{
+                  backgroundColor: "#08397C",
+                  color: "#FFF",
+                  fontFamily: "Montserrat, sans-serif",
+                  fontWeight: 600,
+                  textTransform: "none",
+                  borderRadius: "100px",
+                  padding: "0.75rem",
+                  "&:hover": {
+                    backgroundColor: "#072d61",
+                  },
+                }}
+              >
+                Save Progress
+              </Button>
+            </DialogActions>
+          </Dialog>
 
-                {/* Add Success Dialog */}
-                <Dialog
-                open={isSuccessDialogOpen}
-                onClose={() => {
-                    setIsSuccessDialogOpen(false);
-                    handleFormCleanup();}}
-                PaperProps={{
-                    sx: {
-                    borderRadius: "15px",
-                    padding: "1rem",
-                    },
+          {/* Add Success Dialog */}
+          <Dialog
+            open={isSuccessDialogOpen}
+            onClose={() => {
+              setIsSuccessDialogOpen(false);
+              handleFormCleanup();
+            }}
+            PaperProps={{
+              sx: {
+                borderRadius: "15px",
+                padding: "1rem",
+              },
+            }}
+          >
+            <DialogTitle
+              sx={{
+                fontFamily: "Montserrat, sans-serif",
+                fontWeight: 600,
+                color: "#008000",
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+              }}
+            >
+              <Box
+                component='span'
+                sx={{
+                  backgroundColor: "#E8F5E9",
+                  borderRadius: "75%",
+                  padding: "10px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
                 }}
-                >
-                <DialogTitle
-                    sx={{
-                    fontFamily: "Montserrat, sans-serif",
-                    fontWeight: 600,
-                    color: "#008000",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 1,
-                    }}
-                >
-                    <Box
-                    component='span'
-                    sx={{
-                        backgroundColor: "#E8F5E9",
-                        borderRadius: "75%",
-                        padding: "10px",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                    }}
-                    >
-                    <CheckCircleIcon/>
-                    </Box>
-                    Success
-                </DialogTitle>
-                <DialogContent>
-                    <Typography
-                    sx={{
-                        fontFamily: "Montserrat, sans-serif",
-                        color: "#666",
-                        mt: 1,
-                    }}
-                    >
-                    Publication has been submitted successfully.
-                    </Typography>
-                </DialogContent>
-                <DialogActions sx={{ padding: "1rem" }}>
-                    <Button
-                    onClick={() => {
-                        setIsSuccessDialogOpen(false);
-                        handleFormCleanup();
-                        window.location.reload(); }}
-                    sx={{
-                        backgroundColor: "#08397C",
-                        color: "#FFF",
-                        fontFamily: "Montserrat, sans-serif",
-                        fontWeight: 600,
-                        textTransform: "none",
-                        borderRadius: "100px",
-                        padding: "0.75rem",
-                        "&:hover": {
-                        backgroundColor: "#072d61",
-                        },
-                    }}
-                    >
-                    Close
-                    </Button>
-                </DialogActions>
-            </Dialog>
+              >
+                <CheckCircleIcon />
+              </Box>
+              Success
+            </DialogTitle>
+            <DialogContent>
+              <Typography
+                sx={{
+                  fontFamily: "Montserrat, sans-serif",
+                  color: "#666",
+                  mt: 1,
+                }}
+              >
+                Publication has been submitted successfully.
+              </Typography>
+            </DialogContent>
+            <DialogActions sx={{ padding: "1rem" }}>
+              <Button
+                onClick={() => {
+                  setIsSuccessDialogOpen(false);
+                  handleFormCleanup();
+                  window.location.reload();
+                }}
+                sx={{
+                  backgroundColor: "#08397C",
+                  color: "#FFF",
+                  fontFamily: "Montserrat, sans-serif",
+                  fontWeight: 600,
+                  textTransform: "none",
+                  borderRadius: "100px",
+                  padding: "0.75rem",
+                  "&:hover": {
+                    backgroundColor: "#072d61",
+                  },
+                }}
+              >
+                Close
+              </Button>
+            </DialogActions>
+          </Dialog>
         </Box>
       </Modal>
     </>

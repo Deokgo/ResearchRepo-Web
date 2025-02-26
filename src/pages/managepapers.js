@@ -18,7 +18,7 @@ import homeBg from "../assets/home_bg.png";
 import { Search } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
-import axios from "axios";
+import api from "../services/api";
 import { Virtuoso } from "react-virtuoso";
 import AddPaperModal from "../components/addpapermodal";
 import { useModalContext } from "../context/modalcontext";
@@ -54,7 +54,7 @@ const ManagePapers = () => {
 
   const fetchColleges = async () => {
     try {
-      const response = await axios.get(`/deptprogs/college_depts`);
+      const response = await api.get(`/deptprogs/college_depts`);
       setColleges(response.data.colleges);
     } catch (error) {
       console.error("Error fetching colleges:", error);
@@ -63,7 +63,7 @@ const ManagePapers = () => {
 
   const fetchAllPrograms = async () => {
     try {
-      const response = await axios.get(`/deptprogs/fetch_programs`);
+      const response = await api.get(`/deptprogs/fetch_programs`);
       setPrograms(response.data.programs);
       setAllPrograms(response.data.programs);
     } catch (error) {
@@ -75,7 +75,7 @@ const ManagePapers = () => {
     try {
       if (collegeIds.length > 0) {
         const promises = collegeIds.map((collegeId) =>
-          axios.get(`/deptprogs/programs`, {
+          api.get(`/deptprogs/programs`, {
             params: { department: collegeId },
           })
         );
@@ -96,7 +96,7 @@ const ManagePapers = () => {
     const userId = getUserId();
     if (userId) {
       try {
-        const response = await axios.get(`/accounts/users/${userId}`);
+        const response = await api.get(`/accounts/users/${userId}`);
         const data = response.data;
         setUserDepartment(data.researcher.college_id);
         setUserProgram(data.researcher.program_id);
@@ -109,7 +109,7 @@ const ManagePapers = () => {
   const fetchResearchData = async () => {
     try {
       setLoading(true);
-      const response = await axios.get("/dataset/fetch_ordered_dataset");
+      const response = await api.get("/dataset/fetch_ordered_dataset");
       console.log("Fetched research data:", response.data);
       if (response.data && response.data.dataset) {
         setResearch(response.data.dataset);

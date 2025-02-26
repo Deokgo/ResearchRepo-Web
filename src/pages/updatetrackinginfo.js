@@ -2,10 +2,10 @@ import React, { useEffect, useState } from "react";
 import Navbar from "../components/navbar";
 import DynamicTimeline from "../components/Timeline";
 import { Link } from "react-router-dom";
-import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
-import PublishIcon from '@mui/icons-material/Publish';
-import ArrowForward from '@mui/icons-material/ArrowForward';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
+import PublishIcon from "@mui/icons-material/Publish";
+import ArrowForward from "@mui/icons-material/ArrowForward";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import {
   Box,
   Button,
@@ -21,7 +21,7 @@ import {
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
-import axios from "axios";
+import api from "../services/api";
 import { Snackbar, Alert } from "@mui/material"; // Import Snackbar and Alert from Material UI
 import HeaderWithBackButton from "../components/Header";
 import { useModalContext } from "../context/modalcontext";
@@ -29,7 +29,7 @@ import AddSubmission from "../components/addsubmission";
 import AddPublish from "../components/addpublish";
 import { toast } from "react-hot-toast";
 import { fetchAndCacheFilterData } from "../utils/trackCache";
-import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
+import PriorityHighIcon from "@mui/icons-material/PriorityHigh";
 
 const UpdateTrackingInfo = ({ route, navigate }) => {
   const navpage = useNavigate();
@@ -45,13 +45,16 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
   const [publicationFormat, setPublicationFormat] = useState("");
   const [conferenceTitle, setConferenceTitle] = useState("");
 
-  const { isAddSubmitModalOpen, openAddSubmitModal, closeAddSubmitModal } = useModalContext();
-  const { isAddPublishModalOpen, openAddPublishModal, closeAddPublishModal } = useModalContext();
+  const { isAddSubmitModalOpen, openAddSubmitModal, closeAddSubmitModal } =
+    useModalContext();
+  const { isAddPublishModalOpen, openAddPublishModal, closeAddPublishModal } =
+    useModalContext();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isPullOut, setIsPullOut] = useState(false);
   const [isSuccessDialogOpen, setIsSuccessDialogOpen] = useState(false);
-  const [openConfirmPulloutDialog, setOpenConfirmPulloutDialog] = useState(false);
+  const [openConfirmPulloutDialog, setOpenConfirmPulloutDialog] =
+    useState(false);
 
   ///////////////////// PUBLICATION DATA RETRIEVAL //////////////////////
 
@@ -59,7 +62,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
   useEffect(() => {
     const fetchPublication = async () => {
       try {
-        const response = await axios.get(`/track/publication/${id}`);
+        const response = await api.get(`/track/publication/${id}`);
 
         if (response.data.dataset && response.data.dataset.length > 0) {
           const fetched_data = response.data.dataset;
@@ -77,19 +80,19 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
             single_city: fetched_data[0].city,
             conference_date: fetched_data[0].conference_date,
             status: fetched_data[0].status,
-            publication_paper: fetched_data[0].publication_paper
+            publication_paper: fetched_data[0].publication_paper,
           };
 
           setInitialValues(initialData);
           console.log(initialData);
 
-          if (initialData.status === "PUBLISHED"){
+          if (initialData.status === "PUBLISHED") {
             setHeader("Published Research Details");
-          } 
+          }
 
-          if (initialData.status === "PULLOUT"){
+          if (initialData.status === "PULLOUT") {
             setHeader("Research Details");
-          } 
+          }
 
           // Set current values
           setPublicationFormat(initialData.journal);
@@ -113,7 +116,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
     if (id) {
       const fetchData = async () => {
         try {
-          const response = await axios.get(
+          const response = await api.get(
             `/dataset/fetch_ordered_dataset/${id}`
           );
           const fetchedDataset = response.data.dataset || []; // Use empty array if dataset is undefined
@@ -138,14 +141,13 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
     try {
       setIsSubmitting(true);
       // Send the data
-      const response = await axios.post(`/track/form/accepted/${id}`, {
+      const response = await api.post(`/track/form/accepted/${id}`, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
 
       setIsSuccessDialogOpen(true);
-
     } catch (error) {
       toast.error(error.response?.data?.error || "Error updating status");
       console.error("Error:", error);
@@ -159,13 +161,13 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
 
   const confirmPullOut = async () => {
     setOpenConfirmPulloutDialog(true);
-  }
+  };
   // Handle pull out status update
   const handlePullOut = async (newStatus) => {
     try {
       setIsPullOut(true);
       // Make the status update request
-      const response = await axios.post(`/track/research_status/pullout/${id}`);
+      const response = await api.post(`/track/research_status/pullout/${id}`);
 
       if (response.status === 200 || response.status === 201) {
         // Toggle refresh to trigger timeline update
@@ -252,7 +254,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
       const filePath = initialValues?.publication_paper;
       if (filePath) {
         try {
-          const response = await axios.get(`/paper/view_fs_copy/${id}`, {
+          const response = await api.get(`/paper/view_fs_copy/${id}`, {
             responseType: "blob",
           });
 
@@ -295,10 +297,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
             height: "calc(100% - 6rem)",
           }}
         >
-          <HeaderWithBackButton
-            title={header}
-            onBack={() => navpage(-1)}
-          />
+          <HeaderWithBackButton title={header} onBack={() => navpage(-1)} />
 
           {/*Main Content */}
           <Box
@@ -548,8 +547,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                             "None"}
                                         </Typography>
                                       )}
-                                      {publicationFormat === 'JL' && (
-                                        
+                                      {publicationFormat === "JL" && (
                                         <Typography
                                           variant='h7'
                                           sx={{
@@ -575,8 +573,12 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                             : "None"}
                                         </Typography>
                                       )}
-                                      {initialValues?.status === 'PUBLISHED' && (
-                                        <Box display='flex' flexDirection='column'>
+                                      {initialValues?.status ===
+                                        "PUBLISHED" && (
+                                        <Box
+                                          display='flex'
+                                          flexDirection='column'
+                                        >
                                           <Typography
                                             variant='h7'
                                             sx={{
@@ -609,7 +611,9 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                               },
                                             }}
                                           >
-                                            <strong>Date of Publication:</strong>{" "}
+                                            <strong>
+                                              Date of Publication:
+                                            </strong>{" "}
                                             {initialValues?.date_published
                                               ? new Intl.DateTimeFormat(
                                                   "en-US",
@@ -665,7 +669,9 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                                 },
                                               }}
                                             >
-                                              <strong>Date of Presentation:</strong>{" "}
+                                              <strong>
+                                                Date of Presentation:
+                                              </strong>{" "}
                                               {initialValues?.conference_date
                                                 ? new Intl.DateTimeFormat(
                                                     "en-US",
@@ -701,8 +707,8 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                       </Grid2>
                                     )}
                                   </Grid2>
-                                  {initialValues?.status === 'SUBMITTED' && (
-                                      <Box
+                                  {initialValues?.status === "SUBMITTED" && (
+                                    <Box
                                       sx={{
                                         display: "flex",
                                         alignItems: "flex-start",
@@ -752,28 +758,41 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                         onClick={handleUpdateToAccept}
                                       >
                                         {isSubmitting ? (
-                                          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                                            <CircularProgress size={20} color='#08397C' />
+                                          <Box
+                                            sx={{
+                                              display: "flex",
+                                              alignItems: "center",
+                                              gap: 1,
+                                            }}
+                                          >
+                                            <CircularProgress
+                                              size={20}
+                                              color='#08397C'
+                                            />
                                             Updating Status...
                                           </Box>
                                         ) : (
-                                          <Typography display='flex' justifyContent='center' 
-                                            sx={{fontSize: {
-                                              xs: "0.75rem",
-                                              md: "0.9rem",
-                                              lg: "0.9rem",
-                                            },}}
+                                          <Typography
+                                            display='flex'
+                                            justifyContent='center'
+                                            sx={{
+                                              fontSize: {
+                                                xs: "0.75rem",
+                                                md: "0.9rem",
+                                                lg: "0.9rem",
+                                              },
+                                            }}
                                           >
-                                            SUBMITTED &nbsp;<ArrowForward/>&nbsp;<strong>ACCEPTED</strong>
+                                            SUBMITTED &nbsp;
+                                            <ArrowForward />
+                                            &nbsp;<strong>ACCEPTED</strong>
                                           </Typography>
                                         )}
                                       </Button>
                                     </Box>
                                   )}
-                                  {initialValues?.status === 'ACCEPTED' && (
-                                    <Box
-                                      marginTop='1rem'
-                                    >
+                                  {initialValues?.status === "ACCEPTED" && (
+                                    <Box marginTop='1rem'>
                                       <Button
                                         variant='contained'
                                         color='primary'
@@ -783,8 +802,14 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                           fontFamily: "Montserrat, sans-serif",
                                           fontWeight: 500,
                                           textTransform: "none",
-                                          fontSize: { xs: "0.875rem", md: "0.9rem" },
-                                          padding: { xs: "0.5rem 1rem", md: "0.5rem 0.8rem" },
+                                          fontSize: {
+                                            xs: "0.875rem",
+                                            md: "0.9rem",
+                                          },
+                                          padding: {
+                                            xs: "0.5rem 1rem",
+                                            md: "0.5rem 0.8rem",
+                                          },
                                           width: "40%",
                                           borderRadius: "100px",
                                           "&:hover": {
@@ -793,13 +818,14 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                         }}
                                         onClick={openAddPublishModal}
                                       >
-                                        <PublishIcon/>&nbsp;Publish {selectedFormatName}
+                                        <PublishIcon />
+                                        &nbsp;Publish {selectedFormatName}
                                       </Button>
                                     </Box>
                                   )}
                                   {initialValues?.status === "PUBLISHED" && (
                                     <Typography
-                                      variant="h7"
+                                      variant='h7'
                                       sx={{
                                         mt: "2rem",
                                         mb: "1rem",
@@ -809,18 +835,19 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                                           lg: "0.9rem",
                                         },
                                       }}
-                                      >
+                                    >
                                       <strong>Published Paper:</strong>{" "}
                                       {pdfUrl ? (
                                         <iframe
                                           src={pdfUrl}
-                                          title="Published Paper"
+                                          title='Published Paper'
                                           style={{
                                             marginTop: "1rem",
                                             width: "100%",
                                             height: "800px", // Increased height from 500px to 800px
                                             border: "1px solid #ddd",
-                                            boxShadow: "0 4px 6px rgba(0,0,0,0.1)", // Added subtle shadow
+                                            boxShadow:
+                                              "0 4px 6px rgba(0,0,0,0.1)", // Added subtle shadow
                                             borderRadius: "8px", // Rounded corners
                                           }}
                                         ></iframe>
@@ -891,92 +918,95 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                 </Box>
                 {/* Add loading overlay */}
                 {isSubmitting && (
-                <Box
+                  <Box
                     sx={{
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    backgroundColor: "rgba(255, 255, 255, 0.7)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    zIndex: 9999,
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      backgroundColor: "rgba(255, 255, 255, 0.7)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      zIndex: 9999,
                     }}
-                >
+                  >
                     <Box sx={{ textAlign: "center" }}>
-                    <CircularProgress />
-                    <Typography sx={{ mt: 2, fontSize: "1.25rem"  }}>Updating Status...</Typography>
+                      <CircularProgress />
+                      <Typography sx={{ mt: 2, fontSize: "1.25rem" }}>
+                        Updating Status...
+                      </Typography>
                     </Box>
-                </Box>
+                  </Box>
                 )}
                 {/* Add Success Dialog */}
                 <Dialog
                   open={isSuccessDialogOpen}
                   PaperProps={{
-                      sx: {
+                    sx: {
                       borderRadius: "15px",
                       padding: "1rem",
-                      },
+                    },
                   }}
-                  >
+                >
                   <DialogTitle
-                      sx={{
+                    sx={{
                       fontFamily: "Montserrat, sans-serif",
                       fontWeight: 600,
                       color: "#008000",
                       display: "flex",
                       alignItems: "center",
                       gap: 1,
-                      }}
+                    }}
                   >
-                      <Box
+                    <Box
                       component='span'
                       sx={{
-                          backgroundColor: "#E8F5E9",
-                          borderRadius: "75%",
-                          padding: "10px",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
+                        backgroundColor: "#E8F5E9",
+                        borderRadius: "75%",
+                        padding: "10px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
                       }}
-                      >
-                      <CheckCircleIcon/>
-                      </Box>
-                      Success
+                    >
+                      <CheckCircleIcon />
+                    </Box>
+                    Success
                   </DialogTitle>
                   <DialogContent>
-                      <Typography
+                    <Typography
                       sx={{
-                          fontFamily: "Montserrat, sans-serif",
-                          color: "#666",
-                          mt: 1,
+                        fontFamily: "Montserrat, sans-serif",
+                        color: "#666",
+                        mt: 1,
                       }}
-                      >
+                    >
                       Status has been updated succesfully.
-                      </Typography>
+                    </Typography>
                   </DialogContent>
                   <DialogActions sx={{ padding: "1rem" }}>
-                      <Button
+                    <Button
                       onClick={() => {
-                          setIsSuccessDialogOpen(false);
-                          navpage(0); }}
-                      sx={{
-                          backgroundColor: "#08397C",
-                          color: "#FFF",
-                          fontFamily: "Montserrat, sans-serif",
-                          fontWeight: 600,
-                          textTransform: "none",
-                          borderRadius: "100px",
-                          padding: "0.75rem",
-                          "&:hover": {
-                          backgroundColor: "#072d61",
-                          },
+                        setIsSuccessDialogOpen(false);
+                        navpage(0);
                       }}
-                      >
+                      sx={{
+                        backgroundColor: "#08397C",
+                        color: "#FFF",
+                        fontFamily: "Montserrat, sans-serif",
+                        fontWeight: 600,
+                        textTransform: "none",
+                        borderRadius: "100px",
+                        padding: "0.75rem",
+                        "&:hover": {
+                          backgroundColor: "#072d61",
+                        },
+                      }}
+                    >
                       Close
-                      </Button>
+                    </Button>
                   </DialogActions>
                 </Dialog>
 
@@ -985,12 +1015,12 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                   onClose={() => setOpenConfirmPulloutDialog(false)}
                   PaperProps={{
                     sx: {
-                    borderRadius: "15px",
-                    padding: "1rem",
+                      borderRadius: "15px",
+                      padding: "1rem",
                     },
                   }}
                 >
-                  <DialogTitle 
+                  <DialogTitle
                     sx={{
                       fontFamily: "Montserrat, sans-serif",
                       fontWeight: 600,
@@ -1003,20 +1033,22 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                     <Box
                       component='span'
                       sx={{
-                          backgroundColor: "#E8F5E9",
-                          borderRadius: "75%",
-                          padding: "10px",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
+                        backgroundColor: "#E8F5E9",
+                        borderRadius: "75%",
+                        padding: "10px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
                       }}
-                      >
-                      <PriorityHighIcon/>
+                    >
+                      <PriorityHighIcon />
                     </Box>
-                      &nbsp;Confirm Pull Out
+                    &nbsp;Confirm Pull Out
                   </DialogTitle>
                   <DialogContent>
-                    <DialogContentText sx={{ fontFamily: "Montserrat, sans-serif" }}>
+                    <DialogContentText
+                      sx={{ fontFamily: "Montserrat, sans-serif" }}
+                    >
                       Are you sure you want to pull out this research output?
                     </DialogContentText>
                   </DialogContent>
@@ -1032,9 +1064,9 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                         borderRadius: "100px",
                         padding: "0.75rem",
                         "&:hover": {
-                        color: "#072d61",
+                          color: "#072d61",
                         },
-                    }}
+                      }}
                     >
                       Cancel
                     </Button>
@@ -1050,7 +1082,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                         borderRadius: "100px",
                         padding: "0.75rem",
                         "&:hover": {
-                        backgroundColor: "#A30417",
+                          backgroundColor: "#A30417",
                         },
                       }}
                     >
@@ -1091,7 +1123,8 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                     }}
                   />
                 </Box>
-                { (initialValues?.status === "ACCEPTED" || initialValues?.status === "SUBMITTED") && (
+                {(initialValues?.status === "ACCEPTED" ||
+                  initialValues?.status === "SUBMITTED") && (
                   <Button
                     variant='contained'
                     color='primary'
@@ -1112,14 +1145,29 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                     }}
                   >
                     {isPullOut ? (
-                      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                      <Box
+                        sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                      >
                         <CircularProgress size={20} color='#08397C' />
                         Pulling out...
                       </Box>
                     ) : (
-                        <Typography display='flex' justifyContent='center' sx={{fontSize: { xs: "0.875rem", md: "0.9rem" } }}>
-                          <RemoveCircleIcon sx={{fontSize: { xs: "0.9rem", md: "1.2rem", xs: "1.2rem" } }}/> &nbsp; <strong>PULL OUT PAPER</strong>
-                        </Typography>
+                      <Typography
+                        display='flex'
+                        justifyContent='center'
+                        sx={{ fontSize: { xs: "0.875rem", md: "0.9rem" } }}
+                      >
+                        <RemoveCircleIcon
+                          sx={{
+                            fontSize: {
+                              xs: "0.9rem",
+                              md: "1.2rem",
+                              xs: "1.2rem",
+                            },
+                          }}
+                        />{" "}
+                        &nbsp; <strong>PULL OUT PAPER</strong>
+                      </Typography>
                     )}
                   </Button>
                 )}
@@ -1128,26 +1176,28 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
           </Box>
           {/* Add loading overlay */}
           {isPullOut && (
-          <Box
+            <Box
               sx={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              backgroundColor: "rgba(255, 255, 255, 0.7)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              zIndex: 9999,
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: "rgba(255, 255, 255, 0.7)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                zIndex: 9999,
               }}
-          >
+            >
               <Box sx={{ textAlign: "center" }}>
-              <CircularProgress />
-              <Typography sx={{ mt: 2, fontSize: "1.25rem" }}>Pulling out Publication...</Typography>
+                <CircularProgress />
+                <Typography sx={{ mt: 2, fontSize: "1.25rem" }}>
+                  Pulling out Publication...
+                </Typography>
               </Box>
-          </Box>
-        )}
+            </Box>
+          )}
         </Box>
       </Box>
       <AddSubmission

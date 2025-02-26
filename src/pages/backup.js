@@ -23,7 +23,7 @@ import {
 import HeaderWithBackButton from "../components/Header";
 import { useNavigate } from "react-router-dom";
 import { Virtuoso } from "react-virtuoso";
-import axios from "axios";
+import api from "../services/api";
 import RestoreIcon from "@mui/icons-material/Restore";
 import BackupIcon from "@mui/icons-material/Backup";
 import UploadIcon from "@mui/icons-material/Upload";
@@ -65,7 +65,7 @@ const Backup = () => {
   const fetchBackups = async () => {
     try {
       setLoading(true);
-      const response = await axios.get("/backup/list");
+      const response = await api.get("/backup/list");
       setBackups(response.data.backups);
       setFilteredBackups(response.data.backups);
     } catch (error) {
@@ -79,7 +79,7 @@ const Backup = () => {
   // Add function to fetch current timeline
   const fetchCurrentTimeline = async () => {
     try {
-      const response = await axios.get("/backup/current-timeline");
+      const response = await api.get("/backup/current-timeline");
       setCurrentTimeline(response.data.timeline_id);
     } catch (error) {
       console.error("Error fetching current timeline:", error);
@@ -132,7 +132,7 @@ const Backup = () => {
     setOpenDialog(false);
     setLoading(true);
     try {
-      const response = await axios.post(
+      const response = await api.post(
         `/backup/restore/${selectedBackup.backup_id}`
       );
       setOpenRestoreSuccessDialog(true);
@@ -175,7 +175,7 @@ const Backup = () => {
 
       setLoading(true);
 
-      // Use fetch instead of axios for better large file handling
+      // Use fetch instead of api for better large file handling
       const response = await fetch(`/backup/download/${backup.backup_id}`, {
         method: "GET",
         headers: {
@@ -283,7 +283,7 @@ const Backup = () => {
       formData.append("backup_file", selectedFile);
       setRestoreInProgress(true);
 
-      const response = await axios.post("/backup/restore-from-file", formData, {
+      const response = await api.post("/backup/restore-from-file", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -323,7 +323,7 @@ const Backup = () => {
   const createBackup = async (type) => {
     try {
       setBackupInProgress(true);
-      const response = await axios.post(`/backup/create/${type}`);
+      const response = await api.post(`/backup/create/${type}`);
 
       setSuccessMessage(
         `${
@@ -383,20 +383,20 @@ const Backup = () => {
     try {
       setLoading(true);
       // Create full backup
-      const response = await axios.post("/backup/create/FULL");
+      const response = await api.post("/backup/create/FULL");
 
       // Set success message but don't show it yet
       setSuccessMessage(response.data.message);
 
       // Get the latest backup ID for download
-      const latestBackup = await axios.get("/backup/list");
+      const latestBackup = await api.get("/backup/list");
       const fullBackup = latestBackup.data.backups.find(
         (b) => b.backup_type === "FULL"
       );
 
       if (fullBackup) {
         // Download the backup
-        const downloadResponse = await axios.get(
+        const downloadResponse = await api.get(
           `/backup/download/${fullBackup.backup_id}`,
           {
             responseType: "blob",
@@ -470,10 +470,16 @@ const Backup = () => {
             justifyContent: "space-between",
           }}
         >
-          <Typography sx={{fontSize: { xs: "0.7rem", md: "0.8rem", lg: "0.9rem" },}} color='info.contrastText'>
+          <Typography
+            sx={{ fontSize: { xs: "0.7rem", md: "0.8rem", lg: "0.9rem" } }}
+            color='info.contrastText'
+          >
             Current Timeline: {currentTimeline || "Loading..."}
           </Typography>
-          <Typography sx={{fontSize: { xs: "0.7rem", md: "0.8rem", lg: "0.9rem" },}} color='info.contrastText'>
+          <Typography
+            sx={{ fontSize: { xs: "0.7rem", md: "0.8rem", lg: "0.9rem" } }}
+            color='info.contrastText'
+          >
             Note: Full backup restores continue in the same timeline, while
             incremental restores create a new timeline
           </Typography>
@@ -824,7 +830,7 @@ const Backup = () => {
             onClick={async () => {
               setOpenDownloadDialog(false);
               try {
-                const response = await axios.get(
+                const response = await api.get(
                   `/backup/download/${selectedBackup.backup_id}`,
                   {
                     responseType: "blob",
@@ -856,7 +862,7 @@ const Backup = () => {
             onClick={async () => {
               setOpenDownloadDialog(false);
               try {
-                const response = await axios.get(
+                const response = await api.get(
                   `/backup/download-chain/${selectedBackup.backup_id}`,
                   {
                     responseType: "blob",

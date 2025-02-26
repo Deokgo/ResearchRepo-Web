@@ -16,12 +16,12 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions
+  DialogActions,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import homeBg from "../assets/home_bg.png";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
-import axios from "axios";
+import api from "../services/api";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import HeaderWithBackButton from "../components/Header";
@@ -56,7 +56,7 @@ const Profile = () => {
     suffix: "",
     department: "",
     program: "",
-  });  
+  });
   const navigate = useNavigate();
   const [isOtpModalOpen, setIsOtpModalOpen] = useState(false);
   const [formValues, setFormValues] = useState({
@@ -87,7 +87,7 @@ const Profile = () => {
   const fetchUserData = async () => {
     if (user?.user_id) {
       try {
-        const response = await axios.get(`/accounts/users/${user.user_id}`);
+        const response = await api.get(`/accounts/users/${user.user_id}`);
         const data = response.data;
 
         // Set user data for later use
@@ -174,11 +174,25 @@ const Profile = () => {
         setIsConfirmDialogOpen(true);
         return;
       }
-  
-      const { firstName, middleName, lastName, suffix, department: college_id, program: program_id } = formValues;
-  
-      const payload = { first_name: firstName, middle_name: middleName, last_name: lastName, suffix, college_id, program_id };
-  
+
+      const {
+        firstName,
+        middleName,
+        lastName,
+        suffix,
+        department: college_id,
+        program: program_id,
+      } = formValues;
+
+      const payload = {
+        first_name: firstName,
+        middle_name: middleName,
+        last_name: lastName,
+        suffix,
+        college_id,
+        program_id,
+      };
+
       const hasChanges =
         firstName !== initialData?.firstName ||
         middleName !== initialData?.middleName ||
@@ -186,26 +200,27 @@ const Profile = () => {
         suffix !== initialData?.suffix ||
         college_id !== initialData?.department ||
         program_id !== initialData?.program;
-  
+
       if (!hasChanges) {
         setDialogContent({
           title: "No Changes Detected",
-          message: "You haven't made any changes. Please modify your profile before saving.",
+          message:
+            "You haven't made any changes. Please modify your profile before saving.",
           confirmAction: () => setIsConfirmDialogOpen(false),
         });
         setIsConfirmDialogOpen(true);
         return;
       }
-  
+
       const response = await fetch(`/accounts/update_account/${user.user_id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-  
+
       if (response.ok) {
         const data = await response.json();
-  
+
         // Update initialData to reflect saved changes
         setInitialData({
           firstName,
@@ -215,7 +230,7 @@ const Profile = () => {
           department: college_id,
           program: program_id,
         });
-  
+
         setDialogContent({
           title: "Profile Updated",
           message: "Your profile has been updated successfully.",
@@ -228,30 +243,33 @@ const Profile = () => {
         const errorData = await response.json();
         setDialogContent({
           title: "Update Failed",
-          message: `Failed to update profile: ${errorData.message || "Unknown error"}`,
+          message: `Failed to update profile: ${
+            errorData.message || "Unknown error"
+          }`,
           confirmAction: () => setIsConfirmDialogOpen(false),
         });
-  
+
         if (errorData.missing_fields) {
           console.log("Missing fields:", errorData.missing_fields);
         }
       }
-  
+
       setIsConfirmDialogOpen(true);
     } catch (error) {
       console.error("Error updating profile:", error);
       setDialogContent({
         title: "An Error Occurred",
-        message: "Something went wrong while updating your profile. Please try again later.",
+        message:
+          "Something went wrong while updating your profile. Please try again later.",
         confirmAction: () => setIsConfirmDialogOpen(false),
       });
       setIsConfirmDialogOpen(true);
     }
-  };  
+  };
 
   const handleSaveNewPassword = async () => {
     const { newPassword, confirmPassword } = passwordValues;
-  
+
     if (!user?.user_id) {
       setDialogContent({
         title: "User ID Not Found",
@@ -261,7 +279,7 @@ const Profile = () => {
       setIsConfirmDialogOpen(true);
       return;
     }
-  
+
     // Validate input fields
     if (!newPassword || !confirmPassword) {
       setDialogContent({
@@ -272,7 +290,7 @@ const Profile = () => {
       setIsConfirmDialogOpen(true);
       return;
     }
-  
+
     if (newPassword !== confirmPassword) {
       setDialogContent({
         title: "Password Mismatch",
@@ -282,14 +300,17 @@ const Profile = () => {
       setIsConfirmDialogOpen(true);
       return;
     }
-  
+
     try {
       // Send request to the server
-      const response = await axios.put(`/accounts/update_password/${user.user_id}`, {
-        newPassword,
-        confirmPassword,
-      });
-  
+      const response = await api.put(
+        `/accounts/update_password/${user.user_id}`,
+        {
+          newPassword,
+          confirmPassword,
+        }
+      );
+
       // Handle server response
       if (response.status === 200) {
         setDialogContent({
@@ -313,16 +334,18 @@ const Profile = () => {
       }
     } catch (error) {
       console.error("Error updating password:", error);
-  
+
       setDialogContent({
         title: "An Error Occurred",
-        message: error.response?.data?.message || "An error occurred while updating the password. Please try again later.",
+        message:
+          error.response?.data?.message ||
+          "An error occurred while updating the password. Please try again later.",
         confirmAction: () => setIsConfirmDialogOpen(false),
       });
     }
-  
+
     setIsConfirmDialogOpen(true);
-  };  
+  };
 
   const handleNavigateHome = () => {
     navigate("/main");
@@ -338,8 +361,15 @@ const Profile = () => {
   };
 
   const handleCloseModal = () => {
-    const { firstName, middleName, lastName, suffix, department: college_id, program: program_id } = formValues;
-  
+    const {
+      firstName,
+      middleName,
+      lastName,
+      suffix,
+      department: college_id,
+      program: program_id,
+    } = formValues;
+
     const hasChanges =
       firstName !== initialData?.firstName ||
       middleName !== initialData?.middleName ||
@@ -347,7 +377,7 @@ const Profile = () => {
       suffix !== initialData?.suffix ||
       college_id !== initialData?.department ||
       program_id !== initialData?.program;
-  
+
     if (hasChanges) {
       setDialogContent({
         title: "Unsaved Changes",
@@ -357,7 +387,7 @@ const Profile = () => {
         confirmAction: () => {
           setIsConfirmDialogOpen(false);
           setIsModalOpen(false);
-  
+
           // ✅ Reset form values when discarding changes
           setFormValues(initialData);
         },
@@ -370,7 +400,7 @@ const Profile = () => {
     } else {
       setIsModalOpen(false);
     }
-  };  
+  };
 
   // Fetch all colleges when the modal opens
   useEffect(() => {
@@ -382,7 +412,7 @@ const Profile = () => {
   // Fetch all colleges
   const fetchColleges = async () => {
     try {
-      const response = await axios.get(`/deptprogs/college_depts`);
+      const response = await api.get(`/deptprogs/college_depts`);
       setColleges(response.data.colleges);
     } catch (error) {
       console.error("Error fetching colleges:", error);
@@ -393,7 +423,7 @@ const Profile = () => {
   const fetchProgramsByCollege = async (collegeId) => {
     if (collegeId) {
       try {
-        const response = await axios.get(`/deptprogs/programs/${collegeId}`);
+        const response = await api.get(`/deptprogs/programs/${collegeId}`);
         setPrograms(response.data.programs);
       } catch (error) {
         console.error("Error fetching programs by college:", error);
@@ -413,22 +443,24 @@ const Profile = () => {
   const handleOpenChangePasswordModal = () => {
     setIsChangePasswordModalOpen(true);
   };
-  
 
   const handleOpenOtpModal = async () => {
     try {
-      const otpResponse = await axios.post("/auth/send_otp", {
+      const otpResponse = await api.post("/auth/send_otp", {
         email: email, // Ensure email is correctly defined
         isPasswordReset: true, // Ensure it is explicitly set
       });
-  
+
       if (otpResponse.status === 200) {
         setIsOtpModalOpen(true);
       } else {
         console.warn("Unexpected response status:", otpResponse.status);
       }
     } catch (error) {
-      console.error("Error sending OTP:", error.response?.data || error.message);
+      console.error(
+        "Error sending OTP:",
+        error.response?.data || error.message
+      );
     } finally {
       setIsOtpModalOpen(true); // Ensure modal opens even if OTP fails
     }
@@ -510,20 +542,22 @@ const Profile = () => {
                 mb: "1.5rem",
               }}
             >
-              {userData && userData.account && userData.account.role_name !== "System Administrator" && (
-                <Button
-                  variant='outlined'
-                  startIcon={<EditIcon />}
-                  onClick={handleOpenOtpModal}
-                  sx={{
-                    fontWeight: 600,
-                    flex: "0 1 auto", // Prevents shrinking too much
-                    minWidth: "120px", // Ensures a consistent minimum width
-                  }}
-                >
-                  Change Password
-                </Button>
-              )}
+              {userData &&
+                userData.account &&
+                userData.account.role_name !== "System Administrator" && (
+                  <Button
+                    variant='outlined'
+                    startIcon={<EditIcon />}
+                    onClick={handleOpenOtpModal}
+                    sx={{
+                      fontWeight: 600,
+                      flex: "0 1 auto", // Prevents shrinking too much
+                      minWidth: "120px", // Ensures a consistent minimum width
+                    }}
+                  >
+                    Change Password
+                  </Button>
+                )}
 
               {/* OTP Modal */}
               <OtpModal
@@ -717,12 +751,14 @@ const Profile = () => {
                   <InputLabel
                     sx={{
                       fontSize: {
-                          xs: "0.75rem",
-                          md: "0.75rem",
-                          lg: "0.8rem",
+                        xs: "0.75rem",
+                        md: "0.75rem",
+                        lg: "0.8rem",
                       },
-                      }}
-                  >Department:</InputLabel>
+                    }}
+                  >
+                    Department:
+                  </InputLabel>
                   <Select
                     value={formValues.department || ""} // Use an empty string as fallback
                     onChange={(e) => {
@@ -745,11 +781,11 @@ const Profile = () => {
                         value={college.college_id}
                         sx={{
                           fontSize: {
-                              xs: "0.75rem",
-                              md: "0.75rem",
-                              lg: "0.8rem",
+                            xs: "0.75rem",
+                            md: "0.75rem",
+                            lg: "0.8rem",
                           },
-                          }}
+                        }}
                       >
                         {college.college_name}
                       </MenuItem>
@@ -761,12 +797,14 @@ const Profile = () => {
                   <InputLabel
                     sx={{
                       fontSize: {
-                          xs: "0.75rem",
-                          md: "0.75rem",
-                          lg: "0.8rem",
+                        xs: "0.75rem",
+                        md: "0.75rem",
+                        lg: "0.8rem",
                       },
-                      }}
-                  >Program:</InputLabel>
+                    }}
+                  >
+                    Program:
+                  </InputLabel>
                   <Select
                     value={formValues.program || ""} // Use an empty string as fallback
                     onChange={(e) => {
@@ -795,11 +833,11 @@ const Profile = () => {
                           value={program.program_id}
                           sx={{
                             fontSize: {
-                                xs: "0.75rem",
-                                md: "0.75rem",
-                                lg: "0.8rem",
+                              xs: "0.75rem",
+                              md: "0.75rem",
+                              lg: "0.8rem",
                             },
-                            }}
+                          }}
                         >
                           {program.program_name}
                         </MenuItem>
@@ -828,10 +866,10 @@ const Profile = () => {
                     borderRadius: "100px",
                     maxHeight: "3rem",
                     "&:hover": {
-                        backgroundColor: "#A30417",
-                        color: "#FFF",
+                      backgroundColor: "#A30417",
+                      color: "#FFF",
                     },
-                    }}
+                  }}
                 >
                   Cancel
                 </Button>
@@ -849,9 +887,9 @@ const Profile = () => {
                     maxHeight: "3rem",
                     textTransform: "none",
                     "&:hover": {
-                        backgroundColor: "#072d61",
+                      backgroundColor: "#072d61",
                     },
-                    }}
+                  }}
                 >
                   Save Changes
                 </Button>
@@ -865,10 +903,10 @@ const Profile = () => {
             onClose={handleCloseChangePasswordModal}
             PaperProps={{
               sx: {
-              borderRadius: "15px",
-              padding: "1rem",
+                borderRadius: "15px",
+                padding: "1rem",
               },
-          }}
+            }}
           >
             <Box
               sx={{
@@ -928,10 +966,10 @@ const Profile = () => {
                     borderRadius: "100px",
                     maxHeight: "3rem",
                     "&:hover": {
-                        backgroundColor: "#A30417",
-                        color: "#FFF",
+                      backgroundColor: "#A30417",
+                      color: "#FFF",
                     },
-                    }}
+                  }}
                 >
                   Back
                 </Button>
@@ -948,9 +986,9 @@ const Profile = () => {
                     maxHeight: "3rem",
                     textTransform: "none",
                     "&:hover": {
-                        backgroundColor: "#072d61",
+                      backgroundColor: "#072d61",
                     },
-                    }}
+                  }}
                   onClick={handleSaveNewPassword}
                 >
                   Save Changes
@@ -963,10 +1001,10 @@ const Profile = () => {
             onClose={() => setIsConfirmDialogOpen(false)}
             PaperProps={{
               sx: {
-              borderRadius: "15px",
-              padding: "1rem",
+                borderRadius: "15px",
+                padding: "1rem",
               },
-          }}
+            }}
           >
             <DialogTitle
               sx={{

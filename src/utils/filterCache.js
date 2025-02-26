@@ -1,4 +1,4 @@
-import axios from "axios";
+import api from "../services/api";
 
 const CACHE_KEY = "filterDropdownData";
 const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
@@ -52,10 +52,10 @@ export const fetchAndCacheFilterData = async () => {
   try {
     const [collegesRes, programsRes, researchAreasRes, researchTypesRes] =
       await Promise.all([
-        axios.get("/deptprogs/college_depts"),
-        axios.get("/deptprogs/fetch_programs"),
-        axios.get("/paper/research_areas"),
-        axios.get("/paper/research_types"),
+        api.get("/deptprogs/college_depts"),
+        api.get("/deptprogs/fetch_programs"),
+        api.get("/paper/research_areas"),
+        api.get("/paper/research_types"),
       ]);
 
     const data = {

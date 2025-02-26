@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../services/api";
 import Navbar from "../components/navbar";
 import { Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
@@ -19,7 +19,7 @@ const EngageDash = () => {
           setError("No access token found.");
           return;
         }
-        const response = await axios.get("/dash/engagement", {
+        const response = await api.get("/dash/engagement", {
           headers: {
             Authorization: `Bearer ${token}`, // Add JWT to the request headers
           },
@@ -76,7 +76,7 @@ const EngageDash = () => {
         }}
       >
         <HeaderWithBackButton
-          title="User Engagement Dashboard"
+          title='User Engagement Dashboard'
           onBack={() => navigate(-1)}
         />
         <Box
@@ -89,7 +89,7 @@ const EngageDash = () => {
           }}
         >
           <iframe
-            id="dashboard-iframe"
+            id='dashboard-iframe'
             src={dashUrl}
             style={{
               border: "none",
@@ -97,8 +97,8 @@ const EngageDash = () => {
               height: "100vh", // Full viewport height
               display: "block", // Avoid inline gaps
             }}
-            sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
-            title="Engage Dash App"
+            sandbox='allow-scripts allow-same-origin allow-forms allow-popups'
+            title='Engage Dash App'
           />
         </Box>
       </Box>

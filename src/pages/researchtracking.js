@@ -19,14 +19,14 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
-  useMediaQuery
+  useMediaQuery,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import homeBg from "../assets/home_bg.png";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import { Search, Update } from "@mui/icons-material";
 import { Virtuoso } from "react-virtuoso";
-import axios from "axios";
+import api from "../services/api";
 import { filterCache, fetchAndCacheFilterData } from "../utils/filterCache";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import HeaderWithBackButton from "../components/Header";
@@ -52,7 +52,6 @@ const useDebounce = (value, delay) => {
 const ResearchTracking = () => {
   // Add navigate hook at the top with other hooks
   const navigate = useNavigate();
-
 
   // Then declare all state variables
   const [users, setUsers] = useState([]);
@@ -173,7 +172,7 @@ const ResearchTracking = () => {
     const userId = getUserId();
     if (userId) {
       try {
-        const response = await axios.get(`/accounts/users/${userId}`);
+        const response = await api.get(`/accounts/users/${userId}`);
         const data = response.data;
         setUserDepartment(data.researcher.college_id);
         setDepartment(data.researcher.department_name);
@@ -185,16 +184,16 @@ const ResearchTracking = () => {
 
   const fetchAllResearchData = async () => {
     try {
-      const response = await axios.get(`/dataset/fetch_dataset`);
+      const response = await api.get(`/dataset/fetch_dataset`);
       let fetchedResearch = response.data.dataset;
-  
+
       // Apply automatic filtering based on user college/program
       if (user?.role === "04" || user?.role === "05") {
         setSelectedColleges(user?.college);
         fetchedResearch = fetchedResearch.filter(
           (item) => item.college_id === user?.college
         );
-        if (user?.role === "05"){
+        if (user?.role === "05") {
           fetchedResearch = fetchedResearch.filter(
             (item) => item.program_id === user?.program
           );
@@ -381,7 +380,7 @@ const ResearchTracking = () => {
   useEffect(() => {
     async function fetchDateRange() {
       try {
-        const response = await axios.get("/dataset/fetch_date_range"); // API endpoint
+        const response = await api.get("/dataset/fetch_date_range"); // API endpoint
         const { min_year, max_year } = response.data.date_range;
 
         // Update the date range and initialize the slider values
@@ -546,23 +545,45 @@ const ResearchTracking = () => {
 
                     {user?.role === "02" && (
                       <>
-                        <Accordion 
-                          expanded={expandedAccordion === "college"} 
-                          onChange={() => setExpandedAccordion(expandedAccordion === "college" ? null : "college")}
+                        <Accordion
+                          expanded={expandedAccordion === "college"}
+                          onChange={() =>
+                            setExpandedAccordion(
+                              expandedAccordion === "college" ? null : "college"
+                            )
+                          }
                         >
                           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                            <Typography sx={{ color: "#08397C", fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" } }}>
+                            <Typography
+                              sx={{
+                                color: "#08397C",
+                                fontSize: {
+                                  xs: "0.5rem",
+                                  md: "0.5rem",
+                                  lg: "0.9rem",
+                                },
+                              }}
+                            >
                               College
                             </Typography>
                           </AccordionSummary>
                           <AccordionDetails>
-                            <Box sx={{ maxHeight: "125px", overflow: "auto", display: "flex", flexDirection: "column" }}>
+                            <Box
+                              sx={{
+                                maxHeight: "125px",
+                                overflow: "auto",
+                                display: "flex",
+                                flexDirection: "column",
+                              }}
+                            >
                               {colleges.map((college) => (
                                 <FormControlLabel
                                   key={college.college_id}
                                   control={
                                     <Checkbox
-                                      checked={selectedColleges.includes(String(college.college_id))}
+                                      checked={selectedColleges.includes(
+                                        String(college.college_id)
+                                      )}
                                       onChange={handleCollegeChange}
                                       value={college.college_id}
                                     />
@@ -570,7 +591,11 @@ const ResearchTracking = () => {
                                   label={college.college_name}
                                   sx={{
                                     "& .MuiTypography-root": {
-                                      fontSize: { xs: "0.5rem", md: "0.75rem", lg: "0.9rem" },
+                                      fontSize: {
+                                        xs: "0.5rem",
+                                        md: "0.75rem",
+                                        lg: "0.9rem",
+                                      },
                                     },
                                   }}
                                 />
@@ -579,23 +604,45 @@ const ResearchTracking = () => {
                           </AccordionDetails>
                         </Accordion>
 
-                        <Accordion 
-                          expanded={expandedAccordion === "program"} 
-                          onChange={() => setExpandedAccordion(expandedAccordion === "program" ? null : "program")}
+                        <Accordion
+                          expanded={expandedAccordion === "program"}
+                          onChange={() =>
+                            setExpandedAccordion(
+                              expandedAccordion === "program" ? null : "program"
+                            )
+                          }
                         >
                           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                            <Typography sx={{ color: "#08397C", fontSize: { xs: "0.5rem", md: "0.5rem", lg: "0.9rem" } }}>
+                            <Typography
+                              sx={{
+                                color: "#08397C",
+                                fontSize: {
+                                  xs: "0.5rem",
+                                  md: "0.5rem",
+                                  lg: "0.9rem",
+                                },
+                              }}
+                            >
                               Program
                             </Typography>
                           </AccordionSummary>
                           <AccordionDetails>
-                            <Box sx={{ maxHeight: "125px", overflow: "auto", display: "flex", flexDirection: "column" }}>
+                            <Box
+                              sx={{
+                                maxHeight: "125px",
+                                overflow: "auto",
+                                display: "flex",
+                                flexDirection: "column",
+                              }}
+                            >
                               {programs.map((program) => (
                                 <FormControlLabel
                                   key={program.program_id}
                                   control={
                                     <Checkbox
-                                      checked={selectedPrograms.includes(program.program_name)}
+                                      checked={selectedPrograms.includes(
+                                        program.program_name
+                                      )}
                                       onChange={handleProgramChange}
                                       value={program.program_name}
                                     />
@@ -603,7 +650,11 @@ const ResearchTracking = () => {
                                   label={program.program_name}
                                   sx={{
                                     "& .MuiTypography-root": {
-                                      fontSize: { xs: "0.5rem", md: "0.75rem", lg: "0.9rem" },
+                                      fontSize: {
+                                        xs: "0.5rem",
+                                        md: "0.75rem",
+                                        lg: "0.9rem",
+                                      },
                                     },
                                   }}
                                 />
@@ -613,7 +664,6 @@ const ResearchTracking = () => {
                         </Accordion>
                       </>
                     )}
-                  
                   </Box>
                   <Button
                     onClick={handleResetFilters}
@@ -711,7 +761,11 @@ const ResearchTracking = () => {
                       sx={{
                         justifyContent: "center",
                         color: "#8B8B8B",
-                        fontSize: { xs: "0.75rem", md: "0.8rem", lg: "0.95rem" },
+                        fontSize: {
+                          xs: "0.75rem",
+                          md: "0.8rem",
+                          lg: "0.95rem",
+                        },
                       }}
                     >
                       <strong>{filteredResearch.length}</strong> results found
@@ -779,11 +833,13 @@ const ResearchTracking = () => {
                                     },
                                   }}
                                 >
-                                  <strong>Status:</strong>&nbsp;{paper.status} | <strong>Authors:</strong>&nbsp;
+                                  <strong>Status:</strong>&nbsp;{paper.status} |{" "}
+                                  <strong>Authors:</strong>&nbsp;
                                   {paper.authors
                                     .map((author) => author.name)
                                     .join(", ")}{" "}
-                                  | <strong>Last Updated:</strong>&nbsp;{paper.timestamp}
+                                  | <strong>Last Updated:</strong>&nbsp;
+                                  {paper.timestamp}
                                 </Typography>
                               </Box>
                             )}

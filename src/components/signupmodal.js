@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import OtpModal from "./otpmodal";
 import { useModalContext } from "../context/modalcontext"; // Import the ModalContext
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import PriorityHighIcon from "@mui/icons-material/PriorityHigh";
 import {
   Box,
@@ -26,7 +26,7 @@ import {
   Visibility,
   VisibilityOff,
 } from "@mui/icons-material";
-import axios from "axios";
+import api from "../services/api";
 const SignUpModal = () => {
   const { isSignupModalOpen, closeSignupModal, openLoginModal } =
     useModalContext(); // Use context
@@ -181,7 +181,7 @@ const SignUpModal = () => {
 
     try {
       // Check if email exists
-      const emailCheckResponse = await axios.get(
+      const emailCheckResponse = await api.get(
         `/accounts/check_email?email=${formData.email}`
       );
 
@@ -206,7 +206,7 @@ const SignUpModal = () => {
       setIsSubmitting(true);
 
       // Send OTP
-      const otpResponse = await axios.post("/auth/send_otp", {
+      const otpResponse = await api.post("/auth/send_otp", {
         email: formData.email,
         isPasswordReset: false,
       });
@@ -262,7 +262,7 @@ const SignUpModal = () => {
     if (!isModalOpen) {
       setIsSubmitting(false);
     }
-  })
+  });
 
   return (
     <>
@@ -482,7 +482,11 @@ const SignUpModal = () => {
                       endAdornment: (
                         <InputAdornment position='end'>
                           <IconButton onClick={toggleConfirmPasswordVisibility}>
-                            {showConfirmPassword ? <Visibility /> : <VisibilityOff />}
+                            {showConfirmPassword ? (
+                              <Visibility />
+                            ) : (
+                              <VisibilityOff />
+                            )}
                           </IconButton>
                         </InputAdornment>
                       ),
@@ -520,14 +524,14 @@ const SignUpModal = () => {
                   {isSubmitting ? (
                     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                       <CircularProgress size={20} color='#08397C' />
-                        loading...
-                        </Box>
-                    ) : (
-                        "Create Account"
-                    )}
+                      loading...
+                    </Box>
+                  ) : (
+                    "Create Account"
+                  )}
                 </Button>
-                <Typography 
-                sx={{
+                <Typography
+                  sx={{
                     mt: 1,
                     textAlign: { xs: "center", md: "bottom" },
                     fontFamily: "Montserrat, sans-serif",
@@ -536,7 +540,8 @@ const SignUpModal = () => {
                       sm: "clamp(0.75rem, 3.5vw, 0.75rem)",
                       md: "clamp(0.9rem, 3vw, 0.9rem)",
                     },
-                  }}>
+                  }}
+                >
                   Already a user?{" "}
                   <a
                     href='#'
@@ -546,7 +551,10 @@ const SignUpModal = () => {
                       closeSignupModal();
                       openLoginModal();
                     }}
-                    style={{ color: "#08397C", fontFamily: "Montserrat, sans-serif", }}
+                    style={{
+                      color: "#08397C",
+                      fontFamily: "Montserrat, sans-serif",
+                    }}
                   >
                     Login
                   </a>
@@ -562,9 +570,9 @@ const SignUpModal = () => {
               </Box>
             </Box>
             {/* Add loading overlay */}
-              {isSubmitting && (
+            {isSubmitting && (
               <Box
-                  sx={{
+                sx={{
                   position: "absolute",
                   top: 0,
                   left: 0,
@@ -575,25 +583,27 @@ const SignUpModal = () => {
                   alignItems: "center",
                   justifyContent: "center",
                   zIndex: 9999,
-                  }}
+                }}
               >
-                  <Box sx={{ textAlign: "center" }}>
+                <Box sx={{ textAlign: "center" }}>
                   <CircularProgress />
-                    <Typography sx={{ mt: 2, fontSize: "1.25rem" }}>Sending OTP...</Typography>
-                  </Box>
+                  <Typography sx={{ mt: 2, fontSize: "1.25rem" }}>
+                    Sending OTP...
+                  </Typography>
+                </Box>
               </Box>
-              )}
+            )}
           </form>
           {/* Add Success Dialog */}
           <Dialog
             open={isSuccessDialogOpen}
             PaperProps={{
-                sx: {
+              sx: {
                 borderRadius: "15px",
                 padding: "1rem",
-                },
+              },
             }}
-            >
+          >
             <DialogTitle
               sx={{
                 fontFamily: "Montserrat, sans-serif",
@@ -604,39 +614,40 @@ const SignUpModal = () => {
                 gap: 1,
               }}
             >
-                <Box
+              <Box
                 component='span'
                 sx={{
-                    backgroundColor: "#E8F5E9",
-                    borderRadius: "75%",
-                    padding: "10px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
+                  backgroundColor: "#E8F5E9",
+                  borderRadius: "75%",
+                  padding: "10px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
                 }}
-                >
-                <CheckCircleIcon/>
-                </Box>
-                Success
+              >
+                <CheckCircleIcon />
+              </Box>
+              Success
             </DialogTitle>
             <DialogContent>
-                <Typography
+              <Typography
                 sx={{
-                    fontFamily: "Montserrat, sans-serif",
-                    color: "#666",
-                    mt: 1,
+                  fontFamily: "Montserrat, sans-serif",
+                  color: "#666",
+                  mt: 1,
                 }}
-                >
+              >
                 Your account has been created successfully!
-                </Typography>
+              </Typography>
             </DialogContent>
             <DialogActions sx={{ padding: "1rem" }}>
               <Button
-              onClick={() => {
+                onClick={() => {
                   setIsSuccessDialogOpen(false);
                   closeSignupModal();
-                  openLoginModal(); }}
-              sx={{
+                  openLoginModal();
+                }}
+                sx={{
                   backgroundColor: "#08397C",
                   color: "#FFF",
                   fontFamily: "Montserrat, sans-serif",
@@ -645,11 +656,11 @@ const SignUpModal = () => {
                   borderRadius: "100px",
                   padding: "0.75rem",
                   "&:hover": {
-                  backgroundColor: "#072d61",
+                    backgroundColor: "#072d61",
                   },
-              }}
+                }}
               >
-              Proceed
+                Proceed
               </Button>
             </DialogActions>
           </Dialog>
@@ -658,36 +669,36 @@ const SignUpModal = () => {
             onClose={() => setOpenErrorDialog(false)}
             PaperProps={{
               sx: {
-              borderRadius: "15px",
-              padding: "1rem",
+                borderRadius: "15px",
+                padding: "1rem",
               },
-          }}
-          >
-          <DialogTitle
-            sx={{
-              fontFamily: "Montserrat, sans-serif",
-              fontWeight: 600,
-              color: "#008000",
-              display: "flex",
-              alignItems: "center",
-              gap: 1,
             }}
           >
-            <Box
-              component='span'
+            <DialogTitle
               sx={{
+                fontFamily: "Montserrat, sans-serif",
+                fontWeight: 600,
+                color: "#008000",
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+              }}
+            >
+              <Box
+                component='span'
+                sx={{
                   backgroundColor: "#E8F5E9",
                   borderRadius: "75%",
                   padding: "10px",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-              }}
+                }}
               >
-              <PriorityHighIcon/>
-            </Box>
-            &nbsp;Error
-          </DialogTitle>
+                <PriorityHighIcon />
+              </Box>
+              &nbsp;Error
+            </DialogTitle>
             <DialogContent>
               <DialogContentText
                 sx={{
@@ -695,7 +706,8 @@ const SignUpModal = () => {
                   color: "error.main",
                 }}
               >
-                There was an error completing your registration. Please try again.
+                There was an error completing your registration. Please try
+                again.
               </DialogContentText>
             </DialogContent>
             <DialogActions>

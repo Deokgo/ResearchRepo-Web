@@ -23,11 +23,11 @@ import {
 import { useNavigate } from "react-router-dom";
 import { Add, Search } from "@mui/icons-material";
 import { Virtuoso } from "react-virtuoso";
-import axios from "axios";
+import api from "../services/api";
 import HeaderWithBackButton from "../components/Header";
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import AddIcon from '@mui/icons-material/Add';
-import ErrorIcon from '@mui/icons-material/Error';
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import AddIcon from "@mui/icons-material/Add";
+import ErrorIcon from "@mui/icons-material/Error";
 import { toast } from "react-hot-toast";
 
 const ManageProgram = () => {
@@ -53,10 +53,9 @@ const ManageProgram = () => {
   const [isDuplicateDialogOpen, setIsDuplicateDialogOpen] = useState(false);
   const [isSuccessDialogOpen, setIsSuccessDialogOpen] = useState(false);
 
-
   const fetchColleges = async () => {
     try {
-      const response = await axios.get(`/deptprogs/college_depts`);
+      const response = await api.get(`/deptprogs/college_depts`);
       const fetchColleges = response.data.colleges;
       setColleges(fetchColleges);
       setFilteredCollege(fetchColleges);
@@ -69,7 +68,7 @@ const ManageProgram = () => {
 
   const fetchAllPrograms = async () => {
     try {
-      const response = await axios.get(`/deptprogs/fetch_programs`);
+      const response = await api.get(`/deptprogs/fetch_programs`);
       const fetchedProgram = response.data.programs;
       setPrograms(fetchedProgram);
       setFilteredProgram(fetchedProgram);
@@ -134,7 +133,7 @@ const ManageProgram = () => {
 
   const handleBack = () => {
     if (isSubmitting) {
-        return;
+      return;
     }
     let hasChanges = collegeAbbrv || programAbbrv || programName;
 
@@ -163,12 +162,12 @@ const ManageProgram = () => {
       })
       .map(([key]) => key);
 
-      if (missingFields.length > 0){
-        return true;
-      } 
-    
+    if (missingFields.length > 0) {
+      return true;
+    }
+
     return false;
-  }
+  };
 
   const handleAddProgram = async () => {
     try {
@@ -183,10 +182,12 @@ const ManageProgram = () => {
 
       // Check for duplicates
       const duplicateId = programs.find(
-        (program) => program.program_id.toLowerCase() === programAbbrv.toLowerCase()
+        (program) =>
+          program.program_id.toLowerCase() === programAbbrv.toLowerCase()
       );
       const duplicateName = programs.find(
-        (program) => program.program_name.toLowerCase() === programName.toLowerCase()
+        (program) =>
+          program.program_name.toLowerCase() === programName.toLowerCase()
       );
 
       if (duplicateId || duplicateName) {
@@ -208,20 +209,19 @@ const ManageProgram = () => {
       formData.append("program_name", programName);
 
       // Send the conference data
-      const response = await axios.post("/data/programs", formData, {
+      const response = await api.post("/data/programs", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
 
       setIsSuccessDialogOpen(true);
-      
-      } catch (error) {
-          toast.error(error.response?.data?.error || "Error adding program");
-          console.error("Error:", error);
-        } finally {
-          setIsSubmitting(false);
-      }
+    } catch (error) {
+      toast.error(error.response?.data?.error || "Error adding program");
+      console.error("Error:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // Utility function to create responsive TextField styles
@@ -272,7 +272,7 @@ const ManageProgram = () => {
           }}
         >
           <HeaderWithBackButton
-            title="Manage Programs"
+            title='Manage Programs'
             onBack={() => navigate(-1)}
           />
 
@@ -285,7 +285,7 @@ const ManageProgram = () => {
               height: "calc(100% - 48px)",
               ml: 17.5,
               mr: 17.5,
-              mb: 5
+              mb: 5,
             }}
           >
             <Grid2
@@ -522,7 +522,10 @@ const ManageProgram = () => {
             </Grid2>
 
             {/* Add Program Modal */}
-            <Modal open={addModal} onClose={isSubmitting ? undefined : handleBack}>
+            <Modal
+              open={addModal}
+              onClose={isSubmitting ? undefined : handleBack}
+            >
               <Box
                 sx={{
                   position: "absolute",
@@ -553,13 +556,17 @@ const ManageProgram = () => {
                   Add Program
                 </Typography>
                 <FormControl fullWidth variant='outlined'>
-                  <InputLabel sx={{
-                    fontSize: {
-                      xs: "0.75rem",
-                      md: "0.75rem",
-                      lg: "0.8rem",
-                    },
-                  }}>College</InputLabel>
+                  <InputLabel
+                    sx={{
+                      fontSize: {
+                        xs: "0.75rem",
+                        md: "0.75rem",
+                        lg: "0.8rem",
+                      },
+                    }}
+                  >
+                    College
+                  </InputLabel>
                   <Select
                     value={collegeAbbrv}
                     onChange={(e) => setCollegeAbbrv(e.target.value)}
@@ -650,252 +657,259 @@ const ManageProgram = () => {
                     }}
                   >
                     {isSubmitting ? (
-                        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                      <Box
+                        sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                      >
                         <CircularProgress size={20} color='#08397C' />
                         Adding Program...
-                        </Box>
+                      </Box>
                     ) : (
-                        "Add"
+                      "Add"
                     )}
                   </Button>
                 </Box>
                 {/* Add loading overlay */}
                 {isSubmitting && (
-                <Box
+                  <Box
                     sx={{
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    backgroundColor: "rgba(255, 255, 255, 0.7)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    zIndex: 9999,
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      backgroundColor: "rgba(255, 255, 255, 0.7)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      zIndex: 9999,
                     }}
-                >
+                  >
                     <Box sx={{ textAlign: "center" }}>
-                    <CircularProgress />
-                    <Typography sx={{ mt: 2, fontSize: "1.25rem" }}>Adding Program...</Typography>
+                      <CircularProgress />
+                      <Typography sx={{ mt: 2, fontSize: "1.25rem" }}>
+                        Adding Program...
+                      </Typography>
                     </Box>
-                </Box>
+                  </Box>
                 )}
 
                 {/* Save Progress */}
                 <Dialog
-                    open={isConfirmDialogOpen}
-                    onClose={() => setIsConfirmDialogOpen(false)}
-                    PaperProps={{
-                        sx: {
-                        borderRadius: "15px",
-                        padding: "1rem",
-                        },
-                    }}
-                    >
-                    <DialogTitle
-                        sx={{
-                        fontFamily: "Montserrat, sans-serif",
-                        fontWeight: 600,
-                        color: "#08397C",
-                        }}
-                    >
-                        Unsaved Progress
-                    </DialogTitle>
-                    <DialogContent>
-                        <Typography
-                        sx={{
-                            fontFamily: "Montserrat, sans-serif",
-                            color: "#666",
-                        }}
-                        >
-                        You have unsaved progress. Do you want to save your progress?
-                        </Typography>
-                    </DialogContent>
-                    <DialogActions sx={{ padding: "1rem" }}>
-                        <Button
-                        onClick={() => {
-                            setIsConfirmDialogOpen(false);
-                            handlePostModal(); // Set flag to clear fields
-                            setAddModal(false);
-                        }}
-                        sx={{
-                            backgroundColor: "#CA031B",
-                            color: "#FFF",
-                            fontFamily: "Montserrat, sans-serif",
-                            fontWeight: 600,
-                            textTransform: "none",
-                            borderRadius: "100px",
-                            padding: "0.75rem",
-                            "&:hover": {
-                            backgroundColor: "#A30417",
-                            },
-                        }}
-                        >
-                        Discard
-                        </Button>
-                        <Button
-                        onClick={() => {
-                            setIsConfirmDialogOpen(false);
-                            setAddModal(false);
-                        }}
-                        sx={{
-                            backgroundColor: "#08397C",
-                            color: "#FFF",
-                            fontFamily: "Montserrat, sans-serif",
-                            fontWeight: 600,
-                            textTransform: "none",
-                            borderRadius: "100px",
-                            padding: "0.75rem",
-                            "&:hover": {
-                            backgroundColor: "#072d61",
-                            },
-                        }}
-                        >
-                        Save Progress
-                        </Button>
-                    </DialogActions>
-                    </Dialog>
-
-                    {/* Add Success Dialog */}
-                    <Dialog
-                      open={isSuccessDialogOpen}
-                      onClose={() => {
-                          setIsSuccessDialogOpen(false);
-                          handlePostModal();}}
-                      PaperProps={{
-                          sx: {
-                          borderRadius: "15px",
-                          padding: "1rem",
-                          },
-                      }}
-                      >
-                      <DialogTitle
-                          sx={{
-                          fontFamily: "Montserrat, sans-serif",
-                          fontWeight: 600,
-                          color: "#008000",
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 1,
-                          }}
-                      >
-                        <Box
-                          component='span'
-                          sx={{
-                              backgroundColor: "#E8F5E9",
-                              borderRadius: "75%",
-                              padding: "10px",
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                          }}
-                          >
-                          <CheckCircleIcon/>
-                        </Box>
-                          Success
-                      </DialogTitle>
-                      <DialogContent>
-                          <Typography
-                          sx={{
-                              fontFamily: "Montserrat, sans-serif",
-                              color: "#666",
-                              mt: 1,
-                          }}
-                          >
-                          Program has been added successfully.
-                          </Typography>
-                      </DialogContent>
-                      <DialogActions sx={{ padding: "1rem" }}>
-                        <Button
-                          onClick={() => {
-                              setIsSuccessDialogOpen(false);
-                              handlePostModal();
-                              window.location.reload(); }}
-                          sx={{
-                              backgroundColor: "#08397C",
-                              color: "#FFF",
-                              fontFamily: "Montserrat, sans-serif",
-                              fontWeight: 600,
-                              textTransform: "none",
-                              borderRadius: "100px",
-                              padding: "0.75rem",
-                              "&:hover": {
-                              backgroundColor: "#072d61",
-                              },
-                          }}
-                          >
-                          Close
-                        </Button>
-                      </DialogActions>
-                  </Dialog>
-                  {/* Add Duplicate Dialog */}
-                  <Dialog
-                    open={isDuplicateDialogOpen}
-                    onClose={() => setIsDuplicateDialogOpen(false)}
-                    PaperProps={{
-                      sx: {
-                        borderRadius: "15px",
-                        padding: "1rem",
-                      },
+                  open={isConfirmDialogOpen}
+                  onClose={() => setIsConfirmDialogOpen(false)}
+                  PaperProps={{
+                    sx: {
+                      borderRadius: "15px",
+                      padding: "1rem",
+                    },
+                  }}
+                >
+                  <DialogTitle
+                    sx={{
+                      fontFamily: "Montserrat, sans-serif",
+                      fontWeight: 600,
+                      color: "#08397C",
                     }}
                   >
-                    <DialogTitle
+                    Unsaved Progress
+                  </DialogTitle>
+                  <DialogContent>
+                    <Typography
                       sx={{
                         fontFamily: "Montserrat, sans-serif",
-                        fontWeight: 600,
-                        color: "#CA031B",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 1,
+                        color: "#666",
                       }}
                     >
-                      <Box
-                        component='span'
-                        sx={{
-                          backgroundColor: "#FFEAEA",
-                          borderRadius: "50%",
-                          padding: "8px",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                        }}
-                      >
-                        <ErrorIcon/>
-                      </Box>
-                      Duplicate Detected
-                    </DialogTitle>
-                    <DialogContent>
-                      <Typography
-                        sx={{
-                          fontFamily: "Montserrat, sans-serif", 
-                          color: "#666",
-                          mt: 1,
-                        }}
-                      >
-                        ID or name associated to this program already exist.
-                      </Typography>
-                    </DialogContent>
-                    <DialogActions sx={{ padding: "1rem" }}>
-                      <Button
-                        onClick={() => setIsDuplicateDialogOpen(false)}
-                        sx={{
-                          backgroundColor: "#08397C",
-                          color: "#FFF",
-                          fontFamily: "Montserrat, sans-serif",
-                          fontWeight: 600,
-                          textTransform: "none",
-                          borderRadius: "100px",
-                          padding: "0.75rem",
-                          "&:hover": {
-                            backgroundColor: "#072d61",
-                          },
-                        }}
-                      >
-                        Close
-                      </Button>
-                    </DialogActions>
-                  </Dialog>
+                      You have unsaved progress. Do you want to save your
+                      progress?
+                    </Typography>
+                  </DialogContent>
+                  <DialogActions sx={{ padding: "1rem" }}>
+                    <Button
+                      onClick={() => {
+                        setIsConfirmDialogOpen(false);
+                        handlePostModal(); // Set flag to clear fields
+                        setAddModal(false);
+                      }}
+                      sx={{
+                        backgroundColor: "#CA031B",
+                        color: "#FFF",
+                        fontFamily: "Montserrat, sans-serif",
+                        fontWeight: 600,
+                        textTransform: "none",
+                        borderRadius: "100px",
+                        padding: "0.75rem",
+                        "&:hover": {
+                          backgroundColor: "#A30417",
+                        },
+                      }}
+                    >
+                      Discard
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        setIsConfirmDialogOpen(false);
+                        setAddModal(false);
+                      }}
+                      sx={{
+                        backgroundColor: "#08397C",
+                        color: "#FFF",
+                        fontFamily: "Montserrat, sans-serif",
+                        fontWeight: 600,
+                        textTransform: "none",
+                        borderRadius: "100px",
+                        padding: "0.75rem",
+                        "&:hover": {
+                          backgroundColor: "#072d61",
+                        },
+                      }}
+                    >
+                      Save Progress
+                    </Button>
+                  </DialogActions>
+                </Dialog>
+
+                {/* Add Success Dialog */}
+                <Dialog
+                  open={isSuccessDialogOpen}
+                  onClose={() => {
+                    setIsSuccessDialogOpen(false);
+                    handlePostModal();
+                  }}
+                  PaperProps={{
+                    sx: {
+                      borderRadius: "15px",
+                      padding: "1rem",
+                    },
+                  }}
+                >
+                  <DialogTitle
+                    sx={{
+                      fontFamily: "Montserrat, sans-serif",
+                      fontWeight: 600,
+                      color: "#008000",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                    }}
+                  >
+                    <Box
+                      component='span'
+                      sx={{
+                        backgroundColor: "#E8F5E9",
+                        borderRadius: "75%",
+                        padding: "10px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <CheckCircleIcon />
+                    </Box>
+                    Success
+                  </DialogTitle>
+                  <DialogContent>
+                    <Typography
+                      sx={{
+                        fontFamily: "Montserrat, sans-serif",
+                        color: "#666",
+                        mt: 1,
+                      }}
+                    >
+                      Program has been added successfully.
+                    </Typography>
+                  </DialogContent>
+                  <DialogActions sx={{ padding: "1rem" }}>
+                    <Button
+                      onClick={() => {
+                        setIsSuccessDialogOpen(false);
+                        handlePostModal();
+                        window.location.reload();
+                      }}
+                      sx={{
+                        backgroundColor: "#08397C",
+                        color: "#FFF",
+                        fontFamily: "Montserrat, sans-serif",
+                        fontWeight: 600,
+                        textTransform: "none",
+                        borderRadius: "100px",
+                        padding: "0.75rem",
+                        "&:hover": {
+                          backgroundColor: "#072d61",
+                        },
+                      }}
+                    >
+                      Close
+                    </Button>
+                  </DialogActions>
+                </Dialog>
+                {/* Add Duplicate Dialog */}
+                <Dialog
+                  open={isDuplicateDialogOpen}
+                  onClose={() => setIsDuplicateDialogOpen(false)}
+                  PaperProps={{
+                    sx: {
+                      borderRadius: "15px",
+                      padding: "1rem",
+                    },
+                  }}
+                >
+                  <DialogTitle
+                    sx={{
+                      fontFamily: "Montserrat, sans-serif",
+                      fontWeight: 600,
+                      color: "#CA031B",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                    }}
+                  >
+                    <Box
+                      component='span'
+                      sx={{
+                        backgroundColor: "#FFEAEA",
+                        borderRadius: "50%",
+                        padding: "8px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <ErrorIcon />
+                    </Box>
+                    Duplicate Detected
+                  </DialogTitle>
+                  <DialogContent>
+                    <Typography
+                      sx={{
+                        fontFamily: "Montserrat, sans-serif",
+                        color: "#666",
+                        mt: 1,
+                      }}
+                    >
+                      ID or name associated to this program already exist.
+                    </Typography>
+                  </DialogContent>
+                  <DialogActions sx={{ padding: "1rem" }}>
+                    <Button
+                      onClick={() => setIsDuplicateDialogOpen(false)}
+                      sx={{
+                        backgroundColor: "#08397C",
+                        color: "#FFF",
+                        fontFamily: "Montserrat, sans-serif",
+                        fontWeight: 600,
+                        textTransform: "none",
+                        borderRadius: "100px",
+                        padding: "0.75rem",
+                        "&:hover": {
+                          backgroundColor: "#072d61",
+                        },
+                      }}
+                    >
+                      Close
+                    </Button>
+                  </DialogActions>
+                </Dialog>
               </Box>
             </Modal>
           </Box>

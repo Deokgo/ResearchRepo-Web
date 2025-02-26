@@ -10,12 +10,10 @@ import {
 } from "@mui/material";
 import { useModalContext } from "../context/modalcontext";
 import { useAuth } from "../context/AuthContext";
-import axios from "axios";
+import api from "../services/api";
 import { isMobile } from "react-device-detect";
 import { filterCache, fetchAndCacheFilterData } from "../utils/filterCache";
-axios.defaults.baseURL = "http://localhost:5000";
-axios.defaults.headers.post["Content-Type"] = "application/json";
-axios.defaults.withCredentials = true;
+
 const LoginModal = () => {
   const {
     isLoginModalOpen,
@@ -65,18 +63,18 @@ const LoginModal = () => {
     e.preventDefault();
     setErrorMessage("");
     try {
-      const response = await axios.post("/auth/login", formValues);
+      const response = await api.post("/auth/login", formValues);
       const { token } = response.data;
 
       localStorage.setItem("token", token);
-      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
       await login(token);
 
       console.log("[LoginModal] Fetching and caching filter data");
       await fetchAndCacheFilterData();
 
-      const userResponse = await axios.get("/auth/me");
+      const userResponse = await api.get("/auth/me");
       const userRole = userResponse.data.role;
 
       handleModalClose();
@@ -325,7 +323,10 @@ const LoginModal = () => {
                       openSignupModal();
                       resetFields();
                     }}
-                    style={{ color: "#08397C", fontFamily: "Montserrat, sans-serif", }}
+                    style={{
+                      color: "#08397C",
+                      fontFamily: "Montserrat, sans-serif",
+                    }}
                   >
                     Sign up
                   </a>

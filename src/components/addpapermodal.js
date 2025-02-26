@@ -20,12 +20,12 @@ import {
   DialogContent,
   DialogActions,
 } from "@mui/material";
-import axios from "axios";
+import api from "../services/api";
 import { useModalContext } from "../context/modalcontext";
 import FileUploader from "./FileUploader";
 import sdgGoalsData from "../data/sdgGoals.json";
 import { useAuth } from "../context/AuthContext";
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { filterCache, fetchAndCacheFilterData } from "../utils/filterCache";
 import { toast } from "react-hot-toast";
 import { debounce } from "lodash";
@@ -160,7 +160,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
   const fetchProgramsByCollege = async (collegeId) => {
     if (collegeId) {
       try {
-        const response = await axios.get(`/deptprogs/programs/${collegeId}`);
+        const response = await api.get(`/deptprogs/programs/${collegeId}`);
         setPrograms(response.data.programs);
       } catch (error) {
         console.error("Error fetching programs by college:", error);
@@ -173,7 +173,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
   const handleAuthorSearch = async (query) => {
     if (query.length > 2) {
       try {
-        const response = await axios.get("/accounts/search_user", {
+        const response = await api.get("/accounts/search_user", {
           params: { query },
         });
         setAuthorOptions(response.data.users);
@@ -185,7 +185,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
   const handleAdviserSearch = async (query) => {
     if (query.length > 2) {
       try {
-        const response = await axios.get(
+        const response = await api.get(
           `/accounts/search_user/${selectedCollege}`,
           {
             params: {
@@ -206,7 +206,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
   const handlePanelSearch = async (query) => {
     if (query.length > 2) {
       try {
-        const response = await axios.get("/accounts/search_user", {
+        const response = await api.get("/accounts/search_user", {
           params: { query },
         });
         setPanelOptions(response.data.users);
@@ -411,7 +411,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
     );
 
     try {
-      const response = await axios.post("/paper/add_paper", formData, {
+      const response = await api.post("/paper/add_paper", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -583,7 +583,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
 
     setIsModelPredicting(true);
     try {
-      const response = await axios.post("/paper/predict_research_areas", {
+      const response = await api.post("/paper/predict_research_areas", {
         title,
         abstract,
         keywords: keywords.join(", "),
@@ -632,7 +632,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
       debounce(async (code) => {
         if (code.length > 0) {
           try {
-            const response = await axios.get(`/paper/check_duplicate`, {
+            const response = await api.get(`/paper/check_duplicate`, {
               params: { group_code: code },
             });
             setIsDuplicateCode(response.data.isDuplicate);
@@ -651,7 +651,7 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
       debounce(async (title, authorIds) => {
         if (title.length > 0 && authorIds.length > 0) {
           try {
-            const response = await axios.get(`/paper/check_duplicate`, {
+            const response = await api.get(`/paper/check_duplicate`, {
               params: {
                 title: title,
                 author_ids: authorIds.join(","),
@@ -1396,7 +1396,8 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
                     error={attemptedSubmit && !!formErrors.researchAreas}
                     helperText={
                       attemptedSubmit
-                        ? formErrors.researchAreas || "Select one or more research areas"
+                        ? formErrors.researchAreas ||
+                          "Select one or more research areas"
                         : "Select one or more research areas"
                     }
                     sx={createTextFieldStyles()}
@@ -1542,74 +1543,74 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
           open={isConfirmDialogOpen}
           onClose={() => setIsConfirmDialogOpen(false)}
           PaperProps={{
-              sx: {
+            sx: {
               borderRadius: "15px",
               padding: "1rem",
-              },
+            },
           }}
-          >
+        >
           <DialogTitle
-              sx={{
+            sx={{
               fontFamily: "Montserrat, sans-serif",
               fontWeight: 600,
               color: "#08397C",
-              }}
+            }}
           >
-              Unsaved Progress
+            Unsaved Progress
           </DialogTitle>
           <DialogContent>
-              <Typography
+            <Typography
               sx={{
-                  fontFamily: "Montserrat, sans-serif",
-                  color: "#666",
+                fontFamily: "Montserrat, sans-serif",
+                color: "#666",
               }}
-              >
+            >
               You have unsaved progress. Do you want to save your progress?
-              </Typography>
+            </Typography>
           </DialogContent>
           <DialogActions sx={{ padding: "1rem" }}>
-              <Button
+            <Button
               onClick={() => {
                 setIsConfirmDialogOpen(false);
                 setShouldClearFields(true); // Set flag to clear fields
                 closeAddPaperModal();
               }}
               sx={{
-                  backgroundColor: "#CA031B",
-                  color: "#FFF",
-                  fontFamily: "Montserrat, sans-serif",
-                  fontWeight: 600,
-                  textTransform: "none",
-                  borderRadius: "100px",
-                  padding: "0.75rem",
-                  "&:hover": {
+                backgroundColor: "#CA031B",
+                color: "#FFF",
+                fontFamily: "Montserrat, sans-serif",
+                fontWeight: 600,
+                textTransform: "none",
+                borderRadius: "100px",
+                padding: "0.75rem",
+                "&:hover": {
                   backgroundColor: "#A30417",
-                  },
+                },
               }}
-              >
+            >
               Discard
-              </Button>
-              <Button
+            </Button>
+            <Button
               onClick={() => {
                 setIsConfirmDialogOpen(false);
                 setShouldClearFields(false); // Don't clear fields
                 closeAddPaperModal();
               }}
               sx={{
-                  backgroundColor: "#08397C",
-                  color: "#FFF",
-                  fontFamily: "Montserrat, sans-serif",
-                  fontWeight: 600,
-                  textTransform: "none",
-                  borderRadius: "100px",
-                  padding: "0.75rem",
-                  "&:hover": {
+                backgroundColor: "#08397C",
+                color: "#FFF",
+                fontFamily: "Montserrat, sans-serif",
+                fontWeight: 600,
+                textTransform: "none",
+                borderRadius: "100px",
+                padding: "0.75rem",
+                "&:hover": {
                   backgroundColor: "#072d61",
-                  },
+                },
               }}
-              >
+            >
               Save Progress
-              </Button>
+            </Button>
           </DialogActions>
         </Dialog>
 
@@ -1619,36 +1620,36 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
           onClose={handleSuccessClose}
           PaperProps={{
             sx: {
-            borderRadius: "15px",
-            padding: "1rem",
+              borderRadius: "15px",
+              padding: "1rem",
             },
-        }}
+          }}
         >
           <DialogTitle
             sx={{
-            fontFamily: "Montserrat, sans-serif",
-            fontWeight: 600,
-            color: "#008000",
-            display: "flex",
-            alignItems: "center",
-            gap: 1,
+              fontFamily: "Montserrat, sans-serif",
+              fontWeight: 600,
+              color: "#008000",
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
             }}
-        >
+          >
             <Box
-            component='span'
-            sx={{
+              component='span'
+              sx={{
                 backgroundColor: "#E8F5E9",
                 borderRadius: "75%",
                 padding: "10px",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-            }}
+              }}
             >
-            <CheckCircleIcon/>
+              <CheckCircleIcon />
             </Box>
             Success
-        </DialogTitle>
+          </DialogTitle>
           <DialogContent>
             <Typography
               sx={{
@@ -1672,9 +1673,9 @@ const AddPaperModal = ({ isOpen, handleClose, onPaperAdded }) => {
                 borderRadius: "100px",
                 padding: "0.75rem",
                 "&:hover": {
-                backgroundColor: "#072d61",
+                  backgroundColor: "#072d61",
                 },
-            }}
+              }}
             >
               Close
             </Button>

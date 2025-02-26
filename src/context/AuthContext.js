@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import axios from "axios";
+import api from "../services/api";
 import { useNavigate } from "react-router-dom";
 
 const AuthContext = createContext(null);
@@ -17,7 +17,7 @@ export const AuthProvider = ({ children }) => {
     }
 
     try {
-      const response = await axios.get("/auth/me", {
+      const response = await api.get("/auth/me", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -37,7 +37,7 @@ export const AuthProvider = ({ children }) => {
   const login = async (token) => {
     try {
       localStorage.setItem("token", token);
-      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       await fetchUserDetails();
     } catch (error) {
       console.error("Error during login:", error);
@@ -54,13 +54,13 @@ export const AuthProvider = ({ children }) => {
 
   // Keep one main interceptor for handling token refresh and 401 errors
   useEffect(() => {
-    const interceptor = axios.interceptors.response.use(
+    const interceptor = api.interceptors.response.use(
       (response) => {
         // Check if there's a new token in the response
         const newToken = response.data?.token;
         if (newToken) {
           localStorage.setItem("token", newToken);
-          axios.defaults.headers.common["Authorization"] = `Bearer ${newToken}`;
+          api.defaults.headers.common["Authorization"] = `Bearer ${newToken}`;
         }
         return response;
       },
@@ -72,21 +72,21 @@ export const AuthProvider = ({ children }) => {
       }
     );
 
-    return () => axios.interceptors.response.eject(interceptor);
+    return () => api.interceptors.response.eject(interceptor);
   }, [navigate]);
 
   // Set initial authorization header
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
-      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       fetchUserDetails();
     } else {
       setLoading(false);
     }
 
     return () => {
-      delete axios.defaults.headers.common["Authorization"];
+      delete api.defaults.headers.common["Authorization"];
     };
   }, []);
 

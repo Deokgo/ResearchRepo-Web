@@ -14,7 +14,6 @@ import {
 import placeholderImage from "../assets/placeholder_image.png";
 import homeBg from "../assets/home_bg.png";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import navLogo from "../assets/CCIS-Logo.png";
 import HeaderWithBackButton from "../components/Header";
@@ -62,7 +61,7 @@ const AboutUs = () => {
             flexGrow: 1,
             display: "flex",
             flexDirection: "column",
-            height: "calc(100% - 6rem)"
+            height: "calc(100% - 6rem)",
           }}
         >
           <HeaderWithBackButton title='About Us' onBack={() => navigate(-1)} />
@@ -169,7 +168,7 @@ const AboutUs = () => {
                 Development Team
               </Typography>
             </Box>
-            
+
             <Grid2 container spacing={3} display='flex' justifyContent='center'>
               {team.map((member) => (
                 <Grid2 key={member.name} xs={12} sm={6} md={4}>

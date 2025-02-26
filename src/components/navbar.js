@@ -2,9 +2,9 @@
 
 import MenuIcon from "@mui/icons-material/Menu";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
-import LogoutIcon from '@mui/icons-material/Logout';
-import LoginIcon from '@mui/icons-material/Login';
+import PriorityHighIcon from "@mui/icons-material/PriorityHigh";
+import LogoutIcon from "@mui/icons-material/Logout";
+import LoginIcon from "@mui/icons-material/Login";
 import { isMobile } from "react-device-detect";
 import {
   AppBar,
@@ -30,7 +30,7 @@ import navLogo from "../assets/MMCL_Logo_Nav.png";
 import LoginModal from "./loginmodal";
 import { useAuth } from "../context/AuthContext";
 import { useModalContext } from "../context/modalcontext";
-import axios from "axios";
+import api from "../services/api";
 
 const Navbar = () => {
   const { user, logout } = useAuth();
@@ -182,13 +182,13 @@ const Navbar = () => {
 
   const confirmLogout = async () => {
     setOpenConfirmDialog(true);
-  }
+  };
 
   const handleLogout = async () => {
     try {
-      const response = await axios({
+      const response = await api({
         method: "post",
-        url: "http://localhost:5000/auth/logout",
+        url: "/auth/logout",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -240,36 +240,39 @@ const Navbar = () => {
 
   // Define which menu items are available for each role
   const getNavbarItems = (forMobile = false) => {
-    if (!user) return forMobile ? [
-      { label: "Home", onClick: handleNavigateHome },
-      { label: "Log in", onClick: handleLogin }
-    ] : [];
-  
+    if (!user)
+      return forMobile
+        ? [
+            { label: "Home", onClick: handleNavigateHome },
+            { label: "Log in", onClick: handleLogin },
+          ]
+        : [];
+
     const commonItems = [];
 
     if (user.role !== "01") {
       commonItems.push(
         { label: "Collections", onClick: handleCollection },
-        { label: "Knowledge Graph", onClick: handleKnowledgeGraph },
+        { label: "Knowledge Graph", onClick: handleKnowledgeGraph }
       );
     }
-    
+
     // For mobile view, add these common items
     if (forMobile) {
       if (user.role !== "06") {
         commonItems.push(
           { label: "About Us", onClick: handleAboutUs },
-          { label: "Help", onClick: handleHelp},
+          { label: "Help", onClick: handleHelp }
         );
-      } 
+      }
     }
-  
+
     // If mobile or size is mobile and we want mobile items
     if ((isMobile || isSizeMobile) && !forMobile) {
       // On mobile, only return common items for desktop view
       return commonItems;
     }
-  
+
     // Role-specific items
     const roleSpecificItems = {
       "01": [
@@ -310,21 +313,22 @@ const Navbar = () => {
         // Researcher
         ...commonItems,
         { label: "About Us", onClick: handleAboutUs },
-        { label: "Help", onClick: handleHelp},
+        { label: "Help", onClick: handleHelp },
       ],
     };
 
-    const items = roleSpecificItems[user.role]?.map((item) => ({
-      ...item,
-      isActive: location.pathname === getPathFromLabel(item.label),
-    })) || commonItems;
-  
+    const items =
+      roleSpecificItems[user.role]?.map((item) => ({
+        ...item,
+        isActive: location.pathname === getPathFromLabel(item.label),
+      })) || commonItems;
+
     return items;
   };
 
   useEffect(() => {
     let prevRatio = window.devicePixelRatio;
-  
+
     const handleZoomChange = () => {
       if (window.devicePixelRatio !== prevRatio) {
         handleCloseNavMenu();
@@ -332,14 +336,13 @@ const Navbar = () => {
         prevRatio = window.devicePixelRatio;
       }
     };
-  
+
     window.addEventListener("resize", handleZoomChange);
-  
+
     return () => {
       window.removeEventListener("resize", handleZoomChange);
     };
   }, []);
-  
 
   const mobileMenuItems = getNavbarItems(true);
 
@@ -475,16 +478,17 @@ const Navbar = () => {
                   alignSelf: "center",
                 }}
               />
-              <Button 
-                onClick={handleLogin} 
+              <Button
+                onClick={handleLogin}
                 sx={{
-                  ...buttonSettings, 
-                  color: "#CA031B", 
-                  fontSize: "0.7rem", 
-                  fontWeight: 700 
+                  ...buttonSettings,
+                  color: "#CA031B",
+                  fontSize: "0.7rem",
+                  fontWeight: 700,
                 }}
               >
-                <LoginIcon/>&nbsp; Log in
+                <LoginIcon />
+                &nbsp; Log in
               </Button>
             </Box>
           ) : (
@@ -521,7 +525,7 @@ const Navbar = () => {
               >
                 <AccountCircleIcon fontSize='inherit' />
                 <Typography
-                  variant="h6"
+                  variant='h6'
                   sx={{
                     alignSelf: "center",
                     fontFamily: "Montserrat, sans-serif",
@@ -532,11 +536,22 @@ const Navbar = () => {
                       md: "0.4rem",
                       lg: "0.5rem",
                     },
-                    }}
-                  >
-                    <strong style={{ fontSize: "0.7rem" }}>{user?.first_name} {user?.last_name}</strong> <br /> 
-                    {user?.role_name} <br />  {(user?.role === "04" || user?.role === "05" || (user?.college || user?.program)) && (<>{user?.college} - {user?.program}</>)}
-                  </Typography>
+                  }}
+                >
+                  <strong style={{ fontSize: "0.7rem" }}>
+                    {user?.first_name} {user?.last_name}
+                  </strong>{" "}
+                  <br />
+                  {user?.role_name} <br />{" "}
+                  {(user?.role === "04" ||
+                    user?.role === "05" ||
+                    user?.college ||
+                    user?.program) && (
+                    <>
+                      {user?.college} - {user?.program}
+                    </>
+                  )}
+                </Typography>
               </Button>
             </Box>
           )}
@@ -555,7 +570,7 @@ const Navbar = () => {
           </IconButton>
 
           <Menu
-            id="menu-appbar"
+            id='menu-appbar'
             anchorEl={anchorElNav}
             anchorOrigin={{
               vertical: "bottom",
@@ -584,12 +599,12 @@ const Navbar = () => {
                     color: "#FFF",
                     fontSize: { xs: "2rem", md: "2rem", lg: "3rem" },
                     paddingLeft: 2,
-                    paddingRight: 2
+                    paddingRight: 2,
                   }}
                 >
                   <AccountCircleIcon fontSize='inherit' />
                   <Typography
-                    variant="h6"
+                    variant='h6'
                     sx={{
                       fontFamily: "Montserrat, sans-serif",
                       ml: 1,
@@ -602,8 +617,19 @@ const Navbar = () => {
                       },
                     }}
                   >
-                    <strong style={{ fontSize: "0.7rem" }}>{user?.first_name} {user?.last_name}</strong> <br /> 
-                    {user?.role_name} <br />  {(user?.role === "04" || user?.role === "05" || (user?.college || user?.program)) && (<>{user?.college} - {user?.program}</>)}
+                    <strong style={{ fontSize: "0.7rem" }}>
+                      {user?.first_name} {user?.last_name}
+                    </strong>{" "}
+                    <br />
+                    {user?.role_name} <br />{" "}
+                    {(user?.role === "04" ||
+                      user?.role === "05" ||
+                      user?.college ||
+                      user?.program) && (
+                      <>
+                        {user?.college} - {user?.program}
+                      </>
+                    )}
                   </Typography>
                 </Button>
                 <Divider sx={{ borderColor: "#FFFFF" }} />
@@ -617,19 +643,21 @@ const Navbar = () => {
                   handleCloseNavMenu(); // Close the menu
                 }}
               >
-                <Typography textAlign='center' 
-                sx={{ 
-                  fontSize: {
-                    sm: "0.7rem",
-                    md: "0.9rem",
-                    lg: "1rem",
-                  },
-                  color: "#FFF" }}>
+                <Typography
+                  textAlign='center'
+                  sx={{
+                    fontSize: {
+                      sm: "0.7rem",
+                      md: "0.9rem",
+                      lg: "1rem",
+                    },
+                    color: "#FFF",
+                  }}
+                >
                   {menuItem.label}
                 </Typography>
               </MenuItem>
             ))}
-
 
             {isLoggedIn && (
               <>
@@ -638,15 +666,19 @@ const Navbar = () => {
                   key='Log out'
                   onClick={() => {
                     handleCloseNavMenu(); // Ensure the menu closes
-                    confirmLogout(); 
+                    confirmLogout();
                   }}
                 >
                   <ListItemIcon>
                     <LogoutIcon sx={{ color: "#FFF" }} />
                   </ListItemIcon>
-                  <Typography textAlign='center' sx={{ color: "#FFF", fontWeight: 800 }}>Log out</Typography>
+                  <Typography
+                    textAlign='center'
+                    sx={{ color: "#FFF", fontWeight: 800 }}
+                  >
+                    Log out
+                  </Typography>
                 </MenuItem>
-
               </>
             )}
           </Menu>
@@ -669,42 +701,78 @@ const Navbar = () => {
           onClick={handleCloseUserMenu}
           sx={{ "& .MuiPaper-root": { backgroundColor: "#CA031B" } }}
         >
-          { user?.role === "06" ? (
+          {user?.role === "06" ? (
             <>
               <MenuItem onClick={handleProfile}>
-                <Typography color='common.white' sx={{fontSize: { sm: "0.7rem", md: "0.9rem", lg: "1rem" }}}>Profile</Typography>
+                <Typography
+                  color='common.white'
+                  sx={{ fontSize: { sm: "0.7rem", md: "0.9rem", lg: "1rem" } }}
+                >
+                  Profile
+                </Typography>
               </MenuItem>
               <Divider />
               <MenuItem onClick={confirmLogout}>
-                <Typography color='common.white' sx={{fontSize: { sm: "0.7rem", md: "0.9rem", lg: "1rem" }}}>Log out</Typography>
+                <Typography
+                  color='common.white'
+                  sx={{ fontSize: { sm: "0.7rem", md: "0.9rem", lg: "1rem" } }}
+                >
+                  Log out
+                </Typography>
               </MenuItem>
             </>
-            
           ) : (
             <>
               <MenuItem onClick={handleProfile}>
-                <Typography color='common.white' sx={{fontSize: { sm: "0.7rem", md: "0.9rem", lg: "1rem" }}}>Profile</Typography>
+                <Typography
+                  color='common.white'
+                  sx={{ fontSize: { sm: "0.7rem", md: "0.9rem", lg: "1rem" } }}
+                >
+                  Profile
+                </Typography>
               </MenuItem>
-              { user?.role !== "01" && (
+              {user?.role !== "01" && (
                 <>
                   <MenuItem onClick={handleAboutUs}>
-                    <Typography color='common.white' sx={{fontSize: { sm: "0.7rem", md: "0.9rem", lg: "1rem" }}}>About Us</Typography>
+                    <Typography
+                      color='common.white'
+                      sx={{
+                        fontSize: { sm: "0.7rem", md: "0.9rem", lg: "1rem" },
+                      }}
+                    >
+                      About Us
+                    </Typography>
                   </MenuItem>
                   <MenuItem onClick={handleHelp}>
-                    <Typography color='common.white' sx={{fontSize: { sm: "0.7rem", md: "0.9rem", lg: "1rem" }}}>Help</Typography>
+                    <Typography
+                      color='common.white'
+                      sx={{
+                        fontSize: { sm: "0.7rem", md: "0.9rem", lg: "1rem" },
+                      }}
+                    >
+                      Help
+                    </Typography>
                   </MenuItem>
                 </>
               )}
               <Divider />
               <MenuItem onClick={confirmLogout}>
                 <ListItemIcon>
-                    <LogoutIcon sx={{ color: "#FFF" }} />
+                  <LogoutIcon sx={{ color: "#FFF" }} />
                 </ListItemIcon>
-                <Typography textAlign='center' sx={{ color: "#FFF", fontWeight: 800, fontSize: { sm: "0.7rem", md: "0.9rem", lg: "1rem" } }}>Log out</Typography>
+                <Typography
+                  textAlign='center'
+                  sx={{
+                    color: "#FFF",
+                    fontWeight: 800,
+                    fontSize: { sm: "0.7rem", md: "0.9rem", lg: "1rem" },
+                  }}
+                >
+                  Log out
+                </Typography>
               </MenuItem>
             </>
-          )} 
-          
+          )}
         </Menu>
       </Toolbar>
 
@@ -714,10 +782,10 @@ const Navbar = () => {
         onClose={() => setOpenConfirmDialog(false)}
         PaperProps={{
           sx: {
-          borderRadius: "15px",
-          padding: "1rem",
+            borderRadius: "15px",
+            padding: "1rem",
           },
-      }}
+        }}
       >
         <DialogTitle
           sx={{
@@ -727,31 +795,31 @@ const Navbar = () => {
             display: "flex",
             alignItems: "center",
             gap: 1,
-            }}
+          }}
         >
           <Box
             component='span'
             sx={{
-                backgroundColor: "#E8F5E9",
-                borderRadius: "75%",
-                padding: "10px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
+              backgroundColor: "#E8F5E9",
+              borderRadius: "75%",
+              padding: "10px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
             }}
-            >
-            <PriorityHighIcon/>
+          >
+            <PriorityHighIcon />
           </Box>
-            &nbsp;Confirm Logout
+          &nbsp;Confirm Logout
         </DialogTitle>
         <DialogContent>
           <Typography
             sx={{
-                fontFamily: "Montserrat, sans-serif",
-                color: "#666",
-                mt: 1,
+              fontFamily: "Montserrat, sans-serif",
+              color: "#666",
+              mt: 1,
             }}
-            >
+          >
             Are you sure you want to log out?
           </Typography>
         </DialogContent>
@@ -767,9 +835,9 @@ const Navbar = () => {
               borderRadius: "100px",
               padding: "0.75rem",
               "&:hover": {
-              backgroundColor: "#072d61",
+                backgroundColor: "#072d61",
               },
-          }}
+            }}
           >
             Cancel
           </Button>
@@ -788,7 +856,7 @@ const Navbar = () => {
               borderRadius: "100px",
               padding: "0.75rem",
               "&:hover": {
-              backgroundColor: "#A30417",
+                backgroundColor: "#A30417",
               },
             }}
           >

@@ -37,16 +37,16 @@ import homeBg from "../assets/home_bg.png";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import { Search } from "@mui/icons-material";
 import { Virtuoso } from "react-virtuoso";
-import axios from "axios";
+import api from "../services/api";
 import FileUploadIcon from "@mui/icons-material/FileUpload";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import ErrorIcon from "@mui/icons-material/Error";
 import HeaderWithBackButton from "../components/Header";
-import ArchiveIcon from '@mui/icons-material/Archive';
-import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import WarningIcon from '@mui/icons-material/Warning';
+import ArchiveIcon from "@mui/icons-material/Archive";
+import PriorityHighIcon from "@mui/icons-material/PriorityHigh";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import WarningIcon from "@mui/icons-material/Warning";
 
 const ManageUsers = () => {
   const [users, setUsers] = useState([]);
@@ -98,7 +98,7 @@ const ManageUsers = () => {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const response = await axios.get("/accounts/users");
+      const response = await api.get("/accounts/users");
 
       // Sort users: ACTIVE first, then INACTIVE
       const sortedUsers = response.data.researchers.sort((a, b) => {
@@ -118,8 +118,7 @@ const ManageUsers = () => {
   };
 
   const handleToggleStatus = (user, researcher_id) => {
-    const updatedStatus =
-      user.acc_status === "ACTIVE" ? "INACTIVE" : "ACTIVE";
+    const updatedStatus = user.acc_status === "ACTIVE" ? "INACTIVE" : "ACTIVE";
 
     setConfirmTitle("Confirm Status Change");
     setConfirmMessage(
@@ -128,7 +127,7 @@ const ManageUsers = () => {
     setConfirmAction(() => async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await axios.put(
+        const response = await api.put(
           `/accounts/update_status/${researcher_id}`,
           { acc_status: updatedStatus },
           {
@@ -167,7 +166,7 @@ const ManageUsers = () => {
   const fetchRoles = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.get("/accounts/fetch_roles", {
+      const response = await api.get("/accounts/fetch_roles", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -183,7 +182,7 @@ const ManageUsers = () => {
   const fetchColleges = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.get("/deptprogs/college_depts", {
+      const response = await api.get("/deptprogs/college_depts", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -204,7 +203,7 @@ const ManageUsers = () => {
 
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.get(`/deptprogs/programs/${collegeId}`, {
+      const response = await api.get(`/deptprogs/programs/${collegeId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -291,7 +290,7 @@ const ManageUsers = () => {
       if (tableCount > 1) return true;
 
       // Check database for existing email
-      const response = await axios.get(`/accounts/check_email?email=${email}`);
+      const response = await api.get(`/accounts/check_email?email=${email}`);
       return response.data.exists;
     } catch (error) {
       console.error("Error checking email:", error);
@@ -436,7 +435,7 @@ const ManageUsers = () => {
       formData.append("users", JSON.stringify(enrichedUsers));
 
       // Make the API call
-      const response = await axios.post("/accounts/bulk", formData, {
+      const response = await api.post("/accounts/bulk", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -603,7 +602,7 @@ const ManageUsers = () => {
       setOpenArchiveConfirmDialog(false); // Close confirmation dialog
       setOpenArchiveModal(false); // Close archive modal
 
-      const response = await axios.post("/accounts/archive_accounts");
+      const response = await api.post("/accounts/archive_accounts");
 
       if (response.data.count > 0) {
         setSuccessMessage(
@@ -903,7 +902,7 @@ const ManageUsers = () => {
                   xs: "0.75rem",
                   md: "0.8rem",
                   lg: "0.9rem",
-              },
+                },
               }}
             >
               Required CSV Fields:
@@ -918,7 +917,7 @@ const ManageUsers = () => {
                   xs: "0.75rem",
                   md: "0.75rem",
                   lg: "0.75rem",
-              },
+                },
               }}
             >
               • <span>email</span> - Mapúa MCL Live Account (e.g.,
@@ -933,7 +932,7 @@ const ManageUsers = () => {
                   xs: "0.75rem",
                   md: "0.75rem",
                   lg: "0.75rem",
-              },
+                },
               }}
             >
               • <span>first_name</span> - First Name
@@ -947,7 +946,7 @@ const ManageUsers = () => {
                   xs: "0.75rem",
                   md: "0.75rem",
                   lg: "0.75rem",
-              },
+                },
               }}
             >
               • <span>middle_initial (optional)</span> - Middle Initial
@@ -961,7 +960,7 @@ const ManageUsers = () => {
                   xs: "0.75rem",
                   md: "0.75rem",
                   lg: "0.75rem",
-              },
+                },
               }}
             >
               • <span>surname</span> - Surname
@@ -975,7 +974,7 @@ const ManageUsers = () => {
                   xs: "0.75rem",
                   md: "0.75rem",
                   lg: "0.75rem",
-              },
+                },
               }}
             >
               • <span>suffix (optional)</span> - Name suffix (e.g., Jr., III)
@@ -1583,12 +1582,12 @@ const ManageUsers = () => {
         onClose={() => setOpenArchiveConfirmDialog(false)}
         PaperProps={{
           sx: {
-          borderRadius: "15px",
-          padding: "1rem",
+            borderRadius: "15px",
+            padding: "1rem",
           },
         }}
       >
-        <DialogTitle 
+        <DialogTitle
           sx={{
             fontFamily: "Montserrat, sans-serif",
             fontWeight: 600,
@@ -1609,14 +1608,15 @@ const ManageUsers = () => {
               justifyContent: "center",
             }}
           >
-            <WarningIcon/>
+            <WarningIcon />
           </Box>
           &nbsp;Warning
         </DialogTitle>
         <DialogContent>
           <DialogContentText sx={{ fontFamily: "Montserrat, sans-serif" }}>
-            This operation will archive inactive accounts that have been in that state for 2 years.
-            <Box sx={{ mt: 2, color: "warning.main", fontSize:'0.8rem' }}>
+            This operation will archive inactive accounts that have been in that
+            state for 2 years.
+            <Box sx={{ mt: 2, color: "warning.main", fontSize: "0.8rem" }}>
               Note: Archived accounts will be removed from the active database
               but can be restored later using the generated SQL file.
             </Box>
@@ -1635,9 +1635,9 @@ const ManageUsers = () => {
               borderRadius: "100px",
               padding: "0.75rem",
               "&:hover": {
-              backgroundColor: "#072d61",
+                backgroundColor: "#072d61",
               },
-          }}
+            }}
           >
             Cancel
           </Button>
@@ -1654,7 +1654,7 @@ const ManageUsers = () => {
               borderRadius: "100px",
               padding: "0.75rem",
               "&:hover": {
-              backgroundColor: "#A30417",
+                backgroundColor: "#A30417",
               },
             }}
           >
@@ -1664,13 +1664,15 @@ const ManageUsers = () => {
       </Dialog>
 
       {/* Archive Progress Dialog */}
-      <Dialog open={archiveInProgress}
+      <Dialog
+        open={archiveInProgress}
         PaperProps={{
           sx: {
             borderRadius: "15px",
             padding: "1rem",
-            },
-        }}>
+          },
+        }}
+      >
         <DialogContent>
           <Box
             sx={{
@@ -1694,12 +1696,12 @@ const ManageUsers = () => {
         onClose={() => setOpenSuccessDialog(false)}
         PaperProps={{
           sx: {
-          borderRadius: "15px",
-          padding: "1rem",
+            borderRadius: "15px",
+            padding: "1rem",
           },
-      }}
+        }}
       >
-        <DialogTitle 
+        <DialogTitle
           sx={{
             fontFamily: "Montserrat, sans-serif",
             fontWeight: 600,
@@ -1707,20 +1709,20 @@ const ManageUsers = () => {
             display: "flex",
             alignItems: "center",
             gap: 1,
-            }}
+          }}
         >
           <Box
             component='span'
             sx={{
-                backgroundColor: "#E8F5E9",
-                borderRadius: "75%",
-                padding: "10px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
+              backgroundColor: "#E8F5E9",
+              borderRadius: "75%",
+              padding: "10px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
             }}
-            >
-            <CheckCircleIcon/>
+          >
+            <CheckCircleIcon />
           </Box>
           &nbsp;Operation Successful
         </DialogTitle>
@@ -1741,9 +1743,9 @@ const ManageUsers = () => {
               borderRadius: "100px",
               padding: "0.75rem",
               "&:hover": {
-              backgroundColor: "#072d61",
+                backgroundColor: "#072d61",
               },
-          }}
+            }}
           >
             Close
           </Button>
@@ -1756,10 +1758,10 @@ const ManageUsers = () => {
         onClose={() => setOpenErrorDialog(false)}
         PaperProps={{
           sx: {
-          borderRadius: "15px",
-          padding: "1rem",
+            borderRadius: "15px",
+            padding: "1rem",
           },
-      }}
+        }}
       >
         <DialogTitle
           sx={{
@@ -1782,7 +1784,7 @@ const ManageUsers = () => {
               justifyContent: "center",
             }}
           >
-            <ErrorIcon/>
+            <ErrorIcon />
           </Box>
           &nbsp;Error
         </DialogTitle>
@@ -1808,9 +1810,9 @@ const ManageUsers = () => {
               borderRadius: "100px",
               padding: "0.75rem",
               "&:hover": {
-              backgroundColor: "#072d61",
+                backgroundColor: "#072d61",
               },
-          }}
+            }}
           >
             Close
           </Button>
@@ -1825,7 +1827,7 @@ const ManageUsers = () => {
           sx: {
             borderRadius: "15px",
             padding: "1rem",
-            },
+          },
         }}
       >
         <DialogTitle
@@ -1849,7 +1851,7 @@ const ManageUsers = () => {
               justifyContent: "center",
             }}
           >
-            <WarningIcon/>
+            <WarningIcon />
           </Box>
           &nbsp;Warning
         </DialogTitle>
@@ -1883,10 +1885,10 @@ const ManageUsers = () => {
         onClose={() => setOpenConfirmDialog(false)}
         PaperProps={{
           sx: {
-          borderRadius: "15px",
-          padding: "1rem",
+            borderRadius: "15px",
+            padding: "1rem",
           },
-      }}
+        }}
       >
         <DialogTitle
           sx={{
@@ -1896,31 +1898,31 @@ const ManageUsers = () => {
             display: "flex",
             alignItems: "center",
             gap: 1,
-            }}
+          }}
         >
           <Box
             component='span'
             sx={{
-                backgroundColor: "#E8F5E9",
-                borderRadius: "75%",
-                padding: "10px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
+              backgroundColor: "#E8F5E9",
+              borderRadius: "75%",
+              padding: "10px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
             }}
-            >
-            <PriorityHighIcon/>
+          >
+            <PriorityHighIcon />
           </Box>
-            &nbsp;Confirm Action
+          &nbsp;Confirm Action
         </DialogTitle>
         <DialogContent>
           <Typography
             sx={{
-                fontFamily: "Montserrat, sans-serif",
-                color: "#666",
-                mt: 1,
+              fontFamily: "Montserrat, sans-serif",
+              color: "#666",
+              mt: 1,
             }}
-            >
+          >
             Do you want to change the account status of this user?
           </Typography>
         </DialogContent>
@@ -1936,9 +1938,9 @@ const ManageUsers = () => {
               borderRadius: "100px",
               padding: "0.75rem",
               "&:hover": {
-              backgroundColor: "#072d61",
+                backgroundColor: "#072d61",
               },
-          }}
+            }}
           >
             Cancel
           </Button>
@@ -1957,7 +1959,7 @@ const ManageUsers = () => {
               borderRadius: "100px",
               padding: "0.75rem",
               "&:hover": {
-              backgroundColor: "#A30417",
+                backgroundColor: "#A30417",
               },
             }}
           >

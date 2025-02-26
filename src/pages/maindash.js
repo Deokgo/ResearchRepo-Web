@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "../components/navbar";
 import Footer from "../components/footer";
-import axios from "axios";
+import api from "../services/api";
 import { Box, IconButton, Typography, CircularProgress } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import homeBg from "../assets/home_bg.png";
@@ -27,7 +27,7 @@ const MainDash = () => {
 
   const getUserCollege = async () => {
     try {
-      const response = await axios.get(`/data/college`);
+      const response = await api.get(`/data/college`);
       console.log("Full Response:", response.data.college_id);
     } catch (error) {
       console.error("Error fetching college:", error);
@@ -62,10 +62,7 @@ const MainDash = () => {
             overflow: "hidden",
           }}
         >
-          <HeaderWithBackButton
-            title="Reports"
-            onBack={() => navigate(-1)}
-          />
+          <HeaderWithBackButton title='Reports' onBack={() => navigate(-1)} />
           <Box
             sx={{
               flexGrow: 1,

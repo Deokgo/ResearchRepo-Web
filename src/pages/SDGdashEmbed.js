@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../services/api";
 import Navbar from "../components/navbar";
 import { Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
@@ -19,7 +19,7 @@ const SDGdashEmbed = () => {
           setError("No access token found.");
           return;
         }
-        const response = await axios.get("/dash/analytics", {
+        const response = await api.get("/dash/analytics", {
           headers: {
             Authorization: `Bearer ${token}`, // Add JWT to the request headers
           },
@@ -78,7 +78,7 @@ const SDGdashEmbed = () => {
         }}
       >
         <HeaderWithBackButton
-          title="SDG Impact Dashboard"
+          title='SDG Impact Dashboard'
           onBack={() => navigate(-1)}
         />
         <Box
@@ -91,7 +91,7 @@ const SDGdashEmbed = () => {
           }}
         >
           <iframe
-            id="dashboard-iframe"
+            id='dashboard-iframe'
             src={dashUrl}
             style={{
               border: "none",
@@ -99,8 +99,8 @@ const SDGdashEmbed = () => {
               height: "100vh", // Set height to full viewport
               display: "block", // Ensure block-level display
             }}
-            sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
-            title="SDG Dash App"
+            sandbox='allow-scripts allow-same-origin allow-forms allow-popups'
+            title='SDG Dash App'
           />
         </Box>
       </Box>

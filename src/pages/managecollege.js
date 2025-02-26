@@ -17,11 +17,11 @@ import { useNavigate } from "react-router-dom";
 import { Search } from "@mui/icons-material";
 import CircleIcon from "@mui/icons-material/Circle";
 import { Virtuoso } from "react-virtuoso";
-import axios from "axios";
+import api from "../services/api";
 import HeaderWithBackButton from "../components/Header";
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import ErrorIcon from '@mui/icons-material/Error';
-import AddIcon from '@mui/icons-material/Add';
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import ErrorIcon from "@mui/icons-material/Error";
+import AddIcon from "@mui/icons-material/Add";
 import { toast } from "react-hot-toast";
 
 const ManageCollege = () => {
@@ -42,32 +42,32 @@ const ManageCollege = () => {
 
   // 20 Pre-defined hex colors, will be filtered based on college with existing color code
   const [colorCodes, setColorCodes] = useState([
-    '#141cff',
-    '#04a417',
-    '#c2c2c2', 
-    '#e9e107',
-    '#bb0c0c',
-    '#ff4d2e',
-    '#3ca897',
-    '#8b24d3',
-    '#ff9800',
-    '#2196f3',
-    '#4caf50',
-    '#e91e63',
-    '#795548',
-    '#607d8b',
-    '#9c27b0',
-    '#00bcd4',
-    '#ffeb3b',
-    '#673ab7',
-    '#03a9f4',
-    '#009688'
+    "#141cff",
+    "#04a417",
+    "#c2c2c2",
+    "#e9e107",
+    "#bb0c0c",
+    "#ff4d2e",
+    "#3ca897",
+    "#8b24d3",
+    "#ff9800",
+    "#2196f3",
+    "#4caf50",
+    "#e91e63",
+    "#795548",
+    "#607d8b",
+    "#9c27b0",
+    "#00bcd4",
+    "#ffeb3b",
+    "#673ab7",
+    "#03a9f4",
+    "#009688",
   ]);
 
   useEffect(() => {
     const fetchColleges = async () => {
       try {
-        const response = await axios.get(`/deptprogs/college_depts`);
+        const response = await api.get(`/deptprogs/college_depts`);
         const fetchColleges = response.data.colleges;
         setColleges(fetchColleges);
         setFilteredCollege(fetchColleges);
@@ -103,10 +103,10 @@ const ManageCollege = () => {
   const handleOpenAddModal = () => {
     setAddModal(true);
   };
-  
+
   const handleBack = () => {
     if (isSubmitting) {
-        return;
+      return;
     }
     let hasChanges = collegeAbbrv || collegeName;
 
@@ -134,12 +134,12 @@ const ManageCollege = () => {
       })
       .map(([key]) => key);
 
-      if (missingFields.length > 0){
-        return true;
-      } 
-    
+    if (missingFields.length > 0) {
+      return true;
+    }
+
     return false;
-  }
+  };
 
   const assignColor = () => {
     const colorExist = colleges.map((college) => college.color_code);
@@ -153,9 +153,9 @@ const ManageCollege = () => {
 
     if (updatedArray.length > 0) {
       const randomIndex = Math.floor(Math.random() * updatedArray.length);
-      return(updatedArray[randomIndex]); // Use updatedArray here
+      return updatedArray[randomIndex]; // Use updatedArray here
     }
-  }
+  };
 
   const handleAddCollege = async () => {
     try {
@@ -170,10 +170,12 @@ const ManageCollege = () => {
 
       // Check for duplicates
       const duplicateId = colleges.find(
-        (college) => college.college_id.toLowerCase() === collegeAbbrv.toLowerCase()
+        (college) =>
+          college.college_id.toLowerCase() === collegeAbbrv.toLowerCase()
       );
       const duplicateName = colleges.find(
-        (college) => college.college_name.toLowerCase() === collegeName.toLowerCase()
+        (college) =>
+          college.college_name.toLowerCase() === collegeName.toLowerCase()
       );
 
       if (duplicateId || duplicateName) {
@@ -195,20 +197,19 @@ const ManageCollege = () => {
       formData.append("college_color", assignColor());
 
       // Send the conference data
-      const response = await axios.post("/data/colleges", formData, {
+      const response = await api.post("/data/colleges", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
 
       setIsSuccessDialogOpen(true);
-      
-      } catch (error) {
-          toast.error(error.response?.data?.error || "Error adding college");
-          console.error("Error:", error);
-        } finally {
-          setIsSubmitting(false);
-      }
+    } catch (error) {
+      toast.error(error.response?.data?.error || "Error adding college");
+      console.error("Error:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // Utility function to create responsive TextField styles
@@ -261,7 +262,7 @@ const ManageCollege = () => {
           }}
         >
           <HeaderWithBackButton
-            title="Manage Colleges"
+            title='Manage Colleges'
             onBack={() => navigate(-1)}
           />
 
@@ -273,7 +274,7 @@ const ManageCollege = () => {
               overflow: "hidden",
               ml: 17.5,
               mr: 17.5,
-              mb: 5
+              mb: 5,
             }}
           >
             {/* Search Bar */}
@@ -407,7 +408,10 @@ const ManageCollege = () => {
             </Box>
 
             {/* Add College Modal */}
-            <Modal open={addModal} onClose={isSubmitting ? undefined : handleBack}>
+            <Modal
+              open={addModal}
+              onClose={isSubmitting ? undefined : handleBack}
+            >
               <Box
                 sx={{
                   position: "absolute",
@@ -503,252 +507,259 @@ const ManageCollege = () => {
                     }}
                   >
                     {isSubmitting ? (
-                        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                      <Box
+                        sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                      >
                         <CircularProgress size={20} color='#08397C' />
                         Adding College...
-                        </Box>
+                      </Box>
                     ) : (
-                        "Add"
+                      "Add"
                     )}
                   </Button>
                 </Box>
                 {/* Add loading overlay */}
                 {isSubmitting && (
-                <Box
+                  <Box
                     sx={{
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    backgroundColor: "rgba(255, 255, 255, 0.7)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    zIndex: 9999,
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      backgroundColor: "rgba(255, 255, 255, 0.7)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      zIndex: 9999,
                     }}
-                >
+                  >
                     <Box sx={{ textAlign: "center" }}>
-                    <CircularProgress />
-                    <Typography sx={{ mt: 2, fontSize: "1.25rem" }}>Adding College...</Typography>
+                      <CircularProgress />
+                      <Typography sx={{ mt: 2, fontSize: "1.25rem" }}>
+                        Adding College...
+                      </Typography>
                     </Box>
-                </Box>
+                  </Box>
                 )}
 
                 {/* Save Progress */}
                 <Dialog
-                    open={isConfirmDialogOpen}
-                    onClose={() => setIsConfirmDialogOpen(false)}
-                    PaperProps={{
-                        sx: {
-                        borderRadius: "15px",
-                        padding: "1rem",
-                        },
-                    }}
-                    >
-                    <DialogTitle
-                        sx={{
-                        fontFamily: "Montserrat, sans-serif",
-                        fontWeight: 600,
-                        color: "#08397C",
-                        }}
-                    >
-                        Unsaved Progress
-                    </DialogTitle>
-                    <DialogContent>
-                      <Typography
-                        sx={{
-                          fontFamily: "Montserrat, sans-serif",
-                          color: "#666",
-                        }}
-                        >
-                        You have unsaved progress. Do you want to save your progress?
-                      </Typography>
-                    </DialogContent>
-                    <DialogActions sx={{ padding: "1rem" }}>
-                        <Button
-                          onClick={() => {
-                              setIsConfirmDialogOpen(false);
-                              handlePostModal(); // Set flag to clear fields
-                              setAddModal(false);
-                          }}
-                          sx={{
-                            backgroundColor: "#08397C",
-                            color: "#FFF",
-                            fontFamily: "Montserrat, sans-serif",
-                            fontWeight: 600,
-                            textTransform: "none",
-                            borderRadius: "100px",
-                            padding: "0.75rem",
-                            "&:hover": {
-                            backgroundColor: "#072d61",
-                            },
-                        }}
-                          >
-                          Discard
-                          </Button>
-                          <Button
-                          onClick={() => {
-                              setIsConfirmDialogOpen(false);
-                              setAddModal(false);
-                          }}
-                          sx={{
-                            backgroundColor: "#CA031B",
-                            color: "#FFF",
-                            fontFamily: "Montserrat, sans-serif",
-                            fontWeight: 600,
-                            textTransform: "none",
-                            borderRadius: "100px",
-                            padding: "0.75rem",
-                            "&:hover": {
-                              backgroundColor: "#A30417",
-                              },
-                          }}
-                          >
-                          Save Progress
-                          </Button>
-                    </DialogActions>
-                    </Dialog>
-
-                    {/* Add Success Dialog */}
-                    <Dialog
-                      open={isSuccessDialogOpen}
-                      onClose={() => {
-                          setIsSuccessDialogOpen(false);
-                          handlePostModal();}}
-                      PaperProps={{
-                          sx: {
-                          borderRadius: "15px",
-                          padding: "1rem",
-                          },
-                      }}
-                      >
-                      <DialogTitle
-                          sx={{
-                          fontFamily: "Montserrat, sans-serif",
-                          fontWeight: 600,
-                          color: "#008000",
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 1,
-                          }}
-                      >
-                          <Box
-                          component='span'
-                          sx={{
-                              backgroundColor: "#E8F5E9",
-                              borderRadius: "75%",
-                              padding: "10px",
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                          }}
-                          >
-                          <CheckCircleIcon/>
-                          </Box>
-                          Success
-                      </DialogTitle>
-                      <DialogContent>
-                          <Typography
-                          sx={{
-                              fontFamily: "Montserrat, sans-serif",
-                              color: "#666",
-                              mt: 1,
-                          }}
-                          >
-                          College has been added successfully.
-                          </Typography>
-                      </DialogContent>
-                      <DialogActions sx={{ padding: "1rem" }}>
-                          <Button
-                          onClick={() => {
-                              setIsSuccessDialogOpen(false);
-                              handlePostModal();
-                              window.location.reload(); }}
-                          sx={{
-                              backgroundColor: "#08397C",
-                              color: "#FFF",
-                              fontFamily: "Montserrat, sans-serif",
-                              fontWeight: 600,
-                              textTransform: "none",
-                              borderRadius: "100px",
-                              padding: "0.75rem",
-                              "&:hover": {
-                              backgroundColor: "#072d61",
-                              },
-                          }}
-                          >
-                          Close
-                          </Button>
-                      </DialogActions>
-                  </Dialog>
-                  {/* Add Duplicate Dialog */}
-                  <Dialog
-                    open={isDuplicateDialogOpen}
-                    onClose={() => setIsDuplicateDialogOpen(false)}
-                    PaperProps={{
-                      sx: {
-                        borderRadius: "15px",
-                        padding: "1rem",
-                      },
+                  open={isConfirmDialogOpen}
+                  onClose={() => setIsConfirmDialogOpen(false)}
+                  PaperProps={{
+                    sx: {
+                      borderRadius: "15px",
+                      padding: "1rem",
+                    },
+                  }}
+                >
+                  <DialogTitle
+                    sx={{
+                      fontFamily: "Montserrat, sans-serif",
+                      fontWeight: 600,
+                      color: "#08397C",
                     }}
                   >
-                    <DialogTitle
+                    Unsaved Progress
+                  </DialogTitle>
+                  <DialogContent>
+                    <Typography
                       sx={{
                         fontFamily: "Montserrat, sans-serif",
-                        fontWeight: 600,
-                        color: "#CA031B",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 1,
+                        color: "#666",
                       }}
                     >
-                      <Box
-                        component='span'
-                        sx={{
-                          backgroundColor: "#FFEAEA",
-                          borderRadius: "50%",
-                          padding: "8px",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                        }}
-                      >
-                        <ErrorIcon/>
-                      </Box>
-                      Duplicate Detected
-                    </DialogTitle>
-                    <DialogContent>
-                      <Typography
-                        sx={{
-                          fontFamily: "Montserrat, sans-serif", 
-                          color: "#666",
-                          mt: 1,
-                        }}
-                      >
-                        ID or name associated to this college already exist.
-                      </Typography>
-                    </DialogContent>
-                    <DialogActions sx={{ padding: "1rem" }}>
-                      <Button
-                        onClick={() => setIsDuplicateDialogOpen(false)}
-                        sx={{
-                          backgroundColor: "#08397C",
-                          color: "#FFF",
-                          fontFamily: "Montserrat, sans-serif",
-                          fontWeight: 600,
-                          textTransform: "none",
-                          borderRadius: "100px",
-                          padding: "0.75rem",
-                          "&:hover": {
-                            backgroundColor: "#072d61",
-                          },
-                        }}
-                      >
-                        Close
-                      </Button>
-                    </DialogActions>
-                  </Dialog>
+                      You have unsaved progress. Do you want to save your
+                      progress?
+                    </Typography>
+                  </DialogContent>
+                  <DialogActions sx={{ padding: "1rem" }}>
+                    <Button
+                      onClick={() => {
+                        setIsConfirmDialogOpen(false);
+                        handlePostModal(); // Set flag to clear fields
+                        setAddModal(false);
+                      }}
+                      sx={{
+                        backgroundColor: "#08397C",
+                        color: "#FFF",
+                        fontFamily: "Montserrat, sans-serif",
+                        fontWeight: 600,
+                        textTransform: "none",
+                        borderRadius: "100px",
+                        padding: "0.75rem",
+                        "&:hover": {
+                          backgroundColor: "#072d61",
+                        },
+                      }}
+                    >
+                      Discard
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        setIsConfirmDialogOpen(false);
+                        setAddModal(false);
+                      }}
+                      sx={{
+                        backgroundColor: "#CA031B",
+                        color: "#FFF",
+                        fontFamily: "Montserrat, sans-serif",
+                        fontWeight: 600,
+                        textTransform: "none",
+                        borderRadius: "100px",
+                        padding: "0.75rem",
+                        "&:hover": {
+                          backgroundColor: "#A30417",
+                        },
+                      }}
+                    >
+                      Save Progress
+                    </Button>
+                  </DialogActions>
+                </Dialog>
+
+                {/* Add Success Dialog */}
+                <Dialog
+                  open={isSuccessDialogOpen}
+                  onClose={() => {
+                    setIsSuccessDialogOpen(false);
+                    handlePostModal();
+                  }}
+                  PaperProps={{
+                    sx: {
+                      borderRadius: "15px",
+                      padding: "1rem",
+                    },
+                  }}
+                >
+                  <DialogTitle
+                    sx={{
+                      fontFamily: "Montserrat, sans-serif",
+                      fontWeight: 600,
+                      color: "#008000",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                    }}
+                  >
+                    <Box
+                      component='span'
+                      sx={{
+                        backgroundColor: "#E8F5E9",
+                        borderRadius: "75%",
+                        padding: "10px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <CheckCircleIcon />
+                    </Box>
+                    Success
+                  </DialogTitle>
+                  <DialogContent>
+                    <Typography
+                      sx={{
+                        fontFamily: "Montserrat, sans-serif",
+                        color: "#666",
+                        mt: 1,
+                      }}
+                    >
+                      College has been added successfully.
+                    </Typography>
+                  </DialogContent>
+                  <DialogActions sx={{ padding: "1rem" }}>
+                    <Button
+                      onClick={() => {
+                        setIsSuccessDialogOpen(false);
+                        handlePostModal();
+                        window.location.reload();
+                      }}
+                      sx={{
+                        backgroundColor: "#08397C",
+                        color: "#FFF",
+                        fontFamily: "Montserrat, sans-serif",
+                        fontWeight: 600,
+                        textTransform: "none",
+                        borderRadius: "100px",
+                        padding: "0.75rem",
+                        "&:hover": {
+                          backgroundColor: "#072d61",
+                        },
+                      }}
+                    >
+                      Close
+                    </Button>
+                  </DialogActions>
+                </Dialog>
+                {/* Add Duplicate Dialog */}
+                <Dialog
+                  open={isDuplicateDialogOpen}
+                  onClose={() => setIsDuplicateDialogOpen(false)}
+                  PaperProps={{
+                    sx: {
+                      borderRadius: "15px",
+                      padding: "1rem",
+                    },
+                  }}
+                >
+                  <DialogTitle
+                    sx={{
+                      fontFamily: "Montserrat, sans-serif",
+                      fontWeight: 600,
+                      color: "#CA031B",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                    }}
+                  >
+                    <Box
+                      component='span'
+                      sx={{
+                        backgroundColor: "#FFEAEA",
+                        borderRadius: "50%",
+                        padding: "8px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <ErrorIcon />
+                    </Box>
+                    Duplicate Detected
+                  </DialogTitle>
+                  <DialogContent>
+                    <Typography
+                      sx={{
+                        fontFamily: "Montserrat, sans-serif",
+                        color: "#666",
+                        mt: 1,
+                      }}
+                    >
+                      ID or name associated to this college already exist.
+                    </Typography>
+                  </DialogContent>
+                  <DialogActions sx={{ padding: "1rem" }}>
+                    <Button
+                      onClick={() => setIsDuplicateDialogOpen(false)}
+                      sx={{
+                        backgroundColor: "#08397C",
+                        color: "#FFF",
+                        fontFamily: "Montserrat, sans-serif",
+                        fontWeight: 600,
+                        textTransform: "none",
+                        borderRadius: "100px",
+                        padding: "0.75rem",
+                        "&:hover": {
+                          backgroundColor: "#072d61",
+                        },
+                      }}
+                    >
+                      Close
+                    </Button>
+                  </DialogActions>
+                </Dialog>
               </Box>
             </Modal>
           </Box>

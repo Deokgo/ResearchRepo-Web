@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../services/api";
 import { Box } from "@mui/material";
 import Navbar from "../components/navbar";
 import { useNavigate } from "react-router-dom";
@@ -26,12 +26,12 @@ const ProgDash = () => {
           setError("No access token found.");
           return;
         }
-        const response = await axios.get("/dash/combineddash", {
+        const response = await api.get("/dash/combineddash", {
           headers: {
             Authorization: `Bearer ${token}`, // Add JWT to the request headers
           },
         });
-  
+
         // Check if response contains the overview URL
         if (response.data?.overview) {
           setDashUrl(response.data.overview); // Set the Dash app URL
@@ -44,9 +44,9 @@ const ProgDash = () => {
         );
       }
     };
-  
+
     fetchDashUrl();
-  }, []);  
+  }, []);
 
   useEffect(() => {
     window.addEventListener("resize", updateIframeSize);
@@ -78,21 +78,21 @@ const ProgDash = () => {
           overflow: "hidden", // Ensures no overflow issues
         }}
       >
-        <Box 
-          sx={{ 
-            width: "100%", 
-            height: "100%", 
-            overflow: "hidden", 
-            position: "relative" 
+        <Box
+          sx={{
+            width: "100%",
+            height: "100%",
+            overflow: "hidden",
+            position: "relative",
           }}
         >
           <iframe
-            id="dashboard-iframe"
+            id='dashboard-iframe'
             src={dashUrl}
             style={{
               border: "none",
-              width: "111%",  // Compensating for scale(0.8)
-              height: "111%", 
+              width: "111%", // Compensating for scale(0.8)
+              height: "111%",
               display: "block",
               transform: "scale(0.9)",
               transformOrigin: "top left",
@@ -100,8 +100,8 @@ const ProgDash = () => {
               top: 0,
               left: 0,
             }}
-            sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
-            title="Dash App"
+            sandbox='allow-scripts allow-same-origin allow-forms allow-popups'
+            title='Dash App'
           />
         </Box>
       </Box>

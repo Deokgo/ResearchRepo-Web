@@ -15,7 +15,7 @@ import {
 import placeholderImage from "../assets/placeholder_image.png";
 import homeBg from "../assets/home_bg.png";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
-import axios from "axios";
+import { API_URL } from "../config";
 import { useNavigate } from "react-router-dom";
 import navLogo from "../assets/MMCL_Logo_Horizontal.png";
 import HeaderWithBackButton from "../components/Header";
@@ -45,10 +45,7 @@ const ReadMore = () => {
             overflow: "hidden",
           }}
         >
-          <HeaderWithBackButton
-            title="Read More"
-            onBack={() => navigate(-1)}
-          />
+          <HeaderWithBackButton title='Read More' onBack={() => navigate(-1)} />
 
           {/* Content Section */}
           <Box sx={{ flexGrow: 1, p: { xs: 5, md: 10 } }}>

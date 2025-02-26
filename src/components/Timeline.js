@@ -6,7 +6,7 @@ import TimelineConnector from "@mui/lab/TimelineConnector";
 import TimelineContent from "@mui/lab/TimelineContent";
 import TimelineDot from "@mui/lab/TimelineDot";
 import { Box } from "@mui/material";
-import axios from "axios";
+import api from "../services/api";
 
 export default function DynamicTimeline({ researchId, refresh }) {
   const [events, setEvents] = useState([]);
@@ -16,7 +16,7 @@ export default function DynamicTimeline({ researchId, refresh }) {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`/track/research_status/${researchId}`);
+      const response = await api.get(`/track/research_status/${researchId}`);
       if (Array.isArray(response.data)) {
         setEvents(response.data);
       } else {
@@ -66,7 +66,14 @@ export default function DynamicTimeline({ researchId, refresh }) {
                 {index < events.length - 1 && <TimelineConnector />}
               </TimelineSeparator>
               <TimelineContent>
-                <div style={{ color: (index === events.length - 1 ? "red" : "#08397C"), fontWeight: 550 }}>{event.status}</div>
+                <div
+                  style={{
+                    color: index === events.length - 1 ? "red" : "#08397C",
+                    fontWeight: 550,
+                  }}
+                >
+                  {event.status}
+                </div>
                 <div style={{ fontSize: "0.8rem", color: "#888" }}>
                   {event.time}
                 </div>

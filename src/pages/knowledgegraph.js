@@ -4,12 +4,14 @@ import { Box, Tabs, Tab } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import HeaderWithBackButton from "../components/Header";
 import { useAuth } from "../context/AuthContext";
+import api from "../services/api";
 
 const KnowledgeGraph = () => {
   const navigate = useNavigate();
   const iframeRef = useRef(null);
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState(0);
+  const [graphUrls, setGraphUrls] = useState({});
 
   // Check if user has permission to see tabs
   const showTabs = user?.role === "02" || user?.role === "04"; // Director or College Admin
@@ -91,7 +93,7 @@ const KnowledgeGraph = () => {
         >
           <iframe
             ref={iframeRef}
-            src={`http://localhost:5000/knowledgegraph${
+            src={`https://app.mmcl-researchrepository.com/knowledgegraph${
               activeTab === 1 ? "/research-network" : ""
             }?role=${user?.role || ""}`}
             style={{

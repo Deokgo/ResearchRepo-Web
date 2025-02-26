@@ -17,7 +17,7 @@ import homeBg from "../assets/home_bg.png";
 import { Search } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
-import axios from "axios";
+import api from "../services/api";
 import { Virtuoso } from "react-virtuoso";
 import HeaderWithBackButton from "../components/Header";
 
@@ -46,7 +46,7 @@ const DisplayAuditLog = () => {
 
   const fetchOperations = async () => {
     try {
-      const response = await axios.get(`/auditlogs/fetch_operations`);
+      const response = await api.get(`/auditlogs/fetch_operations`);
       setOperation(response.data.operations);
     } catch (error) {
       console.error("Error fetching operations:", error);
@@ -55,7 +55,7 @@ const DisplayAuditLog = () => {
 
   const fetchRoles = async () => {
     try {
-      const response = await axios.get(`/auditlogs/fetch_roles`);
+      const response = await api.get(`/auditlogs/fetch_roles`);
       setRole(response.data.roles);
     } catch (error) {
       console.error("Error fetching roles:", error);
@@ -67,7 +67,7 @@ const DisplayAuditLog = () => {
       const url = hours
         ? `/auditlogs/fetch_logs/${hours}`
         : "/auditlogs/fetch_logs";
-      const response = await axios.get(url);
+      const response = await api.get(url);
       if (response.data && response.data.logs) {
         setLogs(response.data.logs);
       } else {
@@ -123,9 +123,7 @@ const DisplayAuditLog = () => {
 
     // Filter by Roles
     if (selectedRoles.length > 0) {
-      filtered = filtered.filter((log) =>
-        selectedRoles.includes(log.role)
-      );
+      filtered = filtered.filter((log) => selectedRoles.includes(log.role));
     }
 
     // Filter by Search Query
@@ -158,7 +156,7 @@ const DisplayAuditLog = () => {
   useEffect(() => {
     async function fetchDateRange() {
       try {
-        const response = await axios.get("/auditlogs/fetch_date_range"); // API endpoint
+        const response = await api.get("/auditlogs/fetch_date_range"); // API endpoint
         const { min_year, max_year } = response.data.date_range;
 
         // Update the date range and initialize the slider values
@@ -260,7 +258,7 @@ const DisplayAuditLog = () => {
           }}
         >
           <HeaderWithBackButton
-            title="View Audit Logs"
+            title='View Audit Logs'
             onBack={() => navigate(-1)}
           />
 
@@ -329,7 +327,10 @@ const DisplayAuditLog = () => {
                           }));
                         }}
                         sx={createTextFieldStyles()}
-                        InputLabelProps={{...createInputLabelProps(), shrink: true}}
+                        InputLabelProps={{
+                          ...createInputLabelProps(),
+                          shrink: true,
+                        }}
                         fullWidth
                         size='small'
                       />
@@ -350,7 +351,10 @@ const DisplayAuditLog = () => {
                           }));
                         }}
                         sx={createTextFieldStyles()}
-                        InputLabelProps={{...createInputLabelProps(), shrink: true}}
+                        InputLabelProps={{
+                          ...createInputLabelProps(),
+                          shrink: true,
+                        }}
                         fullWidth
                         size='small'
                       />
