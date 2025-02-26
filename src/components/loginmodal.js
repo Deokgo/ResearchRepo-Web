@@ -285,15 +285,15 @@ const LoginModal = () => {
 
                 <Button
                   onClick={handleForgotPassword}
-                  color='primary'
                   sx={{
+                    color: "#08397C",
+                    fontFamily: "Montserrat, sans-serif",
                     textTransform: "none",
                     fontSize: {
-                      xs: "10px",
-                      sm: "12px",
-                      md: "14px",
-                      lg: "16px",
-                    }, // Small base font size
+                      xs: "clamp(0.5rem, 2vw, 0.5rem)",
+                      sm: "clamp(0.75rem, 3.5vw, 0.75rem)",
+                      md: "clamp(0.9rem, 4vw, 0.9rem)",
+                    },
                     padding: {
                       xs: "4px 6px",
                       sm: "6px 8px",
@@ -307,11 +307,12 @@ const LoginModal = () => {
 
                 <Typography
                   sx={{
+                    fontFamily: "Montserrat, sans-serif",
                     textAlign: { xs: "center", md: "bottom" },
                     fontSize: {
                       xs: "clamp(0.5rem, 2vw, 0.5rem)",
                       sm: "clamp(0.75rem, 3.5vw, 0.75rem)",
-                      md: "clamp(1rem, 4vw, 1rem)",
+                      md: "clamp(0.9rem, 4vw, 0.9rem)",
                     },
                   }}
                 >
@@ -324,7 +325,7 @@ const LoginModal = () => {
                       openSignupModal();
                       resetFields();
                     }}
-                    style={{ color: "#3393EA" }}
+                    style={{ color: "#08397C", fontFamily: "Montserrat, sans-serif", }}
                   >
                     Sign up
                   </a>

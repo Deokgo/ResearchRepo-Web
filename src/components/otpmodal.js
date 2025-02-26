@@ -17,7 +17,8 @@ const OtpModal = ({
   isPasswordReset = false,
   formData = null,
 }) => {
-  const [otp, setOtp] = useState("");
+  const [otp, setOtp] = useState(new Array(6).fill(""));
+  const inputRefs = useRef([]);
   const [timer, setTimer] = useState(300); // 5 minutes = 300 seconds
   const [isVerified, setIsVerified] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -63,12 +64,44 @@ const OtpModal = ({
     setOtp(e.target.value);
   };
 
+   // Handles digit input
+   const handleChange = (index, e) => {
+    const value = e.target.value.replace(/\D/, ""); // Allow only numbers
+    if (!value) return;
+
+    const newOtp = [...otp];
+    newOtp[index] = value;
+    setOtp(newOtp);
+
+    // Move focus to the next input field if available
+    if (index < 5 && value) {
+      inputRefs.current[index + 1].focus();
+    }
+  };
+
+  // Handles backspace and arrow navigation
+  const handleKeyDown = (index, e) => {
+    if (e.key === "Backspace" && !otp[index] && index > 0) {
+      const newOtp = [...otp];
+      newOtp[index - 1] = "";
+      setOtp(newOtp);
+      inputRefs.current[index - 1].focus();
+    }
+    if (e.key === "ArrowLeft" && index > 0) {
+      inputRefs.current[index - 1].focus();
+    }
+    if (e.key === "ArrowRight" && index < 5) {
+      inputRefs.current[index + 1].focus();
+    }
+  };
+
   const verifyOtp = async () => {
+    const otpCode = otp.join(""); // Combine all digits
     if (loading || timer === 0) return;
 
     setLoading(true);
     try {
-      const verifyResponse = await axios.post(OTP_VERIFY_API, { email, otp });
+      const verifyResponse = await axios.post(OTP_VERIFY_API, { email, otp: otpCode });
 
       if (verifyResponse.status === 200) {
         setIsVerified(true);
@@ -150,39 +183,75 @@ const OtpModal = ({
   };
 
   return (
-    <Modal open={open} onClose={onClose}>
+    <Modal open={open}>
       <Box
         sx={{
           position: "absolute",
           top: "50%",
           left: "50%",
           transform: "translate(-50%, -50%)",
-          width: 400,
+          width: { xs: "90%", sm: "80%", md: "600px" }, // Responsive width
           bgcolor: "background.paper",
           boxShadow: 24,
-          p: 4,
-          borderRadius: 2,
+          p: { xs: 2, sm: 3, md: 4 }, // Responsive padding
+          borderRadius: "10px",
           textAlign: "center", // Center all text inside this Box
         }}
       >
-        <Typography variant='h6' component='h2' gutterBottom>
+        <Typography 
+        variant='h2'
+            color='#08397C'
+            fontWeight='700'
+            sx={{
+              py: 0.5,
+              pb: 1.5,
+              textAlign: { xs: "center", md: "bottom" },
+              fontSize: {
+                xs: "clamp(1rem, 2vw, 1rem)",
+                sm: "clamp(1.5rem, 3.5vw, 1.5rem)",
+                md: "clamp(2rem, 4vw, 2rem)",
+              },
+            }}>
           Verify your Email Address
         </Typography>
-        <Typography>
-          Please enter the 6-digit verification code that was sent to {email}
+        <Typography 
+        sx={{
+          fontFamily: "Montserrat, sans-serif",
+          color: "#666",
+          mt: 1,
+      }}>
+          Please enter the 6-digit verification code that was sent to <strong>{email}</strong>
         </Typography>
-        <TextField
-          label='Enter OTP'
-          variant='outlined'
-          fullWidth
-          value={otp}
-          onChange={handleOtpChange}
-          inputProps={{ maxLength: 6 }}
-          margin='normal'
-          placeholder='Enter 6-digit OTP'
-          sx={{ textAlign: "center" }} // Align input placeholder and label
-        />
-        <Typography>Resend verification code in {formatTime(timer)}</Typography>
+        <Box display="flex" justifyContent="center" gap={1} mt={2}>
+          {otp.map((digit, index) => (
+            <TextField
+              key={index}
+              inputRef={(el) => (inputRefs.current[index] = el)}
+              value={digit}
+              onChange={(e) => handleChange(index, e)}
+              onKeyDown={(e) => handleKeyDown(index, e)}
+              variant="outlined"
+              inputProps={{
+                maxLength: 1,
+                style: { textAlign: "center", fontSize: "1.5rem", fontWeight: 600 },
+              }}
+              sx={{ width: "4rem" }}
+            />
+          ))}
+        </Box>
+        {!isVerified && (
+          <Typography 
+          sx={{
+            fontFamily: "Montserrat, sans-serif",
+            fontSize: {
+              xs: "0.75rem",
+              md: "0.75rem",
+              lg: "0.8rem",
+              },
+            color: "#F40824",
+            mt: 1,
+          }}>Resend verification code in <strong>{formatTime(timer)}</strong></Typography>
+        )}
 
         {isVerified && (
           <Typography color='success.main' sx={{ mt: 1 }}>
@@ -208,8 +277,22 @@ const OtpModal = ({
               onClick={verifyOtp}
               variant='contained'
               color='primary'
-              fullWidth
               disabled={loading || timer === 0}
+              sx={{
+                mt: 2,
+                backgroundColor: "#08397C",
+                color: "#FFF",
+                fontFamily: "Montserrat, sans-serif",
+                fontWeight: 600,
+                fontSize: { xs: "0.875rem", md: "1rem" },
+                padding: { xs: "0.5rem 1rem", md: "1.25rem" },
+                borderRadius: "100px",
+                maxHeight: "3rem",
+                textTransform: "none",
+                "&:hover": {
+                    backgroundColor: "#072d61",
+                },
+                }}
             >
               {loading ? "Verifying..." : "Verify OTP"}
             </Button>
@@ -235,18 +318,50 @@ const OtpModal = ({
             color='primary'
             fullWidth
             disabled={resendLoading}
-            sx={{ mt: 2 }}
+            sx={{
+              mt: 2,
+              backgroundColor: "#CA031B",
+              color: "#FFF",
+              fontFamily: "Montserrat, sans-serif",
+              fontWeight: 600,
+              textTransform: "none",
+              fontSize: { xs: "0.875rem", md: "1rem" },
+              padding: { xs: "0.5rem 1rem", md: "1.25rem" },
+              borderRadius: "100px",
+              maxHeight: "3rem",
+              "&:hover": {
+                  backgroundColor: "#A30417",
+                  color: "#FFF",
+              },
+              }}
           >
             {resendLoading ? "Resending..." : "Resend OTP"}
           </Button>
         )}
 
         <Button
-          onClick={onClose}
+          onClick={() => {
+            onClose();
+            setOtp(new Array(6).fill(""));
+            setErrorMessage("");
+            setIsVerified(false);
+          }}
           variant='text'
           color='secondary'
           fullWidth
-          sx={{ mt: 1 }}
+          sx={{
+            color: "#CA031B",
+            fontFamily: "Montserrat, sans-serif",
+            fontWeight: 600,
+            textTransform: "none",
+            fontSize: { xs: "0.875rem", md: "1rem" },
+            padding: { xs: "0.5rem 1rem", md: "1.25rem" },
+            borderRadius: "100px",
+            maxHeight: "3rem",
+            "&:hover": {
+                color: "#A30417",
+            },
+            }}
         >
           Close
         </Button>

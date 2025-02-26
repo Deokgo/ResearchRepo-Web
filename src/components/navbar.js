@@ -535,7 +535,7 @@ const Navbar = () => {
                     }}
                   >
                     <strong style={{ fontSize: "0.7rem" }}>{user?.first_name} {user?.last_name}</strong> <br /> 
-                    {user?.role_name} <br />  {(user?.role === "04" || user?.role === "05" || user?.role === "06") && (<>{user?.college} - {user?.program}</>)}
+                    {user?.role_name} <br />  {(user?.role === "04" || user?.role === "05" || (user?.college || user?.program)) && (<>{user?.college} - {user?.program}</>)}
                   </Typography>
               </Button>
             </Box>
@@ -602,8 +602,8 @@ const Navbar = () => {
                       },
                     }}
                   >
-                    <strong style={{ fontSize: "0.8rem" }}>{user?.first_name} {user?.last_name}</strong> <br /> 
-                    {user?.role_name} {(user?.role === "04" || user?.role === "05" || user?.role === "06") && (<>| {user?.college} - {user?.program}</>)}
+                    <strong style={{ fontSize: "0.7rem" }}>{user?.first_name} {user?.last_name}</strong> <br /> 
+                    {user?.role_name} <br />  {(user?.role === "04" || user?.role === "05" || (user?.college || user?.program)) && (<>{user?.college} - {user?.program}</>)}
                   </Typography>
                 </Button>
                 <Divider sx={{ borderColor: "#FFFFF" }} />

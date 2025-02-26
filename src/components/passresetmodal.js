@@ -34,11 +34,12 @@ const PasswordResetModal = () => {
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    width: { xs: "90%", sm: "80%", md: "600px" }, // Responsive width
+    width: "40rem",
     bgcolor: "background.paper",
     boxShadow: 24,
-    p: { xs: 2, sm: 3, md: 4 }, // Responsive padding
-    borderRadius: "10px",
+    p: 5,
+    borderRadius: "8px",
+    textAlign: 'center'
   };
 
   const handleEmailSubmit = async (e) => {
@@ -123,26 +124,42 @@ const PasswordResetModal = () => {
   return (
     <>
       <Modal open={isPassresetModalOpen} onClose={closePassresetModal}>
-        <Box sx={modalStyle}>
+        <Box 
+          sx={{
+            ...modalStyle,
+            maxHeight: "90vh", // Limit the modal height to 90% of the viewport height
+            overflowY: "auto", // Enable vertical scrolling when content overflows
+          }}
+        >
           <Typography
             variant='h6'
+            color='#0A438F'
+            fontWeight='500'
             sx={{
-              color: "#0A438F",
-              fontWeight: "500",
-              fontSize: { xs: "16px", sm: "18px", md: "20px" }, // Responsive font size
+              mb: 1,
+              textAlign: { xs: "center", md: "bottom" },
+              fontSize: {
+                xs: "clamp(0.5rem, 2vw, 0.5rem)",
+                sm: "clamp(0.75rem, 3.5vw, 0.75rem)",
+                md: "clamp(1rem, 4vw, 1rem)",
+              },
             }}
           >
             Mapúa MCL Research Repository
           </Typography>
           <Typography
-            variant='h3'
-            sx={{
-              color: "#F40824",
-              fontWeight: "700",
-              padding: { xs: 1, sm: 2, md: 3 }, // Responsive padding
-              fontSize: { xs: "24px", sm: "28px", md: "32px" }, // Responsive font size
-              textAlign: "center",
-            }}
+           variant='h2'
+           color='#F40824'
+           fontWeight='700'
+           paddingBottom={3}
+           sx={{
+             textAlign: { xs: "center", md: "bottom" },
+             fontSize: {
+               xs: "clamp(1rem, 2vw, 1rem)",
+               sm: "clamp(1.5rem, 3.5vw, 1.5rem)",
+               md: "clamp(2.5rem, 3vw, 2.5rem)",
+             },
+           }}
           >
             Password Reset
           </Typography>
@@ -169,21 +186,33 @@ const PasswordResetModal = () => {
                   error={Boolean(error)}
                   helperText={error}
                   sx={{
+                    fontSize: {
+                      xs: "0.75rem",
+                      md: "0.75rem",
+                      lg: "0.8rem",
+                    },
                     width: { xs: "90%", sm: "80%", md: "70%" }, // Responsive width
-                    margin: "0 auto", // Center the TextField
+                    margin: "1 auto", // Center the TextField
                   }}
                 />
                 <Button
-                  type='submit'
-                  fullWidth
                   variant='contained'
-                  disabled={loading}
+                  type='submit'
                   sx={{
-                    maxWidth: { xs: "150px", sm: "200px" }, // Responsive max width
-                    marginTop: "20px",
-                    padding: { xs: "10px", sm: "15px" }, // Responsive padding
-                    fontSize: { xs: "14px", sm: "16px" }, // Responsive font size
-                    backgroundColor: "#EC1F28",
+                    m: 2,
+                    backgroundColor: "#CA031B",
+                    color: "#FFF",
+                    fontFamily: "Montserrat, sans-serif",
+                    fontWeight: 600,
+                    textTransform: "none",
+                    fontSize: { xs: "0.875rem", md: "1rem" },
+                    padding: { xs: "0.5rem 1rem", md: "1.25rem" },
+                    borderRadius: "100px",
+                    maxHeight: "3rem",
+                    "&:hover": {
+                      backgroundColor: "#A30417",
+                      color: "#FFF",
+                    },
                   }}
                 >
                   {loading ? "Sending OTP..." : "Send OTP"}
@@ -252,15 +281,24 @@ const PasswordResetModal = () => {
                 />
                 <Button
                   type='submit'
-                  fullWidth
                   variant='contained'
                   disabled={loading}
                   sx={{
-                    maxWidth: { xs: "150px", sm: "200px" }, // Responsive max width
-                    marginTop: "20px",
-                    padding: { xs: "10px", sm: "15px" }, // Responsive padding
-                    backgroundColor: "#EC1F28",
-                  }}
+                    mt: 2,
+                    backgroundColor: "#CA031B",
+                    color: "#FFF",
+                    fontFamily: "Montserrat, sans-serif",
+                    fontWeight: 600,
+                    textTransform: "none",
+                    fontSize: { xs: "0.875rem", md: "1rem" },
+                    padding: { xs: "0.5rem 1rem", md: "1.25rem" },
+                    borderRadius: "100px",
+                    maxHeight: "3rem",
+                    "&:hover": {
+                        backgroundColor: "#A30417",
+                        color: "#FFF",
+                    },
+                    }}
                 >
                   {loading ? "Updating..." : "Update Password"}
                 </Button>

@@ -32,11 +32,11 @@ const modalStyle = {
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  width: { xs: "90%", sm: "80%", md: "600px" }, // Responsive width
+  width: "40rem",
   bgcolor: "background.paper",
   boxShadow: 24,
-  p: { xs: 2, sm: 3, md: 4 }, // Responsive padding
-  borderRadius: "10px",
+  p: 5,
+  borderRadius: "8px",
 };
 
 const Profile = () => {
@@ -433,8 +433,6 @@ const Profile = () => {
       setIsOtpModalOpen(true); // Ensure modal opens even if OTP fails
     }
   };
-  
-  
 
   const handleCloseOtpModal = () => {
     setIsOtpModalOpen(false);
@@ -452,6 +450,19 @@ const Profile = () => {
       confirmPassword: "",
     });
   };
+
+  // Utility function to create responsive TextField styles
+  const createTextFieldStyles = (customFlex = 2) => ({
+    flex: customFlex,
+    "& .MuiInputBase-input": {
+      fontSize: {
+        xs: "0.6em", // Mobile
+        sm: "0.7rem", // Small devices
+        md: "0.8rem", // Medium devices
+        lg: "0.8rem", // Large devices
+      },
+    },
+  });
 
   return (
     <>
@@ -627,7 +638,7 @@ const Profile = () => {
             </Grid2>
           </Box>
 
-          <Modal open={isModalOpen} onClose={handleCloseModal}>
+          <Modal open={isModalOpen}>
             <Box
               sx={{
                 ...modalStyle,
@@ -649,6 +660,7 @@ const Profile = () => {
                     name='firstName'
                     value={formValues.firstName}
                     onChange={handleInputChange}
+                    sx={createTextFieldStyles()}
                   />
                 </Grid2>
                 <Grid2 size={{ xs: 12, sm: 6 }}>
@@ -658,6 +670,7 @@ const Profile = () => {
                     name='middleName'
                     value={formValues.middleName}
                     onChange={handleInputChange}
+                    sx={createTextFieldStyles()}
                   />
                 </Grid2>
                 <Grid2 size={{ xs: 12, sm: 6 }}>
@@ -667,6 +680,7 @@ const Profile = () => {
                     name='lastName'
                     value={formValues.lastName}
                     onChange={handleInputChange}
+                    sx={createTextFieldStyles()}
                   />
                 </Grid2>
                 <Grid2 size={{ xs: 12, sm: 6 }}>
@@ -676,6 +690,7 @@ const Profile = () => {
                     name='suffix'
                     value={formValues.suffix}
                     onChange={handleInputChange}
+                    sx={createTextFieldStyles()}
                   />
                 </Grid2>
                 <Grid2 size={{ xs: 12, sm: 6 }}>
@@ -684,6 +699,7 @@ const Profile = () => {
                     fullWidth
                     name='email'
                     value={formValues.email}
+                    sx={createTextFieldStyles()}
                     disabled
                   />
                 </Grid2>
@@ -693,11 +709,20 @@ const Profile = () => {
                     fullWidth
                     name='role'
                     value={formValues.role}
+                    sx={createTextFieldStyles()}
                     disabled
                   />
                 </Grid2>
                 <Grid2 size={{ xs: 12, sm: 6 }}>
-                  <InputLabel>Department</InputLabel>
+                  <InputLabel
+                    sx={{
+                      fontSize: {
+                          xs: "0.75rem",
+                          md: "0.75rem",
+                          lg: "0.8rem",
+                      },
+                      }}
+                  >Department:</InputLabel>
                   <Select
                     value={formValues.department || ""} // Use an empty string as fallback
                     onChange={(e) => {
@@ -710,18 +735,21 @@ const Profile = () => {
                         program: "", // Reset program when department changes
                       }));
                     }}
-                    label='Department'
-                    sx={{
-                      width: "100%", // Full width for the parent container
-                      maxWidth: { xs: "300px", sm: "400px", md: "500px" }, // Dynamic max width for different screen sizes
-                      minWidth: "200px", // Minimum width to ensure usability
-                    }}
+                    sx={createTextFieldStyles()}
+                    fullWidth
                     disabled={shouldDisableInputs} // Conditionally disable input based on role
                   >
                     {colleges.map((college) => (
                       <MenuItem
                         key={college.college_id}
                         value={college.college_id}
+                        sx={{
+                          fontSize: {
+                              xs: "0.75rem",
+                              md: "0.75rem",
+                              lg: "0.8rem",
+                          },
+                          }}
                       >
                         {college.college_name}
                       </MenuItem>
@@ -730,7 +758,15 @@ const Profile = () => {
                 </Grid2>
 
                 <Grid2 size={{ xs: 12, sm: 6 }}>
-                  <InputLabel>Program</InputLabel>
+                  <InputLabel
+                    sx={{
+                      fontSize: {
+                          xs: "0.75rem",
+                          md: "0.75rem",
+                          lg: "0.8rem",
+                      },
+                      }}
+                  >Program:</InputLabel>
                   <Select
                     value={formValues.program || ""} // Use an empty string as fallback
                     onChange={(e) => {
@@ -742,12 +778,8 @@ const Profile = () => {
                         program: selectedProgram, // Update form state
                       }));
                     }}
-                    label='Program'
-                    sx={{
-                      width: "100%", // Full width for the parent container
-                      maxWidth: { xs: "300px", sm: "400px", md: "500px" }, // Dynamic max width for different screen sizes
-                      minWidth: "200px", // Minimum width to ensure usability
-                    }}
+                    sx={createTextFieldStyles()}
+                    fullWidth
                     disabled={shouldDisableInputs || !formValues.department} // Conditionally disable input based on role and department selection
                   >
                     {programs
@@ -761,6 +793,13 @@ const Profile = () => {
                         <MenuItem
                           key={program.program_id}
                           value={program.program_id}
+                          sx={{
+                            fontSize: {
+                                xs: "0.75rem",
+                                md: "0.75rem",
+                                lg: "0.8rem",
+                            },
+                            }}
                         >
                           {program.program_name}
                         </MenuItem>
@@ -776,20 +815,43 @@ const Profile = () => {
                 }}
               >
                 <Button
-                  variant='outlined'
+                  variant='contained'
                   onClick={handleCloseModal}
-                  sx={{ fontWeight: 600 }}
+                  sx={{
+                    backgroundColor: "#CA031B",
+                    color: "#FFF",
+                    fontFamily: "Montserrat, sans-serif",
+                    fontWeight: 600,
+                    textTransform: "none",
+                    fontSize: { xs: "0.875rem", md: "1rem" },
+                    padding: { xs: "0.5rem 1rem", md: "1.25rem" },
+                    borderRadius: "100px",
+                    maxHeight: "3rem",
+                    "&:hover": {
+                        backgroundColor: "#A30417",
+                        color: "#FFF",
+                    },
+                    }}
                 >
-                  Back
+                  Cancel
                 </Button>
                 <Button
                   variant='contained'
                   onClick={handleSaveUserChanges}
                   sx={{
-                    backgroundColor: "#CA031B",
+                    backgroundColor: "#08397C",
                     color: "#FFF",
+                    fontFamily: "Montserrat, sans-serif",
                     fontWeight: 600,
-                  }}
+                    fontSize: { xs: "0.875rem", md: "1rem" },
+                    padding: { xs: "0.5rem 1rem", md: "1.25rem" },
+                    borderRadius: "100px",
+                    maxHeight: "3rem",
+                    textTransform: "none",
+                    "&:hover": {
+                        backgroundColor: "#072d61",
+                    },
+                    }}
                 >
                   Save Changes
                 </Button>
@@ -801,6 +863,12 @@ const Profile = () => {
           <Modal
             open={isChangePasswordModalOpen}
             onClose={handleCloseChangePasswordModal}
+            PaperProps={{
+              sx: {
+              borderRadius: "15px",
+              padding: "1rem",
+              },
+          }}
           >
             <Box
               sx={{
@@ -823,6 +891,7 @@ const Profile = () => {
                     name='newPassword'
                     value={passwordValues.newPassword}
                     onChange={handlePasswordInputChange}
+                    sx={createTextFieldStyles()}
                     type='password'
                   />
                 </Grid2>
@@ -832,6 +901,7 @@ const Profile = () => {
                     fullWidth
                     name='confirmPassword'
                     value={passwordValues.confirmPassword}
+                    sx={createTextFieldStyles()}
                     onChange={handlePasswordInputChange}
                     type='password'
                   />
@@ -845,19 +915,42 @@ const Profile = () => {
                 }}
               >
                 <Button
-                  variant='outlined'
+                  variant='contained'
                   onClick={handleCloseChangePasswordModal}
-                  sx={{ fontWeight: 600 }}
+                  sx={{
+                    backgroundColor: "#CA031B",
+                    color: "#FFF",
+                    fontFamily: "Montserrat, sans-serif",
+                    fontWeight: 600,
+                    textTransform: "none",
+                    fontSize: { xs: "0.875rem", md: "1rem" },
+                    padding: { xs: "0.5rem 1rem", md: "1.25rem" },
+                    borderRadius: "100px",
+                    maxHeight: "3rem",
+                    "&:hover": {
+                        backgroundColor: "#A30417",
+                        color: "#FFF",
+                    },
+                    }}
                 >
                   Back
                 </Button>
                 <Button
                   variant='contained'
                   sx={{
-                    backgroundColor: "#CA031B",
+                    backgroundColor: "#08397C",
                     color: "#FFF",
+                    fontFamily: "Montserrat, sans-serif",
                     fontWeight: 600,
-                  }}
+                    fontSize: { xs: "0.875rem", md: "1rem" },
+                    padding: { xs: "0.5rem 1rem", md: "1.25rem" },
+                    borderRadius: "100px",
+                    maxHeight: "3rem",
+                    textTransform: "none",
+                    "&:hover": {
+                        backgroundColor: "#072d61",
+                    },
+                    }}
                   onClick={handleSaveNewPassword}
                 >
                   Save Changes
@@ -868,7 +961,12 @@ const Profile = () => {
           <Dialog
             open={isConfirmDialogOpen}
             onClose={() => setIsConfirmDialogOpen(false)}
-            PaperProps={{ sx: { borderRadius: "15px", padding: "1rem" } }}
+            PaperProps={{
+              sx: {
+              borderRadius: "15px",
+              padding: "1rem",
+              },
+          }}
           >
             <DialogTitle
               sx={{

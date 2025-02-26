@@ -862,7 +862,7 @@ const ManageUsers = () => {
             width: "auto",
             bgcolor: "background.paper",
             boxShadow: 24,
-            p: 5,
+            p: 4,
             borderRadius: "8px",
           }}
         >
@@ -870,7 +870,7 @@ const ManageUsers = () => {
             variant='h3'
             color='#08397C'
             fontWeight='1000'
-            mb={4}
+            mb={2}
             sx={{
               textAlign: { xs: "left", md: "bottom" },
               fontSize: {
@@ -898,8 +898,12 @@ const ManageUsers = () => {
               sx={{
                 color: "#08397C",
                 fontWeight: 600,
-                mb: 1,
                 fontFamily: "Montserrat, sans-serif",
+                fontSize: {
+                  xs: "0.75rem",
+                  md: "0.8rem",
+                  lg: "0.9rem",
+              },
               }}
             >
               Required CSV Fields:
@@ -908,7 +912,13 @@ const ManageUsers = () => {
               variant='body2'
               sx={{
                 fontFamily: "Montserrat, sans-serif",
+                fontStyle: "italic",
                 "& span": { fontWeight: 600 },
+                fontSize: {
+                  xs: "0.75rem",
+                  md: "0.75rem",
+                  lg: "0.75rem",
+              },
               }}
             >
               • <span>email</span> - Mapúa MCL Live Account (e.g.,
@@ -919,6 +929,11 @@ const ManageUsers = () => {
               sx={{
                 fontFamily: "Montserrat, sans-serif",
                 "& span": { fontWeight: 600 },
+                fontSize: {
+                  xs: "0.75rem",
+                  md: "0.75rem",
+                  lg: "0.75rem",
+              },
               }}
             >
               • <span>first_name</span> - First Name
@@ -928,6 +943,11 @@ const ManageUsers = () => {
               sx={{
                 fontFamily: "Montserrat, sans-serif",
                 "& span": { fontWeight: 600 },
+                fontSize: {
+                  xs: "0.75rem",
+                  md: "0.75rem",
+                  lg: "0.75rem",
+              },
               }}
             >
               • <span>middle_initial (optional)</span> - Middle Initial
@@ -937,6 +957,11 @@ const ManageUsers = () => {
               sx={{
                 fontFamily: "Montserrat, sans-serif",
                 "& span": { fontWeight: 600 },
+                fontSize: {
+                  xs: "0.75rem",
+                  md: "0.75rem",
+                  lg: "0.75rem",
+              },
               }}
             >
               • <span>surname</span> - Surname
@@ -946,6 +971,11 @@ const ManageUsers = () => {
               sx={{
                 fontFamily: "Montserrat, sans-serif",
                 "& span": { fontWeight: 600 },
+                fontSize: {
+                  xs: "0.75rem",
+                  md: "0.75rem",
+                  lg: "0.75rem",
+              },
               }}
             >
               • <span>suffix (optional)</span> - Name suffix (e.g., Jr., III)
@@ -1348,7 +1378,7 @@ const ManageUsers = () => {
                   parsedUsers.length === 0
                 }
               >
-                Add Users
+                Add User(s)
               </Button>
             </Box>
           </Box>
@@ -1692,7 +1722,7 @@ const ManageUsers = () => {
             >
             <CheckCircleIcon/>
           </Box>
-          &nbsp;Archive Operation Successful
+          &nbsp;Operation Successful
         </DialogTitle>
         <DialogContent>
           <DialogContentText sx={{ fontFamily: "Montserrat, sans-serif" }}>

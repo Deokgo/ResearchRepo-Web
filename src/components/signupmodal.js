@@ -1,7 +1,9 @@
 // signupmodal.js
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import OtpModal from "./otpmodal";
 import { useModalContext } from "../context/modalcontext"; // Import the ModalContext
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import PriorityHighIcon from "@mui/icons-material/PriorityHigh";
 import {
   Box,
   Button,
@@ -12,6 +14,12 @@ import {
   Grid2,
   InputAdornment,
   Divider,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
 } from "@mui/material";
 import {
   Clear as ClearIcon,
@@ -25,6 +33,9 @@ const SignUpModal = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [passwordErrors, setPasswordErrors] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccessDialogOpen, setIsSuccessDialogOpen] = useState(false);
+  const [openErrorDialog, setOpenErrorDialog] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -70,12 +81,11 @@ const SignUpModal = () => {
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    width: { xs: "90%", sm: "80%", md: "600px" }, // Responsive width
-    height: "auto",
+    width: "40rem",
     bgcolor: "background.paper",
     boxShadow: 24,
-    p: { xs: 2, sm: 3, md: 4 }, // Responsive padding
-    borderRadius: "10px",
+    p: 4,
+    borderRadius: "8px",
   };
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
@@ -93,7 +103,6 @@ const SignUpModal = () => {
       try {
         // Close both modals
         setIsModalOpen(false); // Close OTP modal
-        closeSignupModal(); // Close signup modal
 
         // Reset all states
         resetFields();
@@ -103,13 +112,10 @@ const SignUpModal = () => {
         setSignupTriggered(false);
 
         // Show success message and open login modal
-        alert("Account created successfully! Please login to continue.");
-        openLoginModal();
+        setIsSuccessDialogOpen(true);
       } catch (error) {
         console.error("Error during verification handling:", error);
-        alert(
-          "There was an error completing your registration. Please try again."
-        );
+        setOpenErrorDialog(true);
       }
     }
   };
@@ -197,6 +203,8 @@ const SignUpModal = () => {
         return;
       }
 
+      setIsSubmitting(true);
+
       // Send OTP
       const otpResponse = await axios.post("/auth/send_otp", {
         email: formData.email,
@@ -229,13 +237,40 @@ const SignUpModal = () => {
     closeSignupModal(); // Close signup modal
   };
 
+  // Utility function to create responsive TextField styles
+  const createTextFieldStyles = (customFlex = 2) => ({
+    flex: customFlex,
+    "& .MuiInputBase-input": {
+      fontSize: {
+        xs: "0.6em", // Mobile
+        sm: "0.7rem", // Small devices
+        md: "0.8rem", // Medium devices
+        lg: "0.9rem", // Large devices
+      },
+    },
+    "& .MuiInputLabel-root": {
+      fontSize: {
+        xs: "0.6em", // Mobile
+        sm: "0.7rem", // Small devices
+        md: "0.8rem", // Medium devices
+        lg: "0.9rem", // Large devices
+      },
+    },
+  });
+
+  useEffect(() => {
+    if (!isModalOpen) {
+      setIsSubmitting(false);
+    }
+  })
+
   return (
     <>
       <Modal open={isSignupModalOpen} onClose={handleModalClose}>
         <Box
           sx={{
             ...modalStyle,
-            maxHeight: "90vh", // Limit the modal height to 90% of the viewport height
+            maxHeight: "95vh", // Limit the modal height to 90% of the viewport height
             overflowY: "auto", // Enable vertical scrolling when content overflows
           }}
         >
@@ -248,7 +283,7 @@ const SignUpModal = () => {
               fontSize: {
                 xs: "clamp(0.5rem, 2vw, 0.5rem)",
                 sm: "clamp(0.75rem, 3.5vw, 0.75rem)",
-                md: "clamp(1rem, 4vw, 1rem)",
+                md: "clamp(0.9rem, 4vw, 0.9rem)",
               },
             }}
           >
@@ -259,12 +294,13 @@ const SignUpModal = () => {
             color='#F40824'
             fontWeight='700'
             sx={{
-              py: 2,
+              py: 0.5,
+              pb: 1.5,
               textAlign: { xs: "center", md: "bottom" },
               fontSize: {
                 xs: "clamp(1rem, 2vw, 1rem)",
                 sm: "clamp(2rem, 3.5vw, 2rem)",
-                md: "clamp(3rem, 4vw, 3rem)",
+                md: "clamp(2.5rem, 4vw, 2.5rem)",
               },
             }}
           >
@@ -287,35 +323,7 @@ const SignUpModal = () => {
                     value={formData.firstName}
                     onChange={handleChange}
                     variant='outlined'
-                    sx={{
-                      flex: 2,
-                      // Adjust styles for input
-                      "& .MuiInputBase-input": {
-                        fontSize: {
-                          xs: "0.75rem", // Mobile
-                          sm: "0.85rem", // Small devices
-                          md: "0.9rem", // Medium devices
-                          lg: "1rem", // Large devices
-                        },
-                        padding: {
-                          xs: "8px 12px", // Mobile
-                          md: "12px 14px", // Larger screens
-                        },
-                        height: {
-                          xs: "15px", // Mobile
-                          md: "25px", // Larger screens
-                        },
-                      },
-                      // Adjust styles for the label
-                      "& .MuiInputLabel-root": {
-                        fontSize: {
-                          xs: "0.7rem", // Mobile
-                          sm: "0.8rem", // Small devices
-                          md: "0.9rem", // Medium devices
-                          lg: "1rem", // Large devices
-                        },
-                      },
-                    }}
+                    sx={createTextFieldStyles()}
                   ></TextField>
                 </Grid2>
                 <Grid2 item size={{ xs: 12, md: 4 }}>
@@ -326,35 +334,7 @@ const SignUpModal = () => {
                     value={formData.middleName}
                     onChange={handleChange}
                     variant='outlined'
-                    sx={{
-                      flex: 2,
-                      // Adjust styles for input
-                      "& .MuiInputBase-input": {
-                        fontSize: {
-                          xs: "0.75rem", // Mobile
-                          sm: "0.85rem", // Small devices
-                          md: "0.9rem", // Medium devices
-                          lg: "1rem", // Large devices
-                        },
-                        padding: {
-                          xs: "8px 12px", // Mobile
-                          md: "12px 14px", // Larger screens
-                        },
-                        height: {
-                          xs: "15px", // Mobile
-                          md: "25px", // Larger screens
-                        },
-                      },
-                      // Adjust styles for the label
-                      "& .MuiInputLabel-root": {
-                        fontSize: {
-                          xs: "0.7rem", // Mobile
-                          sm: "0.8rem", // Small devices
-                          md: "0.9rem", // Medium devices
-                          lg: "1rem", // Large devices
-                        },
-                      },
-                    }}
+                    sx={createTextFieldStyles()}
                   />
                 </Grid2>
                 <Grid2 item size={{ xs: 12, md: 4 }}>
@@ -365,35 +345,7 @@ const SignUpModal = () => {
                     value={formData.lastName}
                     onChange={handleChange}
                     variant='outlined'
-                    sx={{
-                      flex: 2,
-                      // Adjust styles for input
-                      "& .MuiInputBase-input": {
-                        fontSize: {
-                          xs: "0.75rem", // Mobile
-                          sm: "0.85rem", // Small devices
-                          md: "0.9rem", // Medium devices
-                          lg: "1rem", // Large devices
-                        },
-                        padding: {
-                          xs: "8px 12px", // Mobile
-                          md: "12px 14px", // Larger screens
-                        },
-                        height: {
-                          xs: "15px", // Mobile
-                          md: "25px", // Larger screens
-                        },
-                      },
-                      // Adjust styles for the label
-                      "& .MuiInputLabel-root": {
-                        fontSize: {
-                          xs: "0.7rem", // Mobile
-                          sm: "0.8rem", // Small devices
-                          md: "0.9rem", // Medium devices
-                          lg: "1rem", // Large devices
-                        },
-                      },
-                    }}
+                    sx={createTextFieldStyles()}
                   ></TextField>
                 </Grid2>
                 <Grid2 item size={{ xs: 12, md: 4 }}>
@@ -404,35 +356,7 @@ const SignUpModal = () => {
                     value={formData.suffix}
                     onChange={handleChange}
                     variant='outlined'
-                    sx={{
-                      flex: 2,
-                      // Adjust styles for input
-                      "& .MuiInputBase-input": {
-                        fontSize: {
-                          xs: "0.75rem", // Mobile
-                          sm: "0.85rem", // Small devices
-                          md: "0.9rem", // Medium devices
-                          lg: "1rem", // Large devices
-                        },
-                        padding: {
-                          xs: "8px 12px", // Mobile
-                          md: "12px 14px", // Larger screens
-                        },
-                        height: {
-                          xs: "15px", // Mobile
-                          md: "25px", // Larger screens
-                        },
-                      },
-                      // Adjust styles for the label
-                      "& .MuiInputLabel-root": {
-                        fontSize: {
-                          xs: "0.7rem", // Mobile
-                          sm: "0.8rem", // Small devices
-                          md: "0.9rem", // Medium devices
-                          lg: "1rem", // Large devices
-                        },
-                      },
-                    }}
+                    sx={createTextFieldStyles()}
                   ></TextField>
                 </Grid2>
                 <Grid2 item size={{ xs: 12, md: 8 }}>
@@ -444,35 +368,7 @@ const SignUpModal = () => {
                     value={formData.email}
                     onChange={handleChange}
                     variant='outlined'
-                    sx={{
-                      flex: 2,
-                      // Adjust styles for input
-                      "& .MuiInputBase-input": {
-                        fontSize: {
-                          xs: "0.75rem", // Mobile
-                          sm: "0.85rem", // Small devices
-                          md: "0.9rem", // Medium devices
-                          lg: "1rem", // Large devices
-                        },
-                        padding: {
-                          xs: "8px 12px", // Mobile
-                          md: "12px 14px", // Larger screens
-                        },
-                        height: {
-                          xs: "15px", // Mobile
-                          md: "25px", // Larger screens
-                        },
-                      },
-                      // Adjust styles for the label
-                      "& .MuiInputLabel-root": {
-                        fontSize: {
-                          xs: "0.7rem", // Mobile
-                          sm: "0.8rem", // Small devices
-                          md: "0.9rem", // Medium devices
-                          lg: "1rem", // Large devices
-                        },
-                      },
-                    }}
+                    sx={createTextFieldStyles()}
                   ></TextField>
                 </Grid2>
               </Grid2>
@@ -486,35 +382,7 @@ const SignUpModal = () => {
                 onChange={handleChange}
                 margin='normal'
                 variant='outlined'
-                sx={{
-                  flex: 2,
-                  // Adjust styles for input
-                  "& .MuiInputBase-input": {
-                    fontSize: {
-                      xs: "0.75rem", // Mobile
-                      sm: "0.85rem", // Small devices
-                      md: "0.9rem", // Medium devices
-                      lg: "1rem", // Large devices
-                    },
-                    padding: {
-                      xs: "8px 12px", // Mobile
-                      md: "12px 14px", // Larger screens
-                    },
-                    height: {
-                      xs: "15px", // Mobile
-                      md: "25px", // Larger screens
-                    },
-                  },
-                  // Adjust styles for the label
-                  "& .MuiInputLabel-root": {
-                    fontSize: {
-                      xs: "0.7rem", // Mobile
-                      sm: "0.8rem", // Small devices
-                      md: "0.9rem", // Medium devices
-                      lg: "1rem", // Large devices
-                    },
-                  },
-                }}
+                sx={createTextFieldStyles()}
                 required
                 error={Boolean(institutionError)}
                 helperText={institutionError}
@@ -532,6 +400,7 @@ const SignUpModal = () => {
                 variant='outlined'
                 required
                 error={Boolean(reasonError)}
+                sx={createTextFieldStyles()}
                 helperText={reasonError || `${formData.reason.length}/${100}`}
                 inputProps={{
                   maxLength: 100,
@@ -555,6 +424,7 @@ const SignUpModal = () => {
                     name='password'
                     type={showPassword ? "text" : "password"}
                     value={formData.password}
+                    sx={createTextFieldStyles()}
                     onChange={(e) => {
                       handleChange(e);
                       // Update password errors in real-time
@@ -578,7 +448,7 @@ const SignUpModal = () => {
                       endAdornment: (
                         <InputAdornment position='end'>
                           <IconButton onClick={togglePasswordVisibility}>
-                            {showPassword ? <VisibilityOff /> : <Visibility />}
+                            {showPassword ? <Visibility /> : <VisibilityOff />}
                           </IconButton>
                         </InputAdornment>
                       ),
@@ -595,6 +465,7 @@ const SignUpModal = () => {
                     onChange={handleChange}
                     margin='normal'
                     variant='outlined'
+                    sx={createTextFieldStyles()}
                     error={
                       formData.password.length >= 8 &&
                       formData.confirmPassword.length >= 8 &&
@@ -611,11 +482,7 @@ const SignUpModal = () => {
                       endAdornment: (
                         <InputAdornment position='end'>
                           <IconButton onClick={toggleConfirmPasswordVisibility}>
-                            {showConfirmPassword ? (
-                              <VisibilityOff />
-                            ) : (
-                              <Visibility />
-                            )}
+                            {showConfirmPassword ? <Visibility /> : <VisibilityOff />}
                           </IconButton>
                         </InputAdornment>
                       ),
@@ -628,6 +495,7 @@ const SignUpModal = () => {
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "center",
+                  p: 1,
                 }}
               >
                 <Button
@@ -640,7 +508,7 @@ const SignUpModal = () => {
                     fontWeight: 600,
                     textTransform: "none",
                     fontSize: { xs: "0.875rem", md: "1rem" },
-                    padding: { xs: "0.5rem 1rem", md: "1.5rem" },
+                    padding: { xs: "0.5rem 1rem", md: "1.25rem" },
                     borderRadius: "100px",
                     maxHeight: "3rem",
                     "&:hover": {
@@ -649,10 +517,27 @@ const SignUpModal = () => {
                     },
                   }}
                 >
-                  Create Account
+                  {isSubmitting ? (
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                      <CircularProgress size={20} color='#08397C' />
+                        loading...
+                        </Box>
+                    ) : (
+                        "Create Account"
+                    )}
                 </Button>
-                <Typography sx={{ marginTop: "0.5rem" }}>
-                  Already a member?{" "}
+                <Typography 
+                sx={{
+                    mt: 1,
+                    textAlign: { xs: "center", md: "bottom" },
+                    fontFamily: "Montserrat, sans-serif",
+                    fontSize: {
+                      xs: "clamp(0.5rem, 2vw, 0.5rem)",
+                      sm: "clamp(0.75rem, 3.5vw, 0.75rem)",
+                      md: "clamp(0.9rem, 3vw, 0.9rem)",
+                    },
+                  }}>
+                  Already a user?{" "}
                   <a
                     href='#'
                     onClick={(e) => {
@@ -661,7 +546,7 @@ const SignUpModal = () => {
                       closeSignupModal();
                       openLoginModal();
                     }}
-                    style={{ color: "#3393EA" }}
+                    style={{ color: "#08397C", fontFamily: "Montserrat, sans-serif", }}
                   >
                     Login
                   </a>
@@ -676,7 +561,156 @@ const SignUpModal = () => {
                 />
               </Box>
             </Box>
+            {/* Add loading overlay */}
+              {isSubmitting && (
+              <Box
+                  sx={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  backgroundColor: "rgba(255, 255, 255, 0.7)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  zIndex: 9999,
+                  }}
+              >
+                  <Box sx={{ textAlign: "center" }}>
+                  <CircularProgress />
+                    <Typography sx={{ mt: 2, fontSize: "1.25rem" }}>Sending OTP...</Typography>
+                  </Box>
+              </Box>
+              )}
           </form>
+          {/* Add Success Dialog */}
+          <Dialog
+            open={isSuccessDialogOpen}
+            PaperProps={{
+                sx: {
+                borderRadius: "15px",
+                padding: "1rem",
+                },
+            }}
+            >
+            <DialogTitle
+              sx={{
+                fontFamily: "Montserrat, sans-serif",
+                fontWeight: 600,
+                color: "#008000",
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+              }}
+            >
+                <Box
+                component='span'
+                sx={{
+                    backgroundColor: "#E8F5E9",
+                    borderRadius: "75%",
+                    padding: "10px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                }}
+                >
+                <CheckCircleIcon/>
+                </Box>
+                Success
+            </DialogTitle>
+            <DialogContent>
+                <Typography
+                sx={{
+                    fontFamily: "Montserrat, sans-serif",
+                    color: "#666",
+                    mt: 1,
+                }}
+                >
+                Your account has been created successfully!
+                </Typography>
+            </DialogContent>
+            <DialogActions sx={{ padding: "1rem" }}>
+              <Button
+              onClick={() => {
+                  setIsSuccessDialogOpen(false);
+                  closeSignupModal();
+                  openLoginModal(); }}
+              sx={{
+                  backgroundColor: "#08397C",
+                  color: "#FFF",
+                  fontFamily: "Montserrat, sans-serif",
+                  fontWeight: 600,
+                  textTransform: "none",
+                  borderRadius: "100px",
+                  padding: "0.75rem",
+                  "&:hover": {
+                  backgroundColor: "#072d61",
+                  },
+              }}
+              >
+              Proceed
+              </Button>
+            </DialogActions>
+          </Dialog>
+          <Dialog
+            open={openErrorDialog}
+            onClose={() => setOpenErrorDialog(false)}
+            PaperProps={{
+              sx: {
+              borderRadius: "15px",
+              padding: "1rem",
+              },
+          }}
+          >
+          <DialogTitle
+            sx={{
+              fontFamily: "Montserrat, sans-serif",
+              fontWeight: 600,
+              color: "#008000",
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
+            }}
+          >
+            <Box
+              component='span'
+              sx={{
+                  backgroundColor: "#E8F5E9",
+                  borderRadius: "75%",
+                  padding: "10px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+              }}
+              >
+              <PriorityHighIcon/>
+            </Box>
+            &nbsp;Error
+          </DialogTitle>
+            <DialogContent>
+              <DialogContentText
+                sx={{
+                  fontFamily: "Montserrat, sans-serif",
+                  color: "error.main",
+                }}
+              >
+                There was an error completing your registration. Please try again.
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button
+                onClick={() => setOpenErrorDialog(false)}
+                sx={{
+                  fontFamily: "Montserrat, sans-serif",
+                  textTransform: "none",
+                  fontWeight: 600,
+                }}
+              >
+                Close
+              </Button>
+            </DialogActions>
+          </Dialog>
         </Box>
       </Modal>
     </>
