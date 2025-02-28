@@ -7,6 +7,7 @@ import {
   Typography,
   Modal,
   useMediaQuery,
+  CircularProgress
 } from "@mui/material";
 import { useModalContext } from "../context/modalcontext";
 import { useAuth } from "../context/AuthContext";
@@ -24,6 +25,7 @@ const LoginModal = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
   const isSizeMobile = useMediaQuery("(max-width:600px)");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [formValues, setFormValues] = useState({
     email: "",
@@ -62,6 +64,7 @@ const LoginModal = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     setErrorMessage("");
+    setIsSubmitting(true);
     try {
       const response = await api.post("/auth/login", formValues);
       const { token } = response.data;
@@ -77,6 +80,7 @@ const LoginModal = () => {
       const userResponse = await api.get("/auth/me");
       const userRole = userResponse.data.role;
 
+      setIsSubmitting(false);
       handleModalClose();
 
       // If the user is on a mobile device, navigate to collections immediately
@@ -111,6 +115,7 @@ const LoginModal = () => {
       }
     } catch (error) {
       console.error("Login error details:", error);
+      setIsSubmitting(false);
       setErrorMessage(
         error.response?.data?.message || "Login failed. Please try again."
       );
@@ -278,7 +283,14 @@ const LoginModal = () => {
                     },
                   }}
                 >
-                  Login
+                  {isSubmitting ? (
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    <CircularProgress size={20} color='#08397C' />
+                    Login
+                    </Box>
+                ) : (
+                    "Login"
+                )}
                 </Button>
 
                 <Button
@@ -332,6 +344,28 @@ const LoginModal = () => {
                   </a>
                 </Typography>
               </Box>
+              {/* Add loading overlay */}
+              {isSubmitting && (
+              <Box
+                  sx={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  backgroundColor: "rgba(255, 255, 255)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  zIndex: 9999,
+                  }}
+              >
+                  <Box sx={{ textAlign: "center" }}>
+                  <CircularProgress />
+                  <Typography sx={{ mt: 2, fontSize: "1.25rem" }}>Logging in...</Typography>
+                  </Box>
+              </Box>
+              )}
             </Box>
           </form>
         </Box>

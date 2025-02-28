@@ -23,6 +23,7 @@ import {
   DialogContent,
   DialogActions,
   ListItemIcon,
+  CircularProgress  
 } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -44,6 +45,7 @@ const Navbar = () => {
   const [open, setOpen] = React.useState(false);
   const anchorRef = React.useRef < HTMLButtonElement > null;
   const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -185,6 +187,7 @@ const Navbar = () => {
   };
 
   const handleLogout = async () => {
+    setIsSubmitting(true);
     try {
       const response = await api({
         method: "post",
@@ -206,6 +209,8 @@ const Navbar = () => {
         // Navigate to home
         navigate("/home", { replace: true });
       }
+
+      setIsSubmitting(false);
     } catch (error) {
       console.error("Logout error:", error);
       // Still perform logout actions even if the server request fails
@@ -312,8 +317,6 @@ const Navbar = () => {
       "06": [
         // Researcher
         ...commonItems,
-        { label: "About Us", onClick: handleAboutUs },
-        { label: "Help", onClick: handleHelp },
       ],
     };
 
@@ -701,60 +704,36 @@ const Navbar = () => {
           onClick={handleCloseUserMenu}
           sx={{ "& .MuiPaper-root": { backgroundColor: "#CA031B" } }}
         >
-          {user?.role === "06" ? (
+          <MenuItem onClick={handleProfile}>
+            <Typography
+              color='common.white'
+              sx={{ fontSize: { sm: "0.7rem", md: "0.9rem", lg: "1rem" } }}
+            >
+              Profile
+            </Typography>
+          </MenuItem>
+          {user?.role !== "01" && (
             <>
-              <MenuItem onClick={handleProfile}>
+              <MenuItem onClick={handleAboutUs}>
                 <Typography
                   color='common.white'
-                  sx={{ fontSize: { sm: "0.7rem", md: "0.9rem", lg: "1rem" } }}
+                  sx={{
+                    fontSize: { sm: "0.7rem", md: "0.9rem", lg: "1rem" },
+                  }}
                 >
-                  Profile
+                  About Us
                 </Typography>
               </MenuItem>
-              <Divider />
-              <MenuItem onClick={confirmLogout}>
+              <MenuItem onClick={handleHelp}>
                 <Typography
                   color='common.white'
-                  sx={{ fontSize: { sm: "0.7rem", md: "0.9rem", lg: "1rem" } }}
+                  sx={{
+                    fontSize: { sm: "0.7rem", md: "0.9rem", lg: "1rem" },
+                  }}
                 >
-                  Log out
+                  Help
                 </Typography>
               </MenuItem>
-            </>
-          ) : (
-            <>
-              <MenuItem onClick={handleProfile}>
-                <Typography
-                  color='common.white'
-                  sx={{ fontSize: { sm: "0.7rem", md: "0.9rem", lg: "1rem" } }}
-                >
-                  Profile
-                </Typography>
-              </MenuItem>
-              {user?.role !== "01" && (
-                <>
-                  <MenuItem onClick={handleAboutUs}>
-                    <Typography
-                      color='common.white'
-                      sx={{
-                        fontSize: { sm: "0.7rem", md: "0.9rem", lg: "1rem" },
-                      }}
-                    >
-                      About Us
-                    </Typography>
-                  </MenuItem>
-                  <MenuItem onClick={handleHelp}>
-                    <Typography
-                      color='common.white'
-                      sx={{
-                        fontSize: { sm: "0.7rem", md: "0.9rem", lg: "1rem" },
-                      }}
-                    >
-                      Help
-                    </Typography>
-                  </MenuItem>
-                </>
-              )}
               <Divider />
               <MenuItem onClick={confirmLogout}>
                 <ListItemIcon>
@@ -860,9 +839,38 @@ const Navbar = () => {
               },
             }}
           >
-            Log Out
+            {isSubmitting ? (
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <CircularProgress size={20} color='#08397C' />
+                Log out
+                </Box>
+            ) : (
+                "Log out"
+            )}
           </Button>
         </DialogActions>
+        {/* Add loading overlay */}
+        {isSubmitting && (
+        <Box
+            sx={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(255, 255, 255, 0.7)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 9999,
+            }}
+        >
+            <Box sx={{ textAlign: "center" }}>
+            <CircularProgress />
+            <Typography sx={{ mt: 2, fontSize: "1.25rem" }}>Logging out...</Typography>
+            </Box>
+        </Box>
+        )}
       </Dialog>
       <LoginModal />
     </AppBar>
