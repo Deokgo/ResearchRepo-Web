@@ -1062,67 +1062,6 @@ const DisplayResearchInfo = () => {
                                 },
                               }}
                             >
-                              Research Areas:
-                            </Typography>
-                            <Typography
-                              variant='body1'
-                              sx={{
-                                fontSize: {
-                                  xs: "0.6rem",
-                                  md: "0.7rem",
-                                  lg: "0.8rem",
-                                },
-                                mb: "1.5rem",
-                              }}
-                            >
-                              {Array.isArray(item.research_areas) &&
-                              item.research_areas.length > 0
-                                ? item.research_areas
-                                    .map((area) => area.research_area_name)
-                                    .join("; ")
-                                : "No research areas available"}
-                            </Typography>
-                            <Typography
-                              variant='h6'
-                              fontWeight='700'
-                              sx={{
-                                mb: "0.5rem",
-                                fontSize: {
-                                  xs: "0.75rem",
-                                  md: "0.75rem",
-                                  lg: "1.1rem",
-                                },
-                              }}
-                            >
-                              Keywords:
-                            </Typography>
-                            <Typography
-                              variant='body1'
-                              sx={{
-                                fontSize: {
-                                  xs: "0.6rem",
-                                  md: "0.7rem",
-                                  lg: "0.8rem",
-                                },
-                              }}
-                            >
-                              {Array.isArray(item.keywords)
-                                ? item.keywords.join("; ")
-                                : "No keywords available"}
-                            </Typography>
-                            <Typography
-                              variant='h6'
-                              fontWeight='700'
-                              sx={{
-                                mt: "1.5rem",
-                                mb: "0.5rem",
-                                fontSize: {
-                                  xs: "0.75rem",
-                                  md: "0.75rem",
-                                  lg: "1.1rem",
-                                },
-                              }}
-                            >
                               Abstract:
                             </Typography>
                             <Typography
@@ -1133,10 +1072,51 @@ const DisplayResearchInfo = () => {
                                   md: "0.7rem",
                                   lg: "0.8rem",
                                 },
+                                mb: "2rem",
                               }}
                             >
                               {item.abstract || "No abstract available"}
                             </Typography>
+
+                            <Box sx={{ mt: 2 }}>
+                              <Typography
+                                variant='body2'
+                                sx={{
+                                  fontSize: {
+                                    xs: "0.55rem",
+                                    md: "0.65rem",
+                                    lg: "0.75rem",
+                                  },
+                                  color: "#666",
+                                  mb: "0.25rem",
+                                }}
+                              >
+                                <strong>Research Areas:</strong>{" "}
+                                {Array.isArray(item.research_areas) &&
+                                item.research_areas.length > 0
+                                  ? item.research_areas
+                                      .map((area) => area.research_area_name)
+                                      .join("; ")
+                                  : "No research areas available"}
+                              </Typography>
+
+                              <Typography
+                                variant='body2'
+                                sx={{
+                                  fontSize: {
+                                    xs: "0.55rem",
+                                    md: "0.65rem",
+                                    lg: "0.75rem",
+                                  },
+                                  color: "#666",
+                                }}
+                              >
+                                <strong>Keywords:</strong>{" "}
+                                {Array.isArray(item.keywords)
+                                  ? item.keywords.join("; ")
+                                  : "No keywords available"}
+                              </Typography>
+                            </Box>
                           </Grid2>
                           <Grid2
                             size={isMobile || isSizeMobile ? 12 : 4}

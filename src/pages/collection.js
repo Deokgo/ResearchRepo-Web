@@ -295,8 +295,13 @@ const Collection = () => {
                       author.name?.toLowerCase().includes(query) ||
                       author.email?.toLowerCase().includes(query)
                   ) ?? false;
+                // Add keyword search
+                const keywordMatch =
+                  item.keywords?.some((keyword) =>
+                    keyword.toLowerCase().includes(query)
+                  ) ?? false;
 
-                return titleMatch || authorMatch;
+                return titleMatch || authorMatch || keywordMatch;
               } catch (error) {
                 return false; // Skip this item if an error occurs
               }
@@ -507,6 +512,13 @@ const Collection = () => {
                           valueLabelDisplay='on'
                           min={dateRange[0]}
                           max={dateRange[1]}
+                          marks={Array.from(
+                            { length: dateRange[1] - dateRange[0] + 1 },
+                            (_, i) => ({
+                              value: dateRange[0] + i,
+                              label: "", // Empty label, only shows the mark line
+                            })
+                          )}
                           sx={{
                             width: "90%",
                             "& .MuiSlider-valueLabel": {
@@ -520,6 +532,11 @@ const Collection = () => {
                             },
                             "& .MuiSlider-thumb": {
                               backgroundColor: "#08397C",
+                            },
+                            "& .MuiSlider-mark": {
+                              backgroundColor: "#bbb",
+                              height: "8px",
+                              width: "1px",
                             },
                           }}
                         />
@@ -540,18 +557,42 @@ const Collection = () => {
                             }
                           >
                             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                              <Typography
+                              <Box
                                 sx={{
-                                  color: "#08397C",
-                                  fontSize: {
-                                    xs: "0.5rem",
-                                    md: "0.5rem",
-                                    lg: "0.9rem",
-                                  },
+                                  display: "flex",
+                                  alignItems: "center",
+                                  width: "100%",
                                 }}
                               >
-                                College
-                              </Typography>
+                                <Typography
+                                  sx={{
+                                    color: "#08397C",
+                                    fontSize: {
+                                      xs: "0.5rem",
+                                      md: "0.5rem",
+                                      lg: "0.9rem",
+                                    },
+                                    flex: 1,
+                                  }}
+                                >
+                                  College
+                                </Typography>
+                                {selectedColleges.length > 0 && (
+                                  <Typography
+                                    sx={{
+                                      color: "#666",
+                                      fontSize: {
+                                        xs: "0.45rem",
+                                        md: "0.45rem",
+                                        lg: "0.8rem",
+                                      },
+                                      mr: 1,
+                                    }}
+                                  >
+                                    ({selectedColleges.length} selected)
+                                  </Typography>
+                                )}
+                              </Box>
                             </AccordionSummary>
                             <AccordionDetails>
                               <Box
@@ -603,18 +644,42 @@ const Collection = () => {
                         }
                       >
                         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                          <Typography
+                          <Box
                             sx={{
-                              color: "#08397C",
-                              fontSize: {
-                                xs: "0.5rem",
-                                md: "0.5rem",
-                                lg: "0.9rem",
-                              },
+                              display: "flex",
+                              alignItems: "center",
+                              width: "100%",
                             }}
                           >
-                            Program
-                          </Typography>
+                            <Typography
+                              sx={{
+                                color: "#08397C",
+                                fontSize: {
+                                  xs: "0.5rem",
+                                  md: "0.5rem",
+                                  lg: "0.9rem",
+                                },
+                                flex: 1,
+                              }}
+                            >
+                              Program
+                            </Typography>
+                            {selectedPrograms.length > 0 && (
+                              <Typography
+                                sx={{
+                                  color: "#666",
+                                  fontSize: {
+                                    xs: "0.45rem",
+                                    md: "0.45rem",
+                                    lg: "0.8rem",
+                                  },
+                                  mr: 1,
+                                }}
+                              >
+                                ({selectedPrograms.length} selected)
+                              </Typography>
+                            )}
+                          </Box>
                         </AccordionSummary>
                         <AccordionDetails>
                           <Box
@@ -663,18 +728,42 @@ const Collection = () => {
                       }
                     >
                       <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                        <Typography
+                        <Box
                           sx={{
-                            color: "#08397C",
-                            fontSize: {
-                              xs: "0.5rem",
-                              md: "0.5rem",
-                              lg: "0.9rem",
-                            },
+                            display: "flex",
+                            alignItems: "center",
+                            width: "100%",
                           }}
                         >
-                          Publication Format
-                        </Typography>
+                          <Typography
+                            sx={{
+                              color: "#08397C",
+                              fontSize: {
+                                xs: "0.5rem",
+                                md: "0.5rem",
+                                lg: "0.9rem",
+                              },
+                              flex: 1,
+                            }}
+                          >
+                            Publication Format
+                          </Typography>
+                          {selectedFormats.length > 0 && (
+                            <Typography
+                              sx={{
+                                color: "#666",
+                                fontSize: {
+                                  xs: "0.45rem",
+                                  md: "0.45rem",
+                                  lg: "0.8rem",
+                                },
+                                mr: 1,
+                              }}
+                            >
+                              ({selectedFormats.length} selected)
+                            </Typography>
+                          )}
+                        </Box>
                       </AccordionSummary>
                       <AccordionDetails>
                         <Box
@@ -763,7 +852,7 @@ const Collection = () => {
                     >
                       <TextField
                         variant='outlined'
-                        placeholder='Search by Title or Authors'
+                        placeholder='Search by Title, Authors, or Keywords'
                         value={searchQuery}
                         onChange={handleSearchChange}
                         sx={{
@@ -776,8 +865,8 @@ const Collection = () => {
                             },
                           },
                           "& .MuiInputBase-input::placeholder": {
-                            fontSize: "0.85rem", // Adjust placeholder font size
-                            color: "rgba(0, 0, 0, 0.5)", // Optional: Adjust placeholder color
+                            fontSize: "0.85rem",
+                            color: "rgba(0, 0, 0, 0.5)",
                           },
                         }}
                         InputProps={{
@@ -881,20 +970,46 @@ const Collection = () => {
                                     .join("; ")}{" "}
                                   | {researchItem.year}
                                 </Typography>
-                                <Typography
-                                  variant='caption'
+                                <Box
                                   sx={{
-                                    color: "#0A438F",
-                                    fontWeight: 500,
-                                    fontSize: {
-                                      xs: "0.5rem",
-                                      md: "0.5rem",
-                                      lg: "0.75rem",
-                                    },
+                                    display: "flex",
+                                    gap: 1,
+                                    mt: 0.5,
+                                    flexWrap: "wrap",
                                   }}
                                 >
-                                  {researchItem.journal}
-                                </Typography>
+                                  <Typography
+                                    variant='caption'
+                                    sx={{
+                                      color: "#0A438F",
+                                      fontWeight: 500,
+                                      fontSize: {
+                                        xs: "0.5rem",
+                                        md: "0.5rem",
+                                        lg: "0.75rem",
+                                      },
+                                    }}
+                                  >
+                                    {researchItem.journal}
+                                  </Typography>
+                                  {researchItem.keywords &&
+                                    researchItem.keywords.length > 0 && (
+                                      <Typography
+                                        variant='caption'
+                                        sx={{
+                                          color: "#666",
+                                          fontSize: {
+                                            xs: "0.5rem",
+                                            md: "0.5rem",
+                                            lg: "0.75rem",
+                                          },
+                                        }}
+                                      >
+                                        | Keywords:{" "}
+                                        {researchItem.keywords.join(", ")}
+                                      </Typography>
+                                    )}
+                                </Box>
                               </Box>
                             )}
                           />
