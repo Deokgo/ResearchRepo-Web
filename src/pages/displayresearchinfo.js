@@ -30,7 +30,7 @@ import {
 import Stack from "@mui/material/Stack";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import DownloadIcon from "@mui/icons-material/Download";
-import VisibilityIcon from "@mui/icons-material/Visibility";
+import ArticleIcon from "@mui/icons-material/Article";
 import { useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import homeBg from "../assets/home_bg.png";
@@ -107,6 +107,11 @@ const DisplayResearchInfo = () => {
 
   const [isSuccessDialogOpen, setIsSuccessDialogOpen] = useState(false);
 
+  const [fileAvailability, setFileAvailability] = useState({
+    manuscript: false,
+    extendedAbstract: false,
+  });
+
   useEffect(() => {
     if (!id) return;
 
@@ -155,14 +160,19 @@ const DisplayResearchInfo = () => {
           const response = await api.get(
             `/dataset/fetch_ordered_dataset/${id}`
           );
-          const fetchedDataset = response.data.dataset || []; // Use empty array if dataset is undefined
+          const fetchedDataset = response.data.dataset || [];
           console.log("Fetched data:", fetchedDataset);
           setData({ dataset: fetchedDataset });
+
+          // Check file availability if there's data
+          if (fetchedDataset.length > 0) {
+            await checkFileAvailability(fetchedDataset[0]);
+          }
         } catch (error) {
           console.error("Error fetching data:", error);
-          setData({ dataset: [] }); // Set an empty dataset on error
+          setData({ dataset: [] });
         } finally {
-          setLoading(false); // Stop loading regardless of success or failure
+          setLoading(false);
         }
       };
       fetchData();
@@ -837,6 +847,19 @@ const DisplayResearchInfo = () => {
     return true;
   };
 
+  // Add this function to check file availability
+  const checkFileAvailability = async (researchItem) => {
+    try {
+      const response = await api.get(
+        `/paper/check_files/${researchItem.research_id}`
+      );
+      setFileAvailability(response.data);
+    } catch (error) {
+      console.error("Error checking file availability:", error);
+      setFileAvailability({ manuscript: false, extendedAbstract: false });
+    }
+  };
+
   return (
     <>
       <Box
@@ -1007,7 +1030,7 @@ const DisplayResearchInfo = () => {
                               </Typography>
                             </Stack>
                             <Stack direction='row' alignItems='center' gap={1}>
-                              <VisibilityIcon
+                              <ArticleIcon
                                 color='primary'
                                 sx={{
                                   fontSize: {
@@ -1249,7 +1272,7 @@ const DisplayResearchInfo = () => {
                                   variant='contained'
                                   color='primary'
                                   startIcon={
-                                    <VisibilityIcon
+                                    <ArticleIcon
                                       sx={{
                                         fontSize: {
                                           xs: "0.65rem",
@@ -1276,10 +1299,23 @@ const DisplayResearchInfo = () => {
                                     borderRadius: "100px",
                                     maxHeight: "3rem",
                                     "&:hover": {
-                                      backgroundColor: "#072d61",
+                                      backgroundColor:
+                                        fileAvailability.manuscript
+                                          ? "#072d61"
+                                          : undefined,
+                                    },
+                                    "&.Mui-disabled": {
+                                      backgroundColor: "#cccccc",
+                                      color: "#666666",
                                     },
                                   }}
                                   onClick={() => handleViewManuscript(item)}
+                                  disabled={!fileAvailability.manuscript}
+                                  title={
+                                    !fileAvailability.manuscript
+                                      ? "Manuscript not available"
+                                      : ""
+                                  }
                                 >
                                   Full Manuscript
                                 </Button>
@@ -1288,7 +1324,7 @@ const DisplayResearchInfo = () => {
                                 variant='contained'
                                 color='primary'
                                 startIcon={
-                                  <VisibilityIcon
+                                  <ArticleIcon
                                     sx={{
                                       fontSize: {
                                         xs: "0.65rem",
@@ -1315,10 +1351,23 @@ const DisplayResearchInfo = () => {
                                   borderRadius: "100px",
                                   maxHeight: "3rem",
                                   "&:hover": {
-                                    backgroundColor: "#072d61",
+                                    backgroundColor:
+                                      fileAvailability.extendedAbstract
+                                        ? "#072d61"
+                                        : undefined,
+                                  },
+                                  "&.Mui-disabled": {
+                                    backgroundColor: "#cccccc",
+                                    color: "#666666",
                                   },
                                 }}
                                 onClick={() => handleViewEA(item)}
+                                disabled={!fileAvailability.extendedAbstract}
+                                title={
+                                  !fileAvailability.extendedAbstract
+                                    ? "Extended abstract not available"
+                                    : ""
+                                }
                               >
                                 Extended Abstract
                               </Button>
@@ -1801,42 +1850,6 @@ const DisplayResearchInfo = () => {
                                 Current file: {editableData.full_manuscript}
                               </Typography>
                             )}
-                            <Button
-                              variant='contained'
-                              onClick={() => handleViewManuscript(editableData)}
-                              startIcon={
-                                <VisibilityIcon
-                                  sx={{
-                                    fontSize: {
-                                      xs: "0.65rem",
-                                      md: "0.75rem",
-                                      lg: "1rem",
-                                    },
-                                  }}
-                                />
-                              }
-                              sx={{
-                                backgroundColor: "#08397C",
-                                color: "#FFF",
-                                fontFamily: "Montserrat, sans-serif",
-                                fontWeight: 400,
-                                textTransform: "none",
-                                fontSize: {
-                                  xs: "0.5rem",
-                                  md: "0.65rem",
-                                  lg: "0.8rem",
-                                },
-                                marginTop: "0.5rem",
-                                alignSelf: "center",
-                                borderRadius: "100px",
-                                maxHeight: "3rem",
-                                "&:hover": {
-                                  backgroundColor: "#072d61",
-                                },
-                              }}
-                            >
-                              View Manuscript
-                            </Button>
                           </Grid2>
                           <Grid2
                             size={3}
@@ -1895,42 +1908,6 @@ const DisplayResearchInfo = () => {
                                 Current file: {editableData.extended_abstract}
                               </Typography>
                             )}
-                            <Button
-                              variant='contained'
-                              onClick={() => handleViewEA(editableData)}
-                              startIcon={
-                                <VisibilityIcon
-                                  sx={{
-                                    fontSize: {
-                                      xs: "0.65rem",
-                                      md: "0.75rem",
-                                      lg: "1rem",
-                                    },
-                                  }}
-                                />
-                              }
-                              sx={{
-                                backgroundColor: "#08397C",
-                                color: "#FFF",
-                                fontFamily: "Montserrat, sans-serif",
-                                fontWeight: 400,
-                                textTransform: "none",
-                                fontSize: {
-                                  xs: "0.5rem",
-                                  md: "0.65rem",
-                                  lg: "0.8rem",
-                                },
-                                marginTop: "0.5rem",
-                                alignSelf: "center",
-                                borderRadius: "100px",
-                                maxHeight: "3rem",
-                                "&:hover": {
-                                  backgroundColor: "#072d61",
-                                },
-                              }}
-                            >
-                              View Extended Abstract
-                            </Button>
                           </Grid2>
                           <Box
                             sx={{

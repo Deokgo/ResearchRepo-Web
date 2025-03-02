@@ -488,6 +488,7 @@ const Collection = () => {
                           color: "#08397C",
                           position: "relative",
                           zIndex: 2,
+                          fontFamily: "Montserrat, sans-serif",
                           fontSize: {
                             xs: "0.5rem",
                             md: "0.5rem",
@@ -858,6 +859,7 @@ const Collection = () => {
                         sx={{
                           flex: 2,
                           "& .MuiInputBase-input": {
+                            fontFamily: "Montserrat, sans-serif",
                             fontSize: {
                               xs: "0.5rem",
                               md: "0.75rem",
@@ -865,6 +867,7 @@ const Collection = () => {
                             },
                           },
                           "& .MuiInputBase-input::placeholder": {
+                            fontFamily: "Montserrat, sans-serif",
                             fontSize: "0.85rem",
                             color: "rgba(0, 0, 0, 0.5)",
                           },
@@ -957,6 +960,7 @@ const Collection = () => {
                                   variant='body2'
                                   sx={{
                                     color: "#666",
+                                    fontFamily: "Montserrat, sans-serif",
                                     fontSize: {
                                       xs: "0.5rem",
                                       md: "0.5rem",
@@ -983,6 +987,7 @@ const Collection = () => {
                                     sx={{
                                       color: "#0A438F",
                                       fontWeight: 500,
+                                      fontFamily: "Montserrat, sans-serif",
                                       fontSize: {
                                         xs: "0.5rem",
                                         md: "0.5rem",
@@ -998,6 +1003,7 @@ const Collection = () => {
                                         variant='caption'
                                         sx={{
                                           color: "#666",
+                                          fontFamily: "Montserrat, sans-serif",
                                           fontSize: {
                                             xs: "0.5rem",
                                             md: "0.5rem",
