@@ -56,10 +56,7 @@ const KnowledgeGraph = () => {
           overflow: "hidden",
         }}
       >
-        <HeaderWithBackButton
-          title='Knowledge Graph'
-          onBack={() => navigate(-1)}
-        />
+        <HeaderWithBackButton title='Knowledge Graph' showBackButton={false} />
         {showTabs && (
           <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
             <Tabs
@@ -93,7 +90,7 @@ const KnowledgeGraph = () => {
         >
           <iframe
             ref={iframeRef}
-            src={`https://app.mmcl-researchrepository.com/knowledgegraph${
+            src={`http://localhost:5000/knowledgegraph${
               activeTab === 1 ? "/research-network" : ""
             }?role=${user?.role || ""}`}
             style={{

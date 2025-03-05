@@ -1,8 +1,7 @@
 import axios from "axios";
-
+//process.env.REACT_APP_API_URL || "http://localhost:5000",
 const api = axios.create({
-  // Use your domain instead of IP
-  baseURL: "https://app.mmcl-researchrepository.com",
+  baseURL: "http://localhost:5000",
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",

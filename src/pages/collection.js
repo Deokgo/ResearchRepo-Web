@@ -437,10 +437,7 @@ const Collection = () => {
             overflow: "hidden",
           }}
         >
-          <HeaderWithBackButton
-            title='Collections'
-            onBack={() => navigate(-1)}
-          />
+          <HeaderWithBackButton title='Collections' showBackButton={false} />
 
           {/* Main content area */}
           <Box

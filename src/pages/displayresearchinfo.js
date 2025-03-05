@@ -42,6 +42,7 @@ import { useAuth } from "../context/AuthContext";
 import { filterCache, fetchAndCacheFilterData } from "../utils/filterCache";
 import HeaderWithBackButton from "../components/Header";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 
 const DisplayResearchInfo = () => {
   const userId = localStorage.getItem("user_id");
@@ -1030,7 +1031,7 @@ const DisplayResearchInfo = () => {
                               </Typography>
                             </Stack>
                             <Stack direction='row' alignItems='center' gap={1}>
-                              <ArticleIcon
+                              <VisibilityIcon
                                 color='primary'
                                 sx={{
                                   fontSize: {

@@ -4,7 +4,7 @@ import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import homeBg from "../assets/home_bg.png";
 import newBG from "../assets/new_header_bg.png";
 
-const HeaderWithBackButton = ({ title, onBack, backgroundImage }) => {
+const HeaderWithBackButton = ({ title, onBack, showBackButton = true }) => {
   return (
     <Box
       sx={{
@@ -46,20 +46,24 @@ const HeaderWithBackButton = ({ title, onBack, backgroundImage }) => {
         />
       )}
       <Box sx={{ display: "flex", ml: "5rem", zIndex: 3 }}>
-        <Button
-          onClick={onBack}
-          sx={{
-            color: "#fff",
-            height: "inherit",
-            transform: {
-              xs: "scale(0.8)",
-              sm: "scale(0.9)",
-              md: "scale(1)",
-            },
-          }}
-        >
-          <ArrowBackIosIcon />
-        </Button>
+        {showBackButton ? (
+          <Button
+            onClick={onBack}
+            sx={{
+              color: "#fff",
+              height: "inherit",
+              transform: {
+                xs: "scale(0.8)",
+                sm: "scale(0.9)",
+                md: "scale(1)",
+              },
+            }}
+          >
+            <ArrowBackIosIcon />
+          </Button>
+        ) : (
+          <Box sx={{ width: 48 }} />
+        )}
         <Typography
           variant='h3'
           sx={{
