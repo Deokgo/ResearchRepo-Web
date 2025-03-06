@@ -175,20 +175,12 @@ const Backup = () => {
 
       setLoading(true);
 
-      // Use fetch instead of api for better large file handling
-      const response = await fetch(`/backup/download/${backup.backup_id}`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`, // Add if you're using JWT
-        },
+      const response = await api.get(`/backup/download/${backup.backup_id}`, {
+        responseType: "blob",
       });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
       // Get the filename from the Content-Disposition header if available
-      const contentDisposition = response.headers.get("Content-Disposition");
+      const contentDisposition = response.headers["content-disposition"];
       let filename = `${backup.backup_id}.tar.gz`;
       if (contentDisposition) {
         const filenameMatch = contentDisposition.match(
@@ -199,40 +191,8 @@ const Backup = () => {
         }
       }
 
-      // Create a ReadableStream from the response
-      const reader = response.body.getReader();
-      const contentLength = response.headers.get("Content-Length");
-      let receivedLength = 0;
-      const chunks = [];
-
-      // Read the stream
-      while (true) {
-        const { done, value } = await reader.read();
-
-        if (done) {
-          break;
-        }
-
-        chunks.push(value);
-        receivedLength += value.length;
-
-        // Optional: Add progress indication here if needed
-        if (contentLength) {
-          const progress = (receivedLength / contentLength) * 100;
-          console.log(`Download progress: ${progress.toFixed(2)}%`);
-        }
-      }
-
-      // Combine all chunks into a single Uint8Array
-      const chunksAll = new Uint8Array(receivedLength);
-      let position = 0;
-      for (const chunk of chunks) {
-        chunksAll.set(chunk, position);
-        position += chunk.length;
-      }
-
       // Create blob and download
-      const blob = new Blob([chunksAll], { type: "application/gzip" });
+      const blob = new Blob([response.data], { type: "application/gzip" });
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;

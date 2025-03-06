@@ -23,7 +23,7 @@ import {
   DialogContent,
   DialogActions,
   ListItemIcon,
-  CircularProgress  
+  CircularProgress,
 } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -734,24 +734,24 @@ const Navbar = () => {
                   Help
                 </Typography>
               </MenuItem>
-              <Divider />
-              <MenuItem onClick={confirmLogout}>
-                <ListItemIcon>
-                  <LogoutIcon sx={{ color: "#FFF" }} />
-                </ListItemIcon>
-                <Typography
-                  textAlign='center'
-                  sx={{
-                    color: "#FFF",
-                    fontWeight: 800,
-                    fontSize: { sm: "0.7rem", md: "0.9rem", lg: "1rem" },
-                  }}
-                >
-                  Log out
-                </Typography>
-              </MenuItem>
             </>
           )}
+          <Divider />
+          <MenuItem onClick={confirmLogout}>
+            <ListItemIcon>
+              <LogoutIcon sx={{ color: "#FFF" }} />
+            </ListItemIcon>
+            <Typography
+              textAlign='center'
+              sx={{
+                color: "#FFF",
+                fontWeight: 800,
+                fontSize: { sm: "0.7rem", md: "0.9rem", lg: "1rem" },
+              }}
+            >
+              Log out
+            </Typography>
+          </MenuItem>
         </Menu>
       </Toolbar>
 
@@ -840,36 +840,38 @@ const Navbar = () => {
             }}
           >
             {isSubmitting ? (
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                 <CircularProgress size={20} color='#08397C' />
                 Log out
-                </Box>
+              </Box>
             ) : (
-                "Log out"
+              "Log out"
             )}
           </Button>
         </DialogActions>
         {/* Add loading overlay */}
         {isSubmitting && (
-        <Box
+          <Box
             sx={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: "rgba(255, 255, 255, 0.7)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 9999,
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: "rgba(255, 255, 255, 0.7)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              zIndex: 9999,
             }}
-        >
+          >
             <Box sx={{ textAlign: "center" }}>
-            <CircularProgress />
-            <Typography sx={{ mt: 2, fontSize: "1.25rem" }}>Logging out...</Typography>
+              <CircularProgress />
+              <Typography sx={{ mt: 2, fontSize: "1.25rem" }}>
+                Logging out...
+              </Typography>
             </Box>
-        </Box>
+          </Box>
         )}
       </Dialog>
       <LoginModal />
