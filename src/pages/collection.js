@@ -28,6 +28,8 @@ import AccordionDetails from "@mui/material/AccordionDetails";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import HeaderWithBackButton from "../components/Header";
 import AddIcon from "@mui/icons-material/Add";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import BulkUploadPaperModal from "../components/bulkuploadpapermodal";
 
 // Debounce function to limit rapid state updates
 const useDebounce = (value, delay) => {
@@ -72,6 +74,7 @@ const Collection = () => {
   const [otherSectionsVisible, setOtherSectionsVisible] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const debouncedColleges = useDebounce(selectedColleges, 300);
+  const [isBulkUploadModalOpen, setIsBulkUploadModalOpen] = useState(false);
 
   // Fetch publication formats from the API
   useEffect(() => {
@@ -410,6 +413,10 @@ const Collection = () => {
   };
 
   const [expandedAccordion, setExpandedAccordion] = useState(null);
+
+  // Add handlers for bulk upload modal
+  const handleOpenBulkUploadModal = () => setIsBulkUploadModalOpen(true);
+  const handleCloseBulkUploadModal = () => setIsBulkUploadModalOpen(false);
 
   return (
     <>
@@ -879,28 +886,50 @@ const Collection = () => {
                       />
 
                       {!isMobile && user?.role === "05" && (
-                        <Button
-                          variant='contained'
-                          color='primary'
-                          sx={{
-                            backgroundColor: "#08397C",
-                            color: "#FFF",
-                            fontFamily: "Montserrat, sans-serif",
-                            fontWeight: 600,
-                            textTransform: "none",
-                            fontSize: { xs: "0.875rem", md: "1rem" },
-                            padding: { xs: "0.5rem 1rem", md: "1.25rem" },
-                            marginLeft: "1rem",
-                            borderRadius: "100px",
-                            maxHeight: "3rem",
-                            "&:hover": {
-                              backgroundColor: "#072d61",
-                            },
-                          }}
-                          onClick={openAddPaperModal}
-                        >
-                          <AddIcon></AddIcon>&nbsp;Add New Paper
-                        </Button>
+                        <Box sx={{ display: "flex", gap: 2 }}>
+                          <Button
+                            variant='contained'
+                            onClick={openAddPaperModal}
+                            sx={{
+                              backgroundColor: "#08397C",
+                              color: "#FFF",
+                              fontFamily: "Montserrat, sans-serif",
+                              fontWeight: 600,
+                              textTransform: "none",
+                              fontSize: { xs: "0.875rem", md: "1rem" },
+                              padding: { xs: "0.5rem 1rem", md: "1.25rem" },
+                              borderRadius: "100px",
+                              maxHeight: "3rem",
+                              "&:hover": {
+                                backgroundColor: "#072d61",
+                              },
+                            }}
+                          >
+                            <AddIcon />
+                            &nbsp;Add New Paper
+                          </Button>
+                          <Button
+                            variant='contained'
+                            onClick={handleOpenBulkUploadModal}
+                            sx={{
+                              backgroundColor: "#08397C",
+                              color: "#FFF",
+                              fontFamily: "Montserrat, sans-serif",
+                              fontWeight: 600,
+                              textTransform: "none",
+                              fontSize: { xs: "0.875rem", md: "1rem" },
+                              padding: { xs: "0.5rem 1rem", md: "1.25rem" },
+                              borderRadius: "100px",
+                              maxHeight: "3rem",
+                              "&:hover": {
+                                backgroundColor: "#072d61",
+                              },
+                            }}
+                          >
+                            <CloudUploadIcon />
+                            &nbsp;Bulk Upload
+                          </Button>
+                        </Box>
                       )}
                     </Box>
                     <Box
@@ -1102,6 +1131,11 @@ const Collection = () => {
         isOpen={isAddPaperModalOpen}
         handleClose={closeAddPaperModal}
         onPaperAdded={fetchAllResearchData}
+      />
+      <BulkUploadPaperModal
+        isOpen={isBulkUploadModalOpen}
+        handleClose={handleCloseBulkUploadModal}
+        onPapersAdded={fetchAllResearchData}
       />
     </>
   );
