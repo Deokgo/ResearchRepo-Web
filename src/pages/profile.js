@@ -174,7 +174,7 @@ const Profile = () => {
         setIsConfirmDialogOpen(true);
         return;
       }
-
+  
       const {
         firstName,
         middleName,
@@ -183,7 +183,7 @@ const Profile = () => {
         department: college_id,
         program: program_id,
       } = formValues;
-
+  
       const payload = {
         first_name: firstName,
         middle_name: middleName,
@@ -192,7 +192,7 @@ const Profile = () => {
         college_id,
         program_id,
       };
-
+  
       const hasChanges =
         firstName !== initialData?.firstName ||
         middleName !== initialData?.middleName ||
@@ -200,72 +200,55 @@ const Profile = () => {
         suffix !== initialData?.suffix ||
         college_id !== initialData?.department ||
         program_id !== initialData?.program;
-
+  
       if (!hasChanges) {
         setDialogContent({
           title: "No Changes Detected",
-          message:
-            "You haven't made any changes. Please modify your profile before saving.",
+          message: "You haven't made any changes. Please modify your profile before saving.",
           confirmAction: () => setIsConfirmDialogOpen(false),
         });
         setIsConfirmDialogOpen(true);
         return;
       }
-
-      const response = await fetch(`/accounts/update_account/${user.user_id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+  
+      // Send API request
+      const response = await api.put(`/accounts/update_account/${user.user_id}`, payload);
+  
+      // Update initial data after successful response
+      setInitialData({
+        firstName,
+        middleName,
+        lastName,
+        suffix,
+        department: college_id,
+        program: program_id,
       });
-
-      if (response.ok) {
-        const data = await response.json();
-
-        // Update initialData to reflect saved changes
-        setInitialData({
-          firstName,
-          middleName,
-          lastName,
-          suffix,
-          department: college_id,
-          program: program_id,
-        });
-
-        setDialogContent({
-          title: "Profile Updated",
-          message: "Your profile has been updated successfully.",
-          confirmAction: () => {
-            setIsConfirmDialogOpen(false);
-            fetchUserData();
-          },
-        });
-      } else {
-        const errorData = await response.json();
-        setDialogContent({
-          title: "Update Failed",
-          message: `Failed to update profile: ${
-            errorData.message || "Unknown error"
-          }`,
-          confirmAction: () => setIsConfirmDialogOpen(false),
-        });
-
-        if (errorData.missing_fields) {
-          console.log("Missing fields:", errorData.missing_fields);
-        }
-      }
-
+  
+      setDialogContent({
+        title: "Profile Updated",
+        message: "Your profile has been updated successfully.",
+        confirmAction: () => {
+          setIsConfirmDialogOpen(false);
+          fetchUserData();
+        },
+      });
+  
       setIsConfirmDialogOpen(true);
     } catch (error) {
       console.error("Error updating profile:", error);
+  
+      const errorMessage =
+        error.response?.data?.message || "Something went wrong while updating your profile.";
+  
       setDialogContent({
-        title: "An Error Occurred",
-        message:
-          "Something went wrong while updating your profile. Please try again later.",
+        title: "Update Failed",
+        message: errorMessage,
         confirmAction: () => setIsConfirmDialogOpen(false),
       });
+  
       setIsConfirmDialogOpen(true);
     }
-  };
+  };  
 
   const handleSaveNewPassword = async () => {
     const { newPassword, confirmPassword } = passwordValues;
