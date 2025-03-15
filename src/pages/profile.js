@@ -26,6 +26,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import HeaderWithBackButton from "../components/Header";
 import OtpModal from "../components/otpmodal"; // Adjust the path if needed
+import CircularProgress from "@mui/material/CircularProgress";
 
 const modalStyle = {
   position: "absolute",
@@ -40,6 +41,8 @@ const modalStyle = {
 };
 
 const Profile = () => {
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const { user } = useAuth();
   const [userData, setUserData] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -427,6 +430,32 @@ const Profile = () => {
     setIsChangePasswordModalOpen(true);
   };
 
+  const handleOpenConfirmModal = () => {
+    setIsConfirmModalOpen(true);
+  };
+
+  const handleProceed = async () => {
+    setIsLoading(true);
+    try {
+      const otpResponse = await api.post("/auth/send_otp", {
+        email: email,
+        isPasswordReset: true,
+      });
+
+      if (otpResponse.status === 200) {
+        setIsOtpModalOpen(true);
+      } else {
+        console.warn("Unexpected response status:", otpResponse.status);
+      }
+    } catch (error) {
+      console.error("Error sending OTP:", error.response?.data || error.message);
+    } finally {
+      setIsLoading(false);
+      setIsConfirmModalOpen(false);
+      setIsOtpModalOpen(true);
+    }
+  };
+
   const handleOpenOtpModal = async () => {
     try {
       const otpResponse = await api.post("/auth/send_otp", {
@@ -531,7 +560,7 @@ const Profile = () => {
                   <Button
                     variant='outlined'
                     startIcon={<EditIcon />}
-                    onClick={handleOpenOtpModal}
+                    onClick={handleOpenConfirmModal}
                     sx={{
                       fontWeight: 600,
                       flex: "0 1 auto", // Prevents shrinking too much
@@ -1063,6 +1092,90 @@ const Profile = () => {
               )}
             </DialogActions>
           </Dialog>
+          
+          <Dialog
+            open={isConfirmModalOpen}
+            onClose={() => !isLoading && setIsConfirmModalOpen(false)}
+            PaperProps={{
+              sx: {
+                borderRadius: "15px",
+                padding: "1rem",
+              },
+            }}
+          >
+            {isLoading ? (
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  minHeight: "150px",
+                  padding: "24px",
+                }}
+              >
+                <CircularProgress />
+                <Typography
+                  variant="body1"
+                  sx={{ marginTop: 2, fontFamily: "Montserrat, sans-serif", color: "#666" }}
+                >
+                  Sending OTP...
+                </Typography>
+              </Box>
+            ) : (
+              <>
+                <DialogTitle
+                  sx={{
+                    fontFamily: "Montserrat, sans-serif",
+                    fontWeight: 600,
+                    color: "#08397C",
+                  }}
+                >
+                  OTP Required
+                </DialogTitle>
+                <DialogContent>
+                  <Typography
+                    sx={{ fontFamily: "Montserrat, sans-serif", color: "#666" }}
+                  >
+                    You need to authenticate with an OTP before changing your password.
+                  </Typography>
+                </DialogContent>
+                <DialogActions sx={{ padding: "1rem" }}>
+                  <Button
+                    onClick={() => setIsConfirmModalOpen(false)}
+                    sx={{
+                      backgroundColor: "#CA031B",
+                      color: "#FFF",
+                      fontFamily: "Montserrat, sans-serif",
+                      fontWeight: 600,
+                      textTransform: "none",
+                      borderRadius: "100px",
+                      padding: "0.75rem",
+                      "&:hover": { backgroundColor: "#A30417" },
+                    }}
+                  >
+                    No, Cancel
+                  </Button>
+                  <Button
+                    onClick={handleProceed}
+                    sx={{
+                      backgroundColor: "#08397C",
+                      color: "#FFF",
+                      fontFamily: "Montserrat, sans-serif",
+                      fontWeight: 600,
+                      textTransform: "none",
+                      borderRadius: "100px",
+                      padding: "0.75rem",
+                      "&:hover": { backgroundColor: "#072d61" },
+                    }}
+                  >
+                    Yes, Proceed
+                  </Button>
+                </DialogActions>
+              </>
+            )}
+          </Dialog>
+          
         </Box>
       </Box>
     </>
