@@ -241,6 +241,11 @@ const AddPublish = () => {
     (format) => format.pub_format_id === initialValues?.journal
   )?.pub_format_name;
 
+  // Disable if the conference date is in the future
+  const isDisabled =
+    publicationFormat === "PC" &&
+    new Date(initialValues?.conference_date) > new Date();
+
   return (
     <>
       {/* Update Publication Modal */}
@@ -380,7 +385,7 @@ const AddPublish = () => {
                 Non-Scopus
               </MenuItem>
             </Select>
-          </FormControl>
+          </FormControl>        
           <TextField
             fullWidth
             label='Date of Publication'
@@ -407,6 +412,8 @@ const AddPublish = () => {
               ...createInputLabelProps(),
               shrink: true,
             }}
+            disabled={isDisabled}
+            helperText={isDisabled ? "*Publication Date must be after Conference Date" : ""}
           />
           <Grid2 size={3} padding={3}>
             <Typography variant='body2' sx={{ mb: 1 }}>
