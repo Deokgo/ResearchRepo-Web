@@ -413,7 +413,7 @@ const AddPublish = () => {
               shrink: true,
             }}
             disabled={isDisabled}
-            helperText={isDisabled ? "*Publication Date must be after Conference Date" : ""}
+            helperText={isDisabled ? "*Date must be today or earlier" : ""}
           />
           <Grid2 size={3} padding={3}>
             <Typography variant='body2' sx={{ mb: 1 }}>
