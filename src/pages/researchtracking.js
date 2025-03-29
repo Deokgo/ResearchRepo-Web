@@ -803,9 +803,11 @@ const ResearchTracking = () => {
                                 sx={{
                                   padding: 2,
                                   borderBottom: "1px solid #ddd",
-                                  cursor: "pointer",
+                                  cursor: user?.role === "05" ? "pointer" : "default",
                                 }}
-                                onClick={() => handleKey(paper.research_id)}
+                                onClick={() =>
+                                  user?.role === "05" ? handleKey(paper.research_id) : null
+                                }
                               >
                                 <Typography
                                   variant='h6'

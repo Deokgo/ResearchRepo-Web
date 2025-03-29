@@ -183,46 +183,6 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
   };
 
   ///////////////////// PRE-POST MODAL HANDLING //////////////////////
-  const [hasError, setHasError] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
-
-  useEffect(() => {
-    // Function to call the API when the component mounts
-    const fetchPaperData = async () => {
-      try {
-        const response = await fetch(`/track/published_paper/${id}`, {
-          method: "GET",
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          setErrorMessage(errorData.message || "An error occurred!");
-          setHasError(true); // Set error flag to true to show banner
-        } else {
-          // Handle success response (optional)
-          const data = await response.json();
-          console.log("Success:", data);
-        }
-      } catch (error) {
-        setErrorMessage("Failed to connect to the server.");
-        setHasError(true); // Set error flag to true to show banner
-      }
-    };
-
-    // Call the API immediately
-    fetchPaperData();
-
-    // Cleanup: reset the error state when the component unmounts or id changes
-    return () => {
-      setHasError(false); // Reset error flag on component unmount or id change
-    };
-  }, [id]);
-
-  // Function to dismiss the alert banner
-  const dismissAlert = () => {
-    setHasError(false); // Dismiss the alert by setting hasError to false
-  };
-
   const [publicationFormats, setPublicationFormats] = useState([]);
 
   const loadInitialData = async () => {
@@ -429,22 +389,6 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                           </div>
                         )}
                       </Grid2>
-
-                      <div>
-                        {/* Snackbar for Alert Banner */}
-                        <Snackbar
-                          open={hasError}
-                          onClose={dismissAlert} // Close the banner when the user interacts with it
-                        >
-                          <Alert
-                            onClose={dismissAlert}
-                            severity='error' // "error" severity gives a red background for the alert
-                            sx={{ width: "100%" }}
-                          >
-                            {errorMessage}
-                          </Alert>
-                        </Snackbar>
-                      </div>
 
                       {/* Publication Part */}
                       <Box padding={1}>
