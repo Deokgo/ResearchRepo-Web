@@ -454,10 +454,7 @@ const ResearchTracking = () => {
             overflow: "hidden",
           }}
         >
-          <HeaderWithBackButton
-            title='Research Publication Tracking'
-            onBack={() => navigate(-1)}
-          />
+          <HeaderWithBackButton title='Research Publication Tracking' showBackButton={false} />
           {/* Main Content */}
           <Box
             sx={{

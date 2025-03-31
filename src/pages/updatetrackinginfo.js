@@ -254,10 +254,15 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
             flexGrow: 1,
             display: "flex",
             flexDirection: "column",
-            height: "calc(100% - 6rem)",
+            height: {
+              xs: "calc(100vh - 3.5rem)",
+              sm: "calc(100vh - 4rem)",
+              md: "calc(100vh - 6rem)",
+            },
+            overflow: "hidden",
           }}
         >
-          <HeaderWithBackButton title={header} onBack={() => navpage(-1)} />
+          <HeaderWithBackButton title={header} showBackButton={false} />
 
           {/*Main Content */}
           <Box
