@@ -65,6 +65,11 @@ const BulkUploadPaperModal = ({ isOpen, handleClose, onPapersAdded }) => {
     }
   };
 
+  const handleFileRemove = () => {
+    setFile(null);
+    setHasFile(false);
+  };
+
   const handleDownloadTemplate = async () => {
     try {
       const response = await api.get("/paper/get_template", {
@@ -110,13 +115,17 @@ const BulkUploadPaperModal = ({ isOpen, handleClose, onPapersAdded }) => {
           }}
         >
           <Typography
-            variant='h6'
+            variant='h3'
+            color='#08397C'
+            fontWeight='700'
+            mb={4}
             sx={{
-              mb: 4,
-              color: "#08397C",
-              fontFamily: "Montserrat, sans-serif",
-              fontWeight: 600,
-              textAlign: "center",
+              textAlign: { xs: "left", md: "bottom" },
+              fontSize: {
+                xs: "clamp(1rem, 2vw, 1rem)",
+                sm: "clamp(1rem, 3.5vw, 1rem)",
+                md: "clamp(1.5rem, 4vw, 1.75rem)",
+              },
             }}
           >
             Bulk Upload Papers
@@ -158,7 +167,7 @@ const BulkUploadPaperModal = ({ isOpen, handleClose, onPapersAdded }) => {
               "&:hover": {
                 backgroundColor: "rgba(8, 57, 124, 0.08)",
               },
-              mb: 3,
+              mb: 1,
             }}
             component='label'
           >
@@ -177,7 +186,7 @@ const BulkUploadPaperModal = ({ isOpen, handleClose, onPapersAdded }) => {
                 textAlign: "center",
               }}
             >
-              Click to upload CSV file
+              {hasFile ? file.name : "Click to upload CSV file"}
             </Typography>
             <Typography
               variant='body2'
@@ -201,13 +210,22 @@ const BulkUploadPaperModal = ({ isOpen, handleClose, onPapersAdded }) => {
             }}
           >
             <Button
-              onClick={handleClose}
+              variant='text'
+              onClick={(e) => {
+                handleFileRemove();
+                handleClose();
+              }}
               sx={{
-                color: "#666",
+                mb: 1,
+                color: "#CA031B",
                 fontFamily: "Montserrat, sans-serif",
                 fontWeight: 600,
                 textTransform: "none",
-                px: 3,
+                borderRadius: "8px",
+                padding: "5px 15px",
+                "&:hover": {
+                  color: "#A00216",
+                },
               }}
             >
               Cancel
