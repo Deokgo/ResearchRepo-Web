@@ -497,6 +497,7 @@ const ResearchTracking = () => {
                           color: "#08397C",
                           position: "relative",
                           zIndex: 2,
+                          fontFamily: "Montserrat, sans-serif",
                           fontSize: {
                             xs: "0.5rem",
                             md: "0.5rem",
@@ -521,6 +522,13 @@ const ResearchTracking = () => {
                           valueLabelDisplay='on'
                           min={dateRange[0]}
                           max={dateRange[1]}
+                          marks={Array.from(
+                            { length: dateRange[1] - dateRange[0] + 1 },
+                            (_, i) => ({
+                              value: dateRange[0] + i,
+                              label: "", // Empty label, only shows the mark line
+                            })
+                          )}
                           sx={{
                             width: "90%",
                             "& .MuiSlider-valueLabel": {
@@ -535,10 +543,16 @@ const ResearchTracking = () => {
                             "& .MuiSlider-thumb": {
                               backgroundColor: "#08397C",
                             },
+                            "& .MuiSlider-mark": {
+                              backgroundColor: "#bbb",
+                              height: "8px",
+                              width: "1px",
+                            },
                           }}
                         />
                       </Box>
                     </Box>
+                    
 
                     {user?.role === "02" && (
                       <>
@@ -551,18 +565,42 @@ const ResearchTracking = () => {
                           }
                         >
                           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                            <Typography
+                           <Box
                               sx={{
-                                color: "#08397C",
-                                fontSize: {
-                                  xs: "0.5rem",
-                                  md: "0.5rem",
-                                  lg: "0.9rem",
-                                },
+                                display: "flex",
+                                alignItems: "center",
+                                width: "100%",
                               }}
                             >
-                              College
-                            </Typography>
+                              <Typography
+                                sx={{
+                                  color: "#08397C",
+                                  fontSize: {
+                                    xs: "0.5rem",
+                                    md: "0.5rem",
+                                    lg: "0.9rem",
+                                  },
+                                  flex: 1,
+                                }}
+                              >
+                                College
+                              </Typography>
+                              {selectedColleges.length > 0 && (
+                                <Typography
+                                  sx={{
+                                    color: "#666",
+                                    fontSize: {
+                                      xs: "0.45rem",
+                                      md: "0.45rem",
+                                      lg: "0.8rem",
+                                    },
+                                    mr: 1,
+                                  }}
+                                >
+                                  ({selectedColleges.length} selected)
+                                </Typography>
+                              )}
+                            </Box>
                           </AccordionSummary>
                           <AccordionDetails>
                             <Box
@@ -610,18 +648,42 @@ const ResearchTracking = () => {
                           }
                         >
                           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                            <Typography
+                            <Box
                               sx={{
-                                color: "#08397C",
-                                fontSize: {
-                                  xs: "0.5rem",
-                                  md: "0.5rem",
-                                  lg: "0.9rem",
-                                },
+                                display: "flex",
+                                alignItems: "center",
+                                width: "100%",
                               }}
                             >
-                              Program
-                            </Typography>
+                              <Typography
+                                sx={{
+                                  color: "#08397C",
+                                  fontSize: {
+                                    xs: "0.5rem",
+                                    md: "0.5rem",
+                                    lg: "0.9rem",
+                                  },
+                                  flex: 1,
+                                }}
+                              >
+                                Program
+                              </Typography>
+                              {selectedPrograms.length > 0 && (
+                                <Typography
+                                  sx={{
+                                    color: "#666",
+                                    fontSize: {
+                                      xs: "0.45rem",
+                                      md: "0.45rem",
+                                      lg: "0.8rem",
+                                    },
+                                    mr: 1,
+                                  }}
+                                >
+                                  ({selectedPrograms.length} selected)
+                                </Typography>
+                              )}
+                            </Box>
                           </AccordionSummary>
                           <AccordionDetails>
                             <Box
