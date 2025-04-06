@@ -75,6 +75,8 @@ const ResearchTracking = () => {
   const [dateRange, setDateRange] = useState([2010, 2025]); // Default min and max year
   const [sliderValue, setSliderValue] = useState([2010, 2025]); // Initial slider value
   const [selectedPrograms, setSelectedPrograms] = useState([]);
+  const [selectedFormats, setSelectedFormats] = useState([]);
+  const [publicationFormats, setPublicationFormats] = useState([]);
   const [selectedStatus, setSelectedStatus] = useState([]);
   const isMobile = useMediaQuery("(max-width:600px)"); // Checks if the screen is 600px or smaller (mobile)
   const [otherSectionsVisible, setOtherSectionsVisible] = useState(true);
@@ -208,9 +210,19 @@ const ResearchTracking = () => {
     }
   };
 
+  const fetchPublicationFormats = async () => {
+    try {
+      const response = await api.get("/paper/publication_format");
+      setPublicationFormats(response.data.publication_formats);
+    } catch (error) {
+      console.error("Error fetching publication formats:", error);
+    }
+  };
+
   useEffect(() => {
     fetchUserData();
     fetchDeptProg();
+    fetchPublicationFormats();
     fetchAllResearchData();
   }, []);
 
@@ -308,6 +320,14 @@ const ResearchTracking = () => {
         );
       }
 
+      if (selectedFormats.length > 0) {
+        filtered = filtered.filter((item) =>
+          selectedFormats.some(
+            (format) => format.toLowerCase() === item.journal.toLowerCase()
+          )
+        );
+      }
+
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
         filtered = filtered.filter(
@@ -356,6 +376,7 @@ const ResearchTracking = () => {
     programs,
     sliderValue,
     selectedStatus,
+    selectedFormats,
     searchQuery,
     dateRange,
   ]);
@@ -373,6 +394,14 @@ const ResearchTracking = () => {
   const handleProgramChange = (event) => {
     const { value, checked } = event.target;
     setSelectedPrograms((prev) =>
+      checked ? [...prev, value] : prev.filter((item) => item !== value)
+    );
+  };
+
+  // Handle change in selected formats filter
+  const handleFormatChange = (event) => {
+    const { value, checked } = event.target;
+    setSelectedFormats((prev) =>
       checked ? [...prev, value] : prev.filter((item) => item !== value)
     );
   };
@@ -423,6 +452,7 @@ const ResearchTracking = () => {
   const handleResetFilters = () => {
     setSelectedColleges([]);
     setSelectedPrograms([]);
+    setSelectedFormats([]);
     setSliderValue([dateRange[0], dateRange[1]]);
   };
 
@@ -723,6 +753,88 @@ const ResearchTracking = () => {
                         </Accordion>
                       </>
                     )}
+                    <Accordion
+                      expanded={expandedAccordion === "format"}
+                      onChange={() =>
+                        setExpandedAccordion(
+                          expandedAccordion === "format" ? null : "format"
+                        )
+                      }
+                    >
+                      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            width: "100%",
+                          }}
+                        >
+                          <Typography
+                            sx={{
+                              color: "#08397C",
+                              fontSize: {
+                                xs: "0.5rem",
+                                md: "0.5rem",
+                                lg: "0.9rem",
+                              },
+                              flex: 1,
+                            }}
+                          >
+                            Publication Format
+                          </Typography>
+                          {selectedFormats.length > 0 && (
+                            <Typography
+                              sx={{
+                                color: "#666",
+                                fontSize: {
+                                  xs: "0.45rem",
+                                  md: "0.45rem",
+                                  lg: "0.8rem",
+                                },
+                                mr: 1,
+                              }}
+                            >
+                              ({selectedFormats.length} selected)
+                            </Typography>
+                          )}
+                        </Box>
+                      </AccordionSummary>
+                      <AccordionDetails>
+                        <Box
+                          sx={{
+                            maxHeight: "125px",
+                            overflow: "auto",
+                            display: "flex",
+                            flexDirection: "column",
+                          }}
+                        >
+                          {publicationFormats.map((format) => (
+                            <FormControlLabel
+                              key={format.id}
+                              control={
+                                <Checkbox
+                                  checked={selectedFormats.includes(
+                                    format.name
+                                  )}
+                                  onChange={handleFormatChange}
+                                  value={format.name}
+                                />
+                              }
+                              label={format.name}
+                              sx={{
+                                "& .MuiTypography-root": {
+                                  fontSize: {
+                                    xs: "0.5rem",
+                                    md: "0.75rem",
+                                    lg: "0.9rem",
+                                  },
+                                },
+                              }}
+                            />
+                          ))}
+                        </Box>
+                      </AccordionDetails>
+                    </Accordion>
                   </Box>
                   <Button
                     onClick={handleResetFilters}
