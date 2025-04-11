@@ -17,6 +17,10 @@ import {
   DialogActions,
   DialogContent,
   DialogContentText,
+  TextField,
+  InputAdornment,
+  IconButton,
+
   DialogTitle,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
@@ -45,16 +49,21 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
   const [publicationFormat, setPublicationFormat] = useState("");
   const [conferenceTitle, setConferenceTitle] = useState("");
 
+  const [status, setStatus] = useState("");
+  const [userRemarks, setUserRemarks] = useState("");
+  const [remarksError, setRemarksError] = useState(false);
+
   const { isAddSubmitModalOpen, openAddSubmitModal, closeAddSubmitModal } =
     useModalContext();
   const { isAddPublishModalOpen, openAddPublishModal, closeAddPublishModal } =
     useModalContext();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isPullOut, setIsPullOut] = useState(false);
+  const [isRevert, setIsRivert] = useState(false);
   const [isSuccessDialogOpen, setIsSuccessDialogOpen] = useState(false);
   const [openConfirmPulloutDialog, setOpenConfirmPulloutDialog] =
     useState(false);
+  const [openConfirmRevertDialog, setOpenConfirmRevertDialog] = useState(false);
 
   ///////////////////// PUBLICATION DATA RETRIEVAL //////////////////////
 
@@ -160,14 +169,39 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
   const [refreshTimeline, setRefreshTimeline] = useState(false); // Track refresh state
 
   const confirmPullOut = async () => {
+    setStatus("PULLOUT");
     setOpenConfirmPulloutDialog(true);
   };
+
+  const confirmReject = async () => {
+    setStatus("REJECT");
+    setOpenConfirmPulloutDialog(true);
+  };
+
   // Handle pull out status update
-  const handlePullOut = async (newStatus) => {
+  const handleRevert = async () => {
     try {
-      setIsPullOut(true);
+      setIsRivert(true);
+
+      if (!userRemarks.trim()) {
+        setRemarksError(true);
+        toast.error("Remarks are required.");
+        return;
+      }
+      setRemarksError(false);
+
+      const formData = new FormData();
+
+      // Add new data
+      formData.append("status", status);
+      formData.append("user_remarks", userRemarks);
+
       // Make the status update request
-      const response = await api.post(`/track/research_status/pullout/${id}`);
+      const response = await api.post(`/track/research_status/pullout/${id}`, formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        },
+      });
 
       if (response.status === 200 || response.status === 201) {
         // Toggle refresh to trigger timeline update
@@ -178,7 +212,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
       toast.error(error.response?.data?.error || "Error updating status");
       console.error("Error:", error);
     } finally {
-      setIsPullOut(false);
+      setIsRivert(false);
     }
   };
 
@@ -987,18 +1021,39 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                     >
                       <PriorityHighIcon />
                     </Box>
-                    &nbsp;Confirm Pull Out
+                    &nbsp;Confirm Status Change
                   </DialogTitle>
                   <DialogContent>
                     <DialogContentText
                       sx={{ fontFamily: "Montserrat, sans-serif" }}
                     >
-                      Are you sure you want to pull out this research output?
+                      Are you sure you want to {status} this research paper?
                     </DialogContentText>
+                    <TextField
+                      fullWidth
+                      label='Remarks'
+                      value={userRemarks}
+                      onChange={(e) => setUserRemarks(e.target.value)}
+                      error={remarksError}
+                      helperText={remarksError ? 'Remarks is required.' : ''}
+                      margin='normal'
+                      multiline
+                      maxRows={1}
+                      variant='outlined'
+                      required
+                      inputProps={{
+                        maxLength: 100,
+                      }}
+                      sx={{ fontSize: { xs: "0.7rem", md: "0.8rem", lg: "0.9rem" } }}
+                    />
                   </DialogContent>
                   <DialogActions>
                     <Button
-                      onClick={() => setOpenConfirmPulloutDialog(false)}
+                      onClick={() => {
+                        setOpenConfirmPulloutDialog(false);
+                        setUserRemarks("");
+                        setRemarksError(false);
+                      }}
                       variant='text'
                       sx={{
                         color: "#08397C",
@@ -1015,7 +1070,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                       Cancel
                     </Button>
                     <Button
-                      onClick={handlePullOut}
+                      onClick={handleRevert}
                       variant='contained'
                       sx={{
                         backgroundColor: "#CA031B",
@@ -1030,7 +1085,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                         },
                       }}
                     >
-                      Pull Out Paper
+                      {status} PAPER
                     </Button>
                   </DialogActions>
                 </Dialog>
@@ -1069,57 +1124,104 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                 </Box>
                 {(initialValues?.status === "ACCEPTED" ||
                   initialValues?.status === "SUBMITTED") && (
-                  <Button
-                    variant='contained'
-                    color='primary'
-                    onClick={confirmPullOut}
-                    sx={{
-                      backgroundColor: "#08397C",
-                      color: "#FFF",
-                      fontFamily: "Montserrat, sans-serif",
-                      fontWeight: 600,
-                      textTransform: "none",
-                      fontSize: { xs: "0.875rem", md: "0.9rem" },
-                      marginTop: "1rem",
-                      borderRadius: "100px",
-                      "&:hover": {
-                        backgroundColor: "#072d61",
+                  <>
+                    <Button
+                      variant='contained'
+                      color='primary'
+                      onClick={confirmPullOut}
+                      sx={{
+                        backgroundColor: "#08397C",
                         color: "#FFF",
-                      },
-                    }}
-                  >
-                    {isPullOut ? (
-                      <Box
-                        sx={{ display: "flex", alignItems: "center", gap: 1 }}
-                      >
-                        <CircularProgress size={20} color='#08397C' />
-                        Pulling out...
-                      </Box>
-                    ) : (
-                      <Typography
-                        display='flex'
-                        justifyContent='center'
-                        sx={{ fontSize: { xs: "0.875rem", md: "0.9rem" } }}
-                      >
-                        <RemoveCircleIcon
-                          sx={{
-                            fontSize: {
-                              xs: "0.9rem",
-                              md: "1.2rem",
-                              xs: "1.2rem",
-                            },
-                          }}
-                        />{" "}
-                        &nbsp; <strong>PULL OUT PAPER</strong>
-                      </Typography>
-                    )}
-                  </Button>
+                        fontFamily: "Montserrat, sans-serif",
+                        fontWeight: 600,
+                        textTransform: "none",
+                        fontSize: { xs: "0.875rem", md: "0.9rem" },
+                        marginTop: "1rem",
+                        borderRadius: "100px",
+                        "&:hover": {
+                          backgroundColor: "#072d61",
+                          color: "#FFF",
+                        },
+                      }}
+                    >
+                      {isRevert ? (
+                        <Box
+                          sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                        >
+                          <CircularProgress size={20} color='#08397C' />
+                          Pulling out...
+                        </Box>
+                      ) : (
+                        <Typography
+                          display='flex'
+                          justifyContent='center'
+                          sx={{ fontSize: { xs: "0.875rem", md: "0.9rem" } }}
+                        >
+                          <RemoveCircleIcon
+                            sx={{
+                              fontSize: {
+                                xs: "0.9rem",
+                                md: "1.2rem",
+                                xs: "1.2rem",
+                              },
+                            }}
+                          />{" "}
+                          &nbsp; <strong>PULL OUT PAPER</strong>
+                        </Typography>
+                      )}
+                    </Button>
+                    <Button
+                      variant='contained'
+                      color='primary'
+                      onClick={confirmReject}
+                      sx={{
+                        backgroundColor: "#d40821",
+                        color: "#FFF",
+                        fontFamily: "Montserrat, sans-serif",
+                        fontWeight: 600,
+                        textTransform: "none",
+                        fontSize: { xs: "0.875rem", md: "0.9rem" },
+                        marginTop: "1rem",
+                        borderRadius: "100px",
+                        "&:hover": {
+                          backgroundColor: "#A30417",
+                          color: "#FFF",
+                        },
+                      }}
+                    >
+                      {isRevert ? (
+                        <Box
+                          sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                        >
+                          <CircularProgress size={20} color='#08397C' />
+                          Pulling out...
+                        </Box>
+                      ) : (
+                        <Typography
+                          display='flex'
+                          justifyContent='center'
+                          sx={{ fontSize: { xs: "0.875rem", md: "0.9rem" } }}
+                        >
+                          <RemoveCircleIcon
+                            sx={{
+                              fontSize: {
+                                xs: "0.9rem",
+                                md: "1.2rem",
+                                xs: "1.2rem",
+                              },
+                            }}
+                          />{" "}
+                          &nbsp; <strong>REJECT PAPER</strong>
+                        </Typography>
+                      )}
+                    </Button>
+                  </>
                 )}
               </Grid2>
             </Grid2>
           </Box>
           {/* Add loading overlay */}
-          {isPullOut && (
+          {isRevert && (
             <Box
               sx={{
                 position: "absolute",

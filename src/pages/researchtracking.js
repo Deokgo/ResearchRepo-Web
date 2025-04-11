@@ -780,7 +780,7 @@ const ResearchTracking = () => {
                               flex: 1,
                             }}
                           >
-                            Publication Format
+                            Publication Type
                           </Typography>
                           {selectedFormats.length > 0 && (
                             <Typography
