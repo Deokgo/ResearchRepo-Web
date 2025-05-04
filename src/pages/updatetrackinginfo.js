@@ -1122,8 +1122,7 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                     }}
                   />
                 </Box>
-                {(initialValues?.status === "ACCEPTED" ||
-                  initialValues?.status === "SUBMITTED") && (
+                {(initialValues?.status === "SUBMITTED") && (
                   <>
                     <Button
                       variant='contained'
@@ -1216,6 +1215,53 @@ const UpdateTrackingInfo = ({ route, navigate }) => {
                       )}
                     </Button>
                   </>
+                )}
+                {(initialValues?.status === "ACCEPTED") && (
+                  <Button
+                    variant='contained'
+                    color='primary'
+                    onClick={confirmReject}
+                    sx={{
+                      backgroundColor: "#d40821",
+                      color: "#FFF",
+                      fontFamily: "Montserrat, sans-serif",
+                      fontWeight: 600,
+                      textTransform: "none",
+                      fontSize: { xs: "0.875rem", md: "0.9rem" },
+                      marginTop: "1rem",
+                      borderRadius: "100px",
+                      "&:hover": {
+                        backgroundColor: "#A30417",
+                        color: "#FFF",
+                      },
+                    }}
+                  >
+                    {isRevert ? (
+                      <Box
+                        sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                      >
+                        <CircularProgress size={20} color='#08397C' />
+                        Pulling out...
+                      </Box>
+                    ) : (
+                      <Typography
+                        display='flex'
+                        justifyContent='center'
+                        sx={{ fontSize: { xs: "0.875rem", md: "0.9rem" } }}
+                      >
+                        <RemoveCircleIcon
+                          sx={{
+                            fontSize: {
+                              xs: "0.9rem",
+                              md: "1.2rem",
+                              xs: "1.2rem",
+                            },
+                          }}
+                        />{" "}
+                        &nbsp; <strong>REJECT PAPER</strong>
+                      </Typography>
+                    )}
+                  </Button>
                 )}
               </Grid2>
             </Grid2>
