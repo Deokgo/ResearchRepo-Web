@@ -1,93 +1,84 @@
-**Getting Started**
-These instructions will help you set up the project on your local machine for development purposes.
+# ResearchRepo-Web
 
-**Prerequisites**
-Make sure you have the following installed:
+ResearchRepo-Web is a web application designed to manage, track, and share research projects and papers within an academic or institutional environment. It provides an organized repository for research outputs, user account management, research tracking, audit logging, and administrative operations such as backups and account archiving.
 
-Node.js
-Node.js is required to run React projects. Follow these steps to install Node.js on your system:
+## Features
 
-Download Node.js from the official website: Node.js
-Choose the appropriate version for your operating system and install it.
+- **Research Repository:** Upload, store, filter, and search research papers and related data by college, program, date, format, keywords, and SDGs.
+- **User Management:** Manage user accounts, roles, and permissions. Archive inactive accounts after 2 years, with the ability to restore from SQL backup.
+- **Research Tracking:** Track research outputs, including publication formats, download counts, and metadata. Update tracking information and view detailed info for each research item.
+- **Audit Logs:** View and filter audit logs of system operations and account activities for security and compliance.
+- **Database & File Backup:** Generate and restore full backups of the research repository and its associated files. Restores replace the entire database and repository content.
+- **Access Control:** Role-based filtering and permissions (e.g., college deans and program heads see only relevant research).
+- **Download Tracking:** Automatically count and track downloads of research papers and extended abstracts.
 
-After installation, verify it using the following commands in your terminal:
-node -v
-npm -v
+## Technology Stack
 
-**Install Dependencies**
+- **Frontend:** React (bootstrapped with [Create React App](https://github.com/facebook/create-react-app))
+- **Backend/API:** Not included in this repository (API endpoints are referenced throughout the code)
+- **State Management:** React state/hooks
+- **UI:** Material-UI (MUI)
+- **Other:** Axios for API communication, localStorage for session/user data
 
-Before running the project, you need to install its dependencies, including React, Material UI, and others.
-
-Run the following command in your terminal:
-npm install
-
-# Getting Started with Create React App
+## Getting Started
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## Available Scripts
+### Prerequisites
 
-In the project directory, you can run:
+- Node.js (>=14)
+- npm (>=6)
 
-### `npm start`
+### Installation
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+1. Clone the repository:
+    ```bash
+    git clone https://github.com/Deokgo/ResearchRepo-Web.git
+    cd ResearchRepo-Web
+    ```
+2. Install dependencies:
+    ```bash
+    npm install
+    ```
+3. Start the development server:
+    ```bash
+    npm start
+    ```
+   The app will run on [http://localhost:3000](http://localhost:3000).
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### Available Scripts
 
-### `npm test`
+- `npm start` — Runs the app in development mode.
+- `npm test` — Launches the test runner in interactive watch mode.
+- `npm run build` — Builds the app for production to the `build` folder.
+- `npm run eject` — Ejects the configuration (one-way operation; not recommended unless necessary).
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+You can find more details in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
-### `npm run build`
+## Usage
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- **Uploading/Managing Research:** Navigate to the relevant section to upload new research, update tracking info, and view/download manuscripts and abstracts.
+- **Filtering:** Use provided filters to narrow down research items by college, program, year, format, keywords, and SDGs.
+- **User Management:** Admin users can manage, archive, and restore user accounts.
+- **Backups:** Always generate a full backup before restoring, as restores will completely replace the existing database and files.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Important Notes
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+- **Backup/Restore:** Restoring a backup will fully overwrite the current database and research files. This operation cannot be undone.
+- **Archiving:** Inactive accounts (2+ years) are archived and removed from the active database but can be restored from archive files.
+- **Download Tracking:** The system increments download counts for each research paper accessed.
+- **Role-based Access:** Some features and filters are available only to users with specific roles (e.g., deans, program heads).
 
-### `npm run eject`
+## Notice
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+This repository is not open for public consumption. Access and use are restricted.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## License
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+This project is licensed under the MIT License.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## Acknowledgements
 
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- [React](https://reactjs.org/)
+- [Material-UI](https://mui.com/)
+- [Create React App](https://github.com/facebook/create-react-app)
