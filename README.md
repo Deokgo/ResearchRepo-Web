@@ -2,6 +2,14 @@
 
 ResearchRepo-Web is a web application designed to manage, track, and share research projects and papers within an academic or institutional environment. It provides an organized repository for research outputs, user account management, research tracking, audit logging, and administrative operations such as backups and account archiving.
 
+## Project Structure
+
+- **API/Backend:** Handles data processing, storage, and exposes endpoints for the frontend to consume.
+- **Web/Frontend (this repository):** A separate repository that provides the user interface and communicates with this API to deliver a full-stack web experience.
+
+> **Note:** If you are looking for the backend (api interface) repository, you can find it here:  
+> [https://github.com/Deokgo/ResearchRepo-API](#)  
+
 ## Features
 
 - **Research Repository:** Upload, store, filter, and search research papers and related data by college, program, date, format, keywords, and SDGs.
