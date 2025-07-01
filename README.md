@@ -20,6 +20,48 @@ ResearchRepo-Web is a web application designed to manage, track, and share resea
 - **UI:** Material-UI (MUI)
 - **Other:** Axios for API communication, localStorage for session/user data
 
+## Getting Started
+
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+
+### Prerequisites
+
+- Node.js (>=14)
+- npm (>=6)
+
+### Installation
+
+1. Clone the repository:
+    ```bash
+    git clone https://github.com/Deokgo/ResearchRepo-Web.git
+    cd ResearchRepo-Web
+    ```
+2. Install dependencies:
+    ```bash
+    npm install
+    ```
+3. Start the development server:
+    ```bash
+    npm start
+    ```
+   The app will run on [http://localhost:3000](http://localhost:3000).
+
+### Available Scripts
+
+- `npm start` — Runs the app in development mode.
+- `npm test` — Launches the test runner in interactive watch mode.
+- `npm run build` — Builds the app for production to the `build` folder.
+- `npm run eject` — Ejects the configuration (one-way operation; not recommended unless necessary).
+
+You can find more details in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+
+## Usage
+
+- **Uploading/Managing Research:** Navigate to the relevant section to upload new research, update tracking info, and view/download manuscripts and abstracts.
+- **Filtering:** Use provided filters to narrow down research items by college, program, year, format, keywords, and SDGs.
+- **User Management:** Admin users can manage, archive, and restore user accounts.
+- **Backups:** Always generate a full backup before restoring, as restores will completely replace the existing database and files.
+
 ## Important Notes
 
 - **Backup/Restore:** Restoring a backup will fully overwrite the current database and research files. This operation cannot be undone.
