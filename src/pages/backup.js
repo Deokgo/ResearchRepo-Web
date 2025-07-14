@@ -501,29 +501,6 @@ const Backup = () => {
               <Button
                 variant='contained'
                 sx={{
-                  backgroundColor: "#8c8c8c",
-                  color: "#FFF",
-                  fontFamily: "Montserrat, sans-serif",
-                  fontWeight: 600,
-                  textTransform: "none",
-                  fontSize: { xs: "0.7rem", md: "0.85rem" },
-                  padding: { xs: "0.5rem 1rem", md: "1.25rem" },
-                  marginLeft: "1rem",
-                  borderRadius: "100px",
-                  maxHeight: "3rem",
-                  "&:hover": {
-                    backgroundColor: "#7a7a7a",
-                    color: "#FFF",
-                  },
-                }}
-                onClick={() => setOpenUploadWarningDialog(true)}
-              >
-                <RestoreIcon></RestoreIcon>&nbsp;Restore Full Backup
-              </Button>
-              <Button
-                variant='contained'
-                color='primary'
-                sx={{
                   backgroundColor: "#CA031B",
                   color: "#FFF",
                   fontFamily: "Montserrat, sans-serif",
@@ -539,10 +516,9 @@ const Backup = () => {
                     color: "#FFF",
                   },
                 }}
-                onClick={() => setOpenFullBackupDialog(true)}
+                onClick={() => setOpenUploadWarningDialog(true)}
               >
-                <BackupIcon sx={{ pb: "0.15rem" }}></BackupIcon>&nbsp; Full
-                Backup
+                <RestoreIcon></RestoreIcon>&nbsp;Restore Full Backup
               </Button>
               <Button
                 variant='contained'
@@ -560,6 +536,30 @@ const Backup = () => {
                   maxHeight: "3rem",
                   "&:hover": {
                     backgroundColor: "#072d61",
+                    color: "#FFF",
+                  },
+                }}
+                onClick={() => setOpenFullBackupDialog(true)}
+              >
+                <BackupIcon sx={{ pb: "0.15rem" }}></BackupIcon>&nbsp; Full
+                Backup
+              </Button>
+              <Button
+                variant='contained'
+                color='primary'
+                sx={{
+                  backgroundColor: "#8c8c8c",
+                  color: "#FFF",
+                  fontFamily: "Montserrat, sans-serif",
+                  fontWeight: 600,
+                  textTransform: "none",
+                  fontSize: { xs: "0.7rem", md: "0.85rem" },
+                  padding: { xs: "0.5rem 1rem", md: "1.25rem" },
+                  marginLeft: "1rem",
+                  borderRadius: "100px",
+                  maxHeight: "3rem",
+                  "&:hover": {
+                    backgroundColor: "#7a7a7a",
                     color: "#FFF",
                   },
                 }}
@@ -1315,7 +1315,7 @@ const Backup = () => {
             onClick={handleFullBackup}
             variant='contained'
             sx={{
-              backgroundColor: "#CA031B",
+              backgroundColor: "#08397C",
               color: "#FFF",
               fontFamily: "Montserrat, sans-serif",
               fontWeight: 600,
@@ -1323,7 +1323,7 @@ const Backup = () => {
               borderRadius: "100px",
               padding: "0.75rem",
               "&:hover": {
-                backgroundColor: "#A30417",
+                backgroundColor: "#072d61",
               },
             }}
           >
@@ -1413,7 +1413,7 @@ const Backup = () => {
             onClick={handleIncrementalBackup}
             variant='contained'
             sx={{
-              backgroundColor: "#CA031B",
+              backgroundColor: "#08397C",
               color: "#FFF",
               fontFamily: "Montserrat, sans-serif",
               fontWeight: 600,
@@ -1421,7 +1421,7 @@ const Backup = () => {
               borderRadius: "100px",
               padding: "0.75rem",
               "&:hover": {
-                backgroundColor: "#A30417",
+                backgroundColor: "#072d61",
               },
             }}
           >
